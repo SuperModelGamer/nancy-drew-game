@@ -193,17 +193,21 @@ Each room entry contains:
 | Item | Found in | Used on | Consumed? | Chapter |
 |------|----------|---------|-----------|---------|
 | Master Key | Grand Lobby desk | Auditorium door | Yes | 1 |
-| Effects Manual | Backstage shelf | Reference for puzzles / dialogue | No | 1 |
-| Margaux's Diary | Dressing Room vanity | Dialogue with Vivian, evidence board | No | 2 |
+| Magnifying Glass | Grand Lobby desk | Vanity mirror, film frames (reveals hidden details) | No | 1 |
+| 1928 Playbill | Auditorium seat pocket | Reference, trunk combo clue, evidence board | No | 1 |
+| Effects Manual | Backstage shelf | Reference for puzzles / dialogue conditionals | No | 1 |
+| Margaux's Diary | Dressing Room vanity | Dialogue with Vivian/Edwin, evidence board | No | 2 |
 | Annotated Script | Projection Booth | Script Cipher puzzle, evidence board | No | 2 |
-| Poisoned Teacup | Manager's Office | Dialogue with Stella (chemical analysis), evidence board | No | 2 |
-| Blueprints | Manager's Office desk | Dialogue with Stella (hidden passages) | No | 2 |
-| Basement Key | Backstage lighting panel | Basement door | Yes | 2 |
-| Edwin's Notebook | Catwalk | Evidence board | No | 3 |
+| Poisoned Teacup | Manager's Office | Poison identification puzzle, evidence board | No | 2 |
+| Blueprints | Manager's Office (conditional) | Passage navigation puzzle, dialogue with Stella | No | 2 |
+| Basement Key | Backstage lighting panel (conditional) | Basement door | Yes | 2 |
+| Margaux's Locket | Dressing Room trunk (puzzle reward) | Dialogue with Vivian (emotional reveal) | No | 2 |
+| Stella's Records | Backstage lockbox (puzzle reward) | Confrontation with Stella | No | 2 |
+| Ashworth's Files | Office safe (puzzle reward) | Confrontation with Ashworth | No | 2 |
+| Chemical Receipt | Lobby coat check | Red herring / supplementary evidence | No | 1 |
+| Edwin's Notebook | Catwalk (lighting puzzle reward) | Evidence board | No | 3 |
 | Fog Machine Part | Basement | Evidence board | No | 3 |
-| Cecilia's Letter | Basement (Edwin's stash) | Evidence board — proves 1928 murder | No | 3 |
-| Margaux's Locket | Dressing Room (hidden compartment, after diary clue) | Dialogue with Vivian, evidence board | No | 2 |
-| Playbill 1928 | Auditorium seat pocket | Reference, evidence board | No | 1 |
+| Cecilia's Letters | Basement alcove | Evidence board — proves 1928 murder | No | 3 |
 
 ---
 
@@ -225,9 +229,15 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 | Puzzle | Type | Location | Answer | Clues scattered in |
 |--------|------|----------|--------|--------------------|
 | Dressing Room Trunk | combination | Dressing Room | 10-31-28 | Playbill date (Oct 31 1928), diary entry, Vivian dialogue |
-| Script Cipher | logic | Inventory (annotated script) | "goblet" | Margin notes, effects manual, Diego's observations |
-| Lighting Sequence | sequence | Catwalk | Reproduce the lighting cue from 1928 | Effects manual, stage directions in script, Edwin's notebook |
-| Evidence Board | sequence | Basement (final) | Correct timeline connecting both mysteries | All journal entries and collected evidence |
+| Script Cipher | logic | Projection Booth (annotated script) | "goblet" | Margin notes, effects manual, Diego's observations |
+| Vanity Mirror | logic | Dressing Room (requires magnifying glass) | "cd" | Mirror wax message, wall photos, playbill understudy listing |
+| Film Frames | sequence | Projection Booth (requires magnifying glass) | toast-drink-collapse-understudy | Script stage directions, playbill, diary entries |
+| Stella's Lockbox | combination | Backstage | 4200 | Call board inventory notice ($4,200 missing), Stella's dialogue |
+| Office Wall Safe | combination | Manager's Office | 1928 | Ashworth's ghost book, heritage filing, playbills everywhere |
+| Lighting Sequence | sequence | Catwalk | red-blue-white-red | Effects manual, annotated script symbols, Edwin's seat note |
+| Hidden Passage | logic | Basement (requires blueprints) | "dressing room" | Blueprints, heating vent in dressing room, passage entrance |
+| Poison Identification | logic | Inventory (requires teacup + alchemy book) | "antimony" | Alchemy book annotations, diary symptoms, basement chemicals |
+| Evidence Board | sequence | Basement (final) | cecilia-goblet-margaux-edwin-ghost-ashworth | All journal entries and collected evidence |
 
 ### Puzzle Feedback
 - **Wrong answer:** Gentle shake animation, "That doesn't seem right" text, no penalty
@@ -282,15 +292,15 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 | ID | Character | Chapter | Nodes (est.) | Key unlocks |
 |----|-----------|---------|-------------|-------------|
 | vivian_intro | Vivian Delacroix | 1 | 6 | learned_about_margaux, learned_about_ashworth |
-| vivian_diary | Vivian Delacroix | 2 | 5 | Deeper Margaux history, Cecilia Drake named |
-| vivian_locket | Vivian Delacroix | 2 | 4 | Emotional reveal about Margaux as godmother |
-| edwin_auditorium | Edwin Hale | 1 | 6 | learned_about_crimson_veil, theater architecture |
-| edwin_ch2 | Edwin Hale | 2 | 5 | Misdirection, "helpful" theories |
-| edwin_confronted | Edwin Hale | 3 | 8 | Full confession, ending choice |
-| ashworth_office | Roland Ashworth | 2 | 6 | learned_about_basement_intruder, blueprints clue |
-| stella_backstage | Stella Morrow | 1 | 5 | learned_about_missing_props, effects_manual_location |
-| stella_passages | Stella Morrow | 2 | 5 | catwalk_access, basement_key_location (conditional) |
-| diego_booth | Diego Reyes | 2 | 4 | annotated_script_found, heard_basement_noises |
+| vivian_diary | Vivian Delacroix | 2 | 5 | learned_about_cecilia, learned_about_hale_family (conditional on diary) |
+| vivian_locket | Vivian Delacroix | 2 | 3 | vivian_full_trust (conditional on locket item) |
+| edwin_auditorium | Edwin Hale | 1 | 7 | learned_about_crimson_veil, conditional branches for diary/effects manual/grandfather |
+| edwin_confronted | Edwin Hale | 3 | 8 | Full confession, 3 ending choices, conditional grandfather branch |
+| ashworth_office | Roland Ashworth | 2 | 7 | learned_about_basement_intruder, conditional branches for poison ID/insurance files |
+| stella_backstage | Stella Morrow | 1–2 | 8 | learned_about_missing_props, effects_manual_location, stella_confession, basement_key_location (conditional on lockbox/note) |
+| stella_passages | Stella Morrow | 2 | 2 | catwalk_access (conditional on blueprints item) |
+| diego_booth | Diego Reyes | 2 | 6 | annotated_script_found, heard_basement_noises, cipher_discussed (conditional on script_decoded) |
+| phone_calls | Various (Bess/George, Carson, Historical Society) | 1–3 | 5 | called_friends, called_dad, called_historical_society |
 
 ---
 
@@ -399,10 +409,10 @@ Audio is **not required for MVP** but the system should support it from the star
 | DialogueSystem | Done | Lines, branching choices, conditions, events |
 | PuzzleSystem | Done | Answer checking, clue retrieval, serialize |
 | SaveSystem | Done | Full save/load to localStorage |
-| rooms.json (Grand Lobby, Auditorium) | Done | 2 rooms, 10 hotspots |
-| items.json | Done | 5 starting items |
-| dialogue.json | Done | 2 dialogue trees (Vivian intro, Edwin intro) |
-| puzzles.json | Done | 2 puzzles defined |
+| rooms.json (all 8 rooms) | Done | 8 rooms, 95+ hotspots incl. atmospheric/conditional |
+| items.json | Done | 16 items (12 key, 3 optional, 1 red herring) |
+| dialogue.json | Done | 10 dialogue trees with conditional branches (requiredItem/requiredFlag) |
+| puzzles.json | Done | 10 puzzles with progressive hint system |
 
 ### What Needs Building (in priority order)
 
@@ -414,12 +424,12 @@ Audio is **not required for MVP** but the system should support it from the star
 | 4 | **Item-on-hotspot interaction** | Select inventory item, tap hotspot to "use" | InventorySystem + RoomScene |
 | 5 | **Chapter progression** | Chapter flag gating room access + new dialogue | SaveSystem + rooms.json |
 | 6 | **Ghost sighting scripted event** | Fog + spotlight + figure animation in Auditorium | RoomScene + chapter trigger |
-| 7 | **Backstage room + data** | Room, hotspots, Stella dialogue | rooms.json, dialogue.json |
-| 8 | **Dressing Room + Projection Booth** | Rooms, Margaux's vanity, Diego dialogue | rooms.json, dialogue.json |
-| 9 | **Manager's Office** | Room, Ashworth dialogue, blueprints | rooms.json, dialogue.json |
-| 10 | **Catwalk + Basement** | Final rooms, Edwin confrontation | rooms.json, dialogue.json |
-| 11 | **Evidence board puzzle** | Dual-timeline arrangement puzzle | PuzzleSystem |
-| 12 | **Ending sequences** | 3 ending variants based on player choice | Narrative text |
+| 7 | ~~Backstage room + data~~ | ~~Done — room, hotspots, Stella dialogue~~ | rooms.json, dialogue.json |
+| 8 | ~~Dressing Room + Projection Booth~~ | ~~Done — rooms, puzzles, Diego dialogue~~ | rooms.json, dialogue.json |
+| 9 | ~~Manager's Office~~ | ~~Done — room, Ashworth dialogue, puzzles~~ | rooms.json, dialogue.json |
+| 10 | ~~Catwalk + Basement~~ | ~~Done — rooms, Edwin confrontation~~ | rooms.json, dialogue.json |
+| 11 | **Evidence board puzzle UI** | Dual-timeline arrangement puzzle with visual board | PuzzleSystem |
+| 12 | ~~Ending sequences~~ | ~~Done — 3 endings in Edwin confrontation dialogue~~ | dialogue.json |
 | 13 | **Room background art** | Illustrated backgrounds for all 8 rooms | Asset pipeline |
 | 14 | **Character portraits** | Portrait art for dialogue panels | Asset pipeline |
 | 15 | **Audio integration** | Ambience + UI sounds | Phaser audio |

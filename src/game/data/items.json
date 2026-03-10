@@ -8,80 +8,108 @@
       "isKeyItem": true
     },
     {
+      "id": "magnifying_glass",
+      "name": "Magnifying Glass",
+      "description": "A silver-handled magnifying glass from Vivian's desk. 'You'll need sharp eyes here,' her note said. Useful for examining fine details invisible to the naked eye.",
+      "icon": "🔍",
+      "isKeyItem": true
+    },
+    {
       "id": "playbill_1928",
       "name": "1928 Playbill",
-      "description": "The playbill from the final performance of 'The Crimson Veil' — October 31, 1928. Cast list: Margaux Fontaine as Lady Ashford. Understudy: Cecilia Drake.",
+      "description": "The playbill from the final performance of 'The Crimson Veil' — October 31, 1928. Cast: Margaux Fontaine as Lady Ashford. Understudy: Cecilia Drake (circled in red ink). The program includes Act III stage directions.",
       "icon": "🎭",
       "isKeyItem": true
     },
     {
       "id": "effects_manual",
       "name": "Effects Manual",
-      "description": "The Monarch Theatre Special Effects Manual, 1925. Detailed diagrams of fog machines, trapdoors, hidden passages, and lighting systems built into the original theater.",
+      "description": "The Monarch Theatre Special Effects Manual, 1925. Detailed diagrams of fog machines, trapdoors, hidden passages, and lighting systems. Someone has added fresh pencil notes translating the old theatrical terms to modern equivalents.",
       "icon": "📖",
       "isKeyItem": true
     },
     {
       "id": "margaux_diary",
       "name": "Margaux's Diary",
-      "description": "A leather diary with 'M.F.' embossed in gold. The final entries describe feeling ill after tea, suspecting someone, and writing: 'If I do not survive the final curtain, look to the one who stands in the wings.'",
+      "description": "A leather diary with 'M.F.' embossed in gold. The final entries describe feeling ill after tea, suspecting someone, metallic tastes, and her final entry: 'If I do not survive the final curtain, look to the one who stands in the wings.'",
       "icon": "📔",
       "isKeyItem": true
     },
     {
       "id": "annotated_script",
       "name": "Annotated Script",
-      "description": "The original script of 'The Crimson Veil' with coded margin notes in red ink. The circled letters throughout the stage directions seem to spell something.",
+      "description": "The original script of 'The Crimson Veil' with coded margin notes in red ink. Red-circled letters scattered through the Act III stage directions. Read in order, they spell a word.",
       "icon": "📜",
       "isKeyItem": true
     },
     {
       "id": "poisoned_teacup",
       "name": "Poisoned Teacup",
-      "description": "Ashworth's porcelain teacup with dried residue at the bottom. Whatever made him ill, the evidence is in this cup.",
+      "description": "Ashworth's porcelain teacup with dried metallic, crystalline residue at the bottom. The alchemy book in the dressing room might help identify the compound.",
       "icon": "🍵",
+      "isKeyItem": true
+    },
+    {
+      "id": "blueprints",
+      "name": "Theater Blueprints",
+      "description": "Demolition blueprints annotated in red pen (Edwin's handwriting). Hidden passages, sealed rooms, and a tunnel network beneath the stage are all marked. The passages connect the basement to the dressing room, lobby walls, and orchestra pit.",
+      "icon": "📐",
       "isKeyItem": true
     },
     {
       "id": "basement_key",
       "name": "Basement Key",
-      "description": "A heavy iron key found hidden behind the backstage lighting panel. It fits the basement door.",
+      "description": "A heavy iron key found hidden behind the backstage lighting panel. It fits the basement door. Stella knew it was there.",
       "icon": "🗝️",
       "isKeyItem": true
     },
     {
       "id": "edwins_notebook",
       "name": "Edwin's Notebook",
-      "description": "A leather notebook labeled 'The Ghost Project — E.H.' Contains years of research into Margaux's death, diagrams of the hidden passage system, and a detailed plan to stage hauntings.",
+      "description": "A leather notebook labeled 'The Ghost Project — E.H.' Fifteen years of research into Margaux's death, diagrams of the hidden passage system, timing cues for ghost appearances, and a margin note: 'Like the Penvellyns and their curse — every old family has its poison.'",
       "icon": "📓",
       "isKeyItem": true
     },
     {
       "id": "fog_machine_part",
       "name": "Remote Control",
-      "description": "A modified remote control system that can trigger fog machines, stage lights, and the trapdoor mechanism from the basement. One-person ghost operation.",
+      "description": "A modified remote control system from the basement. Triggers fog machines, stage lights, and the trapdoor mechanism. Labeled sequences: 'Entrance,' 'The Walk,' 'Vanish.' One-person ghost operation.",
       "icon": "🎛️",
       "isKeyItem": true
     },
     {
       "id": "cecilia_letter",
       "name": "Cecilia's Letters",
-      "description": "Correspondence between Cecilia Drake and a pharmacist, dated October 1928. She ordered the same compound found in the prop goblet. This is proof Margaux was murdered.",
+      "description": "Correspondence between Cecilia Drake and a pharmacist, dated October 1928. She ordered antimony compounds — the same poison described in Margaux's symptoms. Includes a note: 'The prop goblet must be replaced before the 31st.'",
       "icon": "✉️",
       "isKeyItem": true
     },
     {
       "id": "margaux_locket",
       "name": "Margaux's Locket",
-      "description": "A gold locket found in the trunk. Inside: a photo of young Vivian as a child, and an inscription — 'To my little star. One day you'll shine brighter than all of us. — Margaux.'",
+      "description": "A gold locket from the trunk. Inside: a photo of young Vivian as a child. Inscription: 'To my little star. One day you'll shine brighter than all of us. — Margaux.' This is why Vivian stayed at the Monarch her whole life.",
       "icon": "📿",
       "isKeyItem": true
     },
     {
-      "id": "magnifying_glass",
-      "name": "Magnifying Glass",
-      "description": "A silver-handled magnifying glass from the concierge desk. Useful for examining fine details.",
-      "icon": "🔍",
+      "id": "stella_records",
+      "name": "Stella's Records",
+      "description": "A ledger from Stella's lockbox documenting every prop she sold, the buyer, and the price. Total: $4,200. A separate note: 'Mom's bills this month: $3,800. I'm sorry, Monarch.' She's not a villain — she's desperate.",
+      "icon": "📋",
+      "isKeyItem": false
+    },
+    {
+      "id": "ashworth_files",
+      "name": "Ashworth's Files",
+      "description": "Documents from Ashworth's wall safe. Includes the original purchase agreement for the Monarch, a demolition insurance policy worth $2.3 million, and a rejected offer from the Historical Society to buy the theater for $800,000. He could have sold. He chose demolition for the insurance payout.",
+      "icon": "💼",
+      "isKeyItem": false
+    },
+    {
+      "id": "chemical_receipt",
+      "name": "Chemical Receipt",
+      "description": "A receipt from a chemical supply company found in the lobby coat check. Dated last week. Items purchased: antimony tartrate, glycol fog fluid, UV-reactive paint. Buyer: paid cash, no name. But the store is three blocks from Edwin's listed address.",
+      "icon": "🧾",
       "isKeyItem": false
     }
   ]
