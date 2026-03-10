@@ -190,6 +190,16 @@ export class RoomScene extends Phaser.Scene {
       container.add([bg, label]);
       container.setSize(w, h);
 
+      // Subtle gold glow pulse animation
+      this.tweens.add({
+        targets: bg,
+        alpha: { from: 0.15, to: 0.35 },
+        duration: 1500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+
       // Hover feedback (desktop)
       bg.on('pointerover', () => {
         bg.setFillStyle(0xc9a84c, 0.3);

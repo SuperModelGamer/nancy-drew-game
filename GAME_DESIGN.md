@@ -359,7 +359,7 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 │                                      │
 │                                      │
 ├──────────────────────────────────────┤
-│ [Items]              [Journal] [⚙]  │
+│ [Items]  [Suspects] [Map]  [Journal]│
 └──────────────────────────────────────┘
 ```
 
@@ -414,26 +414,46 @@ Audio is **not required for MVP** but the system should support it from the star
 | dialogue.json | Done | 10 dialogue trees with conditional branches (requiredItem/requiredFlag) |
 | puzzles.json | Done | 10 puzzles with progressive hint system |
 
+### Completed Engine Systems
+
+| # | Task | Status |
+|---|------|--------|
+| 1 | Puzzle interaction UI (combination dials, text input, sequence buttons) | Done |
+| 2 | Journal UI (slide-up panel, numbered entries, empty state) | Done |
+| 3 | Conditional hotspots (showWhen flags, chapter gating, dialogue events) | Done |
+| 4 | Item-on-hotspot interaction (select item → use on hotspot) | Done |
+| 5 | Chapter progression (5-act milestone system, auto-advance) | Done |
+| 6 | Ghost sighting scripted events (3 encounters: auditorium, dressing room, backstage) | Done |
+| 7 | Progressive hint system (hints after failed puzzle attempts) | Done |
+| 8 | Auto-save on room transitions + Continue button on TitleScene | Done |
+| 9 | Speaker color coding in dialogue | Done |
+| 10 | Selected item indicator in RoomScene | Done |
+| 11 | Item description panel on hover/select | Done |
+| 12 | requiredFlag support in dialogue (hides choices until flag set) | Done |
+| 13 | PuzzleScene registered and launchable from locked hotspots | Done |
+| 14 | All 8 rooms with 95+ hotspots | Done |
+| 15 | 10 dialogue trees with conditional branches | Done |
+| 16 | 10 puzzles with clues and hints | Done |
+| 17 | 16 items (12 key, 3 optional, 1 red herring) | Done |
+| 18 | 3 endings in Edwin confrontation | Done |
+| 19 | Suspect/character screen (5 profiles, flag-gated facts, discovery counter) | Done |
+| 20 | Multi-room navigation map (theater floorplan, fast travel, chapter-gated basement) | Done |
+| 21 | Hotspot glow pulse animations (subtle gold sine wave pulse on all hotspots) | Done |
+| 22 | Ending epilogue screens (3 cinematic endings with sequential fade-in, credits) | Done |
+| 23 | Suspects button + Map button in UIScene toolbar | Done |
+
 ### What Needs Building (in priority order)
 
 | # | Task | Scope | Depends on |
 |---|------|-------|------------|
-| 1 | **Puzzle interaction UI** | Modal overlay with combination dial / text input | PuzzleSystem |
-| 2 | **Journal UI** | Slide-up panel listing journal entries by chapter | SaveSystem |
-| 3 | **Conditional hotspots** | Hotspots that appear/disappear based on flags | RoomScene |
-| 4 | **Item-on-hotspot interaction** | Select inventory item, tap hotspot to "use" | InventorySystem + RoomScene |
-| 5 | **Chapter progression** | Chapter flag gating room access + new dialogue | SaveSystem + rooms.json |
-| 6 | **Ghost sighting scripted event** | Fog + spotlight + figure animation in Auditorium | RoomScene + chapter trigger |
-| 7 | ~~Backstage room + data~~ | ~~Done — room, hotspots, Stella dialogue~~ | rooms.json, dialogue.json |
-| 8 | ~~Dressing Room + Projection Booth~~ | ~~Done — rooms, puzzles, Diego dialogue~~ | rooms.json, dialogue.json |
-| 9 | ~~Manager's Office~~ | ~~Done — room, Ashworth dialogue, puzzles~~ | rooms.json, dialogue.json |
-| 10 | ~~Catwalk + Basement~~ | ~~Done — rooms, Edwin confrontation~~ | rooms.json, dialogue.json |
-| 11 | **Evidence board puzzle UI** | Dual-timeline arrangement puzzle with visual board | PuzzleSystem |
-| 12 | ~~Ending sequences~~ | ~~Done — 3 endings in Edwin confrontation dialogue~~ | dialogue.json |
-| 13 | **Room background art** | Illustrated backgrounds for all 8 rooms | Asset pipeline |
-| 14 | **Character portraits** | Portrait art for dialogue panels | Asset pipeline |
-| 15 | **Audio integration** | Ambience + UI sounds | Phaser audio |
-| 16 | **Polish pass** | Animations, transitions, edge cases, mobile QA | Everything |
+| 1 | **Evidence board puzzle UI** | Visual corkboard with draggable evidence for the final puzzle | PuzzleScene variant |
+| 2 | **Room background art** | Illustrated backgrounds for all 8 rooms | Asset pipeline |
+| 3 | **Character portraits** | Portrait art for dialogue panels | Asset pipeline |
+| 4 | **Audio integration** | Ambience + UI sounds | Phaser audio |
+| 5 | **Chapter transition screens** | Night 1 / Day 2 / Night 2 interstitials on chapter advance | ChapterSystem |
+| 6 | **Dialogue skip/fast-forward** | Skip button for already-seen dialogue | DialogueSystem |
+| 7 | **Mobile touch testing** | Tap target tuning, responsive layout QA | Everything |
+| 8 | **Polish pass** | Animations, transitions, edge cases | Everything |
 
 ---
 

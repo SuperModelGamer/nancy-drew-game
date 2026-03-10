@@ -63,6 +63,36 @@ export class UIScene extends Phaser.Scene {
 
     journalBg.on('pointerdown', () => this.toggleJournal());
 
+    // Suspects button (bottom-center-left)
+    const suspectsBtn = this.add.container(width / 2 - 55, height - 40);
+    const suspectsBg = this.add.rectangle(0, 0, 90, 48, 0x1a1a2e, 0.9);
+    suspectsBg.setStrokeStyle(1, 0xb4a0d4, 0.6);
+    suspectsBg.setInteractive({ useHandCursor: true });
+    const suspectsText = this.add.text(0, 0, 'Suspects', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '15px',
+      color: '#b4a0d4',
+    }).setOrigin(0.5);
+    suspectsBtn.add([suspectsBg, suspectsText]);
+    suspectsBg.on('pointerdown', () => {
+      this.scene.launch('SuspectScene');
+    });
+
+    // Map button (bottom-center-right)
+    const mapBtn = this.add.container(width / 2 + 55, height - 40);
+    const mapBg = this.add.rectangle(0, 0, 80, 48, 0x1a1a2e, 0.9);
+    mapBg.setStrokeStyle(1, 0x7ba3c9, 0.6);
+    mapBg.setInteractive({ useHandCursor: true });
+    const mapText = this.add.text(0, 0, 'Map', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '15px',
+      color: '#7ba3c9',
+    }).setOrigin(0.5);
+    mapBtn.add([mapBg, mapText]);
+    mapBg.on('pointerdown', () => {
+      this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() });
+    });
+
     // Inventory panel (hidden)
     this.inventoryPanel = this.createInventoryPanel();
     this.inventoryPanel.setVisible(false);
