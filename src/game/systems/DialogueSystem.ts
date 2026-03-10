@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import dialogueData from '../data/dialogue.json';
 import { InventorySystem } from './InventorySystem';
 import { SaveSystem } from './SaveSystem';
+import { Colors, TextColors, FONT, Depths } from '../constants';
 
 interface DialogueLine {
   speaker: string;
@@ -68,18 +69,18 @@ export class DialogueSystem {
 
     const { width, height } = this.scene.cameras.main;
     this.container = this.scene.add.container(0, 0);
-    this.container.setDepth(500);
+    this.container.setDepth(Depths.dialogue);
 
     // Dim overlay
-    const overlay = this.scene.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.5);
+    const overlay = this.scene.add.rectangle(width / 2, height / 2, width, height, Colors.black, 0.5);
     overlay.setInteractive(); // block clicks through
     this.container.add(overlay);
 
     // Dialogue box
     const boxH = 180;
     const boxY = height - boxH / 2 - 20;
-    const box = this.scene.add.rectangle(width / 2, boxY, width * 0.9, boxH, 0x0a0a1a, 0.95);
-    box.setStrokeStyle(2, 0xc9a84c, 0.7);
+    const box = this.scene.add.rectangle(width / 2, boxY, width * 0.9, boxH, Colors.darkNavy, 0.95);
+    box.setStrokeStyle(2, Colors.gold, 0.7);
     this.container.add(box);
   }
 
@@ -133,7 +134,7 @@ export class DialogueSystem {
     // Speaker name with color coding
     const speakerColor = this.getSpeakerColor(line.speaker);
     const speaker = this.scene.add.text(width * 0.1, boxY - 50, line.speaker, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '18px',
       color: speakerColor,
       fontStyle: 'bold',
@@ -142,9 +143,9 @@ export class DialogueSystem {
 
     // Dialogue text
     const text = this.scene.add.text(width * 0.1, boxY - 20, line.text, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '16px',
-      color: '#e0d5c0',
+      color: TextColors.cream,
       wordWrap: { width: width * 0.8 },
       lineSpacing: 4,
     });
@@ -152,9 +153,9 @@ export class DialogueSystem {
 
     // Tap/click to advance - large hit area
     const advanceBtn = this.scene.add.text(width * 0.85, boxY + 40, 'Continue ▸', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '14px',
-      color: '#8a7a5a',
+      color: TextColors.dim,
     }).setOrigin(1, 0.5);
     advanceBtn.setInteractive({ useHandCursor: true });
     advanceBtn.on('pointerdown', () => this.advance());
@@ -162,18 +163,18 @@ export class DialogueSystem {
 
     // Skip button — fast-forward to choices or end of node
     const skipBtn = this.scene.add.text(width * 0.15, boxY + 40, '▸▸ Skip', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '13px',
-      color: '#5a5a5a',
+      color: TextColors.dimmer,
     }).setOrigin(0, 0.5);
     skipBtn.setInteractive({ useHandCursor: true });
-    skipBtn.on('pointerover', () => skipBtn.setColor('#8a7a5a'));
-    skipBtn.on('pointerout', () => skipBtn.setColor('#5a5a5a'));
+    skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.dim));
+    skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.dimmer));
     skipBtn.on('pointerdown', () => this.skipToEnd());
     this.container.add(skipBtn);
 
     // Also allow tapping the box area to advance
-    const hitArea = this.scene.add.rectangle(width / 2, boxY, width * 0.9, 180, 0x000000, 0);
+    const hitArea = this.scene.add.rectangle(width / 2, boxY, width * 0.9, 180, Colors.black, 0);
     hitArea.setInteractive({ useHandCursor: true });
     hitArea.on('pointerdown', () => this.advance());
     this.container.add(hitArea);
@@ -209,8 +210,8 @@ export class DialogueSystem {
       const itemAvailable = !choice.requiredItem || inventory.hasItem(choice.requiredItem);
       const y = startY + i * choiceHeight;
 
-      const btn = this.scene!.add.rectangle(width / 2, y, width * 0.75, 38, 0x1a1a2e, 0.9);
-      btn.setStrokeStyle(1, itemAvailable ? 0xc9a84c : 0x444444, 0.6);
+      const btn = this.scene!.add.rectangle(width / 2, y, width * 0.75, 38, Colors.navy, 0.9);
+      btn.setStrokeStyle(1, itemAvailable ? Colors.gold : 0x444444, 0.6);
       if (itemAvailable) btn.setInteractive({ useHandCursor: true });
 
       let displayText = choice.text;
@@ -219,15 +220,15 @@ export class DialogueSystem {
       }
 
       const text = this.scene!.add.text(width / 2, y, displayText, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '14px',
-        color: itemAvailable ? '#c9a84c' : '#555555',
+        color: itemAvailable ? TextColors.gold : '#555555',
         wordWrap: { width: width * 0.7 },
       }).setOrigin(0.5);
 
       if (itemAvailable) {
-        btn.on('pointerover', () => btn.setFillStyle(0x2a2a4e));
-        btn.on('pointerout', () => btn.setFillStyle(0x1a1a2e, 0.9));
+        btn.on('pointerover', () => btn.setFillStyle(Colors.navyHover));
+        btn.on('pointerout', () => btn.setFillStyle(Colors.navy, 0.9));
         btn.on('pointerdown', () => this.selectChoice(choice));
       }
 
@@ -237,7 +238,7 @@ export class DialogueSystem {
 
   private getSpeakerColor(speaker: string): string {
     const colors: Record<string, string> = {
-      'Nancy': '#e0d5c0',
+      'Nancy': TextColors.cream,
       'Vivian': '#b4a0d4',
       'Edwin': '#7ba3c9',
       'Stella': '#c9947b',
@@ -248,7 +249,7 @@ export class DialogueSystem {
       'Carson Drew': '#c9b87b',
       'Receptionist': '#8a8a8a',
     };
-    return colors[speaker] || '#c9a84c';
+    return colors[speaker] || TextColors.gold;
   }
 
   private advance(): void {

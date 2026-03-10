@@ -348,12 +348,12 @@ export class PuzzleScene extends Phaser.Scene {
     // Backspace key
     const bksX = startX + cols * keySpacing / 2 + 40;
     const bksY = startY + 3 * (keySize + 6);
-    const bksBg = this.add.rectangle(bksX, bksY, 50, keySize, 0x1a1a2e, 0.8);
-    bksBg.setStrokeStyle(1, 0xc9a84c, 0.4);
+    const bksBg = this.add.rectangle(bksX, bksY, 50, keySize, Colors.navy, 0.8);
+    bksBg.setStrokeStyle(1, Colors.gold, 0.4);
     bksBg.setInteractive({ useHandCursor: true });
     const bksText = this.add.text(bksX, bksY, '⌫', {
       fontSize: '16px',
-      color: '#c9a84c',
+      color: TextColors.gold,
     }).setOrigin(0.5);
     bksBg.on('pointerdown', () => {
       this.textInput = this.textInput.slice(0, -1);
@@ -368,19 +368,19 @@ export class PuzzleScene extends Phaser.Scene {
   }
 
   private addSubmitButton(x: number, y: number, onClick: () => void): void {
-    const btnBg = this.add.rectangle(x, y, 140, 44, 0xc9a84c, 0.2);
-    btnBg.setStrokeStyle(2, 0xc9a84c, 0.7);
+    const btnBg = this.add.rectangle(x, y, 140, 44, Colors.gold, 0.2);
+    btnBg.setStrokeStyle(2, Colors.gold, 0.7);
     btnBg.setInteractive({ useHandCursor: true });
 
     const btnText = this.add.text(x, y, 'Submit', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '18px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    btnBg.on('pointerover', () => btnBg.setFillStyle(0xc9a84c, 0.35));
-    btnBg.on('pointerout', () => btnBg.setFillStyle(0xc9a84c, 0.2));
+    btnBg.on('pointerover', () => btnBg.setFillStyle(Colors.gold, 0.35));
+    btnBg.on('pointerout', () => btnBg.setFillStyle(Colors.gold, 0.2));
     btnBg.on('pointerdown', onClick);
 
     this.panel.add([btnBg, btnText]);
@@ -425,7 +425,7 @@ export class PuzzleScene extends Phaser.Scene {
     const correct = puzzleSystem.checkAnswer(this.puzzleId, answer);
 
     if (correct) {
-      this.feedbackText.setColor('#4ade80');
+      this.feedbackText.setColor(TextColors.success);
       this.feedbackText.setText('Correct!');
       this.hintText.setText('');
 
@@ -451,7 +451,7 @@ export class PuzzleScene extends Phaser.Scene {
         this.closePuzzle();
       });
     } else {
-      this.feedbackText.setColor('#ff6b6b');
+      this.feedbackText.setColor(TextColors.error);
       this.feedbackText.setText('That\'s not right...');
 
       // Show progressive hint after failed attempts
