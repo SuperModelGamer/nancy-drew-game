@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
+import { ChapterSystem } from '../systems/ChapterSystem';
 import itemsData from '../data/items.json';
 
 export class UIScene extends Phaser.Scene {
@@ -32,6 +33,21 @@ export class UIScene extends Phaser.Scene {
     invBtn.add([invBg, invText]);
 
     invBg.on('pointerdown', () => this.toggleInventory());
+
+    // Chapter indicator (top-center)
+    const chapterLabel = this.add.text(width / 2, 12, '', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '12px',
+      color: '#5a5a5a',
+      fontStyle: 'italic',
+    }).setOrigin(0.5, 0).setDepth(50);
+    const updateChapter = () => {
+      const ch = SaveSystem.getInstance().getChapter();
+      chapterLabel.setText(ChapterSystem.getInstance().getChapterTitle(ch));
+    };
+    updateChapter();
+    // Refresh chapter display when scene resumes (room change)
+    this.events.on('wake', updateChapter);
 
     // Journal button (bottom-right) - 48px minimum tap target
     this.journalButton = this.add.container(width - 50, height - 40);

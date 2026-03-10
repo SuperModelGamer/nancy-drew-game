@@ -4,6 +4,8 @@ import { InventorySystem } from '../systems/InventorySystem';
 import { DialogueSystem } from '../systems/DialogueSystem';
 import { PuzzleSystem } from '../systems/PuzzleSystem';
 import { SaveSystem } from '../systems/SaveSystem';
+import { ScriptedEventScene } from './ScriptedEventScene';
+import { ChapterSystem } from '../systems/ChapterSystem';
 
 interface Hotspot {
   id: string;
@@ -112,8 +114,28 @@ export class RoomScene extends Phaser.Scene {
     // Listen for inventory selection changes
     InventorySystem.getInstance().onChange(() => this.updateSelectedItemIndicator());
 
+    // Check chapter progression
+    ChapterSystem.getInstance().checkProgression();
+
+    // Auto-save on room entry
+    SaveSystem.getInstance().save();
+
     // Fade in
     this.cameras.main.fadeIn(500, 0, 0, 0);
+
+    // Check for scripted events after fade-in
+    this.cameras.main.once('camerafadeincomplete', () => {
+      this.checkScriptedEvents();
+    });
+  }
+
+  private checkScriptedEvents(): void {
+    const event = ScriptedEventScene.getTriggerable(this.currentRoom.id);
+    if (event) {
+      this.time.delayedCall(1500, () => {
+        this.scene.launch('ScriptedEventScene', { eventId: event.id });
+      });
+    }
   }
 
   private createHotspots(): void {
@@ -388,6 +410,8 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private navigateToRoom(roomId: string): void {
+    SaveSystem.getInstance().setCurrentRoom(roomId);
+    SaveSystem.getInstance().save();
     this.cameras.main.fadeOut(400, 0, 0, 0);
     this.time.delayedCall(400, () => {
       this.scene.restart({ roomId });
