@@ -1,50 +1,53 @@
 # TODO
 
-## MVP
+## MVP — COMPLETE
 - [x] Project scaffolding (Phaser + TypeScript + Vite)
-- [x] Title screen
+- [x] Title screen with Continue / New Investigation
 - [x] All 8 rooms defined with hotspots (95+ total, 12+ per room)
-- [x] Inventory system
-- [x] Dialogue system with branching
-- [x] Save/load system
+- [x] Inventory system with select/use/describe
+- [x] Dialogue system with branching, requiredItem, requiredFlag, triggerEvent
+- [x] Save/load system with auto-save on room transitions
 - [x] 16 items defined (key items, optional items, red herrings)
-- [x] 10 dialogue trees with conditional branches (requiredItem/requiredFlag)
+- [x] 10 dialogue trees with conditional branches
 - [x] 10 puzzles defined with progressive hint system
 - [x] 3 endings written into Edwin confrontation dialogue
 - [x] Phone call mechanic (Bess/George, Carson Drew, Historical Society)
 - [x] Atmospheric/flavor hotspots throughout (50%+ non-critical)
-- [x] Conditional hotspots (appear based on flags/chapter)
+- [x] Conditional hotspots (showWhen flags + chapter gating)
 - [x] Red herring items and dead-end inspections
 - [x] Blackmoor Manor easter eggs (3 references)
 - [x] Puzzle interaction UI (combination dials, text input, sequence buttons)
-- [x] Journal/clue board UI
-- [x] Conditional hotspot rendering in RoomScene (showWhen flag support)
-- [x] requiredItem/requiredFlag support in dialogue rendering
+- [x] Journal/clue board UI with numbered entries
 - [x] Item-on-hotspot interaction flow (magnifying glass on mirror, etc.)
 - [x] PuzzleScene registered and launchable from locked hotspots
 - [x] Progressive hint system (hints revealed after failed attempts)
 - [x] Speaker name color coding in dialogue
 - [x] Selected item indicator in RoomScene
 - [x] Item description panel on hover/select in inventory
-- [ ] One complete puzzle chain (lobby → auditorium → backstage → dressing room → trunk)
-- [ ] Mobile touch testing and tap target tuning
+- [x] Ghost sighting scripted events (auditorium, dressing room, backstage)
+- [x] Chapter progression (5-act milestone system)
+- [x] Auto-save + Continue button on TitleScene
 
-## Next
-- [ ] Ghost sighting scripted event (fog + spotlight + figure)
-- [ ] Chapter progression and room gating
-- [ ] Suspect screen with portrait and dialogue history
-- [ ] Multi-room navigation map
+## Tier 2 — COMPLETE
+- [x] Suspect/character screen (profiles, known facts, dialogue history)
+- [x] Multi-room navigation map (theater floorplan for fast travel)
+- [x] Hotspot highlight animations (subtle gold glow pulse)
+- [x] Ending epilogue screens (full-screen narrative + credits per ending)
+
+## Tier 2.5 — Next Sprint
+- [ ] Evidence board puzzle UI (visual corkboard with draggable pieces)
+
+## Tier 3 — Polish & Assets
+- [ ] Room background art (illustrated, 8 rooms)
+- [ ] Character portraits for dialogue panels
 - [ ] Audio ambience and UI sound effects
-- [ ] Chapter transitions (Night 1 / Day 2 / Night 2)
-- [ ] Room background art integration
-- [ ] Hotspot highlight animation (subtle glow)
-- [ ] Progressive hint display (after 3 failed puzzle attempts)
+- [ ] Mobile touch testing and tap target tuning
+- [ ] Chapter transition screens (Night 1 / Day 2 / Night 2)
+- [ ] Dialogue skip/fast-forward button
 
-## Later
+## Tier 4 — Stretch
 - [ ] Multiple save slots
 - [ ] Settings menu (audio, text speed)
 - [ ] Achievement/discovery tracking
-- [ ] Evidence board dual-timeline puzzle UI (visual corkboard)
-- [ ] Ending epilogue screens with unique art
-- [ ] Second playthrough variations (new dialogue for returning players)
+- [ ] Second playthrough variations
 - [ ] Wrap for mobile app if needed

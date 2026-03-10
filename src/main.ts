@@ -5,6 +5,9 @@ import { RoomScene } from './game/scenes/RoomScene';
 import { UIScene } from './game/scenes/UIScene';
 import { PuzzleScene } from './game/scenes/PuzzleScene';
 import { ScriptedEventScene } from './game/scenes/ScriptedEventScene';
+import { SuspectScene } from './game/scenes/SuspectScene';
+import { MapScene } from './game/scenes/MapScene';
+import { EndingScene } from './game/scenes/EndingScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -20,7 +23,7 @@ const config: Phaser.Types.Core.GameConfig = {
       height: 180,
     },
   },
-  scene: [BootScene, TitleScene, RoomScene, UIScene, PuzzleScene, ScriptedEventScene],
+  scene: [BootScene, TitleScene, RoomScene, UIScene, PuzzleScene, ScriptedEventScene, SuspectScene, MapScene, EndingScene],
   input: {
     activePointers: 2,
   },
