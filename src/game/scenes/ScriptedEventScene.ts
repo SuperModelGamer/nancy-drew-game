@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
+import { Colors, TextColors, FONT, Depths } from '../constants';
 
 interface ScriptedStep {
   action: 'fog' | 'spotlight' | 'figure' | 'text' | 'shake' | 'flicker' | 'wait' | 'sound';
@@ -134,10 +135,10 @@ export class ScriptedEventScene extends Phaser.Scene {
     const { width, height } = this.cameras.main;
 
     this.container = this.add.container(0, 0);
-    this.container.setDepth(600);
+    this.container.setDepth(Depths.scriptedEvent);
 
     // Click blocker
-    const blocker = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0);
+    const blocker = this.add.rectangle(width / 2, height / 2, width, height, Colors.black, 0);
     blocker.setInteractive();
     this.container.add(blocker);
 
@@ -158,20 +159,20 @@ export class ScriptedEventScene extends Phaser.Scene {
     this.textBox = this.add.container(width / 2, height - 80);
     this.textBox.setAlpha(0);
 
-    const textBg = this.add.rectangle(0, 0, width * 0.85, 70, 0x000000, 0.9);
-    textBg.setStrokeStyle(1, 0xc9a84c, 0.5);
+    const textBg = this.add.rectangle(0, 0, width * 0.85, 70, Colors.black, 0.9);
+    textBg.setStrokeStyle(1, Colors.gold, 0.5);
 
     this.speakerText = this.add.text(-width * 0.4 + 20, -20, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '14px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'bold',
     });
 
     this.textContent = this.add.text(0, 5, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '15px',
-      color: '#e0d5c0',
+      color: TextColors.cream,
       fontStyle: 'italic',
       wordWrap: { width: width * 0.8 },
       align: 'center',
@@ -298,7 +299,7 @@ export class ScriptedEventScene extends Phaser.Scene {
 
   private doFlicker(duration: number, count: number): void {
     const { width, height } = this.cameras.main;
-    const flash = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0);
+    const flash = this.add.rectangle(width / 2, height / 2, width, height, Colors.black, 0);
     this.container.add(flash);
 
     const flickerInterval = duration / (count * 2);

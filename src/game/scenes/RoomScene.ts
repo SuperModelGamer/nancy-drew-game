@@ -321,6 +321,7 @@ export class RoomScene extends Phaser.Scene {
         // Use the selected item on this hotspot
         this.showDescription(hotspot.description || 'Unlocked!');
         this.usedHotspots.add(hotspot.id);
+        SaveSystem.getInstance().setFlag('hotspot_used_' + hotspot.id, true);
         // Consume key items that are used to unlock
         if (hotspot.targetRoom) {
           inv.removeItem(hotspot.requiredItem);
@@ -436,5 +437,9 @@ export class RoomScene extends Phaser.Scene {
     this.time.delayedCall(400, () => {
       this.scene.restart({ roomId });
     });
+  }
+
+  shutdown(): void {
+    this.tweens.killAll();
   }
 }

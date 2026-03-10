@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { Colors, TextColors, FONT } from '../constants';
 
 const TRANSITIONS: Record<number, { title: string; subtitle: string; time: string; description: string }> = {
   1: {
@@ -56,7 +57,7 @@ export class ChapterTransitionScene extends Phaser.Scene {
     }
 
     // Full black background
-    this.add.rectangle(width / 2, height / 2, width, height, 0x000000);
+    this.add.rectangle(width / 2, height / 2, width, height, Colors.black);
 
     // Track all timed events so we can cancel on skip
     const timedEvents: Phaser.Time.TimerEvent[] = [];
@@ -64,9 +65,9 @@ export class ChapterTransitionScene extends Phaser.Scene {
 
     // --- Time stamp (fades in first) ---
     const timeText = this.add.text(width / 2, height * 0.18, transition.time, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '14px',
-      color: '#8a7a5a',
+      color: TextColors.dim,
       fontStyle: 'italic',
     });
     timeText.setOrigin(0.5);
@@ -81,9 +82,9 @@ export class ChapterTransitionScene extends Phaser.Scene {
 
     // --- Title (after 1s) ---
     const titleText = this.add.text(width / 2, height * 0.32, transition.title, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '36px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'bold',
     });
     titleText.setOrigin(0.5);
@@ -102,9 +103,9 @@ export class ChapterTransitionScene extends Phaser.Scene {
 
     // --- Subtitle (after 2s) ---
     const subtitleText = this.add.text(width / 2, height * 0.42, transition.subtitle, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '20px',
-      color: '#e0d5c0',
+      color: TextColors.cream,
       fontStyle: 'italic',
     });
     subtitleText.setOrigin(0.5);
@@ -129,9 +130,9 @@ export class ChapterTransitionScene extends Phaser.Scene {
 
     descriptionLines.forEach((line, index) => {
       const lineText = this.add.text(width / 2, lineStartY + index * lineSpacing, line, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '15px',
-        color: '#8a7a5a',
+        color: TextColors.dim,
         align: 'center',
       });
       lineText.setOrigin(0.5);
@@ -152,9 +153,9 @@ export class ChapterTransitionScene extends Phaser.Scene {
 
     // --- "Click to continue" hint (after 4s) ---
     const hintText = this.add.text(width / 2, height * 0.92, 'Click to continue', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '12px',
-      color: '#8a7a5a',
+      color: TextColors.dim,
       fontStyle: 'italic',
     });
     hintText.setOrigin(0.5);

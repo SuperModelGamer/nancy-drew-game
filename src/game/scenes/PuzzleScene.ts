@@ -208,9 +208,9 @@ export class PuzzleScene extends Phaser.Scene {
 
     // Sequence display
     this.sequenceDisplay = this.add.text(0, 20, 'Sequence: (none)', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '16px',
-      color: '#e0d5c0',
+      color: TextColors.cream,
     }).setOrigin(0.5);
     this.panel.add(this.sequenceDisplay);
 
@@ -225,13 +225,13 @@ export class PuzzleScene extends Phaser.Scene {
 
       const color = this.getSequenceColor(option);
       const btnBg = this.add.rectangle(0, 0, btnSpacing - 10, 48, color, 0.7);
-      btnBg.setStrokeStyle(2, 0xc9a84c, 0.6);
+      btnBg.setStrokeStyle(2, Colors.gold, 0.6);
       btnBg.setInteractive({ useHandCursor: true });
 
       const btnText = this.add.text(0, 0, option.toUpperCase(), {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '14px',
-        color: '#ffffff',
+        color: TextColors.white,
         fontStyle: 'bold',
       }).setOrigin(0.5);
 
@@ -254,16 +254,16 @@ export class PuzzleScene extends Phaser.Scene {
 
     // Clear button
     const clearBtn = this.add.text(-60, btnY + 55, 'Clear', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '14px',
-      color: '#8a7a5a',
+      color: TextColors.dim,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     clearBtn.on('pointerdown', () => {
       this.sequenceInput = [];
       this.updateSequenceDisplay();
     });
-    clearBtn.on('pointerover', () => clearBtn.setColor('#c9a84c'));
-    clearBtn.on('pointerout', () => clearBtn.setColor('#8a7a5a'));
+    clearBtn.on('pointerover', () => clearBtn.setColor(TextColors.gold));
+    clearBtn.on('pointerout', () => clearBtn.setColor(TextColors.dim));
     this.panel.add(clearBtn);
 
     // Submit button
@@ -275,14 +275,14 @@ export class PuzzleScene extends Phaser.Scene {
 
   private buildTextInputUI(_panelW: number, _panelH: number): void {
     // Text display area
-    const inputBg = this.add.rectangle(0, 30, 300, 48, 0x1a1a2e, 0.9);
-    inputBg.setStrokeStyle(2, 0xc9a84c, 0.6);
+    const inputBg = this.add.rectangle(0, 30, 300, 48, Colors.navy, 0.9);
+    inputBg.setStrokeStyle(2, Colors.gold, 0.6);
     this.panel.add(inputBg);
 
     this.textDisplay = this.add.text(0, 30, '|', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '22px',
-      color: '#e0d5c0',
+      color: TextColors.cream,
     }).setOrigin(0.5);
     this.panel.add(this.textDisplay);
 
@@ -323,14 +323,14 @@ export class PuzzleScene extends Phaser.Scene {
       const x = startX + col * keySpacing;
       const y = startY + row * (keySize + 6);
 
-      const keyBg = this.add.rectangle(x, y, keySize, keySize, 0x1a1a2e, 0.8);
-      keyBg.setStrokeStyle(1, 0xc9a84c, 0.4);
+      const keyBg = this.add.rectangle(x, y, keySize, keySize, Colors.navy, 0.8);
+      keyBg.setStrokeStyle(1, Colors.gold, 0.4);
       keyBg.setInteractive({ useHandCursor: true });
 
       const keyText = this.add.text(x, y, char === ' ' ? '␣' : char, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '14px',
-        color: '#c9a84c',
+        color: TextColors.gold,
       }).setOrigin(0.5);
 
       keyBg.on('pointerdown', () => {
@@ -339,8 +339,8 @@ export class PuzzleScene extends Phaser.Scene {
           this.textDisplay.setText(this.textInput + '|');
         }
       });
-      keyBg.on('pointerover', () => keyBg.setFillStyle(0x2a2a4e));
-      keyBg.on('pointerout', () => keyBg.setFillStyle(0x1a1a2e, 0.8));
+      keyBg.on('pointerover', () => keyBg.setFillStyle(Colors.navyHover));
+      keyBg.on('pointerout', () => keyBg.setFillStyle(Colors.navy, 0.8));
 
       this.panel.add([keyBg, keyText]);
     });
