@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { ChapterSystem } from '../systems/ChapterSystem';
+import { Colors, TextColors, FONT } from '../constants';
 
 export class TitleScene extends Phaser.Scene {
   constructor() {
@@ -17,24 +18,24 @@ export class TitleScene extends Phaser.Scene {
 
     // Title text
     const title = this.add.text(width / 2, height * 0.25, 'NANCY DREW', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '64px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'bold',
     });
     title.setOrigin(0.5);
 
     // Subtitle
     const subtitle = this.add.text(width / 2, height * 0.25 + 70, 'The Last Curtain Call', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '24px',
-      color: '#8a7a5a',
+      color: TextColors.dim,
       fontStyle: 'italic',
     });
     subtitle.setOrigin(0.5);
 
     // Decorative line
-    const line = this.add.rectangle(width / 2, height * 0.25 + 110, 200, 1, 0xc9a84c);
+    const line = this.add.rectangle(width / 2, height * 0.25 + 110, 200, 1, Colors.gold);
     line.setAlpha(0.5);
 
     // Continue button (if save exists)
@@ -42,26 +43,26 @@ export class TitleScene extends Phaser.Scene {
       save.load();
       const chapterTitle = ChapterSystem.getInstance().getChapterTitle(save.getChapter());
 
-      const contBtnBg = this.add.rectangle(width / 2, height * 0.55, 260, 64, 0x1a1a2e);
-      contBtnBg.setStrokeStyle(2, 0xc9a84c);
+      const contBtnBg = this.add.rectangle(width / 2, height * 0.55, 260, 64, Colors.navy);
+      contBtnBg.setStrokeStyle(2, Colors.gold);
       contBtnBg.setInteractive({ useHandCursor: true });
 
       const contBtnText = this.add.text(width / 2, height * 0.55, 'Continue', {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '22px',
-        color: '#c9a84c',
+        color: TextColors.gold,
       }).setOrigin(0.5);
 
       // Chapter info below continue
       this.add.text(width / 2, height * 0.55 + 42, chapterTitle, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '13px',
-        color: '#8a7a5a',
+        color: TextColors.dim,
         fontStyle: 'italic',
       }).setOrigin(0.5);
 
-      contBtnBg.on('pointerover', () => contBtnBg.setFillStyle(0x2a2a4e));
-      contBtnBg.on('pointerout', () => contBtnBg.setFillStyle(0x1a1a2e));
+      contBtnBg.on('pointerover', () => contBtnBg.setFillStyle(Colors.navyHover));
+      contBtnBg.on('pointerout', () => contBtnBg.setFillStyle(Colors.navy));
       contBtnBg.on('pointerdown', () => {
         this.cameras.main.fadeOut(500, 0, 0, 0);
         this.time.delayedCall(500, () => {
@@ -74,18 +75,18 @@ export class TitleScene extends Phaser.Scene {
 
     // New Game button
     const newY = hasSave ? height * 0.7 : height * 0.6;
-    const newBtnBg = this.add.rectangle(width / 2, newY, 260, 64, 0x1a1a2e);
-    newBtnBg.setStrokeStyle(2, hasSave ? 0x5a5a5a : 0xc9a84c);
+    const newBtnBg = this.add.rectangle(width / 2, newY, 260, 64, Colors.navy);
+    newBtnBg.setStrokeStyle(2, hasSave ? 0x5a5a5a : Colors.gold);
     newBtnBg.setInteractive({ useHandCursor: true });
 
     const newBtnText = this.add.text(width / 2, newY, hasSave ? 'New Investigation' : 'Begin Investigation', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '22px',
-      color: hasSave ? '#8a7a5a' : '#c9a84c',
+      color: hasSave ? TextColors.dim : TextColors.gold,
     }).setOrigin(0.5);
 
-    newBtnBg.on('pointerover', () => newBtnBg.setFillStyle(0x2a2a4e));
-    newBtnBg.on('pointerout', () => newBtnBg.setFillStyle(0x1a1a2e));
+    newBtnBg.on('pointerover', () => newBtnBg.setFillStyle(Colors.navyHover));
+    newBtnBg.on('pointerout', () => newBtnBg.setFillStyle(Colors.navy));
     newBtnBg.on('pointerdown', () => {
       if (hasSave) {
         // Confirm before erasing save
@@ -103,7 +104,7 @@ export class TitleScene extends Phaser.Scene {
 
     // Credits
     this.add.text(width / 2, height - 30, 'Created by Carley Beck', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '12px',
       color: '#555566',
     }).setOrigin(0.5);
@@ -121,18 +122,18 @@ export class TitleScene extends Phaser.Scene {
     const container = this.add.container(width / 2, height / 2);
     container.setDepth(100);
 
-    const dimmer = this.add.rectangle(0, 0, width, height, 0x000000, 0.7);
+    const dimmer = this.add.rectangle(0, 0, width, height, Colors.black, 0.7);
     dimmer.setInteractive();
     container.add(dimmer);
 
-    const box = this.add.rectangle(0, 0, 400, 180, 0x0a0a1a, 0.97);
-    box.setStrokeStyle(2, 0xc9a84c, 0.7);
+    const box = this.add.rectangle(0, 0, 400, 180, Colors.darkNavy, 0.97);
+    box.setStrokeStyle(2, Colors.gold, 0.7);
     container.add(box);
 
     const text = this.add.text(0, -40, 'Start a new investigation?\nYour current progress will be lost.', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '16px',
-      color: '#e0d5c0',
+      color: TextColors.cream,
       align: 'center',
       lineSpacing: 4,
     }).setOrigin(0.5);
@@ -140,12 +141,12 @@ export class TitleScene extends Phaser.Scene {
 
     // Confirm
     const yesBg = this.add.rectangle(-80, 40, 120, 44, 0x8b0000, 0.8);
-    yesBg.setStrokeStyle(1, 0xc9a84c, 0.5);
+    yesBg.setStrokeStyle(1, Colors.gold, 0.5);
     yesBg.setInteractive({ useHandCursor: true });
     const yesText = this.add.text(-80, 40, 'Yes', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '16px',
-      color: '#e0d5c0',
+      color: TextColors.cream,
     }).setOrigin(0.5);
     yesBg.on('pointerover', () => yesBg.setFillStyle(0xaa0000));
     yesBg.on('pointerout', () => yesBg.setFillStyle(0x8b0000, 0.8));
@@ -156,16 +157,16 @@ export class TitleScene extends Phaser.Scene {
     container.add([yesBg, yesText]);
 
     // Cancel
-    const noBg = this.add.rectangle(80, 40, 120, 44, 0x1a1a2e, 0.8);
-    noBg.setStrokeStyle(1, 0xc9a84c, 0.5);
+    const noBg = this.add.rectangle(80, 40, 120, 44, Colors.navy, 0.8);
+    noBg.setStrokeStyle(1, Colors.gold, 0.5);
     noBg.setInteractive({ useHandCursor: true });
     const noText = this.add.text(80, 40, 'Cancel', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '16px',
-      color: '#c9a84c',
+      color: TextColors.gold,
     }).setOrigin(0.5);
-    noBg.on('pointerover', () => noBg.setFillStyle(0x2a2a4e));
-    noBg.on('pointerout', () => noBg.setFillStyle(0x1a1a2e, 0.8));
+    noBg.on('pointerover', () => noBg.setFillStyle(Colors.navyHover));
+    noBg.on('pointerout', () => noBg.setFillStyle(Colors.navy, 0.8));
     noBg.on('pointerdown', () => container.destroy());
     container.add([noBg, noText]);
   }
