@@ -43,6 +43,10 @@ export class SaveSystem {
     this.chapter = chapter;
   }
 
+  getChapter(): number {
+    return this.chapter;
+  }
+
   addJournalEntry(entry: string): void {
     if (!this.journal.includes(entry)) {
       this.journal.push(entry);

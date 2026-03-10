@@ -16,16 +16,21 @@
 - [x] Conditional hotspots (appear based on flags/chapter)
 - [x] Red herring items and dead-end inspections
 - [x] Blackmoor Manor easter eggs (3 references)
-- [ ] Puzzle interaction UI (input modal for combinations/answers)
-- [ ] Journal/clue board UI
+- [x] Puzzle interaction UI (combination dials, text input, sequence buttons)
+- [x] Journal/clue board UI
+- [x] Conditional hotspot rendering in RoomScene (showWhen flag support)
+- [x] requiredItem/requiredFlag support in dialogue rendering
+- [x] Item-on-hotspot interaction flow (magnifying glass on mirror, etc.)
+- [x] PuzzleScene registered and launchable from locked hotspots
+- [x] Progressive hint system (hints revealed after failed attempts)
+- [x] Speaker name color coding in dialogue
+- [x] Selected item indicator in RoomScene
+- [x] Item description panel on hover/select in inventory
 - [ ] One complete puzzle chain (lobby → auditorium → backstage → dressing room → trunk)
 - [ ] Mobile touch testing and tap target tuning
-- [ ] Conditional hotspot rendering in RoomScene (showWhen flag support)
 
 ## Next
 - [ ] Ghost sighting scripted event (fog + spotlight + figure)
-- [ ] requiredItem/requiredFlag support in dialogue rendering
-- [ ] Item-on-hotspot interaction flow (magnifying glass on mirror, etc.)
 - [ ] Chapter progression and room gating
 - [ ] Suspect screen with portrait and dialogue history
 - [ ] Multi-room navigation map
