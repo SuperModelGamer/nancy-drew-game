@@ -1,0 +1,113 @@
+{
+  "rooms": [
+    {
+      "id": "foyer",
+      "name": "Thornwood Manor — Foyer",
+      "description": "The grand entrance of Thornwood Manor. Dust motes drift through shafts of pale light. A grandfather clock ticks in the silence.",
+      "hotspots": [
+        {
+          "id": "foyer_table",
+          "x": 300,
+          "y": 400,
+          "width": 100,
+          "height": 80,
+          "label": "Side Table",
+          "type": "inspect",
+          "description": "An ornate side table. There's a half-finished letter addressed to someone named 'E.W.' The ink is still wet."
+        },
+        {
+          "id": "foyer_key",
+          "x": 640,
+          "y": 350,
+          "width": 60,
+          "height": 60,
+          "label": "Old Key",
+          "type": "pickup",
+          "itemId": "brass_key",
+          "onceOnly": true
+        },
+        {
+          "id": "foyer_portrait",
+          "x": 900,
+          "y": 250,
+          "width": 120,
+          "height": 140,
+          "label": "Portrait",
+          "type": "inspect",
+          "description": "A stern-looking woman in Victorian dress. A small plaque reads: 'Eleanor Thornwood, 1842-1899'. Her eyes seem to follow you."
+        },
+        {
+          "id": "foyer_study_door",
+          "x": 1050,
+          "y": 400,
+          "width": 100,
+          "height": 160,
+          "label": "Study Door",
+          "type": "locked",
+          "requiredItem": "brass_key",
+          "description": "The door creaks open, revealing a dimly lit study beyond.",
+          "targetRoom": "study"
+        },
+        {
+          "id": "foyer_housekeeper",
+          "x": 480,
+          "y": 380,
+          "width": 80,
+          "height": 120,
+          "label": "Mrs. Pembrook",
+          "type": "talk",
+          "dialogueId": "housekeeper_intro"
+        }
+      ]
+    },
+    {
+      "id": "study",
+      "name": "Thornwood Manor — Study",
+      "description": "A wood-paneled study lined with bookshelves. Papers are scattered across a mahogany desk.",
+      "hotspots": [
+        {
+          "id": "study_desk",
+          "x": 640,
+          "y": 400,
+          "width": 200,
+          "height": 100,
+          "label": "Desk",
+          "type": "inspect",
+          "description": "The desk is covered in financial records. Several entries are circled in red ink. Someone was tracking large withdrawals."
+        },
+        {
+          "id": "study_bookshelf",
+          "x": 200,
+          "y": 300,
+          "width": 120,
+          "height": 200,
+          "label": "Bookshelf",
+          "type": "inspect",
+          "description": "Mostly legal texts and ledgers. One book — 'The Art of Deception' — is pulled slightly forward."
+        },
+        {
+          "id": "study_safe",
+          "x": 1000,
+          "y": 350,
+          "width": 80,
+          "height": 80,
+          "label": "Wall Safe",
+          "type": "locked",
+          "requiredItem": "safe_combination",
+          "description": "The safe clicks open. Inside: a bundle of letters and a faded photograph.",
+          "puzzleId": "safe_puzzle"
+        },
+        {
+          "id": "study_back",
+          "x": 100,
+          "y": 500,
+          "width": 100,
+          "height": 60,
+          "label": "Back to Foyer",
+          "type": "navigate",
+          "targetRoom": "foyer"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "items": [
+    {
+      "id": "brass_key",
+      "name": "Brass Key",
+      "description": "A heavy brass key with an ornate handle. It looks like it fits an interior door.",
+      "icon": "🔑",
+      "isKeyItem": true
+    },
+    {
+      "id": "torn_letter",
+      "name": "Torn Letter",
+      "description": "Half of a letter. The visible text reads: '...cannot forgive what was done to the estate. If the truth is revealed...'",
+      "icon": "📄",
+      "isKeyItem": true
+    },
+    {
+      "id": "magnifying_glass",
+      "name": "Magnifying Glass",
+      "description": "A silver-handled magnifying glass. Useful for examining fine details.",
+      "icon": "🔍",
+      "isKeyItem": false
+    },
+    {
+      "id": "safe_combination",
+      "name": "Safe Combination",
+      "description": "A slip of paper with numbers: 8-23-42. Found hidden inside a book.",
+      "icon": "🔢",
+      "isKeyItem": true
+    },
+    {
+      "id": "faded_photograph",
+      "name": "Faded Photograph",
+      "description": "A sepia photograph of two women standing before Thornwood Manor. One has been crossed out in ink.",
+      "icon": "📷",
+      "isKeyItem": true
+    }
+  ]
+}
