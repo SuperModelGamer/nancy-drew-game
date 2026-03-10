@@ -1,30 +1,192 @@
 {
   "puzzles": [
     {
-      "id": "safe_puzzle",
-      "name": "The Wall Safe",
+      "id": "trunk_puzzle",
+      "name": "Margaux's Trunk",
       "type": "combination",
-      "description": "A heavy iron safe set into the wall behind a painting. It requires a three-number combination.",
-      "answer": "8-23-42",
+      "description": "An antique trunk with a three-dial combination lock. Each dial shows numbers 0–9. Something precious is locked inside. The combination is a date that mattered to Margaux more than any other.",
+      "answer": "10-31-28",
       "clues": [
-        "Mrs. Pembrook mentioned Lady Thornwood's favorite numbers.",
-        "The book 'The Art of Deception' has numbers underlined on pages 8, 23, and 42.",
-        "A slip of paper in the desk drawer reads: 'Remember August 23rd, '42.'"
+        "The 1928 playbill is dated October 31, 1928.",
+        "Margaux's diary: 'I will lock away what matters most before the final curtain on the 31st.'",
+        "Vivian: 'Margaux always used dates she could never forget — she called it her last Halloween.'"
       ],
-      "unlocks": "faded_photograph"
+      "unlocks": "margaux_locket",
+      "hints": [
+        "The trunk was locked the night of the final performance.",
+        "Think about the date of The Crimson Veil's last show.",
+        "October is the 10th month. The show was on the 31st. The year was 1928."
+      ]
     },
     {
-      "id": "letter_puzzle",
-      "name": "The Torn Letter",
+      "id": "script_cipher",
+      "name": "The Script Cipher",
       "type": "logic",
-      "description": "Two halves of a torn letter. Piece them together to reveal the full message.",
-      "answer": "inheritance",
+      "description": "Red-circled letters in the margins of The Crimson Veil script. Read them in order through the stage directions of Act III to reveal the hidden message. What single word do they spell?",
+      "answer": "goblet",
       "clues": [
-        "The first half mentions the estate and forgiveness.",
-        "The second half was found in Mr. Graves' room.",
-        "The key word connects both halves of the letter."
+        "The circled letters follow the order of the stage directions, not the dialogue.",
+        "The effects manual describes a 'prop goblet' used in Act III's poisoning scene.",
+        "Margaux's diary: 'The tea tastes wrong again. And now the wine in rehearsal...'",
+        "Diego: 'The annotations focus on Act III — the scene where Lady Ashford drinks from the cup.'"
       ],
-      "unlocks": "study_secret"
+      "unlocks": "script_decoded",
+      "hints": [
+        "Focus only on the red-circled letters in the stage directions.",
+        "There are six circled letters in Act III.",
+        "It's the vessel that killed Lady Ashford on stage — and killed Margaux in reality."
+      ]
+    },
+    {
+      "id": "lighting_sequence",
+      "name": "The Lighting Sequence",
+      "type": "sequence",
+      "description": "The catwalk lighting board. Four colored switches must be pressed in the exact order of the Act III lighting cue to open the hidden compartment.",
+      "answer": "red-blue-white-red",
+      "clues": [
+        "The effects manual: 'Act III cue: crimson wash, moonlight blue, center spot, crimson wash.'",
+        "The annotated script's margin symbols for Act III: ●○★●",
+        "Edwin's notebook (seat G-12 note): 'Lighting cue — crimson wash, moonlight blue, center spot, crimson wash.'",
+        "Edwin's notebook maps the symbols: ● = crimson/red, ○ = moonlight/blue, ★ = spotlight/white"
+      ],
+      "unlocks": "edwins_notebook",
+      "hints": [
+        "The effects manual translates poetic stage directions to actual light colors.",
+        "Crimson = red. Moonlight = blue. Center spot = white.",
+        "The sequence starts and ends with the same color."
+      ]
+    },
+    {
+      "id": "evidence_board",
+      "name": "The Evidence Board",
+      "type": "sequence",
+      "description": "Two intertwined timelines must be connected: the 1928 murder of Margaux Fontaine, and the modern-day poisoning of Roland Ashworth. Arrange six pieces of evidence in chronological order to prove both cases.",
+      "answer": "cecilia-goblet-margaux-edwin-ghost-ashworth",
+      "clues": [
+        "Cecilia's Letters: She ordered poison from a pharmacist in October 1928.",
+        "Script Cipher + Mirror Message: Cecilia swapped the prop goblet for a real one.",
+        "Diary + Playbill: Margaux drank the poison on stage, October 31, 1928.",
+        "Edwin's Notebook: He discovered the proof decades later and devised the Ghost Project.",
+        "Fog Controls + Ghost Costume: Edwin staged the hauntings using the theater's effects.",
+        "Poisoned Teacup + Ashworth's testimony: Edwin poisoned Ashworth when he was discovered."
+      ],
+      "unlocks": "case_closed",
+      "hints": [
+        "Start with the oldest event — who acted first in 1928?",
+        "The 1928 timeline has three steps: plan, execute, result.",
+        "The modern timeline also has three steps: discover, stage, cover up."
+      ]
+    },
+    {
+      "id": "mirror_puzzle",
+      "name": "The Vanity Mirror",
+      "type": "logic",
+      "description": "Using the magnifying glass, you've revealed wax writing on Margaux's mirror. She left an accusation. Who did she accuse? Enter the initials.",
+      "answer": "cd",
+      "clues": [
+        "The mirror message: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.'",
+        "The wall photos show Margaux with 'my dear Cecilia.'",
+        "The 1928 playbill lists Cecilia Drake as understudy."
+      ],
+      "unlocks": "margaux_accusation",
+      "hints": [
+        "Margaux wrote the initials of her killer on her own mirror.",
+        "Think about who her understudy was — the person who took over her role.",
+        "The initials stand for a first and last name."
+      ]
+    },
+    {
+      "id": "film_puzzle",
+      "name": "The Film Frames",
+      "type": "sequence",
+      "description": "Four frames from the 1928 rehearsal footage, visible through the magnifying glass. They've been spliced out of order. Arrange them to show what happened on stage that night.",
+      "answer": "toast-drink-collapse-understudy",
+      "clues": [
+        "The script's Act III stage directions describe the sequence: toast, drink, collapse.",
+        "The playbill notes Cecilia Drake as understudy — she would have been waiting in the wings.",
+        "Margaux's diary: 'In the final scene, Lady Ashford raises the goblet and drinks. Then she falls.'",
+        "Frame descriptions: A woman raising a goblet (toast), drinking from it (drink), collapsing on stage (collapse), a second woman stepping out from the wings (understudy)"
+      ],
+      "unlocks": "film_decoded",
+      "hints": [
+        "The sequence follows the plot of The Crimson Veil's final scene.",
+        "What happens first in the scene? The toast.",
+        "After the lead actress falls, who steps forward to take her place?"
+      ]
+    },
+    {
+      "id": "lockbox_puzzle",
+      "name": "Stella's Lockbox",
+      "type": "combination",
+      "description": "A metal lockbox under Stella's work station with a four-digit combination lock. The lock has numbers 0–9 on each dial.",
+      "answer": "4200",
+      "clues": [
+        "The call board lists missing props with 'est. value: $4,200.'",
+        "Stella mentioned she's been tracking what's been 'relocated.'",
+        "The value of the missing items is the key — it's what she's trying to hide."
+      ],
+      "unlocks": "stella_records",
+      "hints": [
+        "Look at the call board notice near Stella's station.",
+        "The combination relates to the estimated value of missing props.",
+        "The number is a dollar amount, four digits."
+      ]
+    },
+    {
+      "id": "office_safe_puzzle",
+      "name": "Office Wall Safe",
+      "type": "combination",
+      "description": "A modern electronic wall safe in the Manager's Office. It requires a four-digit PIN.",
+      "answer": "1928",
+      "clues": [
+        "Ashworth's book 'Ghosts of the American Theatre' has a chapter on the Monarch bookmarked to the year of the haunting.",
+        "The filing cabinet contains a heritage assessment focused on events of 1928.",
+        "Ashworth told Nancy he's been researching the theater's history — the year of Margaux's death."
+      ],
+      "unlocks": "ashworth_files",
+      "hints": [
+        "Ashworth set the code to something related to the theater's most famous event.",
+        "What year did Margaux Fontaine die?",
+        "The year appears everywhere in this theater: playbills, memorials, records."
+      ]
+    },
+    {
+      "id": "passage_navigation",
+      "name": "Hidden Passage Navigation",
+      "type": "logic",
+      "description": "The hidden passages behind the theater's walls form a network. Using the blueprints, determine which room the passage from the basement connects to. Where does it emerge?",
+      "answer": "dressing room",
+      "clues": [
+        "The blueprints show passages connecting the basement to several rooms.",
+        "The dressing room has a heating vent with warm air rising from below.",
+        "The passage entrance in the basement points toward the dressing room wing.",
+        "The plastered-over door in the lobby mirror reflection aligns with the passage route."
+      ],
+      "unlocks": "passage_mapped",
+      "hints": [
+        "Which room has a direct connection to the basement that you've noticed?",
+        "Think about where the warm air and machinery sounds are coming from.",
+        "Edwin needed access to Margaux's costume — what room has it?"
+      ]
+    },
+    {
+      "id": "tea_analysis",
+      "name": "Poison Identification",
+      "type": "logic",
+      "description": "Compare the poisoned teacup residue with compounds described in Margaux's alchemy book. What compound was used to poison Ashworth?",
+      "answer": "antimony",
+      "clues": [
+        "The alchemy book in the dressing room has a section on antimony compounds heavily annotated by Margaux.",
+        "The teacup residue has a metallic, crystalline appearance.",
+        "Margaux's diary mentions a 'metallic taste' — the same symptom antimony poisoning causes.",
+        "The chemical bottles in the basement include pharmaceutical antimony compounds."
+      ],
+      "unlocks": "poison_identified",
+      "hints": [
+        "Margaux annotated one specific section of the alchemy book — what compound?",
+        "The same poison was used in 1928 and in the modern day.",
+        "It's a metallic element — Margaux wrote 'These are my symptoms exactly' next to it."
+      ]
     }
   ]
 }

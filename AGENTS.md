@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ## Project goal
-Build a polished mobile-friendly browser-based point-and-click mystery game inspired by classic detective adventures (Nancy Drew style).
+Build a polished mobile-friendly browser-based point-and-click mystery game inspired by classic detective adventures (Nancy Drew style). The game is "The Last Curtain Call" — set in a 1920s theater facing demolition, featuring a dual mystery: a modern poisoning and a century-old murder.
 
 ## Non-negotiables
 - Do not convert this project to Unity
@@ -30,11 +30,13 @@ Build a polished mobile-friendly browser-based point-and-click mystery game insp
 - Save progress locally using localStorage
 - Journal entries unlock based on clues found
 - Puzzles are validated against answers defined in puzzles.json
+- The 72-hour demolition deadline is narrative (chapter-based), not a real-time timer
 
 ## Aesthetic goals
-- Moody, elegant, mysterious
+- Moody, elegant, mysterious — theater noir
 - Clean UI with Georgia/serif typography
-- Gold (#c9a84c) accent on dark backgrounds
+- Gold (#c9a84c) accent on dark backgrounds, crimson (#8b1a1a) secondary accent
+- Art deco motifs, dramatic shadows, spotlight effects
 - Premium detective feel
 - Minimal clutter on screen
 
@@ -44,3 +46,4 @@ Build a polished mobile-friendly browser-based point-and-click mystery game insp
 - All game content lives in src/game/data/*.json
 - Room hotspots define all interactions (inspect, pickup, locked, navigate, talk)
 - UIScene runs as a parallel scene over RoomScene for HUD elements
+- 8 rooms total: Grand Lobby, Auditorium, Backstage, Dressing Room, Projection Booth, Manager's Office, Catwalk, Basement

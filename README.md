@@ -4,7 +4,9 @@ A mobile-friendly 2D point-and-click mystery game for browser, designed to work 
 
 ## About
 
-*Mystery at Thornwood Manor* — Lady Thornwood has vanished from her estate. As Nancy Drew, investigate the manor, question suspects, collect evidence, and uncover the truth behind her disappearance.
+*The Last Curtain Call* — The Monarch Theatre is haunted. Or so they say. When a real estate developer is poisoned on the eve of demolition, retired actress Vivian Delacroix calls Nancy Drew to investigate. As Nancy, explore the grand 1920s theater, question suspects, collect evidence, and uncover two intertwined mysteries — a modern-day poisoning and a century-old murder.
+
+72 hours until demolition. The ghost has a secret. The truth is buried beneath the stage.
 
 ## Stack
 
@@ -21,6 +23,7 @@ A mobile-friendly 2D point-and-click mystery game for browser, designed to work 
 - Puzzle progression gated by clues and items
 - Save/load via local storage
 - Responsive — works on desktop and phone browsers
+- Three distinct endings based on player choice
 
 ## Commands
 
@@ -56,7 +59,7 @@ src/
 
 ## Current Priorities
 
-1. First playable room with hotspot interactions
+1. First playable room chain (Lobby → Auditorium → Backstage)
 2. Inventory pickup and use-on-hotspot flow
 3. Dialogue modal with branching choices
 4. Clue journal UI

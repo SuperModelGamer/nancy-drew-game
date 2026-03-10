@@ -21,7 +21,7 @@ export class TitleScene extends Phaser.Scene {
     title.setOrigin(0.5);
 
     // Subtitle
-    const subtitle = this.add.text(width / 2, height * 0.3 + 70, 'Mystery at Thornwood Manor', {
+    const subtitle = this.add.text(width / 2, height * 0.3 + 70, 'The Last Curtain Call', {
       fontFamily: 'Georgia, serif',
       fontSize: '24px',
       color: '#8a7a5a',
@@ -55,7 +55,7 @@ export class TitleScene extends Phaser.Scene {
     btnBg.on('pointerdown', () => {
       this.cameras.main.fadeOut(500, 0, 0, 0);
       this.time.delayedCall(500, () => {
-        this.scene.start('RoomScene', { roomId: 'foyer' });
+        this.scene.start('RoomScene', { roomId: 'lobby' });
         this.scene.launch('UIScene');
       });
     });
