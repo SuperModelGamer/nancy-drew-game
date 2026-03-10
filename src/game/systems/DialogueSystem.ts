@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import dialogueData from '../data/dialogue.json';
 import { InventorySystem } from './InventorySystem';
+import { SaveSystem } from './SaveSystem';
 
 interface DialogueLine {
   speaker: string;
@@ -11,6 +12,7 @@ interface DialogueChoice {
   text: string;
   nextNode: string;
   requiredItem?: string;
+  requiredFlag?: string;
   triggerEvent?: string;
 }
 
@@ -19,6 +21,7 @@ interface DialogueNode {
   lines: DialogueLine[];
   choices?: DialogueChoice[];
   nextNode?: string;
+  triggerEvent?: string;
 }
 
 interface Dialogue {
@@ -93,18 +96,26 @@ export class DialogueSystem {
       const line = node.lines[this.currentLineIndex];
       this.renderLine(line);
     } else if (node.choices && node.choices.length > 0) {
+      // Filter choices by requiredItem and requiredFlag
       this.renderChoices(node.choices);
-    } else if (node.nextNode) {
-      const nextIndex = this.currentDialogue.nodes.findIndex(n => n.id === node.nextNode);
-      if (nextIndex >= 0) {
-        this.currentNodeIndex = nextIndex;
-        this.currentLineIndex = 0;
-        this.showCurrentLine();
+    } else {
+      // Trigger node-level events before advancing
+      if (node.triggerEvent) {
+        this.triggerEvent(node.triggerEvent);
+      }
+
+      if (node.nextNode) {
+        const nextIndex = this.currentDialogue.nodes.findIndex(n => n.id === node.nextNode);
+        if (nextIndex >= 0) {
+          this.currentNodeIndex = nextIndex;
+          this.currentLineIndex = 0;
+          this.showCurrentLine();
+        } else {
+          this.endDialogue();
+        }
       } else {
         this.endDialogue();
       }
-    } else {
-      this.endDialogue();
     }
   }
 
@@ -119,11 +130,12 @@ export class DialogueSystem {
     const { width, height } = this.scene.cameras.main;
     const boxY = height - 110;
 
-    // Speaker name
+    // Speaker name with color coding
+    const speakerColor = this.getSpeakerColor(line.speaker);
     const speaker = this.scene.add.text(width * 0.1, boxY - 50, line.speaker, {
       fontFamily: 'Georgia, serif',
       fontSize: '18px',
-      color: '#c9a84c',
+      color: speakerColor,
       fontStyle: 'bold',
     });
     this.container.add(speaker);
@@ -163,24 +175,45 @@ export class DialogueSystem {
     }
 
     const { width, height } = this.scene.cameras.main;
-    const boxY = height - 110;
     const inventory = InventorySystem.getInstance();
+    const save = SaveSystem.getInstance();
 
-    choices.forEach((choice, i) => {
-      const available = !choice.requiredItem || inventory.hasItem(choice.requiredItem);
-      const y = boxY - 40 + i * 45;
+    // Filter out choices whose requiredFlag is not met (hide them entirely if flag-gated)
+    // But show requiredItem choices as grayed out so player knows they need something
+    const visibleChoices = choices.filter(choice => {
+      if (choice.requiredFlag) {
+        return save.getFlag(choice.requiredFlag) || this.triggeredEvents.has(choice.requiredFlag);
+      }
+      return true;
+    });
+
+    // Calculate layout
+    const choiceHeight = 42;
+    const totalHeight = visibleChoices.length * choiceHeight;
+    const boxY = height - 20 - 90; // center of dialogue box
+    const startY = boxY - totalHeight / 2 + choiceHeight / 2;
+
+    visibleChoices.forEach((choice, i) => {
+      const itemAvailable = !choice.requiredItem || inventory.hasItem(choice.requiredItem);
+      const y = startY + i * choiceHeight;
 
       const btn = this.scene!.add.rectangle(width / 2, y, width * 0.75, 38, 0x1a1a2e, 0.9);
-      btn.setStrokeStyle(1, available ? 0xc9a84c : 0x444444, 0.6);
-      if (available) btn.setInteractive({ useHandCursor: true });
+      btn.setStrokeStyle(1, itemAvailable ? 0xc9a84c : 0x444444, 0.6);
+      if (itemAvailable) btn.setInteractive({ useHandCursor: true });
 
-      const text = this.scene!.add.text(width / 2, y, choice.text, {
+      let displayText = choice.text;
+      if (choice.requiredItem && !itemAvailable) {
+        displayText += ' (requires evidence)';
+      }
+
+      const text = this.scene!.add.text(width / 2, y, displayText, {
         fontFamily: 'Georgia, serif',
-        fontSize: '15px',
-        color: available ? '#c9a84c' : '#555555',
+        fontSize: '14px',
+        color: itemAvailable ? '#c9a84c' : '#555555',
+        wordWrap: { width: width * 0.7 },
       }).setOrigin(0.5);
 
-      if (available) {
+      if (itemAvailable) {
         btn.on('pointerover', () => btn.setFillStyle(0x2a2a4e));
         btn.on('pointerout', () => btn.setFillStyle(0x1a1a2e, 0.9));
         btn.on('pointerdown', () => this.selectChoice(choice));
@@ -188,6 +221,22 @@ export class DialogueSystem {
 
       this.container!.add([btn, text]);
     });
+  }
+
+  private getSpeakerColor(speaker: string): string {
+    const colors: Record<string, string> = {
+      'Nancy': '#e0d5c0',
+      'Vivian': '#b4a0d4',
+      'Edwin': '#7ba3c9',
+      'Stella': '#c9947b',
+      'Diego': '#7bc98a',
+      'Ashworth': '#c97b7b',
+      'Bess': '#d4a0b4',
+      'George': '#a0c9a0',
+      'Carson Drew': '#c9b87b',
+      'Receptionist': '#8a8a8a',
+    };
+    return colors[speaker] || '#c9a84c';
   }
 
   private advance(): void {
@@ -201,7 +250,7 @@ export class DialogueSystem {
     if (!this.currentDialogue) return;
 
     if (choice.triggerEvent) {
-      this.triggeredEvents.add(choice.triggerEvent);
+      this.triggerEvent(choice.triggerEvent);
     }
 
     const nextIndex = this.currentDialogue.nodes.findIndex(n => n.id === choice.nextNode);
@@ -214,7 +263,21 @@ export class DialogueSystem {
     }
   }
 
+  private triggerEvent(eventId: string): void {
+    this.triggeredEvents.add(eventId);
+    // Also set as a SaveSystem flag for persistence and cross-system access
+    SaveSystem.getInstance().setFlag(eventId, true);
+  }
+
   private endDialogue(): void {
+    // Check if the last node has a triggerEvent
+    if (this.currentDialogue) {
+      const node = this.currentDialogue.nodes[this.currentNodeIndex];
+      if (node?.triggerEvent) {
+        this.triggerEvent(node.triggerEvent);
+      }
+    }
+
     this.active = false;
     this.currentDialogue = null;
     this.destroyUI();

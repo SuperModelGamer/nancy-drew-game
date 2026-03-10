@@ -3,6 +3,7 @@ import roomsData from '../data/rooms.json';
 import { InventorySystem } from '../systems/InventorySystem';
 import { DialogueSystem } from '../systems/DialogueSystem';
 import { PuzzleSystem } from '../systems/PuzzleSystem';
+import { SaveSystem } from '../systems/SaveSystem';
 
 interface Hotspot {
   id: string;
@@ -19,6 +20,7 @@ interface Hotspot {
   targetRoom?: string;
   puzzleId?: string;
   onceOnly?: boolean;
+  showWhen?: string;
 }
 
 interface RoomData {
@@ -35,15 +37,17 @@ export class RoomScene extends Phaser.Scene {
   private tooltipText!: Phaser.GameObjects.Text;
   private descriptionBox!: Phaser.GameObjects.Container;
   private usedHotspots: Set<string> = new Set();
+  private selectedItemIndicator!: Phaser.GameObjects.Text;
 
   constructor() {
     super({ key: 'RoomScene' });
   }
 
   init(data: { roomId?: string }): void {
-    const roomId = data.roomId || 'foyer';
+    const roomId = data.roomId || 'lobby';
     const rooms = roomsData.rooms as RoomData[];
     this.currentRoom = rooms.find(r => r.id === roomId) || rooms[0];
+    SaveSystem.getInstance().setCurrentRoom(roomId);
   }
 
   create(): void {
@@ -60,7 +64,24 @@ export class RoomScene extends Phaser.Scene {
     });
     banner.setOrigin(0.5);
 
-    // Create hotspots
+    // Room description on first visit
+    const descText = this.add.text(width / 2, 58, this.currentRoom.description, {
+      fontFamily: 'Georgia, serif',
+      fontSize: '12px',
+      color: '#8a7a5a',
+      fontStyle: 'italic',
+      wordWrap: { width: width * 0.8 },
+      align: 'center',
+    });
+    descText.setOrigin(0.5, 0);
+    this.tweens.add({
+      targets: descText,
+      alpha: 0,
+      delay: 4000,
+      duration: 1000,
+    });
+
+    // Create hotspots (filtered by showWhen)
     this.createHotspots();
 
     // Tooltip for hover
@@ -79,6 +100,18 @@ export class RoomScene extends Phaser.Scene {
     this.descriptionBox.setVisible(false);
     this.descriptionBox.setDepth(200);
 
+    // Selected item indicator (top-right)
+    this.selectedItemIndicator = this.add.text(width - 20, 20, '', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '13px',
+      color: '#c9a84c',
+      fontStyle: 'italic',
+    }).setOrigin(1, 0).setDepth(90);
+    this.updateSelectedItemIndicator();
+
+    // Listen for inventory selection changes
+    InventorySystem.getInstance().onChange(() => this.updateSelectedItemIndicator());
+
     // Fade in
     this.cameras.main.fadeIn(500, 0, 0, 0);
   }
@@ -87,7 +120,33 @@ export class RoomScene extends Phaser.Scene {
     this.hotspotObjects.forEach(h => h.destroy());
     this.hotspotObjects = [];
 
+    const save = SaveSystem.getInstance();
+    const dialogue = DialogueSystem.getInstance();
+
     for (const hotspot of this.currentRoom.hotspots) {
+      // Check showWhen condition
+      if (hotspot.showWhen) {
+        const flagSet = save.getFlag(hotspot.showWhen);
+        const eventTriggered = dialogue.hasTriggeredEvent(hotspot.showWhen);
+        const chapterMatch = hotspot.showWhen.startsWith('chapter_') &&
+          save.getCurrentRoom() !== '' &&
+          this.checkChapterCondition(hotspot.showWhen);
+
+        if (!flagSet && !eventTriggered && !chapterMatch) {
+          continue; // Skip this hotspot — condition not met
+        }
+      }
+
+      // Skip already-used onceOnly hotspots
+      if (hotspot.onceOnly && this.usedHotspots.has(hotspot.id)) {
+        continue;
+      }
+
+      // Skip solved puzzle hotspots
+      if (hotspot.puzzleId && PuzzleSystem.getInstance().isSolved(hotspot.puzzleId)) {
+        continue;
+      }
+
       const container = this.add.container(hotspot.x, hotspot.y);
 
       // Hotspot clickable area - minimum 48px for mobile tap targets
@@ -134,11 +193,24 @@ export class RoomScene extends Phaser.Scene {
     }
   }
 
+  private checkChapterCondition(condition: string): boolean {
+    const match = condition.match(/^chapter_(\d+)$/);
+    if (!match) return false;
+    const requiredChapter = parseInt(match[1], 10);
+    return SaveSystem.getInstance().getChapter() >= requiredChapter;
+  }
+
   private handleHotspot(hotspot: Hotspot): void {
+    // Don't handle if dialogue is active
+    if (DialogueSystem.getInstance().isActive()) return;
+
     if (hotspot.onceOnly && this.usedHotspots.has(hotspot.id)) {
       this.showDescription('Nothing else to find here.');
       return;
     }
+
+    // Check for item-on-hotspot interaction
+    const selectedItem = InventorySystem.getInstance().getSelectedItem();
 
     switch (hotspot.type) {
       case 'inspect':
@@ -161,18 +233,7 @@ export class RoomScene extends Phaser.Scene {
         break;
 
       case 'locked':
-        if (hotspot.requiredItem) {
-          const inv = InventorySystem.getInstance();
-          if (inv.hasItem(hotspot.requiredItem)) {
-            this.showDescription(hotspot.description || 'Unlocked!');
-            this.usedHotspots.add(hotspot.id);
-            if (hotspot.targetRoom) {
-              this.navigateToRoom(hotspot.targetRoom);
-            }
-          } else {
-            this.showDescription('It\'s locked. You need something to open this.');
-          }
-        }
+        this.handleLockedHotspot(hotspot, selectedItem);
         break;
 
       case 'navigate':
@@ -190,6 +251,87 @@ export class RoomScene extends Phaser.Scene {
     }
   }
 
+  private handleLockedHotspot(hotspot: Hotspot, selectedItem: string | null): void {
+    const inv = InventorySystem.getInstance();
+
+    // Puzzle hotspots
+    if (hotspot.puzzleId) {
+      // Some puzzle hotspots require a specific item (e.g., magnifying glass)
+      if (hotspot.requiredItem) {
+        if (selectedItem === hotspot.requiredItem || inv.hasItem(hotspot.requiredItem)) {
+          // Show the description first, then open puzzle
+          if (hotspot.description) {
+            this.showDescription(hotspot.description);
+          }
+          this.time.delayedCall(hotspot.description ? 1500 : 0, () => {
+            this.openPuzzle(hotspot.puzzleId!);
+          });
+        } else {
+          this.showDescription('You need something specific to examine this more closely.');
+        }
+      } else {
+        // No item required — just open the puzzle
+        this.openPuzzle(hotspot.puzzleId);
+      }
+      return;
+    }
+
+    // Item-on-hotspot: if player has selected the required item, use it
+    if (hotspot.requiredItem) {
+      if (selectedItem === hotspot.requiredItem) {
+        // Use the selected item on this hotspot
+        this.showDescription(hotspot.description || 'Unlocked!');
+        this.usedHotspots.add(hotspot.id);
+        // Consume key items that are used to unlock
+        if (hotspot.targetRoom) {
+          inv.removeItem(hotspot.requiredItem);
+          inv.selectItem(null);
+          this.time.delayedCall(1000, () => {
+            this.navigateToRoom(hotspot.targetRoom!);
+          });
+        }
+      } else if (inv.hasItem(hotspot.requiredItem)) {
+        // Has the item but hasn't selected it
+        this.showDescription(`This seems to need something from your inventory. Try selecting an item first.`);
+      } else {
+        this.showDescription('It\'s locked. You need something to open this.');
+      }
+      return;
+    }
+
+    // Fallback for locked without requiredItem
+    this.showDescription(hotspot.description || 'It\'s locked.');
+  }
+
+  private openPuzzle(puzzleId: string): void {
+    if (PuzzleSystem.getInstance().isSolved(puzzleId)) {
+      this.showDescription('You\'ve already solved this.');
+      return;
+    }
+
+    this.scene.launch('PuzzleScene', {
+      puzzleId,
+      onSolved: () => {
+        // Refresh hotspots to hide solved puzzle hotspots
+        this.createHotspots();
+        const puzzle = PuzzleSystem.getInstance().getPuzzle(puzzleId);
+        if (puzzle?.unlocks) {
+          SaveSystem.getInstance().setFlag(puzzle.unlocks, true);
+        }
+      },
+    });
+  }
+
+  private updateSelectedItemIndicator(): void {
+    const selected = InventorySystem.getInstance().getSelectedItem();
+    if (selected) {
+      this.selectedItemIndicator.setText(`Using: ${selected}`);
+      this.selectedItemIndicator.setAlpha(1);
+    } else {
+      this.selectedItemIndicator.setText('');
+    }
+  }
+
   private showDescription(text: string): void {
     const { width, height } = this.cameras.main;
 
@@ -197,7 +339,12 @@ export class RoomScene extends Phaser.Scene {
     const textObj = this.descriptionBox.getAt(1) as Phaser.GameObjects.Text;
     textObj.setText(text);
 
-    this.descriptionBox.setPosition(width / 2, height - 80);
+    // Resize background to fit text
+    const bg = this.descriptionBox.getAt(0) as Phaser.GameObjects.Rectangle;
+    const textHeight = textObj.height;
+    bg.setSize(width * 0.8, Math.max(50, textHeight + 30));
+
+    this.descriptionBox.setPosition(width / 2, height - 60);
     this.descriptionBox.setVisible(true);
     this.descriptionBox.setAlpha(0);
 
@@ -207,8 +354,9 @@ export class RoomScene extends Phaser.Scene {
       duration: 200,
     });
 
-    // Auto-hide after a delay
-    this.time.delayedCall(3000, () => {
+    // Auto-hide based on text length
+    const displayTime = Math.max(3000, text.length * 40);
+    this.time.delayedCall(displayTime, () => {
       this.tweens.add({
         targets: this.descriptionBox,
         alpha: 0,
@@ -227,10 +375,11 @@ export class RoomScene extends Phaser.Scene {
 
     const text = this.add.text(0, 0, '', {
       fontFamily: 'Georgia, serif',
-      fontSize: '16px',
+      fontSize: '15px',
       color: '#e0d5c0',
       align: 'center',
       wordWrap: { width: width * 0.75 },
+      lineSpacing: 3,
     });
     text.setOrigin(0.5);
 
