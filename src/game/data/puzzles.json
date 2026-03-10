@@ -1,30 +1,56 @@
 {
   "puzzles": [
     {
-      "id": "safe_puzzle",
-      "name": "The Wall Safe",
+      "id": "trunk_puzzle",
+      "name": "Margaux's Trunk",
       "type": "combination",
-      "description": "A heavy iron safe set into the wall behind a painting. It requires a three-number combination.",
-      "answer": "8-23-42",
+      "description": "An antique trunk with a three-dial combination lock. Each dial shows numbers 0–9. Something precious is locked inside.",
+      "answer": "10-31-28",
       "clues": [
-        "Mrs. Pembrook mentioned Lady Thornwood's favorite numbers.",
-        "The book 'The Art of Deception' has numbers underlined on pages 8, 23, and 42.",
-        "A slip of paper in the desk drawer reads: 'Remember August 23rd, '42.'"
+        "The 1928 playbill is dated October 31, 1928.",
+        "Margaux's diary mentions: 'I will lock away what matters most before the final curtain on the 31st.'",
+        "Vivian said Margaux always used dates she could never forget."
       ],
-      "unlocks": "faded_photograph"
+      "unlocks": "margaux_locket"
     },
     {
-      "id": "letter_puzzle",
-      "name": "The Torn Letter",
+      "id": "script_cipher",
+      "name": "The Script Cipher",
       "type": "logic",
-      "description": "Two halves of a torn letter. Piece them together to reveal the full message.",
-      "answer": "inheritance",
+      "description": "Red-circled letters in the margins of 'The Crimson Veil' script. They spell a word when read in order through the stage directions.",
+      "answer": "goblet",
       "clues": [
-        "The first half mentions the estate and forgiveness.",
-        "The second half was found in Mr. Graves' room.",
-        "The key word connects both halves of the letter."
+        "Diego noticed the circled letters follow the order of the stage directions, not the dialogue.",
+        "The effects manual describes a 'prop goblet' used in Act III for the poisoning scene.",
+        "Margaux's diary mentions: 'The tea tastes wrong again. And now the wine in rehearsal...'"
       ],
-      "unlocks": "study_secret"
+      "unlocks": "script_decoded"
+    },
+    {
+      "id": "lighting_sequence",
+      "name": "The Lighting Sequence",
+      "type": "sequence",
+      "description": "The catwalk lighting board. Reproduce the exact lighting cue from the fatal night to reveal what the audience would have seen.",
+      "answer": "red-blue-white-red",
+      "clues": [
+        "The effects manual lists the Act III lighting sequence: 'crimson wash, moonlight blue, center spot, crimson wash.'",
+        "The annotated script has symbols in the margins at Act III: ●○★●",
+        "Edwin's notebook maps the symbols: ● = crimson, ○ = moonlight, ★ = spotlight"
+      ],
+      "unlocks": "catwalk_access"
+    },
+    {
+      "id": "evidence_board",
+      "name": "The Evidence Board",
+      "type": "sequence",
+      "description": "Arrange the evidence to connect both mysteries — the 1928 murder of Margaux Fontaine and the modern-day poisoning of Roland Ashworth.",
+      "answer": "cecilia-goblet-margaux-edwin-ghost-ashworth",
+      "clues": [
+        "All journal entries and collected items contain pieces of both timelines.",
+        "The 1928 timeline: Cecilia obtained poison, switched the prop goblet, Margaux died on stage.",
+        "The modern timeline: Edwin discovered the truth, staged the ghost, Ashworth found out, Edwin poisoned him."
+      ],
+      "unlocks": "case_closed"
     }
   ]
 }

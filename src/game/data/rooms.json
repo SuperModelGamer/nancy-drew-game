@@ -1,111 +1,587 @@
 {
   "rooms": [
     {
-      "id": "foyer",
-      "name": "Thornwood Manor — Foyer",
-      "description": "The grand entrance of Thornwood Manor. Dust motes drift through shafts of pale light. A grandfather clock ticks in the silence.",
+      "id": "lobby",
+      "name": "The Monarch Theatre — Grand Lobby",
+      "description": "The grand lobby of the Monarch Theatre. A dusty chandelier hangs above cracked marble floors. Faded playbills line the walls, and a brass ticket booth sits dark and empty. The air smells of old velvet and forgotten glamour.",
       "hotspots": [
         {
-          "id": "foyer_table",
+          "id": "lobby_desk",
           "x": 300,
-          "y": 400,
-          "width": 100,
+          "y": 420,
+          "width": 120,
           "height": 80,
-          "label": "Side Table",
+          "label": "Concierge Desk",
           "type": "inspect",
-          "description": "An ornate side table. There's a half-finished letter addressed to someone named 'E.W.' The ink is still wet."
+          "description": "A curved concierge desk with a guest ledger. A master key sits on a brass hook behind it. There's a note in shaky handwriting: 'Nancy — take the key. V.D.'"
         },
         {
-          "id": "foyer_key",
-          "x": 640,
-          "y": 350,
+          "id": "lobby_key",
+          "x": 340,
+          "y": 380,
           "width": 60,
           "height": 60,
-          "label": "Old Key",
+          "label": "Master Key",
           "type": "pickup",
-          "itemId": "brass_key",
+          "itemId": "master_key",
           "onceOnly": true
         },
         {
-          "id": "foyer_portrait",
-          "x": 900,
-          "y": 250,
-          "width": 120,
-          "height": 140,
-          "label": "Portrait",
-          "type": "inspect",
-          "description": "A stern-looking woman in Victorian dress. A small plaque reads: 'Eleanor Thornwood, 1842-1899'. Her eyes seem to follow you."
-        },
-        {
-          "id": "foyer_study_door",
-          "x": 1050,
-          "y": 400,
+          "id": "lobby_playbills",
+          "x": 150,
+          "y": 280,
           "width": 100,
-          "height": 160,
-          "label": "Study Door",
-          "type": "locked",
-          "requiredItem": "brass_key",
-          "description": "The door creaks open, revealing a dimly lit study beyond.",
-          "targetRoom": "study"
+          "height": 140,
+          "label": "Wall of Playbills",
+          "type": "inspect",
+          "description": "Dozens of playbills spanning decades. One is framed in gold: 'THE CRIMSON VEIL — Starring Margaux Fontaine — Final Performance, October 31, 1928.' Someone has placed fresh flowers beneath it."
         },
         {
-          "id": "foyer_housekeeper",
-          "x": 480,
+          "id": "lobby_chandelier",
+          "x": 640,
+          "y": 120,
+          "width": 140,
+          "height": 100,
+          "label": "Chandelier",
+          "type": "inspect",
+          "description": "A massive crystal chandelier, dark and dust-covered. A few prisms still catch the light from the lobby windows, casting faint rainbows on the marble floor."
+        },
+        {
+          "id": "lobby_vivian",
+          "x": 800,
           "y": 380,
           "width": 80,
           "height": 120,
-          "label": "Mrs. Pembrook",
+          "label": "Vivian Delacroix",
           "type": "talk",
-          "dialogueId": "housekeeper_intro"
+          "dialogueId": "vivian_intro"
+        },
+        {
+          "id": "lobby_auditorium_door",
+          "x": 1050,
+          "y": 350,
+          "width": 100,
+          "height": 180,
+          "label": "Auditorium Doors",
+          "type": "locked",
+          "requiredItem": "master_key",
+          "description": "The ornate double doors swing open with a groan, revealing the vast darkness of the auditorium beyond.",
+          "targetRoom": "auditorium"
+        },
+        {
+          "id": "lobby_old_poster",
+          "x": 500,
+          "y": 260,
+          "width": 80,
+          "height": 100,
+          "label": "Faded Poster",
+          "type": "inspect",
+          "description": "A half-torn touring poster: 'BLACKMOOR PLAYERS present: The Penvellyn Curse — A Tale of Alchemy and Shadows.' Someone's written in pencil at the bottom: 'Brilliant. Almost too real. —M.F.' Margaux Fontaine saw this show."
         }
       ]
     },
     {
-      "id": "study",
-      "name": "Thornwood Manor — Study",
-      "description": "A wood-paneled study lined with bookshelves. Papers are scattered across a mahogany desk.",
+      "id": "auditorium",
+      "name": "The Monarch Theatre — Auditorium",
+      "description": "A vast auditorium stretches before you. Rows of velvet seats descend toward a grand stage, its crimson curtain drawn shut. The air is thick and still. A single ghost light burns center stage.",
       "hotspots": [
         {
-          "id": "study_desk",
+          "id": "aud_stage",
           "x": 640,
-          "y": 400,
-          "width": 200,
-          "height": 100,
-          "label": "Desk",
-          "type": "inspect",
-          "description": "The desk is covered in financial records. Several entries are circled in red ink. Someone was tracking large withdrawals."
-        },
-        {
-          "id": "study_bookshelf",
-          "x": 200,
           "y": 300,
-          "width": 120,
-          "height": 200,
-          "label": "Bookshelf",
+          "width": 200,
+          "height": 120,
+          "label": "The Stage",
           "type": "inspect",
-          "description": "Mostly legal texts and ledgers. One book — 'The Art of Deception' — is pulled slightly forward."
+          "description": "The stage where Margaux Fontaine collapsed during the final act of The Crimson Veil, October 31, 1928. A single bare bulb — the ghost light — stands at center stage. Theater tradition says it keeps ghosts away. Or invites them."
         },
         {
-          "id": "study_safe",
-          "x": 1000,
-          "y": 350,
-          "width": 80,
-          "height": 80,
-          "label": "Wall Safe",
-          "type": "locked",
-          "requiredItem": "safe_combination",
-          "description": "The safe clicks open. Inside: a bundle of letters and a faded photograph.",
-          "puzzleId": "safe_puzzle"
-        },
-        {
-          "id": "study_back",
-          "x": 100,
+          "id": "aud_seats",
+          "x": 400,
           "y": 500,
+          "width": 140,
+          "height": 80,
+          "label": "Audience Seats",
+          "type": "inspect",
+          "description": "Rows of dusty velvet seats. You check the seat pockets — mostly old ticket stubs. One pocket holds a faded playbill from the 1928 performance."
+        },
+        {
+          "id": "aud_playbill",
+          "x": 420,
+          "y": 520,
+          "width": 60,
+          "height": 50,
+          "label": "1928 Playbill",
+          "type": "pickup",
+          "itemId": "playbill_1928",
+          "onceOnly": true
+        },
+        {
+          "id": "aud_edwin",
+          "x": 250,
+          "y": 450,
+          "width": 80,
+          "height": 120,
+          "label": "Edwin Hale",
+          "type": "talk",
+          "dialogueId": "edwin_auditorium"
+        },
+        {
+          "id": "aud_curtain",
+          "x": 640,
+          "y": 200,
+          "width": 300,
+          "height": 80,
+          "label": "Crimson Curtain",
+          "type": "inspect",
+          "description": "The original crimson velvet curtain, heavy with age. Gold tassels hang from its edges. A small brass plaque at stage left reads: 'For Margaux — the last light of the Monarch.'"
+        },
+        {
+          "id": "aud_backstage_door",
+          "x": 1100,
+          "y": 400,
+          "width": 80,
+          "height": 140,
+          "label": "Backstage Door",
+          "type": "navigate",
+          "targetRoom": "backstage"
+        },
+        {
+          "id": "aud_back_lobby",
+          "x": 100,
+          "y": 550,
           "width": 100,
           "height": 60,
-          "label": "Back to Foyer",
+          "label": "Back to Lobby",
           "type": "navigate",
-          "targetRoom": "foyer"
+          "targetRoom": "lobby"
+        }
+      ]
+    },
+    {
+      "id": "backstage",
+      "name": "The Monarch Theatre — Backstage",
+      "description": "A labyrinth of rigging ropes, costume racks, and stacked set pieces. The air smells of sawdust and old paint. Somewhere in the shadows, something mechanical hums.",
+      "hotspots": [
+        {
+          "id": "bs_fog_machine",
+          "x": 300,
+          "y": 400,
+          "width": 120,
+          "height": 80,
+          "label": "Fog Machine",
+          "type": "inspect",
+          "description": "An industrial fog machine, old but functional. The fluid reservoir is half-empty and the nozzle is still damp. Someone used this recently."
+        },
+        {
+          "id": "bs_stella",
+          "x": 640,
+          "y": 380,
+          "width": 80,
+          "height": 120,
+          "label": "Stella Morrow",
+          "type": "talk",
+          "dialogueId": "stella_backstage"
+        },
+        {
+          "id": "bs_tech_shelf",
+          "x": 900,
+          "y": 350,
+          "width": 120,
+          "height": 100,
+          "label": "Technical Shelf",
+          "type": "inspect",
+          "description": "Shelves of old stage manuals and equipment logs. One binder stands out: 'MONARCH THEATRE — SPECIAL EFFECTS MANUAL, 1925.' It details fog machines, trapdoors, and hidden passages built into the original construction."
+        },
+        {
+          "id": "bs_effects_manual",
+          "x": 920,
+          "y": 330,
+          "width": 60,
+          "height": 50,
+          "label": "Effects Manual",
+          "type": "pickup",
+          "itemId": "effects_manual",
+          "onceOnly": true
+        },
+        {
+          "id": "bs_prop_table",
+          "x": 500,
+          "y": 300,
+          "width": 120,
+          "height": 80,
+          "label": "Prop Table",
+          "type": "inspect",
+          "description": "A cluttered prop table. There's a dusty globe, some trick daggers, and a small stone gargoyle that looks like it belongs in an English manor. A tag reads: 'Blackmoor Manor set — 1932 touring production. DO NOT DISCARD.' Strange — it feels heavier than a prop should."
+        },
+        {
+          "id": "bs_costume_rack",
+          "x": 150,
+          "y": 300,
+          "width": 100,
+          "height": 160,
+          "label": "Costume Rack",
+          "type": "inspect",
+          "description": "Rows of costumes from past productions. One white gown near the back seems out of place — it's not dusty at all. The hem is damp."
+        },
+        {
+          "id": "bs_basement_door",
+          "x": 1050,
+          "y": 450,
+          "width": 80,
+          "height": 120,
+          "label": "Basement Door",
+          "type": "locked",
+          "requiredItem": "basement_key",
+          "description": "The heavy door swings open, revealing a steep staircase descending into darkness beneath the stage.",
+          "targetRoom": "basement"
+        },
+        {
+          "id": "bs_back_aud",
+          "x": 100,
+          "y": 550,
+          "width": 100,
+          "height": 60,
+          "label": "Back to Auditorium",
+          "type": "navigate",
+          "targetRoom": "auditorium"
+        }
+      ]
+    },
+    {
+      "id": "dressing_room",
+      "name": "Margaux's Dressing Room",
+      "description": "Time stopped here in 1928. A vanity mirror surrounded by lightbulbs — half of them dead — reflects dusty perfume bottles and a dried corsage. A velvet settee sits beneath a rack of moth-eaten costumes. The room smells of old powder and roses.",
+      "hotspots": [
+        {
+          "id": "dr_vanity",
+          "x": 400,
+          "y": 350,
+          "width": 140,
+          "height": 100,
+          "label": "Margaux's Vanity",
+          "type": "inspect",
+          "description": "A vanity table with a cracked mirror surrounded by lightbulbs. Margaux's name is still painted on the mirror in faded gold. The surface holds dried roses, an empty perfume bottle, and a hairbrush with dark strands still caught in the bristles."
+        },
+        {
+          "id": "dr_diary",
+          "x": 420,
+          "y": 320,
+          "width": 60,
+          "height": 50,
+          "label": "Vanity Drawer",
+          "type": "pickup",
+          "itemId": "margaux_diary",
+          "onceOnly": true,
+          "description": "Inside the drawer: a leather-bound diary with M.F. embossed in gold on the cover."
+        },
+        {
+          "id": "dr_trunk",
+          "x": 800,
+          "y": 450,
+          "width": 120,
+          "height": 80,
+          "label": "Locked Trunk",
+          "type": "locked",
+          "puzzleId": "trunk_puzzle",
+          "description": "An antique trunk with a combination lock. Three dials, each numbered 0–9."
+        },
+        {
+          "id": "dr_photos",
+          "x": 200,
+          "y": 280,
+          "width": 100,
+          "height": 100,
+          "label": "Wall Photos",
+          "type": "inspect",
+          "description": "Framed photographs of Margaux in various roles. In one, she stands with a younger woman — the inscription reads 'With my dear Cecilia, who will one day outshine us all.' The glass over Cecilia's face is cracked."
+        },
+        {
+          "id": "dr_alchemy_book",
+          "x": 650,
+          "y": 380,
+          "width": 80,
+          "height": 60,
+          "label": "Old Book",
+          "type": "inspect",
+          "description": "A leather-bound volume wedged behind the settee cushion: 'The Alchemist's Apprentice — A Study of Poisons and Their Remedies, 1890.' Several pages are dog-eared. Margaux was doing her own research into what was happening to her."
+        },
+        {
+          "id": "dr_back",
+          "x": 100,
+          "y": 550,
+          "width": 100,
+          "height": 60,
+          "label": "Back to Backstage",
+          "type": "navigate",
+          "targetRoom": "backstage"
+        }
+      ]
+    },
+    {
+      "id": "projection_booth",
+      "name": "Projection Booth",
+      "description": "A cramped booth above the auditorium, crammed with old projectors and film canisters. Diego Reyes has set up a makeshift writing desk between the equipment. Papers and coffee cups everywhere.",
+      "hotspots": [
+        {
+          "id": "pb_projector",
+          "x": 300,
+          "y": 350,
+          "width": 120,
+          "height": 100,
+          "label": "Old Projector",
+          "type": "inspect",
+          "description": "A 1920s carbon arc projector, beautifully preserved. A film reel is still loaded — the label reads 'The Crimson Veil — Rehearsal Footage, 1928.' The film is too degraded to play."
+        },
+        {
+          "id": "pb_diego",
+          "x": 700,
+          "y": 380,
+          "width": 80,
+          "height": 120,
+          "label": "Diego Reyes",
+          "type": "talk",
+          "dialogueId": "diego_booth"
+        },
+        {
+          "id": "pb_script",
+          "x": 750,
+          "y": 320,
+          "width": 80,
+          "height": 60,
+          "label": "Annotated Script",
+          "type": "pickup",
+          "itemId": "annotated_script",
+          "onceOnly": true,
+          "description": "The original script of 'The Crimson Veil' with handwritten annotations in the margins. The notes are in some kind of code — letters circled in red ink throughout the stage directions."
+        },
+        {
+          "id": "pb_window",
+          "x": 500,
+          "y": 200,
+          "width": 200,
+          "height": 100,
+          "label": "Booth Window",
+          "type": "inspect",
+          "description": "Through the thick glass, you can see the entire auditorium below — the stage, the seats, the balcony. A perfect vantage point. From here, you'd see everything that happened on that stage."
+        },
+        {
+          "id": "pb_back",
+          "x": 100,
+          "y": 550,
+          "width": 100,
+          "height": 60,
+          "label": "Back to Auditorium",
+          "type": "navigate",
+          "targetRoom": "auditorium"
+        }
+      ]
+    },
+    {
+      "id": "managers_office",
+      "name": "Manager's Office",
+      "description": "Roland Ashworth's temporary headquarters. A modern laptop sits incongruously on an ornate mahogany desk. Demolition blueprints are pinned to the walls. A cot in the corner suggests he's been sleeping here. He looks pale and unwell.",
+      "hotspots": [
+        {
+          "id": "mo_ashworth",
+          "x": 640,
+          "y": 400,
+          "width": 100,
+          "height": 120,
+          "label": "Roland Ashworth",
+          "type": "talk",
+          "dialogueId": "ashworth_office"
+        },
+        {
+          "id": "mo_blueprints",
+          "x": 300,
+          "y": 280,
+          "width": 140,
+          "height": 100,
+          "label": "Blueprints",
+          "type": "inspect",
+          "description": "Demolition blueprints for the Monarch Theatre. But someone has drawn over them in red pen — marking hidden passages, sealed rooms, and what looks like a tunnel network beneath the stage. These aren't Ashworth's notes."
+        },
+        {
+          "id": "mo_teacup",
+          "x": 800,
+          "y": 420,
+          "width": 60,
+          "height": 50,
+          "label": "Teacup",
+          "type": "pickup",
+          "itemId": "poisoned_teacup",
+          "onceOnly": true,
+          "description": "A porcelain teacup with dried residue at the bottom. Whatever Ashworth drank, the remains are still here."
+        },
+        {
+          "id": "mo_laptop",
+          "x": 500,
+          "y": 380,
+          "width": 100,
+          "height": 60,
+          "label": "Laptop",
+          "type": "inspect",
+          "description": "Ashworth's laptop, open to an email chain. The latest message: 'The historical society's petition is meaningless. Proceed with demolition on schedule. — R.A.' A reply draft reads: 'There's someone in the building at night. I have proof.'"
+        },
+        {
+          "id": "mo_cot",
+          "x": 1000,
+          "y": 450,
+          "width": 100,
+          "height": 80,
+          "label": "Cot",
+          "type": "inspect",
+          "description": "A camp cot with rumpled blankets. On the pillow: a small flashlight and a book — 'Ghosts of the American Theatre.' A chapter on the Monarch is bookmarked."
+        },
+        {
+          "id": "mo_back",
+          "x": 100,
+          "y": 550,
+          "width": 100,
+          "height": 60,
+          "label": "Back to Lobby",
+          "type": "navigate",
+          "targetRoom": "lobby"
+        }
+      ]
+    },
+    {
+      "id": "catwalk",
+      "name": "The Catwalk",
+      "description": "A narrow metal walkway suspended above the stage. Lighting rigs hang at eye level, and the stage floor is a dizzying distance below. The ghost light flickers far beneath you. Every step echoes.",
+      "hotspots": [
+        {
+          "id": "cw_lights",
+          "x": 400,
+          "y": 350,
+          "width": 120,
+          "height": 80,
+          "label": "Lighting Rig",
+          "type": "inspect",
+          "description": "A bank of theatrical spotlights, some original from the 1920s. One spotlight has been recently adjusted — its gel filter is crimson red. It's aimed directly at center stage, exactly where Margaux would have stood."
+        },
+        {
+          "id": "cw_notebook",
+          "x": 700,
+          "y": 380,
+          "width": 60,
+          "height": 50,
+          "label": "Leather Notebook",
+          "type": "pickup",
+          "itemId": "edwins_notebook",
+          "onceOnly": true,
+          "description": "A leather notebook tucked behind a lighting fixture. The first page reads: 'The Ghost Project — E.H.' Pages of research, timelines, diagrams of the theater's hidden passage system."
+        },
+        {
+          "id": "cw_view_down",
+          "x": 640,
+          "y": 500,
+          "width": 200,
+          "height": 60,
+          "label": "Look Down",
+          "type": "inspect",
+          "description": "The stage stretches out far below. From up here, you can see scuff marks on the stage floor — a path worn between the trapdoor and stage left. Someone's been using that trapdoor regularly."
+        },
+        {
+          "id": "cw_rope_system",
+          "x": 200,
+          "y": 300,
+          "width": 80,
+          "height": 140,
+          "label": "Fly System",
+          "type": "inspect",
+          "description": "The theater's original counterweight fly system — ropes and pulleys for raising and lowering scenery. One line has been recently re-rigged. Whatever it lifts, it's been used within the last few days."
+        },
+        {
+          "id": "cw_back",
+          "x": 100,
+          "y": 550,
+          "width": 100,
+          "height": 60,
+          "label": "Back to Backstage",
+          "type": "navigate",
+          "targetRoom": "backstage"
+        }
+      ]
+    },
+    {
+      "id": "basement",
+      "name": "Beneath the Stage",
+      "description": "A cavernous space beneath the stage. Massive trapdoor mechanisms loom in the shadows. Old set pieces lean against the walls like sleeping giants. In the far corner, a work lamp illuminates a makeshift workshop that wasn't here in 1928.",
+      "hotspots": [
+        {
+          "id": "bm_workshop",
+          "x": 800,
+          "y": 380,
+          "width": 140,
+          "height": 100,
+          "label": "Workshop",
+          "type": "inspect",
+          "description": "Edwin's hidden workshop. A table covered in historical documents, a fog machine remote control, a white costume on a dress form, and chemical bottles. This is where the ghost was made."
+        },
+        {
+          "id": "bm_fog_controls",
+          "x": 400,
+          "y": 400,
+          "width": 100,
+          "height": 80,
+          "label": "Fog Machine Controls",
+          "type": "pickup",
+          "itemId": "fog_machine_part",
+          "onceOnly": true,
+          "description": "A remote control system wired to the fog machines upstairs. It's been modified for one-person operation — someone could trigger fog, lights, and the trapdoor from right here."
+        },
+        {
+          "id": "bm_trapdoor",
+          "x": 640,
+          "y": 200,
+          "width": 160,
+          "height": 80,
+          "label": "Trapdoor Mechanism",
+          "type": "inspect",
+          "description": "The original stage trapdoor mechanism. Recently oiled and fully functional. A pulley system can lift a person from the basement to center stage in seconds. This is how the 'ghost' appeared and vanished."
+        },
+        {
+          "id": "bm_hidden_safe",
+          "x": 200,
+          "y": 350,
+          "width": 100,
+          "height": 80,
+          "label": "Brick Alcove",
+          "type": "inspect",
+          "description": "A section of the basement wall has been carefully dismantled, revealing a hidden alcove. Inside: a bundle of letters tied with ribbon — correspondence between Cecilia Drake and a pharmacist, dated 1928. This is the proof that Margaux was murdered."
+        },
+        {
+          "id": "bm_cecilia_letter",
+          "x": 220,
+          "y": 340,
+          "width": 60,
+          "height": 50,
+          "label": "Cecilia's Letters",
+          "type": "pickup",
+          "itemId": "cecilia_letter",
+          "onceOnly": true
+        },
+        {
+          "id": "bm_edwin",
+          "x": 900,
+          "y": 380,
+          "width": 80,
+          "height": 120,
+          "label": "Edwin Hale",
+          "type": "talk",
+          "dialogueId": "edwin_confronted"
+        },
+        {
+          "id": "bm_back",
+          "x": 100,
+          "y": 550,
+          "width": 100,
+          "height": 60,
+          "label": "Back to Backstage",
+          "type": "navigate",
+          "targetRoom": "backstage"
         }
       ]
     }
