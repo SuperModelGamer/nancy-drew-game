@@ -441,19 +441,21 @@ Audio is **not required for MVP** but the system should support it from the star
 | 21 | Hotspot glow pulse animations (subtle gold sine wave pulse on all hotspots) | Done |
 | 22 | Ending epilogue screens (3 cinematic endings with sequential fade-in, credits) | Done |
 | 23 | Suspects button + Map button in UIScene toolbar | Done |
+| 24 | Evidence board puzzle UI (draggable corkboard with 6 cards, red string, timeline) | Done |
+| 25 | Chapter transition screens (5 cinematic act interstitials with timed fade-ins) | Done |
+| 26 | Dialogue skip/fast-forward button (skip to choices or end of node) | Done |
+| 27 | EvidenceBoardScene routed from RoomScene (evidence_board puzzle → dedicated scene) | Done |
+| 28 | ChapterSystem returns new chapter number, RoomScene launches transition on advance | Done |
 
 ### What Needs Building (in priority order)
 
 | # | Task | Scope | Depends on |
 |---|------|-------|------------|
-| 1 | **Evidence board puzzle UI** | Visual corkboard with draggable evidence for the final puzzle | PuzzleScene variant |
-| 2 | **Room background art** | Illustrated backgrounds for all 8 rooms | Asset pipeline |
-| 3 | **Character portraits** | Portrait art for dialogue panels | Asset pipeline |
-| 4 | **Audio integration** | Ambience + UI sounds | Phaser audio |
-| 5 | **Chapter transition screens** | Night 1 / Day 2 / Night 2 interstitials on chapter advance | ChapterSystem |
-| 6 | **Dialogue skip/fast-forward** | Skip button for already-seen dialogue | DialogueSystem |
-| 7 | **Mobile touch testing** | Tap target tuning, responsive layout QA | Everything |
-| 8 | **Polish pass** | Animations, transitions, edge cases | Everything |
+| 1 | **Room background art** | Illustrated backgrounds for all 8 rooms | Asset pipeline |
+| 2 | **Character portraits** | Portrait art for dialogue panels | Asset pipeline |
+| 3 | **Audio integration** | Ambience + UI sounds | Phaser audio |
+| 4 | **Mobile touch testing** | Tap target tuning, responsive layout QA | Everything |
+| 5 | **Polish pass** | Animations, transitions, edge cases | Everything |
 
 ---
 

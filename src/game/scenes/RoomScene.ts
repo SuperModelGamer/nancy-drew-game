@@ -114,8 +114,11 @@ export class RoomScene extends Phaser.Scene {
     // Listen for inventory selection changes
     InventorySystem.getInstance().onChange(() => this.updateSelectedItemIndicator());
 
-    // Check chapter progression
-    ChapterSystem.getInstance().checkProgression();
+    // Check chapter progression — show transition if advanced
+    const newChapter = ChapterSystem.getInstance().checkProgression();
+    if (newChapter) {
+      this.scene.launch('ChapterTransitionScene', { chapter: newChapter });
+    }
 
     // Auto-save on room entry
     SaveSystem.getInstance().save();
@@ -341,17 +344,20 @@ export class RoomScene extends Phaser.Scene {
       return;
     }
 
-    this.scene.launch('PuzzleScene', {
-      puzzleId,
-      onSolved: () => {
-        // Refresh hotspots to hide solved puzzle hotspots
-        this.createHotspots();
-        const puzzle = PuzzleSystem.getInstance().getPuzzle(puzzleId);
-        if (puzzle?.unlocks) {
-          SaveSystem.getInstance().setFlag(puzzle.unlocks, true);
-        }
-      },
-    });
+    const onSolved = () => {
+      this.createHotspots();
+      const puzzle = PuzzleSystem.getInstance().getPuzzle(puzzleId);
+      if (puzzle?.unlocks) {
+        SaveSystem.getInstance().setFlag(puzzle.unlocks, true);
+      }
+    };
+
+    // Route evidence board to its dedicated scene
+    if (puzzleId === 'evidence_board') {
+      this.scene.launch('EvidenceBoardScene', { onSolved });
+    } else {
+      this.scene.launch('PuzzleScene', { puzzleId, onSolved });
+    }
   }
 
   private updateSelectedItemIndicator(): void {

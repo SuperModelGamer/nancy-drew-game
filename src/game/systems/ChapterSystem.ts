@@ -65,17 +65,17 @@ export class ChapterSystem {
     return ChapterSystem.instance;
   }
 
-  checkProgression(): boolean {
+  checkProgression(): number | null {
     const save = SaveSystem.getInstance();
     const inventory = InventorySystem.getInstance();
     const puzzles = PuzzleSystem.getInstance();
     const dialogue = DialogueSystem.getInstance();
     const currentChapter = save.getChapter();
-    let advanced = false;
+    let newChapter: number | null = null;
 
     for (const milestone of CHAPTER_MILESTONES) {
       if (milestone.chapter <= currentChapter) continue;
-      if (milestone.chapter !== currentChapter + 1) continue; // Only advance one chapter at a time
+      if (milestone.chapter !== currentChapter + 1) continue;
 
       const allMet = milestone.conditions.every(cond => {
         switch (cond.type) {
@@ -96,11 +96,11 @@ export class ChapterSystem {
         save.setChapter(milestone.chapter);
         save.addJournalEntry(milestone.journalEntry);
         save.save();
-        advanced = true;
+        newChapter = milestone.chapter;
       }
     }
 
-    return advanced;
+    return newChapter;
   }
 
   getChapterTitle(chapter: number): string {
