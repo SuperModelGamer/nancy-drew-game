@@ -34,16 +34,16 @@
 - [x] Hotspot highlight animations (subtle gold glow pulse)
 - [x] Ending epilogue screens (full-screen narrative + credits per ending)
 
-## Tier 2.5 — Next Sprint
-- [ ] Evidence board puzzle UI (visual corkboard with draggable pieces)
+## Tier 2.5 — COMPLETE
+- [x] Evidence board puzzle UI (visual corkboard with draggable pieces)
+- [x] Chapter transition screens (Night 1 / Day 2 / Night 2)
+- [x] Dialogue skip/fast-forward button
 
 ## Tier 3 — Polish & Assets
 - [ ] Room background art (illustrated, 8 rooms)
 - [ ] Character portraits for dialogue panels
 - [ ] Audio ambience and UI sound effects
 - [ ] Mobile touch testing and tap target tuning
-- [ ] Chapter transition screens (Night 1 / Day 2 / Night 2)
-- [ ] Dialogue skip/fast-forward button
 
 ## Tier 4 — Stretch
 - [ ] Multiple save slots

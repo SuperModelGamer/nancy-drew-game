@@ -160,6 +160,18 @@ export class DialogueSystem {
     advanceBtn.on('pointerdown', () => this.advance());
     this.container.add(advanceBtn);
 
+    // Skip button — fast-forward to choices or end of node
+    const skipBtn = this.scene.add.text(width * 0.15, boxY + 40, '▸▸ Skip', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '13px',
+      color: '#5a5a5a',
+    }).setOrigin(0, 0.5);
+    skipBtn.setInteractive({ useHandCursor: true });
+    skipBtn.on('pointerover', () => skipBtn.setColor('#8a7a5a'));
+    skipBtn.on('pointerout', () => skipBtn.setColor('#5a5a5a'));
+    skipBtn.on('pointerdown', () => this.skipToEnd());
+    this.container.add(skipBtn);
+
     // Also allow tapping the box area to advance
     const hitArea = this.scene.add.rectangle(width / 2, boxY, width * 0.9, 180, 0x000000, 0);
     hitArea.setInteractive({ useHandCursor: true });
@@ -244,6 +256,23 @@ export class DialogueSystem {
 
     this.currentLineIndex++;
     this.showCurrentLine();
+  }
+
+  private skipToEnd(): void {
+    if (!this.currentDialogue) return;
+
+    const node = this.currentDialogue.nodes[this.currentNodeIndex];
+    if (!node) return;
+
+    // Skip to choices (if node has them) or to the end of the node
+    if (node.choices && node.choices.length > 0) {
+      this.currentLineIndex = node.lines.length;
+      this.showCurrentLine();
+    } else {
+      // Skip entire node — trigger events and advance
+      this.currentLineIndex = node.lines.length;
+      this.showCurrentLine();
+    }
   }
 
   private selectChoice(choice: DialogueChoice): void {
