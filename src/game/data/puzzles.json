@@ -1,0 +1,30 @@
+{
+  "puzzles": [
+    {
+      "id": "safe_puzzle",
+      "name": "The Wall Safe",
+      "type": "combination",
+      "description": "A heavy iron safe set into the wall behind a painting. It requires a three-number combination.",
+      "answer": "8-23-42",
+      "clues": [
+        "Mrs. Pembrook mentioned Lady Thornwood's favorite numbers.",
+        "The book 'The Art of Deception' has numbers underlined on pages 8, 23, and 42.",
+        "A slip of paper in the desk drawer reads: 'Remember August 23rd, '42.'"
+      ],
+      "unlocks": "faded_photograph"
+    },
+    {
+      "id": "letter_puzzle",
+      "name": "The Torn Letter",
+      "type": "logic",
+      "description": "Two halves of a torn letter. Piece them together to reveal the full message.",
+      "answer": "inheritance",
+      "clues": [
+        "The first half mentions the estate and forgiveness.",
+        "The second half was found in Mr. Graves' room.",
+        "The key word connects both halves of the letter."
+      ],
+      "unlocks": "study_secret"
+    }
+  ]
+}

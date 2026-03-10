@@ -1,0 +1,40 @@
+import Phaser from 'phaser';
+
+export class BootScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'BootScene' });
+  }
+
+  preload(): void {
+    // Show loading bar
+    const { width, height } = this.cameras.main;
+    const barWidth = width * 0.6;
+    const barHeight = 8;
+    const barX = (width - barWidth) / 2;
+    const barY = height / 2;
+
+    const bg = this.add.rectangle(width / 2, barY, barWidth, barHeight, 0x222233);
+    bg.setOrigin(0.5);
+
+    const bar = this.add.rectangle(barX, barY, 0, barHeight, 0xc9a84c);
+    bar.setOrigin(0, 0.5);
+
+    const loadingText = this.add.text(width / 2, barY - 30, 'Loading...', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '18px',
+      color: '#c9a84c',
+    });
+    loadingText.setOrigin(0.5);
+
+    this.load.on('progress', (value: number) => {
+      bar.width = barWidth * value;
+    });
+
+    // Load shared assets here
+    // this.load.image('key', 'assets/path.png');
+  }
+
+  create(): void {
+    this.scene.start('TitleScene');
+  }
+}

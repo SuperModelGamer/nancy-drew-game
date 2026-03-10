@@ -1,0 +1,72 @@
+{
+  "dialogues": [
+    {
+      "id": "housekeeper_intro",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Mrs. Pembrook", "text": "Oh! You must be the detective. I wasn't expecting anyone so soon." },
+            { "speaker": "Nancy", "text": "Nancy Drew. I came as quickly as I could. Can you tell me what happened?" },
+            { "speaker": "Mrs. Pembrook", "text": "It's the mistress — Lady Thornwood. She's been missing since Tuesday. The police say she left on her own, but I know better." }
+          ],
+          "choices": [
+            {
+              "text": "What makes you think something happened to her?",
+              "nextNode": "suspicion"
+            },
+            {
+              "text": "Who else lives in the manor?",
+              "nextNode": "residents"
+            },
+            {
+              "text": "I'd like to look around first.",
+              "nextNode": "end"
+            }
+          ]
+        },
+        {
+          "id": "suspicion",
+          "lines": [
+            { "speaker": "Mrs. Pembrook", "text": "She would never leave without telling me. And there were... arguments. Loud ones, in the study, the night before she vanished." },
+            { "speaker": "Nancy", "text": "Arguments with whom?" },
+            { "speaker": "Mrs. Pembrook", "text": "Her nephew, Mr. Graves. He's been staying here for weeks. Something about the inheritance." }
+          ],
+          "choices": [
+            {
+              "text": "Where can I find Mr. Graves?",
+              "nextNode": "graves_location",
+              "triggerEvent": "learned_about_graves"
+            },
+            {
+              "text": "Can I see the study?",
+              "nextNode": "end"
+            }
+          ]
+        },
+        {
+          "id": "residents",
+          "lines": [
+            { "speaker": "Mrs. Pembrook", "text": "Just myself, the gardener Mr. Chen, and Lady Thornwood's nephew — Mr. Graves. He arrived a month ago, uninvited." },
+            { "speaker": "Mrs. Pembrook", "text": "There's also Miss Whitfield, Lady Thornwood's solicitor. She visits weekly." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "graves_location",
+          "lines": [
+            { "speaker": "Mrs. Pembrook", "text": "He keeps to the garden pavilion mostly. But he was in the study this morning — I heard drawers opening." },
+            { "speaker": "Nancy", "text": "Thank you, Mrs. Pembrook. That's very helpful." }
+          ],
+          "nextNode": "end"
+        },
+        {
+          "id": "end",
+          "lines": [
+            { "speaker": "Mrs. Pembrook", "text": "Be careful, dear. This house has more secrets than rooms." }
+          ]
+        }
+      ]
+    }
+  ]
+}
