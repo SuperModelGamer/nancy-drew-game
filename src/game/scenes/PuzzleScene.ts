@@ -3,6 +3,7 @@ import { PuzzleSystem } from '../systems/PuzzleSystem';
 import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import itemsData from '../data/items.json';
+import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 
 export class PuzzleScene extends Phaser.Scene {
   private puzzleId!: string;
@@ -59,32 +60,32 @@ export class PuzzleScene extends Phaser.Scene {
     // Dark overlay
     this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
     this.overlay.setInteractive(); // block clicks through
-    this.overlay.setDepth(400);
+    this.overlay.setDepth(Depths.puzzleOverlay);
 
     // Main panel
     const panelW = Math.min(width * 0.85, 600);
     const panelH = Math.min(height * 0.75, 500);
     this.panel = this.add.container(width / 2, height / 2);
-    this.panel.setDepth(401);
+    this.panel.setDepth(Depths.puzzleContent);
 
-    const bg = this.add.rectangle(0, 0, panelW, panelH, 0x0a0a1a, 0.97);
-    bg.setStrokeStyle(2, 0xc9a84c, 0.8);
+    const bg = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.97);
+    bg.setStrokeStyle(2, Colors.gold, 0.8);
     this.panel.add(bg);
 
     // Title
     const title = this.add.text(0, -panelH / 2 + 30, puzzle.name, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '22px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'bold',
     }).setOrigin(0.5);
     this.panel.add(title);
 
     // Description
     const desc = this.add.text(0, -panelH / 2 + 70, puzzle.description, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '14px',
-      color: '#e0d5c0',
+      color: TextColors.light,
       wordWrap: { width: panelW - 60 },
       lineSpacing: 4,
       align: 'center',
@@ -93,7 +94,7 @@ export class PuzzleScene extends Phaser.Scene {
 
     // Feedback text (for wrong answers, success messages)
     this.feedbackText = this.add.text(0, panelH / 2 - 80, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '14px',
       color: '#ff6b6b',
       align: 'center',
@@ -102,9 +103,9 @@ export class PuzzleScene extends Phaser.Scene {
 
     // Hint text
     this.hintText = this.add.text(0, panelH / 2 - 55, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '13px',
-      color: '#8a7a5a',
+      color: TextColors.goldDim,
       fontStyle: 'italic',
       wordWrap: { width: panelW - 60 },
       align: 'center',
@@ -113,12 +114,12 @@ export class PuzzleScene extends Phaser.Scene {
 
     // Close button
     const closeBtn = this.add.text(panelW / 2 - 20, -panelH / 2 + 15, '✕', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '22px',
-      color: '#8a7a5a',
+      color: TextColors.goldDim,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-    closeBtn.on('pointerover', () => closeBtn.setColor('#c9a84c'));
-    closeBtn.on('pointerout', () => closeBtn.setColor('#8a7a5a'));
+    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
+    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
     closeBtn.on('pointerdown', () => this.closePuzzle());
     this.panel.add(closeBtn);
 
@@ -157,24 +158,24 @@ export class PuzzleScene extends Phaser.Scene {
 
       // Up arrow
       const upBtn = this.add.text(x, dialY - 50, '▲', {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '24px',
-        color: '#c9a84c',
+        color: TextColors.gold,
       }).setOrigin(0.5).setInteractive({ useHandCursor: true });
       upBtn.on('pointerdown', () => this.changeDial(i, 1));
       upBtn.on('pointerover', () => upBtn.setColor('#ffffff'));
-      upBtn.on('pointerout', () => upBtn.setColor('#c9a84c'));
+      upBtn.on('pointerout', () => upBtn.setColor(TextColors.gold));
       this.panel.add(upBtn);
 
       // Dial display
-      const dialBg = this.add.rectangle(x, dialY, 50, 55, 0x1a1a2e, 0.9);
-      dialBg.setStrokeStyle(2, 0xc9a84c, 0.6);
+      const dialBg = this.add.rectangle(x, dialY, 50, 55, Colors.sceneBg, 0.9);
+      dialBg.setStrokeStyle(2, Colors.gold, 0.6);
       this.panel.add(dialBg);
 
       const dialText = this.add.text(x, dialY, '0', {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '32px',
-        color: '#e0d5c0',
+        color: TextColors.light,
         fontStyle: 'bold',
       }).setOrigin(0.5);
       this.panel.add(dialText);
@@ -182,21 +183,21 @@ export class PuzzleScene extends Phaser.Scene {
 
       // Down arrow
       const downBtn = this.add.text(x, dialY + 50, '▼', {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '24px',
-        color: '#c9a84c',
+        color: TextColors.gold,
       }).setOrigin(0.5).setInteractive({ useHandCursor: true });
       downBtn.on('pointerdown', () => this.changeDial(i, -1));
       downBtn.on('pointerover', () => downBtn.setColor('#ffffff'));
-      downBtn.on('pointerout', () => downBtn.setColor('#c9a84c'));
+      downBtn.on('pointerout', () => downBtn.setColor(TextColors.gold));
       this.panel.add(downBtn);
 
       // Separator dash between dials
       if (i < this.dialCount - 1) {
         const sep = this.add.text(x + dialSpacing / 2, dialY, '—', {
-          fontFamily: 'Georgia, serif',
+          fontFamily: FONT,
           fontSize: '24px',
-          color: '#8a7a5a',
+          color: TextColors.goldDim,
         }).setOrigin(0.5);
         this.panel.add(sep);
       }
@@ -215,9 +216,9 @@ export class PuzzleScene extends Phaser.Scene {
 
     // Sequence display
     this.sequenceDisplay = this.add.text(0, 20, 'Sequence: (none)', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '16px',
-      color: '#e0d5c0',
+      color: TextColors.light,
     }).setOrigin(0.5);
     this.panel.add(this.sequenceDisplay);
 
@@ -232,11 +233,11 @@ export class PuzzleScene extends Phaser.Scene {
 
       const color = this.getSequenceColor(option);
       const btnBg = this.add.rectangle(0, 0, btnSpacing - 10, 48, color, 0.7);
-      btnBg.setStrokeStyle(2, 0xc9a84c, 0.6);
+      btnBg.setStrokeStyle(2, Colors.gold, 0.6);
       btnBg.setInteractive({ useHandCursor: true });
 
       const btnText = this.add.text(0, 0, option.toUpperCase(), {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '14px',
         color: '#ffffff',
         fontStyle: 'bold',
@@ -261,16 +262,16 @@ export class PuzzleScene extends Phaser.Scene {
 
     // Clear button
     const clearBtn = this.add.text(-60, btnY + 55, 'Clear', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '14px',
-      color: '#8a7a5a',
+      color: TextColors.goldDim,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     clearBtn.on('pointerdown', () => {
       this.sequenceInput = [];
       this.updateSequenceDisplay();
     });
-    clearBtn.on('pointerover', () => clearBtn.setColor('#c9a84c'));
-    clearBtn.on('pointerout', () => clearBtn.setColor('#8a7a5a'));
+    clearBtn.on('pointerover', () => clearBtn.setColor(TextColors.gold));
+    clearBtn.on('pointerout', () => clearBtn.setColor(TextColors.goldDim));
     this.panel.add(clearBtn);
 
     // Submit button
@@ -282,14 +283,14 @@ export class PuzzleScene extends Phaser.Scene {
 
   private buildTextInputUI(_panelW: number, _panelH: number): void {
     // Text display area
-    const inputBg = this.add.rectangle(0, 30, 300, 48, 0x1a1a2e, 0.9);
-    inputBg.setStrokeStyle(2, 0xc9a84c, 0.6);
+    const inputBg = this.add.rectangle(0, 30, 300, 48, Colors.sceneBg, 0.9);
+    inputBg.setStrokeStyle(2, Colors.gold, 0.6);
     this.panel.add(inputBg);
 
     this.textDisplay = this.add.text(0, 30, '|', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '22px',
-      color: '#e0d5c0',
+      color: TextColors.light,
     }).setOrigin(0.5);
     this.panel.add(this.textDisplay);
 
@@ -330,14 +331,14 @@ export class PuzzleScene extends Phaser.Scene {
       const x = startX + col * keySpacing;
       const y = startY + row * (keySize + 6);
 
-      const keyBg = this.add.rectangle(x, y, keySize, keySize, 0x1a1a2e, 0.8);
-      keyBg.setStrokeStyle(1, 0xc9a84c, 0.4);
+      const keyBg = this.add.rectangle(x, y, keySize, keySize, Colors.sceneBg, 0.8);
+      keyBg.setStrokeStyle(1, Colors.gold, 0.4);
       keyBg.setInteractive({ useHandCursor: true });
 
       const keyText = this.add.text(x, y, char === ' ' ? '␣' : char, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '14px',
-        color: '#c9a84c',
+        color: TextColors.gold,
       }).setOrigin(0.5);
 
       keyBg.on('pointerdown', () => {
@@ -346,8 +347,8 @@ export class PuzzleScene extends Phaser.Scene {
           this.textDisplay.setText(this.textInput + '|');
         }
       });
-      keyBg.on('pointerover', () => keyBg.setFillStyle(0x2a2a4e));
-      keyBg.on('pointerout', () => keyBg.setFillStyle(0x1a1a2e, 0.8));
+      keyBg.on('pointerover', () => keyBg.setFillStyle(Colors.hoverBg));
+      keyBg.on('pointerout', () => keyBg.setFillStyle(Colors.sceneBg, 0.8));
 
       this.panel.add([keyBg, keyText]);
     });
@@ -355,12 +356,12 @@ export class PuzzleScene extends Phaser.Scene {
     // Backspace key
     const bksX = startX + cols * keySpacing / 2 + 40;
     const bksY = startY + 3 * (keySize + 6);
-    const bksBg = this.add.rectangle(bksX, bksY, 50, keySize, 0x1a1a2e, 0.8);
-    bksBg.setStrokeStyle(1, 0xc9a84c, 0.4);
+    const bksBg = this.add.rectangle(bksX, bksY, 50, keySize, Colors.sceneBg, 0.8);
+    bksBg.setStrokeStyle(1, Colors.gold, 0.4);
     bksBg.setInteractive({ useHandCursor: true });
     const bksText = this.add.text(bksX, bksY, '⌫', {
       fontSize: '16px',
-      color: '#c9a84c',
+      color: TextColors.gold,
     }).setOrigin(0.5);
     bksBg.on('pointerdown', () => {
       this.textInput = this.textInput.slice(0, -1);
@@ -375,19 +376,19 @@ export class PuzzleScene extends Phaser.Scene {
   }
 
   private addSubmitButton(x: number, y: number, onClick: () => void): void {
-    const btnBg = this.add.rectangle(x, y, 140, 44, 0xc9a84c, 0.2);
-    btnBg.setStrokeStyle(2, 0xc9a84c, 0.7);
+    const btnBg = this.add.rectangle(x, y, 140, 44, Colors.gold, 0.2);
+    btnBg.setStrokeStyle(2, Colors.gold, 0.7);
     btnBg.setInteractive({ useHandCursor: true });
 
     const btnText = this.add.text(x, y, 'Submit', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '18px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'bold',
     }).setOrigin(0.5);
 
-    btnBg.on('pointerover', () => btnBg.setFillStyle(0xc9a84c, 0.35));
-    btnBg.on('pointerout', () => btnBg.setFillStyle(0xc9a84c, 0.2));
+    btnBg.on('pointerover', () => btnBg.setFillStyle(Colors.gold, 0.35));
+    btnBg.on('pointerout', () => btnBg.setFillStyle(Colors.gold, 0.2));
     btnBg.on('pointerdown', onClick);
 
     this.panel.add([btnBg, btnText]);

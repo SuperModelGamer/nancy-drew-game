@@ -6,6 +6,7 @@ import { PuzzleSystem } from '../systems/PuzzleSystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import { ScriptedEventScene } from './ScriptedEventScene';
 import { ChapterSystem } from '../systems/ChapterSystem';
+import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 
 interface Hotspot {
   id: string;
@@ -56,21 +57,21 @@ export class RoomScene extends Phaser.Scene {
     const { width, height } = this.cameras.main;
 
     // Room background - placeholder colored rectangle until real art exists
-    this.add.rectangle(width / 2, height / 2, width, height, 0x1a1a2e);
+    this.add.rectangle(width / 2, height / 2, width, height, Colors.sceneBg);
 
     // Room name banner
     const banner = this.add.text(width / 2, 30, this.currentRoom.name, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '20px',
-      color: '#c9a84c',
+      color: TextColors.gold,
     });
     banner.setOrigin(0.5);
 
     // Room description on first visit
     const descText = this.add.text(width / 2, 58, this.currentRoom.description, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '12px',
-      color: '#8a7a5a',
+      color: TextColors.goldDim,
       fontStyle: 'italic',
       wordWrap: { width: width * 0.8 },
       align: 'center',
@@ -88,25 +89,25 @@ export class RoomScene extends Phaser.Scene {
 
     // Tooltip for hover
     this.tooltipText = this.add.text(0, 0, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '14px',
-      color: '#ffffff',
+      color: TextColors.white,
       backgroundColor: '#000000aa',
       padding: { x: 8, y: 4 },
     });
     this.tooltipText.setVisible(false);
-    this.tooltipText.setDepth(100);
+    this.tooltipText.setDepth(Depths.tooltip);
 
     // Description box (hidden)
     this.descriptionBox = this.createDescriptionBox();
     this.descriptionBox.setVisible(false);
-    this.descriptionBox.setDepth(200);
+    this.descriptionBox.setDepth(Depths.descriptionBox);
 
     // Selected item indicator (top-right)
     this.selectedItemIndicator = this.add.text(width - 20, 20, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '13px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'italic',
     }).setOrigin(1, 0).setDepth(90);
     this.updateSelectedItemIndicator();
@@ -154,7 +155,6 @@ export class RoomScene extends Phaser.Scene {
         const flagSet = save.getFlag(hotspot.showWhen);
         const eventTriggered = dialogue.hasTriggeredEvent(hotspot.showWhen);
         const chapterMatch = hotspot.showWhen.startsWith('chapter_') &&
-          save.getCurrentRoom() !== '' &&
           this.checkChapterCondition(hotspot.showWhen);
 
         if (!flagSet && !eventTriggered && !chapterMatch) {
@@ -163,7 +163,7 @@ export class RoomScene extends Phaser.Scene {
       }
 
       // Skip already-used onceOnly hotspots
-      if (hotspot.onceOnly && this.usedHotspots.has(hotspot.id)) {
+      if (hotspot.onceOnly && (this.usedHotspots.has(hotspot.id) || SaveSystem.getInstance().getFlag('used_hotspot_' + hotspot.id))) {
         continue;
       }
 
@@ -178,14 +178,14 @@ export class RoomScene extends Phaser.Scene {
       const w = Math.max(hotspot.width, 48);
       const h = Math.max(hotspot.height, 48);
 
-      const bg = this.add.rectangle(0, 0, w, h, 0xc9a84c, 0.15);
-      bg.setStrokeStyle(1, 0xc9a84c, 0.4);
+      const bg = this.add.rectangle(0, 0, w, h, Colors.gold, 0.15);
+      bg.setStrokeStyle(1, Colors.gold, 0.4);
       bg.setInteractive({ useHandCursor: true });
 
       const label = this.add.text(0, h / 2 + 10, hotspot.label, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '12px',
-        color: '#c9a84c',
+        color: TextColors.gold,
         align: 'center',
       });
       label.setOrigin(0.5, 0);
@@ -205,7 +205,7 @@ export class RoomScene extends Phaser.Scene {
 
       // Hover feedback (desktop)
       bg.on('pointerover', () => {
-        bg.setFillStyle(0xc9a84c, 0.3);
+        bg.setFillStyle(Colors.gold, 0.3);
         this.tooltipText.setText(hotspot.label);
         this.tooltipText.setVisible(true);
       });
@@ -215,7 +215,7 @@ export class RoomScene extends Phaser.Scene {
       });
 
       bg.on('pointerout', () => {
-        bg.setFillStyle(0xc9a84c, 0.15);
+        bg.setFillStyle(Colors.gold, 0.15);
         this.tooltipText.setVisible(false);
       });
 
@@ -409,12 +409,12 @@ export class RoomScene extends Phaser.Scene {
     const container = this.add.container(width / 2, 0);
 
     const bg = this.add.rectangle(0, 0, width * 0.8, 50, 0x000000, 0.85);
-    bg.setStrokeStyle(1, 0xc9a84c, 0.5);
+    bg.setStrokeStyle(1, Colors.gold, 0.5);
 
     const text = this.add.text(0, 0, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '15px',
-      color: '#e0d5c0',
+      color: TextColors.light,
       align: 'center',
       wordWrap: { width: width * 0.75 },
       lineSpacing: 3,

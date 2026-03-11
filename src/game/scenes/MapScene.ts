@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
+import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 
 interface RoomDef {
   id: string;
@@ -18,7 +20,7 @@ const ROOMS: RoomDef[] = [
   { id: 'auditorium',       name: 'Auditorium',        icon: '🎭', color: 0x7ba3c9, gridX: 2, gridY: 1 },
   { id: 'managers_office',  name: "Manager's Office",  icon: '📋', color: 0xc97b7b, gridX: 4, gridY: 1 },
   { id: 'dressing_room',    name: 'Dressing Room',     icon: '💄', color: 0xb4a0d4, gridX: 1, gridY: 2 },
-  { id: 'lobby',            name: 'Grand Lobby',       icon: '🏛️', color: 0xc9a84c, gridX: 2, gridY: 2 },
+  { id: 'lobby',            name: 'Grand Lobby',       icon: '🏛️', color: Colors.gold, gridX: 2, gridY: 2 },
   { id: 'basement',         name: 'Basement',          icon: '🚪', color: 0x5a5a7a, requiresChapter: 4, gridX: 2, gridY: 3 },
 ];
 
@@ -52,12 +54,10 @@ export class MapScene extends Phaser.Scene {
     this.roomCards.clear();
 
     // --- Full-screen overlay to block clicks through to RoomScene ---
-    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);
-    overlay.setDepth(390);
-    overlay.setInteractive();
+    const overlay = createOverlay(this, 0.8, Depths.mapOverlay);
 
     // --- Content container depth ---
-    const contentDepth = 391;
+    const contentDepth = Depths.mapContent;
 
     // --- Main panel background ---
     const panelW = Math.min(780, width - 60);
@@ -65,21 +65,21 @@ export class MapScene extends Phaser.Scene {
     const panelX = width / 2;
     const panelY = height / 2 + 10;
 
-    const panelBg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x0a0a1a, 1);
-    panelBg.setStrokeStyle(2, 0xc9a84c, 0.6);
+    const panelBg = this.add.rectangle(panelX, panelY, panelW, panelH, Colors.panelBg, 1);
+    panelBg.setStrokeStyle(2, Colors.gold, 0.6);
     panelBg.setDepth(contentDepth);
 
     // Decorative inner border
-    const innerBorder = this.add.rectangle(panelX, panelY, panelW - 12, panelH - 12, 0x1a1a2e, 0);
-    innerBorder.setStrokeStyle(1, 0xc9a84c, 0.25);
+    const innerBorder = this.add.rectangle(panelX, panelY, panelW - 12, panelH - 12, Colors.sceneBg, 0);
+    innerBorder.setStrokeStyle(1, Colors.gold, 0.25);
     innerBorder.setDepth(contentDepth);
 
     // --- Title ---
     const titleY = panelY - panelH / 2 + 32;
     const titleText = this.add.text(panelX, titleY, 'Theater Map', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '26px',
-      color: '#c9a84c',
+      color: TextColors.gold,
     });
     titleText.setOrigin(0.5);
     titleText.setDepth(contentDepth);
@@ -87,22 +87,22 @@ export class MapScene extends Phaser.Scene {
     // Small decorative line under title
     const lineGfx = this.add.graphics();
     lineGfx.setDepth(contentDepth);
-    lineGfx.lineStyle(1, 0xc9a84c, 0.4);
+    lineGfx.lineStyle(1, Colors.gold, 0.4);
     lineGfx.lineBetween(panelX - 80, titleY + 18, panelX + 80, titleY + 18);
 
     // --- Close button ---
     const closeBtnX = panelX + panelW / 2 - 28;
     const closeBtnY = panelY - panelH / 2 + 28;
     const closeBtn = this.add.text(closeBtnX, closeBtnY, '✕', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '22px',
-      color: '#e0d5c0',
+      color: TextColors.light,
     });
     closeBtn.setOrigin(0.5);
     closeBtn.setDepth(contentDepth);
     closeBtn.setInteractive({ useHandCursor: true });
-    closeBtn.on('pointerover', () => closeBtn.setColor('#c9a84c'));
-    closeBtn.on('pointerout', () => closeBtn.setColor('#e0d5c0'));
+    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
+    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.light));
     closeBtn.on('pointerdown', () => this.scene.stop());
 
     // --- Compute room card positions ---
@@ -135,11 +135,11 @@ export class MapScene extends Phaser.Scene {
       const b = getRoomCenter(roomB);
 
       // Draw a subtle gold connection line
-      linesGfx.lineStyle(1.5, 0xc9a84c, 0.2);
+      linesGfx.lineStyle(1.5, Colors.gold, 0.2);
       linesGfx.lineBetween(a.x, a.y, b.x, b.y);
 
       // Small dots at endpoints
-      linesGfx.fillStyle(0xc9a84c, 0.3);
+      linesGfx.fillStyle(Colors.gold, 0.3);
       linesGfx.fillCircle(a.x, a.y, 2);
       linesGfx.fillCircle(b.x, b.y, 2);
     }
@@ -157,9 +157,9 @@ export class MapScene extends Phaser.Scene {
       const cardH = 90;
 
       // Card background
-      const cardColor = isLocked ? 0x1a1a2e : 0x1a1a2e;
+      const cardColor = isLocked ? Colors.sceneBg : Colors.sceneBg;
       const cardBg = this.add.rectangle(0, 0, cardW, cardH, cardColor, isLocked ? 0.5 : 0.9);
-      const borderColor = isCurrentRoom ? 0xc9a84c : room.color;
+      const borderColor = isCurrentRoom ? Colors.gold : room.color;
       const borderAlpha = isCurrentRoom ? 1 : (isLocked ? 0.25 : 0.5);
       const borderWidth = isCurrentRoom ? 2.5 : 1.5;
       cardBg.setStrokeStyle(borderWidth, borderColor, borderAlpha);
@@ -168,7 +168,7 @@ export class MapScene extends Phaser.Scene {
       // Current-room glow highlight
       if (isCurrentRoom) {
         const glow = this.add.rectangle(0, 0, cardW + 6, cardH + 6, room.color, 0.08);
-        glow.setStrokeStyle(1, 0xc9a84c, 0.3);
+        glow.setStrokeStyle(1, Colors.gold, 0.3);
         container.addAt(glow, 0);
       }
 
@@ -186,9 +186,9 @@ export class MapScene extends Phaser.Scene {
       container.add(iconText);
 
       // Room name
-      const nameColor = isLocked ? '#5a5a6a' : '#e0d5c0';
+      const nameColor = isLocked ? TextColors.mutedBlue : TextColors.light;
       const nameText = this.add.text(0, 18, room.name, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '12px',
         color: nameColor,
         align: 'center',
@@ -200,9 +200,9 @@ export class MapScene extends Phaser.Scene {
       // "You are here" indicator
       if (isCurrentRoom) {
         const hereText = this.add.text(0, cardH / 2 - 12, '— you are here —', {
-          fontFamily: 'Georgia, serif',
+          fontFamily: FONT,
           fontSize: '8px',
-          color: '#c9a84c',
+          color: TextColors.gold,
         });
         hereText.setOrigin(0.5);
         hereText.setAlpha(0.7);
@@ -212,9 +212,9 @@ export class MapScene extends Phaser.Scene {
       // Locked subtitle
       if (isLocked) {
         const lockText = this.add.text(0, cardH / 2 - 12, `Chapter ${room.requiresChapter}`, {
-          fontFamily: 'Georgia, serif',
+          fontFamily: FONT,
           fontSize: '8px',
-          color: '#5a5a6a',
+          color: TextColors.mutedBlue,
         });
         lockText.setOrigin(0.5);
         container.add(lockText);
@@ -235,9 +235,9 @@ export class MapScene extends Phaser.Scene {
 
         cardBg.on('pointerout', () => {
           if (room.id !== this.currentRoom) {
-            cardBg.setFillStyle(0x1a1a2e, 0.9);
+            cardBg.setFillStyle(Colors.sceneBg, 0.9);
             cardBg.setStrokeStyle(1.5, room.color, 0.5);
-            nameText.setColor('#e0d5c0');
+            nameText.setColor(TextColors.light);
           }
         });
 
@@ -254,9 +254,9 @@ export class MapScene extends Phaser.Scene {
     // --- Subtitle text at the bottom ---
     const subtitleY = panelY + panelH / 2 - 20;
     const subtitle = this.add.text(panelX, subtitleY, 'Select a location to travel', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '11px',
-      color: '#e0d5c0',
+      color: TextColors.light,
     });
     subtitle.setOrigin(0.5);
     subtitle.setAlpha(0.4);
