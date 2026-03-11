@@ -102,11 +102,14 @@ const SUSPECTS: SuspectProfile[] = [
   },
 ];
 
+// Canvas is 1280×720. Toolbar is 52px at bottom.
+const TOOLBAR_H = 52;
+const W = 1280;
+const H = 720;
+
 export class SuspectScene extends Phaser.Scene {
   private container!: Phaser.GameObjects.Container;
-  private detailPanel!: Phaser.GameObjects.Container;
   private selectedIndex = 0;
-  private tabElements: { bg: Phaser.GameObjects.Rectangle; indicator: Phaser.GameObjects.Rectangle }[] = [];
 
   constructor() {
     super({ key: 'SuspectScene' });
@@ -115,328 +118,315 @@ export class SuspectScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
-    // Overlay
-    createOverlay(this, 0.85, Depths.suspectOverlay);
+    // Full-screen dark overlay
+    createOverlay(this, 0.88, Depths.suspectOverlay);
 
     this.container = this.add.container(0, 0);
     this.container.setDepth(Depths.suspectContent);
 
-    // ─── Main dossier panel (case-file look) ───
-    const panelW = Math.min(width * 0.92, 900);
-    const panelH = Math.min(height * 0.88, 650);
+    // ─── Main panel ───
+    // Leave 52px for toolbar + 8px padding at bottom, 8px at top
+    const panelW = 1100;
+    const panelH = height - TOOLBAR_H - 16;
     const panelX = width / 2;
-    const panelY = height / 2;
+    const panelY = panelH / 2 + 8;
 
-    // Outer panel — dark with gold border
-    const outerBg = this.add.rectangle(panelX, panelY, panelW, panelH, Colors.panelBg, 0.97);
-    outerBg.setStrokeStyle(2, Colors.gold, 0.5);
-    this.container.add(outerBg);
+    // Background — aged dark paper
+    const bg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x12111a, 0.97);
+    bg.setStrokeStyle(1.5, Colors.gold, 0.35);
+    this.container.add(bg);
 
-    // Header strip
-    const headerH = 50;
+    // ─── Header bar ───
+    const headerH = 44;
     const headerY = panelY - panelH / 2 + headerH / 2;
-    const headerBg = this.add.rectangle(panelX, headerY, panelW - 4, headerH, 0x15152a, 1);
+
+    const headerBg = this.add.rectangle(panelX, headerY, panelW - 2, headerH, 0x0e0d16, 1);
     this.container.add(headerBg);
 
-    // Title with decorative elements
-    const titleText = this.add.text(panelX, headerY, 'CASE FILE — SUSPECT DOSSIERS', {
+    const title = this.add.text(panelX, headerY, 'CASE FILE — SUSPECT DOSSIERS', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '15px',
       color: TextColors.gold,
       fontStyle: 'bold',
-      letterSpacing: 3,
+      letterSpacing: 4,
     }).setOrigin(0.5);
-    this.container.add(titleText);
+    this.container.add(title);
 
-    // Decorative lines flanking title
+    // Decorative lines
     const lineGfx = this.add.graphics();
-    lineGfx.lineStyle(1, Colors.gold, 0.3);
-    const titleW = 220;
-    lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - titleW, headerY);
-    lineGfx.lineBetween(panelX + titleW, headerY, panelX + panelW / 2 - 20, headerY);
+    lineGfx.lineStyle(1, Colors.gold, 0.25);
+    lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - 200, headerY);
+    lineGfx.lineBetween(panelX + 200, headerY, panelX + panelW / 2 - 20, headerY);
     this.container.add(lineGfx);
 
     // Close button
-    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 25, headerY, () => this.scene.stop(), '22px');
+    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.scene.stop(), '20px');
     closeBtn.setDepth(Depths.suspectContent);
 
-    // ─── Suspect tabs (left sidebar style) ───
-    const tabW = 160;
-    const tabStartX = panelX - panelW / 2 + tabW / 2 + 12;
-    const tabStartY = panelY - panelH / 2 + headerH + 15;
-    const tabH = 90;
-    const tabSpacing = tabH + 8;
-
-    this.tabElements = [];
+    // ─── Suspect tabs (horizontal strip below header) ───
+    const tabStripY = headerY + headerH / 2 + 40;
+    const tabW = 190;
+    const tabGap = 12;
+    const totalTabsW = SUSPECTS.length * tabW + (SUSPECTS.length - 1) * tabGap;
+    const tabStartX = panelX - totalTabsW / 2 + tabW / 2;
 
     SUSPECTS.forEach((suspect, i) => {
-      const ty = tabStartY + i * tabSpacing + tabH / 2;
+      const tx = tabStartX + i * (tabW + tabGap);
       const isSelected = i === this.selectedIndex;
+      const colorHex = `#${suspect.color.toString(16).padStart(6, '0')}`;
 
-      // Tab background
-      const tabBg = this.add.rectangle(tabStartX, ty, tabW, tabH,
-        isSelected ? 0x1a1a3a : Colors.sceneBg, isSelected ? 1 : 0.7);
-      tabBg.setStrokeStyle(isSelected ? 2 : 1, suspect.color, isSelected ? 0.8 : 0.25);
+      // Tab card
+      const tabBg = this.add.rectangle(tx, tabStripY, tabW, 54,
+        isSelected ? 0x1e1d2e : 0x15141e, isSelected ? 1 : 0.85);
+      tabBg.setStrokeStyle(isSelected ? 2 : 1, suspect.color, isSelected ? 0.7 : 0.2);
       tabBg.setInteractive({ useHandCursor: true });
 
-      // Active indicator — colored bar on left edge
-      const indicator = this.add.rectangle(
-        tabStartX - tabW / 2 + 2, ty, 4, tabH - 4,
-        suspect.color, isSelected ? 1 : 0
-      );
-
-      // Portrait (small, in the tab)
-      const portraitKey = `portrait_${suspect.id}`;
-      const portraitX = tabStartX - tabW / 2 + 30;
-      if (this.textures.exists(portraitKey)) {
-        const portrait = this.add.image(portraitX, ty, portraitKey);
-        portrait.setDisplaySize(40, 40);
-        const maskGfx = this.make.graphics({});
-        maskGfx.fillCircle(portraitX, ty, 20);
-        portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
-        const ring = this.add.ellipse(portraitX, ty, 42, 42)
-          .setStrokeStyle(isSelected ? 2 : 1.5, suspect.color, isSelected ? 0.9 : 0.5)
-          .setFillStyle(0x000000, 0);
-        this.container.add([portrait, ring]);
-      } else {
-        const iconCircle = this.add.ellipse(portraitX, ty, 40, 40, suspect.color, 0.2);
-        const iconText = this.add.text(portraitX, ty, suspect.icon, {
-          fontFamily: FONT, fontSize: '20px', color: TextColors.white, fontStyle: 'bold',
-        }).setOrigin(0.5);
-        this.container.add([iconCircle, iconText]);
+      // Bottom accent bar when selected
+      if (isSelected) {
+        const accent = this.add.rectangle(tx, tabStripY + 27 - 2, tabW, 3, suspect.color, 0.8);
+        this.container.add(accent);
       }
 
-      // Name (first name only in tab)
+      // Small portrait
+      const portraitX = tx - tabW / 2 + 24;
+      const portraitKey = `portrait_${suspect.id}`;
+      if (this.textures.exists(portraitKey)) {
+        const portrait = this.add.image(portraitX, tabStripY, portraitKey);
+        portrait.setDisplaySize(36, 36);
+        const maskGfx = this.make.graphics({});
+        maskGfx.fillCircle(portraitX, tabStripY, 18);
+        portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
+        this.container.add(portrait);
+      } else {
+        const circle = this.add.ellipse(portraitX, tabStripY, 36, 36, suspect.color, 0.15);
+        const letter = this.add.text(portraitX, tabStripY, suspect.icon, {
+          fontFamily: FONT, fontSize: '18px', color: colorHex, fontStyle: 'bold',
+        }).setOrigin(0.5);
+        this.container.add([circle, letter]);
+      }
+
+      // Name
       const firstName = suspect.name.split(' ')[0];
-      const tabName = this.add.text(tabStartX + 10, ty - 12, firstName, {
+      const nameText = this.add.text(tx + 2, tabStripY - 10, firstName, {
         fontFamily: FONT,
-        fontSize: isSelected ? '14px' : '13px',
+        fontSize: isSelected ? '15px' : '14px',
         color: isSelected ? TextColors.light : TextColors.goldDim,
         fontStyle: isSelected ? 'bold' : 'normal',
-      }).setOrigin(0, 0.5);
+      }).setOrigin(0.5, 0.5);
 
-      // Role beneath name
-      const tabRole = this.add.text(tabStartX + 10, ty + 8, suspect.role, {
+      // Role
+      const roleText = this.add.text(tx + 2, tabStripY + 10, suspect.role, {
         fontFamily: FONT,
         fontSize: '10px',
-        color: isSelected ? `#${suspect.color.toString(16).padStart(6, '0')}` : TextColors.muted,
+        color: isSelected ? colorHex : TextColors.muted,
         fontStyle: 'italic',
-      }).setOrigin(0, 0.5);
+      }).setOrigin(0.5, 0.5);
 
-      // Discovery badge
-      const save = SaveSystem.getInstance();
-      const dialogue = DialogueSystem.getInstance();
-      const discovered = suspect.facts.filter(f =>
-        !f.requiresFlag || save.getFlag(f.requiresFlag) || dialogue.hasTriggeredEvent(f.requiresFlag)
-      ).length;
-      const badgeText = this.add.text(tabStartX + tabW / 2 - 14, ty + tabH / 2 - 10,
-        `${discovered}/${suspect.facts.length}`, {
-          fontFamily: FONT, fontSize: '9px', color: TextColors.muted,
-        }).setOrigin(1, 1);
+      this.container.add([tabBg, nameText, roleText]);
 
-      this.container.add([tabBg, indicator, tabName, tabRole, badgeText]);
-      this.tabElements.push({ bg: tabBg, indicator });
-
-      // Tab click handler
       tabBg.on('pointerdown', () => {
         this.selectedIndex = i;
-        this.refreshSelection();
-        this.showSuspectDetail(suspect);
+        this.scene.restart();
       });
       tabBg.on('pointerover', () => {
-        if (i !== this.selectedIndex) tabBg.setFillStyle(Colors.hoverBg, 0.8);
+        if (i !== this.selectedIndex) tabBg.setFillStyle(0x1e1d2e, 0.9);
       });
       tabBg.on('pointerout', () => {
-        if (i !== this.selectedIndex) tabBg.setFillStyle(Colors.sceneBg, 0.7);
+        if (i !== this.selectedIndex) tabBg.setFillStyle(0x15141e, 0.85);
       });
     });
 
-    // ─── Detail panel area (right side) ───
-    const detailX = panelX - panelW / 2 + tabW + 30 + (panelW - tabW - 40) / 2;
-    const detailY = panelY + headerH / 2;
-    this.detailPanel = this.add.container(detailX, detailY);
-    this.detailPanel.setDepth(Depths.suspectContent);
-    this.showSuspectDetail(SUSPECTS[this.selectedIndex]);
+    // ─── Detail area (below tabs) ───
+    const detailTop = tabStripY + 42;
+    const detailBottom = panelY + panelH / 2 - 14;
+    const detailH = detailBottom - detailTop;
+    const detailW = panelW - 60;
+    const detailCenterX = panelX;
+    const detailCenterY = detailTop + detailH / 2;
+
+    this.showSuspectDetail(SUSPECTS[this.selectedIndex], detailCenterX, detailCenterY, detailW, detailH);
 
     // Fade in
     this.container.setAlpha(0);
-    this.tweens.add({ targets: this.container, alpha: 1, duration: 250 });
-    this.detailPanel.setAlpha(0);
-    this.tweens.add({ targets: this.detailPanel, alpha: 1, duration: 250, delay: 50 });
+    this.tweens.add({ targets: this.container, alpha: 1, duration: 200 });
   }
 
-  private refreshSelection(): void {
-    SUSPECTS.forEach((suspect, i) => {
-      const isSelected = i === this.selectedIndex;
-      const tab = this.tabElements[i];
-      tab.bg.setFillStyle(isSelected ? 0x1a1a3a : Colors.sceneBg, isSelected ? 1 : 0.7);
-      tab.bg.setStrokeStyle(isSelected ? 2 : 1, suspect.color, isSelected ? 0.8 : 0.25);
-      tab.indicator.setAlpha(isSelected ? 1 : 0);
-    });
-  }
+  private showSuspectDetail(
+    suspect: SuspectProfile,
+    cx: number, cy: number, dw: number, dh: number,
+  ): void {
+    const colorHex = `#${suspect.color.toString(16).padStart(6, '0')}`;
+    const save = SaveSystem.getInstance();
+    const dialogue = DialogueSystem.getInstance();
 
-  private showSuspectDetail(suspect: SuspectProfile): void {
-    this.detailPanel.removeAll(true);
+    // ── Left column: portrait + info card ──
+    const leftW = 280;
+    const leftX = cx - dw / 2;
 
-    const { width, height } = this.cameras.main;
-    const panelW = Math.min(width * 0.92, 900);
-    const tabW = 160;
-    const detailW = panelW - tabW - 50;
-    const detailH = Math.min(height * 0.88, 650) - 80;
-
-    // Detail background
-    const detailBg = this.add.rectangle(0, 0, detailW, detailH, 0x0e0e1e, 0.6);
-    detailBg.setStrokeStyle(1, suspect.color, 0.2);
-    this.detailPanel.add(detailBg);
-
-    // ─── Header section ───
-    const headerY = -detailH / 2 + 20;
-    const hasPortrait = this.textures.exists(`portrait_${suspect.id}`);
+    // Portrait card background
+    const cardH = Math.min(dh - 10, 480);
+    const cardY = cy;
+    const cardBg = this.add.rectangle(leftX + leftW / 2, cardY, leftW, cardH, 0x0e0d16, 0.7);
+    cardBg.setStrokeStyle(1, suspect.color, 0.2);
+    this.container.add(cardBg);
 
     // Large portrait
-    const portraitSize = 90;
-    const portraitX = -detailW / 2 + 25 + portraitSize / 2;
-    if (hasPortrait) {
-      const portrait = this.add.image(portraitX, headerY + portraitSize / 2, `portrait_${suspect.id}`);
+    const portraitSize = 160;
+    const portraitY = cardY - cardH / 2 + 20 + portraitSize / 2;
+    const portraitX = leftX + leftW / 2;
+    const portraitKey = `portrait_${suspect.id}`;
+
+    if (this.textures.exists(portraitKey)) {
+      const portrait = this.add.image(portraitX, portraitY, portraitKey);
       portrait.setDisplaySize(portraitSize, portraitSize);
       const maskGfx = this.make.graphics({});
       maskGfx.fillRoundedRect(
-        portraitX - portraitSize / 2, headerY, portraitSize, portraitSize, 8
+        portraitX - portraitSize / 2, portraitY - portraitSize / 2,
+        portraitSize, portraitSize, 10
       );
       portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
+      this.container.add(portrait);
 
-      // Border frame
+      // Portrait frame
       const frame = this.add.graphics();
-      frame.lineStyle(2, suspect.color, 0.7);
+      frame.lineStyle(2, suspect.color, 0.5);
       frame.strokeRoundedRect(
-        portraitX - portraitSize / 2, headerY, portraitSize, portraitSize, 8
+        portraitX - portraitSize / 2, portraitY - portraitSize / 2,
+        portraitSize, portraitSize, 10
       );
-      this.detailPanel.add([portrait, frame]);
+      this.container.add(frame);
+    } else {
+      // Fallback icon
+      const iconBg = this.add.rectangle(portraitX, portraitY, portraitSize, portraitSize, suspect.color, 0.1);
+      iconBg.setStrokeStyle(2, suspect.color, 0.3);
+      const iconText = this.add.text(portraitX, portraitY, suspect.icon, {
+        fontFamily: FONT, fontSize: '60px', color: colorHex, fontStyle: 'bold',
+      }).setOrigin(0.5);
+      this.container.add([iconBg, iconText]);
     }
 
-    // Name & metadata (right of portrait)
-    const textX = hasPortrait ? portraitX + portraitSize / 2 + 20 : -detailW / 2 + 25;
-    const colorHex = `#${suspect.color.toString(16).padStart(6, '0')}`;
-
-    this.detailPanel.add(this.add.text(textX, headerY + 8, suspect.name, {
+    // Name (below portrait)
+    const nameY = portraitY + portraitSize / 2 + 20;
+    this.container.add(this.add.text(portraitX, nameY, suspect.name, {
       fontFamily: FONT,
-      fontSize: '22px',
+      fontSize: '20px',
       color: colorHex,
       fontStyle: 'bold',
-    }));
+      align: 'center',
+    }).setOrigin(0.5));
 
-    this.detailPanel.add(this.add.text(textX, headerY + 36, suspect.role, {
+    // Role
+    this.container.add(this.add.text(portraitX, nameY + 26, suspect.role, {
       fontFamily: FONT,
       fontSize: '14px',
       color: TextColors.light,
       fontStyle: 'italic',
-    }));
+    }).setOrigin(0.5));
 
     // Info chips
-    const chipY = headerY + 60;
+    const chipStartY = nameY + 56;
     const chips = [
       { label: `Age: ${suspect.age}`, icon: '◈' },
       { label: suspect.location, icon: '◉' },
     ];
-    let chipX = textX;
-    chips.forEach(chip => {
-      const chipBg = this.add.rectangle(chipX + 45, chipY, 100, 22, suspect.color, 0.1);
-      chipBg.setStrokeStyle(1, suspect.color, 0.3);
-      chipBg.setOrigin(0, 0.5);
-      const chipLabel = this.add.text(chipX + 50, chipY, `${chip.icon} ${chip.label}`, {
-        fontFamily: FONT, fontSize: '10px', color: TextColors.goldDim,
-      }).setOrigin(0, 0.5);
-      this.detailPanel.add([chipBg, chipLabel]);
-      chipX += 115;
+    chips.forEach((chip, i) => {
+      const chipY = chipStartY + i * 30;
+      const chipBg = this.add.rectangle(portraitX, chipY, 200, 24, suspect.color, 0.08);
+      chipBg.setStrokeStyle(1, suspect.color, 0.2);
+      const chipLabel = this.add.text(portraitX, chipY, `${chip.icon}  ${chip.label}`, {
+        fontFamily: FONT, fontSize: '12px', color: TextColors.goldDim,
+      }).setOrigin(0.5);
+      this.container.add([chipBg, chipLabel]);
     });
 
-    // ─── Divider ───
-    const dividerY = headerY + portraitSize + 15;
-    const divGfx = this.add.graphics();
-    divGfx.lineStyle(1, suspect.color, 0.3);
-    divGfx.lineBetween(-detailW / 2 + 20, dividerY, detailW / 2 - 20, dividerY);
-    // Small diamond accent at center
-    divGfx.fillStyle(suspect.color, 0.5);
-    divGfx.fillRect(-3, dividerY - 3, 6, 6);
-    this.detailPanel.add(divGfx);
+    // Discovery count
+    const discovered = suspect.facts.filter(f =>
+      !f.requiresFlag || save.getFlag(f.requiresFlag) || dialogue.hasTriggeredEvent(f.requiresFlag)
+    ).length;
+    const total = suspect.facts.length;
 
-    // ─── Known Facts section ───
-    const factsStartY = dividerY + 20;
-    this.detailPanel.add(this.add.text(-detailW / 2 + 25, factsStartY, 'KNOWN FACTS', {
+    const progressY = chipStartY + 80;
+    const progressW = 200;
+    const progressH = 5;
+
+    const trackBg = this.add.rectangle(portraitX, progressY, progressW, progressH, 0x1a1a2e, 1);
+    this.container.add(trackBg);
+
+    const pct = discovered / total;
+    if (pct > 0) {
+      const fill = this.add.rectangle(
+        portraitX - progressW / 2 + (progressW * pct) / 2, progressY,
+        progressW * pct, progressH, suspect.color, 0.7
+      );
+      this.container.add(fill);
+    }
+
+    this.container.add(this.add.text(portraitX, progressY + 14, `${discovered} / ${total} facts discovered`, {
+      fontFamily: FONT, fontSize: '11px', color: TextColors.muted, fontStyle: 'italic',
+    }).setOrigin(0.5));
+
+    // ── Right column: Known Facts ──
+    const rightX = leftX + leftW + 24;
+    const rightW = dw - leftW - 24;
+    const rightCx = rightX + rightW / 2;
+
+    // Facts panel background
+    const factsPanelH = cardH;
+    const factsBg = this.add.rectangle(rightCx, cy, rightW, factsPanelH, 0x0e0d16, 0.5);
+    factsBg.setStrokeStyle(1, suspect.color, 0.12);
+    this.container.add(factsBg);
+
+    // Section header
+    const factsHeaderY = cy - factsPanelH / 2 + 24;
+    this.container.add(this.add.text(rightX + 20, factsHeaderY, 'KNOWN FACTS', {
       fontFamily: FONT,
-      fontSize: '12px',
+      fontSize: '14px',
       color: TextColors.gold,
       fontStyle: 'bold',
-      letterSpacing: 2,
+      letterSpacing: 3,
     }));
 
-    const save = SaveSystem.getInstance();
-    const dialogue = DialogueSystem.getInstance();
-    let y = factsStartY + 28;
+    // Divider under header
+    const divGfx = this.add.graphics();
+    divGfx.lineStyle(1, Colors.gold, 0.2);
+    divGfx.lineBetween(rightX + 20, factsHeaderY + 22, rightX + rightW - 20, factsHeaderY + 22);
+    this.container.add(divGfx);
 
-    let discoveredCount = 0;
+    // Facts list
+    let y = factsHeaderY + 40;
+    const factMaxW = rightW - 60;
+
     suspect.facts.forEach((fact, idx) => {
       const unlocked = !fact.requiresFlag ||
         save.getFlag(fact.requiresFlag) ||
         dialogue.hasTriggeredEvent(fact.requiresFlag);
 
-      if (unlocked) discoveredCount++;
-
-      // Fact row with subtle alternating background
+      // Alternating subtle row tint
       if (idx % 2 === 0) {
-        const rowBg = this.add.rectangle(0, y + 8, detailW - 40, 28, suspect.color, 0.03);
-        this.detailPanel.add(rowBg);
+        const rowBg = this.add.rectangle(rightCx, y + 10, rightW - 20, 36, suspect.color, 0.03);
+        this.container.add(rowBg);
       }
 
-      // Bullet icon
-      const bulletColor = unlocked ? colorHex : TextColors.hidden;
+      // Bullet
       const bullet = unlocked ? '◆' : '◇';
-      this.detailPanel.add(this.add.text(-detailW / 2 + 30, y, bullet, {
-        fontFamily: FONT, fontSize: '12px', color: bulletColor,
+      const bulletColor = unlocked ? colorHex : TextColors.hidden;
+      this.container.add(this.add.text(rightX + 24, y, bullet, {
+        fontFamily: FONT, fontSize: '14px', color: bulletColor,
       }));
 
       // Fact text
-      const factColor = unlocked ? TextColors.light : TextColors.hidden;
       const displayText = unlocked ? fact.text : '— Undiscovered —';
-      const factText = this.add.text(-detailW / 2 + 50, y, displayText, {
+      const factText = this.add.text(rightX + 46, y, displayText, {
         fontFamily: FONT,
-        fontSize: '13px',
-        color: factColor,
+        fontSize: '14px',
+        color: unlocked ? TextColors.light : TextColors.hidden,
         fontStyle: unlocked ? 'normal' : 'italic',
-        wordWrap: { width: detailW - 80 },
-        lineSpacing: 2,
+        wordWrap: { width: factMaxW },
+        lineSpacing: 3,
       });
-      this.detailPanel.add(factText);
-      y += Math.max(factText.height + 10, 28);
+      this.container.add(factText);
+
+      y += Math.max(factText.height + 14, 36);
     });
-
-    // ─── Progress bar at bottom ───
-    const progressY = detailH / 2 - 25;
-    const progressW = detailW - 50;
-    const progressH = 6;
-    const totalFacts = suspect.facts.length;
-    const pct = discoveredCount / totalFacts;
-
-    // Track background
-    const trackBg = this.add.rectangle(0, progressY, progressW, progressH, 0x1a1a2e, 1);
-    trackBg.setStrokeStyle(1, suspect.color, 0.2);
-    this.detailPanel.add(trackBg);
-
-    // Fill bar
-    const fillW = progressW * pct;
-    if (fillW > 0) {
-      const fill = this.add.rectangle(
-        -progressW / 2 + fillW / 2, progressY,
-        fillW, progressH, suspect.color, 0.6
-      );
-      this.detailPanel.add(fill);
-    }
-
-    // Label
-    this.detailPanel.add(this.add.text(
-      detailW / 2 - 25, progressY - 12,
-      `${discoveredCount}/${totalFacts} facts discovered`, {
-        fontFamily: FONT, fontSize: '10px', color: TextColors.muted, fontStyle: 'italic',
-      }).setOrigin(1, 0.5));
   }
 }
