@@ -6,6 +6,9 @@ import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { UISounds } from '../utils/sounds';
 
+// Height of the bottom toolbar strip
+const TOOLBAR_H = 52;
+
 export class UIScene extends Phaser.Scene {
   private inventoryBar!: Phaser.GameObjects.Container;
   private journalButton!: Phaser.GameObjects.Container;
@@ -21,22 +24,62 @@ export class UIScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = this.cameras.main;
+    const barY = height - TOOLBAR_H / 2;
 
-    // Inventory button (bottom-left) - 48px minimum tap target
-    const invBtn = this.add.container(50, height - 40);
-    const invBg = this.add.rectangle(0, 0, 80, 48, Colors.sceneBg, 0.9);
-    invBg.setStrokeStyle(1, Colors.gold, 0.6);
-    invBg.setInteractive({ useHandCursor: true });
-    const invText = this.add.text(0, 0, 'Items', {
-      fontFamily: FONT,
-      fontSize: '16px',
-      color: TextColors.gold,
-    }).setOrigin(0.5);
-    invBtn.add([invBg, invText]);
+    // ─── Bottom toolbar background strip ───
+    // Gradient fade: transparent at top → solid dark at bottom
+    const barBg = this.add.graphics();
+    // Top fade zone (20px above the bar)
+    for (let i = 0; i < 20; i++) {
+      const alpha = (i / 20) * 0.85;
+      barBg.fillStyle(0x0a0a12, alpha);
+      barBg.fillRect(0, height - TOOLBAR_H - 20 + i, width, 1);
+    }
+    // Solid bar background
+    barBg.fillStyle(0x0a0a12, 0.85);
+    barBg.fillRect(0, height - TOOLBAR_H, width, TOOLBAR_H);
+    // Gold accent line at top of bar
+    barBg.lineStyle(1, Colors.gold, 0.25);
+    barBg.lineBetween(0, height - TOOLBAR_H, width, height - TOOLBAR_H);
+    barBg.setDepth(Depths.tooltip - 1);
 
-    invBg.on('pointerdown', () => this.toggleInventory());
+    // ─── Toolbar buttons ───
+    // All buttons sit on the bar, evenly spaced
+    const btnStyle = { fontFamily: FONT, fontSize: '14px' };
+    const buttons = [
+      { label: 'Items', color: TextColors.gold, borderColor: Colors.gold, x: width * 0.12, action: () => this.toggleInventory() },
+      { label: 'Suspects', color: '#b4a0d4', borderColor: 0xb4a0d4, x: width * 0.38, action: () => this.scene.launch('SuspectScene') },
+      { label: 'Map', color: TextColors.edwin, borderColor: Colors.mapBlue, x: width * 0.62, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
+      { label: 'Journal', color: TextColors.gold, borderColor: Colors.gold, x: width * 0.88, action: () => this.toggleJournal() },
+    ];
 
-    // Chapter indicator (top-center)
+    buttons.forEach(btn => {
+      const container = this.add.container(btn.x, barY);
+      container.setDepth(Depths.tooltip);
+
+      const bg = this.add.rectangle(0, 0, 100, 36, 0x0a0a12, 0);
+      bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
+      bg.setInteractive({ useHandCursor: true });
+
+      const text = this.add.text(0, 0, btn.label, {
+        ...btnStyle,
+        color: btn.color,
+      }).setOrigin(0.5);
+
+      container.add([bg, text]);
+
+      bg.on('pointerover', () => {
+        bg.setFillStyle(Colors.hoverBg, 0.6);
+        bg.setStrokeStyle(1, btn.borderColor as number, 0.8);
+      });
+      bg.on('pointerout', () => {
+        bg.setFillStyle(0x0a0a12, 0);
+        bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
+      });
+      bg.on('pointerdown', btn.action);
+    });
+
+    // ─── Chapter indicator (top-center, on dark strip) ───
     const chapterLabel = this.add.text(width / 2, 12, '', {
       fontFamily: FONT,
       fontSize: '12px',
@@ -48,62 +91,15 @@ export class UIScene extends Phaser.Scene {
       chapterLabel.setText(ChapterSystem.getInstance().getChapterTitle(ch));
     };
     updateChapter();
-    // Refresh chapter display when scene resumes (room change)
     this.events.on('wake', updateChapter);
 
-    // Journal button (bottom-right) - 48px minimum tap target
-    this.journalButton = this.add.container(width - 50, height - 40);
-    const journalBg = this.add.rectangle(0, 0, 80, 48, Colors.sceneBg, 0.9);
-    journalBg.setStrokeStyle(1, Colors.gold, 0.6);
-    journalBg.setInteractive({ useHandCursor: true });
-    const journalText = this.add.text(0, 0, 'Journal', {
-      fontFamily: FONT,
-      fontSize: '16px',
-      color: TextColors.gold,
-    }).setOrigin(0.5);
-    this.journalButton.add([journalBg, journalText]);
-
-    journalBg.on('pointerdown', () => this.toggleJournal());
-
-    // Suspects button (bottom-center-left)
-    const suspectsBtn = this.add.container(width / 2 - 55, height - 40);
-    const suspectsBg = this.add.rectangle(0, 0, 90, 48, Colors.sceneBg, 0.9);
-    suspectsBg.setStrokeStyle(1, 0xb4a0d4, 0.6);
-    suspectsBg.setInteractive({ useHandCursor: true });
-    const suspectsText = this.add.text(0, 0, 'Suspects', {
-      fontFamily: FONT,
-      fontSize: '15px',
-      color: '#b4a0d4',
-    }).setOrigin(0.5);
-    suspectsBtn.add([suspectsBg, suspectsText]);
-    suspectsBg.on('pointerdown', () => {
-      this.scene.launch('SuspectScene');
-    });
-
-    // Map button (bottom-center-right)
-    const mapBtn = this.add.container(width / 2 + 55, height - 40);
-    const mapBg = this.add.rectangle(0, 0, 80, 48, Colors.sceneBg, 0.9);
-    mapBg.setStrokeStyle(1, Colors.mapBlue, 0.6);
-    mapBg.setInteractive({ useHandCursor: true });
-    const mapText = this.add.text(0, 0, 'Map', {
-      fontFamily: FONT,
-      fontSize: '15px',
-      color: TextColors.edwin,
-    }).setOrigin(0.5);
-    mapBtn.add([mapBg, mapText]);
-    mapBg.on('pointerdown', () => {
-      this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() });
-    });
-
-    // Inventory panel (hidden)
+    // ─── Panels (hidden by default) ───
     this.inventoryPanel = this.createInventoryPanel();
     this.inventoryPanel.setVisible(false);
 
-    // Journal panel (hidden)
     this.journalPanel = this.createJournalPanel();
     this.journalPanel.setVisible(false);
 
-    // Item description panel (hidden)
     this.itemDescPanel = this.createItemDescPanel();
     this.itemDescPanel.setVisible(false);
 
@@ -165,7 +161,8 @@ export class UIScene extends Phaser.Scene {
     const { width, height } = this.cameras.main;
     const panelW = Math.min(width * 0.9, 600);
     const panelH = 220;
-    const panel = this.add.container(width / 2, height - 190);
+    // Position above the toolbar
+    const panel = this.add.container(width / 2, height - TOOLBAR_H - panelH / 2 - 10);
 
     const bg = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.95);
     bg.setStrokeStyle(2, Colors.gold, 0.7);
@@ -195,7 +192,9 @@ export class UIScene extends Phaser.Scene {
     const { width, height } = this.cameras.main;
     const panelW = Math.min(width * 0.9, 600);
     const panelH = 400;
-    const panel = this.add.container(width / 2, height / 2);
+    // Center vertically but stay above toolbar
+    const panelY = Math.min(height / 2, height - TOOLBAR_H - panelH / 2 - 15);
+    const panel = this.add.container(width / 2, panelY);
 
     // Aged paper background
     const paper = this.add.rectangle(0, 0, panelW, panelH, Colors.paper, 0.95);
