@@ -46,6 +46,35 @@ export class BootScene extends Phaser.Scene {
     for (const suspect of suspects) {
       this.load.image(`portrait_${suspect}`, `assets/portraits/${suspect}.png`);
     }
+
+    // Load map room medallion icons
+    const mapRooms = ['lobby', 'auditorium', 'backstage', 'dressing_room', 'projection_booth', 'catwalk', 'basement', 'managers_office'];
+    for (const room of mapRooms) {
+      this.load.image(`map_${room}`, `assets/ui/map/${room}.png`);
+    }
+
+    // Load real item icons (texture key matches item_icon_{id} so procedural fallback is skipped)
+    const itemIcons: Record<string, string> = {
+      master_key: 'master_key',
+      magnifying_glass: 'magnifying_glass',
+      playbill_1928: 'playbill_1928',
+      effects_manual: 'stage_effects_manual',
+      margaux_diary: 'diary',
+      annotated_script: 'annotated_script',
+      poisoned_teacup: 'teacup',
+      blueprints: 'blueprint',
+      basement_key: 'basement_key',
+      edwins_notebook: 'eh_notebook',
+      fog_machine_part: 'fog_machine_part',
+      cecilia_letter: 'sealed_envelope',
+      stella_records: 'clipboard',
+      ashworth_files: 'briefcase',
+      chemical_receipt: 'torn_receipt',
+      margaux_locket: 'gold_locket',
+    };
+    for (const [itemId, filename] of Object.entries(itemIcons)) {
+      this.load.image(`item_icon_${itemId}`, `assets/ui/items/${filename}.png`);
+    }
   }
 
   create(): void {
