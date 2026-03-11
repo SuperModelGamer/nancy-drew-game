@@ -131,9 +131,30 @@ export class DialogueSystem {
     const { width, height } = this.scene.cameras.main;
     const boxY = height - 110;
 
+    // Portrait image (if available for this speaker)
+    const portraitKey = this.getSpeakerPortraitKey(line.speaker);
+    const portraitSize = 64;
+    let textOffsetX = width * 0.1;
+
+    if (portraitKey && this.scene.textures.exists(portraitKey)) {
+      const portraitX = width * 0.08;
+      const portraitY = boxY - 20;
+      textOffsetX = width * 0.16;
+
+      const portrait = this.scene.add.image(portraitX, portraitY, portraitKey);
+      portrait.setDisplaySize(portraitSize, portraitSize);
+      const mask = this.scene.add.ellipse(portraitX, portraitY, portraitSize, portraitSize, 0xffffff).setVisible(false);
+      portrait.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, mask));
+      const speakerColorHex = parseInt(this.getSpeakerColor(line.speaker).replace('#', ''), 16);
+      const ring = this.scene.add.ellipse(portraitX, portraitY, portraitSize + 4, portraitSize + 4)
+        .setStrokeStyle(2, speakerColorHex, 0.8)
+        .setFillStyle(0x000000, 0);
+      this.container.add([mask, portrait, ring]);
+    }
+
     // Speaker name with color coding
     const speakerColor = this.getSpeakerColor(line.speaker);
-    const speaker = this.scene.add.text(width * 0.1, boxY - 50, line.speaker, {
+    const speaker = this.scene.add.text(textOffsetX, boxY - 50, line.speaker, {
       fontFamily: FONT,
       fontSize: '18px',
       color: speakerColor,
@@ -142,11 +163,12 @@ export class DialogueSystem {
     this.container.add(speaker);
 
     // Dialogue text
-    const text = this.scene.add.text(width * 0.1, boxY - 20, line.text, {
+    const textWidth = portraitKey && this.scene.textures.exists(portraitKey) ? width * 0.72 : width * 0.8;
+    const text = this.scene.add.text(textOffsetX, boxY - 20, line.text, {
       fontFamily: FONT,
       fontSize: '16px',
       color: TextColors.light,
-      wordWrap: { width: width * 0.8 },
+      wordWrap: { width: textWidth },
       lineSpacing: 4,
     });
     this.container.add(text);
@@ -234,6 +256,17 @@ export class DialogueSystem {
 
       this.container!.add([btn, text]);
     });
+  }
+
+  private getSpeakerPortraitKey(speaker: string): string | null {
+    const portraitMap: Record<string, string> = {
+      'Vivian': 'portrait_vivian',
+      'Edwin': 'portrait_edwin',
+      'Stella': 'portrait_stella',
+      'Ashworth': 'portrait_ashworth',
+      'Diego': 'portrait_diego',
+    };
+    return portraitMap[speaker] || null;
   }
 
   private getSpeakerColor(speaker: string): string {
