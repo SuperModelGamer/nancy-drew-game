@@ -9,6 +9,7 @@ import { ChapterSystem } from '../systems/ChapterSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { drawRoomBackground } from '../utils/room-backgrounds';
 import { showTutorialIfNeeded } from '../utils/tutorial';
+import { Cursors, CursorType } from '../utils/cursors';
 
 interface Hotspot {
   id: string;
@@ -132,6 +133,9 @@ export class RoomScene extends Phaser.Scene {
     // Auto-save on room entry
     SaveSystem.getInstance().save();
 
+    // Set default magnifying glass cursor
+    this.input.setDefaultCursor(Cursors.default);
+
     // Fade in
     this.cameras.main.fadeIn(500, 0, 0, 0);
 
@@ -222,11 +226,13 @@ export class RoomScene extends Phaser.Scene {
         ease: 'Sine.easeInOut',
       });
 
-      // Hover feedback (desktop)
+      // Hover feedback (desktop) — cursor changes by hotspot type
+      const cursorType: CursorType = hotspot.type as CursorType;
       bg.on('pointerover', () => {
         bg.setFillStyle(Colors.gold, 0.3);
         this.tooltipText.setText(hotspot.label);
         this.tooltipText.setVisible(true);
+        this.input.setDefaultCursor(Cursors[cursorType] || Cursors.default);
       });
 
       bg.on('pointermove', (pointer: Phaser.Input.Pointer) => {
@@ -236,6 +242,7 @@ export class RoomScene extends Phaser.Scene {
       bg.on('pointerout', () => {
         bg.setFillStyle(Colors.gold, 0.15);
         this.tooltipText.setVisible(false);
+        this.input.setDefaultCursor(Cursors.default);
       });
 
       // Click/tap handler
