@@ -15,7 +15,15 @@ export const Cursors = {
 
 export type CursorType = keyof typeof Cursors;
 
+/** CSS cursor string for interactive/clickable UI elements (gold hand) */
+export const HAND_CURSOR = Cursors.pickup;
+
 // Set cursor on the game canvas
 export function setGameCursor(scene: Phaser.Scene, type: CursorType): void {
   scene.input.setDefaultCursor(Cursors[type]);
+}
+
+/** Set the default cursor for any scene to the gold spyglass */
+export function initSceneCursor(scene: Phaser.Scene): void {
+  scene.input.setDefaultCursor(Cursors.default);
 }

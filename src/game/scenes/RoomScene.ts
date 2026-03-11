@@ -9,7 +9,7 @@ import { ChapterSystem } from '../systems/ChapterSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { drawRoomBackground } from '../utils/room-backgrounds';
 import { showTutorialIfNeeded } from '../utils/tutorial';
-import { Cursors, CursorType } from '../utils/cursors';
+import { Cursors, CursorType, HAND_CURSOR } from '../utils/cursors';
 import { addAmbientParticles } from '../utils/ambient-particles';
 import { UISounds } from '../utils/sounds';
 
@@ -218,7 +218,7 @@ export class RoomScene extends Phaser.Scene {
 
       const bg = this.add.rectangle(0, 0, w, h, hotspotColor, 0.15);
       bg.setStrokeStyle(1, hotspotColor, 0.4);
-      bg.setInteractive({ useHandCursor: true });
+      bg.setInteractive({ cursor: HAND_CURSOR });
 
       // Label starts hidden, fades in on hover
       const label = this.add.text(0, h / 2 + 10, hotspot.label, {

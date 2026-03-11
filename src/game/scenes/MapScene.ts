@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createOverlay } from '../utils/ui-helpers';
 
 interface RoomDef {
@@ -57,6 +58,7 @@ export class MapScene extends Phaser.Scene {
 
     // --- Full-screen overlay ---
     createOverlay(this, 0.8, Depths.mapOverlay);
+    initSceneCursor(this);
 
     const contentDepth = Depths.mapContent;
 
@@ -104,7 +106,7 @@ export class MapScene extends Phaser.Scene {
     });
     closeBtn.setOrigin(0.5);
     closeBtn.setDepth(contentDepth + 2);
-    closeBtn.setInteractive({ useHandCursor: true });
+    closeBtn.setInteractive({ cursor: HAND_CURSOR });
     closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
     closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
     closeBtn.on('pointerdown', () => this.scene.stop());
@@ -213,7 +215,7 @@ export class MapScene extends Phaser.Scene {
         // Invisible hit area over the full medallion (including nameplate)
         const hitW = MEDALLION_DISPLAY_SIZE * (medallion.width / medallion.height);
         const hitArea = this.add.rectangle(0, -6, hitW, MEDALLION_DISPLAY_SIZE, 0x000000, 0);
-        hitArea.setInteractive({ useHandCursor: true });
+        hitArea.setInteractive({ cursor: HAND_CURSOR });
         container.add(hitArea);
 
         // Hover effects

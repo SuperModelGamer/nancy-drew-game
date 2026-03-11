@@ -4,6 +4,7 @@ import { SaveSystem } from '../systems/SaveSystem';
 import { ChapterSystem } from '../systems/ChapterSystem';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 import { UISounds } from '../utils/sounds';
 
 // Height of the bottom toolbar strip
@@ -24,7 +25,9 @@ export class UIScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = this.cameras.main;
+    initSceneCursor(this);
     const barY = height - TOOLBAR_H / 2;
+    initSceneCursor(this);
 
     // ─── Bottom toolbar background strip ───
     // Gradient fade: transparent at top → solid dark at bottom
@@ -59,7 +62,7 @@ export class UIScene extends Phaser.Scene {
 
       const bg = this.add.rectangle(0, 0, 100, 36, 0x0a0a12, 0);
       bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
-      bg.setInteractive({ useHandCursor: true });
+      bg.setInteractive({ cursor: HAND_CURSOR });
 
       const text = this.add.text(0, 0, btn.label, {
         ...btnStyle,
@@ -159,6 +162,7 @@ export class UIScene extends Phaser.Scene {
 
   private createInventoryPanel(): Phaser.GameObjects.Container {
     const { width, height } = this.cameras.main;
+    initSceneCursor(this);
     const panelW = Math.min(width * 0.9, 600);
     const panelH = 220;
     // Position above the toolbar
@@ -190,6 +194,7 @@ export class UIScene extends Phaser.Scene {
 
   private createJournalPanel(): Phaser.GameObjects.Container {
     const { width, height } = this.cameras.main;
+    initSceneCursor(this);
     const panelW = Math.min(width * 0.9, 600);
     const panelH = 400;
     // Center vertically but stay above toolbar
@@ -237,7 +242,7 @@ export class UIScene extends Phaser.Scene {
       fontFamily: FONT,
       fontSize: '20px',
       color: '#6a5a4a',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
     closeBtn.on('pointerdown', () => this.toggleJournal());
     closeBtn.on('pointerover', () => closeBtn.setColor('#3a2a1a'));
     closeBtn.on('pointerout', () => closeBtn.setColor('#6a5a4a'));
@@ -310,7 +315,7 @@ export class UIScene extends Phaser.Scene {
 
       const slot = this.add.rectangle(x, y, slotSize, slotSize, Colors.sceneBg, 0.8);
       slot.setStrokeStyle(isSelected ? 2 : 1, borderColor, borderAlpha);
-      slot.setInteractive({ useHandCursor: true });
+      slot.setInteractive({ cursor: HAND_CURSOR });
 
       const label = this.add.text(x, y + slotSize / 2 + 8, itemData.name, {
         fontFamily: FONT,
