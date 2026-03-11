@@ -136,13 +136,9 @@ export class RoomScene extends Phaser.Scene {
     // Set default magnifying glass cursor
     this.input.setDefaultCursor(Cursors.default);
 
-    // Fade in
-    this.cameras.main.fadeIn(500, 0, 0, 0);
-
-    // Check for scripted events after fade-in
-    this.cameras.main.once('camerafadeincomplete', () => {
+    // Curtain open reveal
+    this.playCurtainOpen(() => {
       this.checkScriptedEvents();
-      // Show tutorial on first visit
       showTutorialIfNeeded(this);
     });
 
@@ -492,11 +488,72 @@ export class RoomScene extends Phaser.Scene {
     }
   }
 
+  private playCurtainOpen(onComplete: () => void): void {
+    const { width, height } = this.cameras.main;
+    const curtainColor = 0x4a0a0a; // deep crimson
+
+    const left = this.add.rectangle(width / 4, height / 2, width / 2, height, curtainColor, 1);
+    const right = this.add.rectangle(width * 3 / 4, height / 2, width / 2, height, curtainColor, 1);
+    left.setDepth(Depths.scriptedEvent + 10);
+    right.setDepth(Depths.scriptedEvent + 10);
+
+    // Gold fringe line at inner edge
+    const fringeL = this.add.rectangle(width / 2 - 1, height / 2, 3, height, Colors.gold, 0.6);
+    const fringeR = this.add.rectangle(width / 2 + 1, height / 2, 3, height, Colors.gold, 0.6);
+    fringeL.setDepth(Depths.scriptedEvent + 11);
+    fringeR.setDepth(Depths.scriptedEvent + 11);
+
+    this.tweens.add({
+      targets: [left, fringeL],
+      x: `-=${width / 2 + 10}`,
+      duration: 600,
+      ease: 'Power2',
+      delay: 100,
+      onComplete: () => { left.destroy(); fringeL.destroy(); },
+    });
+    this.tweens.add({
+      targets: [right, fringeR],
+      x: `+=${width / 2 + 10}`,
+      duration: 600,
+      ease: 'Power2',
+      delay: 100,
+      onComplete: () => { right.destroy(); fringeR.destroy(); onComplete(); },
+    });
+  }
+
+  private playCurtainClose(onComplete: () => void): void {
+    const { width, height } = this.cameras.main;
+    const curtainColor = 0x4a0a0a;
+
+    const left = this.add.rectangle(-width / 4, height / 2, width / 2, height, curtainColor, 1);
+    const right = this.add.rectangle(width + width / 4, height / 2, width / 2, height, curtainColor, 1);
+    left.setDepth(Depths.scriptedEvent + 10);
+    right.setDepth(Depths.scriptedEvent + 10);
+
+    const fringeL = this.add.rectangle(-width / 4 + width / 4, height / 2, 3, height, Colors.gold, 0.6);
+    const fringeR = this.add.rectangle(width + width / 4 - width / 4, height / 2, 3, height, Colors.gold, 0.6);
+    fringeL.setDepth(Depths.scriptedEvent + 11);
+    fringeR.setDepth(Depths.scriptedEvent + 11);
+
+    this.tweens.add({
+      targets: [left, fringeL],
+      x: `+=${width / 4}`,
+      duration: 500,
+      ease: 'Power2',
+    });
+    this.tweens.add({
+      targets: [right, fringeR],
+      x: `-=${width / 4}`,
+      duration: 500,
+      ease: 'Power2',
+      onComplete: () => onComplete(),
+    });
+  }
+
   private navigateToRoom(roomId: string): void {
     SaveSystem.getInstance().setCurrentRoom(roomId);
     SaveSystem.getInstance().save();
-    this.cameras.main.fadeOut(400, 0, 0, 0);
-    this.time.delayedCall(400, () => {
+    this.playCurtainClose(() => {
       this.scene.restart({ roomId });
     });
   }
