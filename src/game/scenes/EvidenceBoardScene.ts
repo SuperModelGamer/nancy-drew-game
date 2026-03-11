@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { PuzzleSystem } from '../systems/PuzzleSystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { UISounds } from '../utils/sounds';
 
 interface EvidenceCard {
   id: string;
@@ -28,6 +29,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
   private boardContainer!: Phaser.GameObjects.Container;
   private feedbackText!: Phaser.GameObjects.Text;
   private hintText!: Phaser.GameObjects.Text;
+  private stringGraphics!: Phaser.GameObjects.Graphics;
 
   constructor() {
     super({ key: 'EvidenceBoardScene' });
@@ -139,6 +141,10 @@ export class EvidenceBoardScene extends Phaser.Scene {
       this.dropZones.push({ x: zx, y: zoneY, cardId: null });
     }
 
+    // Red string connections (drawn dynamically as cards are placed)
+    this.stringGraphics = this.add.graphics();
+    this.boardContainer.add(this.stringGraphics);
+
     // Feedback text
     this.feedbackText = this.add.text(boardX, boardY + boardH / 2 - 65, '', {
       fontFamily: FONT,
@@ -187,6 +193,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
       this.dropZones.forEach(zone => {
         if (zone.cardId === cardId) zone.cardId = null;
       });
+      this.drawStringConnections();
 
       // Find nearest zone
       let nearestZone = -1;
@@ -207,6 +214,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
           y: this.dropZones[nearestZone].y,
           duration: 200,
           ease: 'Back.easeOut',
+          onComplete: () => this.drawStringConnections(),
         });
         this.checkAllPlaced();
       } else {
@@ -276,6 +284,47 @@ export class EvidenceBoardScene extends Phaser.Scene {
     this.cardContainers.push(container);
   }
 
+  private drawStringConnections(): void {
+    this.stringGraphics.clear();
+
+    // Find consecutive filled zones and draw red string between them
+    const filledZones = this.dropZones
+      .map((zone, i) => ({ ...zone, index: i }))
+      .filter(z => z.cardId !== null);
+
+    if (filledZones.length < 2) return;
+
+    // Sort by index to draw strings between adjacent placed cards
+    filledZones.sort((a, b) => a.index - b.index);
+
+    for (let i = 0; i < filledZones.length - 1; i++) {
+      const a = filledZones[i];
+      const b = filledZones[i + 1];
+
+      // Only draw string between consecutive slots
+      if (b.index - a.index === 1) {
+        // Red yarn with slight sag (quadratic curve)
+        this.stringGraphics.lineStyle(2, Colors.redString, 0.6);
+        const midX = (a.x + b.x) / 2;
+        const midY = (a.y + b.y) / 2 + 12; // sag downward
+        this.stringGraphics.beginPath();
+        this.stringGraphics.moveTo(a.x, a.y);
+        // Approximate bezier with line segments for the sag
+        for (let t = 0; t <= 1; t += 0.1) {
+          const px = (1 - t) * (1 - t) * a.x + 2 * (1 - t) * t * midX + t * t * b.x;
+          const py = (1 - t) * (1 - t) * a.y + 2 * (1 - t) * t * midY + t * t * b.y;
+          this.stringGraphics.lineTo(px, py);
+        }
+        this.stringGraphics.strokePath();
+
+        // Push pin dots at connection points
+        this.stringGraphics.fillStyle(Colors.pushPin, 0.8);
+        this.stringGraphics.fillCircle(a.x, a.y, 4);
+        this.stringGraphics.fillCircle(b.x, b.y, 4);
+      }
+    }
+  }
+
   private checkAllPlaced(): void {
     const allFilled = this.dropZones.every(zone => zone.cardId !== null);
     if (!allFilled) return;
@@ -284,6 +333,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
     const correct = PuzzleSystem.getInstance().checkAnswer('evidence_board', answer);
 
     if (correct) {
+      UISounds.puzzleSolve();
       this.feedbackText.setColor('#4ade80');
       this.feedbackText.setText('Case Closed!');
       this.hintText.setText('');
@@ -291,16 +341,26 @@ export class EvidenceBoardScene extends Phaser.Scene {
       SaveSystem.getInstance().setFlag('case_closed', true);
       SaveSystem.getInstance().save();
 
-      // Draw red string connections
-      const gfx = this.add.graphics();
-      gfx.lineStyle(2, 0x8b1a1a, 0.8);
+      // Final red string connections — full opacity
+      this.stringGraphics.clear();
       for (let i = 0; i < this.dropZones.length - 1; i++) {
-        gfx.lineBetween(
-          this.dropZones[i].x, this.dropZones[i].y,
-          this.dropZones[i + 1].x, this.dropZones[i + 1].y,
-        );
+        const a = this.dropZones[i];
+        const b = this.dropZones[i + 1];
+        const midX = (a.x + b.x) / 2;
+        const midY = (a.y + b.y) / 2 + 12;
+        this.stringGraphics.lineStyle(2.5, Colors.redString, 0.9);
+        this.stringGraphics.beginPath();
+        this.stringGraphics.moveTo(a.x, a.y);
+        for (let t = 0; t <= 1; t += 0.1) {
+          const px = (1 - t) * (1 - t) * a.x + 2 * (1 - t) * t * midX + t * t * b.x;
+          const py = (1 - t) * (1 - t) * a.y + 2 * (1 - t) * t * midY + t * t * b.y;
+          this.stringGraphics.lineTo(px, py);
+        }
+        this.stringGraphics.strokePath();
+        this.stringGraphics.fillStyle(Colors.pushPin, 1);
+        this.stringGraphics.fillCircle(a.x, a.y, 5);
+        this.stringGraphics.fillCircle(b.x, b.y, 5);
       }
-      this.boardContainer.add(gfx);
 
       this.cardContainers.forEach(c => c.disableInteractive());
 
@@ -309,6 +369,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
         this.scene.stop();
       });
     } else {
+      UISounds.wrongAnswer();
       this.feedbackText.setColor('#ff6b6b');
       this.feedbackText.setText("That's not quite right...");
 
@@ -329,6 +390,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
       // Reset cards after delay
       this.time.delayedCall(1500, () => {
         this.dropZones.forEach(zone => { zone.cardId = null; });
+        this.drawStringConnections();
         this.cardContainers.forEach((container, i) => {
           const start = this.cardStartPositions[i];
           this.tweens.add({
