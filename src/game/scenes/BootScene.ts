@@ -36,6 +36,12 @@ export class BootScene extends Phaser.Scene {
     for (const room of rooms) {
       this.load.image(`bg_${room}`, `assets/backgrounds/${room}.png`);
     }
+
+    // Load character portrait images
+    const suspects = ['vivian', 'edwin', 'ashworth', 'stella', 'diego'];
+    for (const suspect of suspects) {
+      this.load.image(`portrait_${suspect}`, `assets/portraits/${suspect}.png`);
+    }
   }
 
   create(): void {

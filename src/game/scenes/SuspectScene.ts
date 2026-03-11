@@ -146,14 +146,26 @@ export class SuspectScene extends Phaser.Scene {
       card.setStrokeStyle(i === this.selectedIndex ? 2 : 1, suspect.color, i === this.selectedIndex ? 0.9 : 0.4);
       card.setInteractive({ useHandCursor: true });
 
-      // Icon circle
-      const iconCircle = this.add.ellipse(x, y - 20, 40, 40, suspect.color, 0.3);
-      const iconText = this.add.text(x, y - 20, suspect.icon, {
-        fontFamily: FONT,
-        fontSize: '22px',
-        color: TextColors.white,
-        fontStyle: 'bold',
-      }).setOrigin(0.5);
+      // Portrait or fallback icon
+      const portraitKey = `portrait_${suspect.id}`;
+      let iconElements: Phaser.GameObjects.GameObject[];
+      if (this.textures.exists(portraitKey)) {
+        const portrait = this.add.image(x, y - 20, portraitKey);
+        portrait.setDisplaySize(44, 44);
+        const mask = this.add.ellipse(x, y - 20, 44, 44, 0xffffff).setVisible(false);
+        portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, mask));
+        const ring = this.add.ellipse(x, y - 20, 46, 46).setStrokeStyle(2, suspect.color, 0.8).setFillStyle(0x000000, 0);
+        iconElements = [portrait, ring];
+      } else {
+        const iconCircle = this.add.ellipse(x, y - 20, 40, 40, suspect.color, 0.3);
+        const iconText = this.add.text(x, y - 20, suspect.icon, {
+          fontFamily: FONT,
+          fontSize: '22px',
+          color: TextColors.white,
+          fontStyle: 'bold',
+        }).setOrigin(0.5);
+        iconElements = [iconCircle, iconText];
+      }
 
       // Name
       const name = this.add.text(x, y + 20, suspect.name.split(' ')[0], {
@@ -180,7 +192,7 @@ export class SuspectScene extends Phaser.Scene {
       card.on('pointerover', () => card.setFillStyle(Colors.hoverBg));
       card.on('pointerout', () => card.setFillStyle(Colors.sceneBg, 0.95));
 
-      this.container.add([card, iconCircle, iconText, name, role]);
+      this.container.add([card, ...iconElements, name, role]);
     });
 
     // Show first suspect's detail
@@ -201,15 +213,32 @@ export class SuspectScene extends Phaser.Scene {
     bg.setStrokeStyle(2, suspect.color, 0.6);
     this.detailPanel.add(bg);
 
+    // Portrait in detail panel
+    const detailPortraitKey = `portrait_${suspect.id}`;
+    const portraitSize = 80;
+    const hasPortrait = this.textures.exists(detailPortraitKey);
+    const contentOffsetX = hasPortrait ? 30 : 0;
+
+    if (hasPortrait) {
+      const detailPortrait = this.add.image(-panelW / 2 + 70, -panelH / 2 + 70, detailPortraitKey);
+      detailPortrait.setDisplaySize(portraitSize, portraitSize);
+      const detailMask = this.add.ellipse(-panelW / 2 + 70, -panelH / 2 + 70, portraitSize, portraitSize, 0xffffff).setVisible(false);
+      // Position mask relative to detail panel
+      this.detailPanel.add(detailMask);
+      detailPortrait.setMask(new Phaser.Display.Masks.GeometryMask(this, detailMask));
+      const detailRing = this.add.ellipse(-panelW / 2 + 70, -panelH / 2 + 70, portraitSize + 4, portraitSize + 4).setStrokeStyle(2, suspect.color, 0.8).setFillStyle(0x000000, 0);
+      this.detailPanel.add([detailPortrait, detailRing]);
+    }
+
     // Name & details header
-    this.detailPanel.add(this.add.text(0, -panelH / 2 + 25, suspect.name, {
+    this.detailPanel.add(this.add.text(hasPortrait ? contentOffsetX : 0, -panelH / 2 + 25, suspect.name, {
       fontFamily: FONT,
       fontSize: '22px',
       color: `#${suspect.color.toString(16).padStart(6, '0')}`,
       fontStyle: 'bold',
     }).setOrigin(0.5));
 
-    this.detailPanel.add(this.add.text(0, -panelH / 2 + 52, `${suspect.role} — ${suspect.age} — ${suspect.location}`, {
+    this.detailPanel.add(this.add.text(hasPortrait ? contentOffsetX : 0, -panelH / 2 + 52, `${suspect.role} — ${suspect.age} — ${suspect.location}`, {
       fontFamily: FONT,
       fontSize: '13px',
       color: TextColors.goldDim,
