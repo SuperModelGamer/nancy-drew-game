@@ -37,6 +37,9 @@ export class BootScene extends Phaser.Scene {
       this.load.image(`bg_${room}`, `assets/backgrounds/${room}.png`);
     }
 
+    // Load title screen cover image
+    this.load.image('cover', 'assets/cover.png');
+
     // Load character portrait images
     const suspects = ['vivian', 'edwin', 'ashworth', 'stella', 'diego'];
     for (const suspect of suspects) {
