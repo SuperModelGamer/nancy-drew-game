@@ -147,7 +147,7 @@ export class IntroScene extends Phaser.Scene {
     // Ambient particles (dust motes)
     this.createDustParticles();
 
-    // Skip hint
+    // Skip hint (bottom right)
     this.skipHint = this.add.text(width - 20, height - 20, 'Click to continue', {
       fontFamily: FONT,
       fontSize: '12px',
@@ -155,8 +155,25 @@ export class IntroScene extends Phaser.Scene {
       fontStyle: 'italic',
     }).setOrigin(1, 1).setAlpha(0).setDepth(10);
 
+    // Skip button (top right)
+    const skipBtn = this.add.text(width - 24, 24, 'SKIP ▸', {
+      fontFamily: FONT,
+      fontSize: '14px',
+      color: TextColors.goldDim,
+      letterSpacing: 2,
+    }).setOrigin(1, 0).setAlpha(0).setDepth(10);
+    skipBtn.setInteractive({ useHandCursor: true });
+    skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.gold));
+    skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.goldDim));
+    skipBtn.on('pointerdown', () => this.skipToGame());
+    this.tweens.add({ targets: skipBtn, alpha: 0.7, duration: 1500, delay: 2000 });
+
     // Click handler
-    this.input.on('pointerdown', () => this.handleClick());
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      // Don't advance slides when clicking the skip button area
+      if (pointer.x > width - 80 && pointer.y < 50) return;
+      this.handleClick();
+    });
 
     // Keyboard handler
     this.input.keyboard?.on('keydown-SPACE', () => this.handleClick());
