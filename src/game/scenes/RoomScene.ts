@@ -201,10 +201,14 @@ export class RoomScene extends Phaser.Scene {
       const w = Math.max(hotspot.width, 48);
       const h = Math.max(hotspot.height, 48);
 
-      const bg = this.add.rectangle(0, 0, w, h, Colors.gold, 0.15);
-      bg.setStrokeStyle(1, Colors.gold, 0.4);
+      // Color by hotspot type
+      const hotspotColor = this.getHotspotColor(hotspot.type);
+
+      const bg = this.add.rectangle(0, 0, w, h, hotspotColor, 0.15);
+      bg.setStrokeStyle(1, hotspotColor, 0.4);
       bg.setInteractive({ useHandCursor: true });
 
+      // Label starts hidden, fades in on hover
       const label = this.add.text(0, h / 2 + 10, hotspot.label, {
         fontFamily: FONT,
         fontSize: '12px',
@@ -212,11 +216,12 @@ export class RoomScene extends Phaser.Scene {
         align: 'center',
       });
       label.setOrigin(0.5, 0);
+      label.setAlpha(0);
 
       container.add([bg, label]);
       container.setSize(w, h);
 
-      // Subtle gold glow pulse animation
+      // Subtle glow pulse animation (color matches type)
       this.tweens.add({
         targets: bg,
         alpha: { from: 0.15, to: 0.35 },
@@ -226,10 +231,12 @@ export class RoomScene extends Phaser.Scene {
         ease: 'Sine.easeInOut',
       });
 
-      // Hover feedback (desktop) — cursor changes by hotspot type
+      // Hover feedback (desktop) — cursor changes by hotspot type, label fades in
       const cursorType: CursorType = hotspot.type as CursorType;
       bg.on('pointerover', () => {
-        bg.setFillStyle(Colors.gold, 0.3);
+        bg.setFillStyle(hotspotColor, 0.3);
+        bg.setStrokeStyle(2, hotspotColor, 0.7);
+        this.tweens.add({ targets: label, alpha: 1, duration: 200 });
         this.tooltipText.setText(hotspot.label);
         this.tooltipText.setVisible(true);
         this.input.setDefaultCursor(Cursors[cursorType] || Cursors.default);
@@ -240,13 +247,16 @@ export class RoomScene extends Phaser.Scene {
       });
 
       bg.on('pointerout', () => {
-        bg.setFillStyle(Colors.gold, 0.15);
+        bg.setFillStyle(hotspotColor, 0.15);
+        bg.setStrokeStyle(1, hotspotColor, 0.4);
+        this.tweens.add({ targets: label, alpha: 0, duration: 200 });
         this.tooltipText.setVisible(false);
         this.input.setDefaultCursor(Cursors.default);
       });
 
-      // Click/tap handler
+      // Click/tap handler with sparkle feedback
       bg.on('pointerdown', () => {
+        this.playClickSparkle(hotspot.x, hotspot.y, hotspotColor);
         this.handleHotspot(hotspot);
       });
 
@@ -449,6 +459,37 @@ export class RoomScene extends Phaser.Scene {
 
     container.add([bg, text]);
     return container;
+  }
+
+  private getHotspotColor(type: string): number {
+    switch (type) {
+      case 'inspect': return Colors.hotspotInspect;
+      case 'pickup': return Colors.hotspotPickup;
+      case 'navigate': return Colors.hotspotNavigate;
+      case 'talk': return Colors.hotspotTalk;
+      case 'locked': return Colors.hotspotLocked;
+      default: return Colors.gold;
+    }
+  }
+
+  private playClickSparkle(x: number, y: number, color: number): void {
+    // Create 6 small sparkle dots that burst outward and fade
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      const spark = this.add.circle(x, y, 3, color, 0.8);
+      spark.setDepth(Depths.tooltip + 1);
+      this.tweens.add({
+        targets: spark,
+        x: x + Math.cos(angle) * 25,
+        y: y + Math.sin(angle) * 25,
+        alpha: 0,
+        scaleX: 0.2,
+        scaleY: 0.2,
+        duration: 350,
+        ease: 'Power2',
+        onComplete: () => spark.destroy(),
+      });
+    }
   }
 
   private navigateToRoom(roomId: string): void {

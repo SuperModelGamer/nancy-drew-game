@@ -23,6 +23,13 @@ export const Colors = {
   stella: 0xc9947b,
   diego: 0x7bc98a,
 
+  // Hotspot type colors
+  hotspotInspect: 0xc9a84c,   // gold
+  hotspotPickup: 0x4ade80,    // green
+  hotspotNavigate: 0x7ba3c9,  // blue
+  hotspotTalk: 0xb4a0d4,      // purple
+  hotspotLocked: 0xc97b7b,    // warm red
+
   // Map / UI accents
   mapBlue: 0x7ba3c9,
   suspectPurple: 0xb4a0d4,
