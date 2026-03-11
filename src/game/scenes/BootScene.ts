@@ -31,8 +31,11 @@ export class BootScene extends Phaser.Scene {
       bar.width = barWidth * value;
     });
 
-    // Load shared assets here
-    // this.load.image('key', 'assets/path.png');
+    // Load room background images
+    const rooms = ['lobby', 'auditorium', 'backstage', 'dressing_room', 'catwalk', 'basement', 'managers_office'];
+    for (const room of rooms) {
+      this.load.image(`bg_${room}`, `assets/backgrounds/${room}.png`);
+    }
   }
 
   create(): void {
