@@ -295,9 +295,17 @@ export class UIScene extends Phaser.Scene {
         wordWrap: { width: slotSize + 10 },
       }).setOrigin(0.5, 0);
 
-      const icon = this.add.text(x, y, itemData.icon || '?', {
-        fontSize: '28px',
-      }).setOrigin(0.5);
+      // Use procedural icon texture if available, fall back to emoji
+      const iconKey = `item_icon_${itemId}`;
+      let icon: Phaser.GameObjects.GameObject;
+      if (this.textures.exists(iconKey)) {
+        const img = this.add.image(x, y, iconKey).setDisplaySize(40, 40);
+        icon = img;
+      } else {
+        icon = this.add.text(x, y, itemData.icon || '?', {
+          fontSize: '28px',
+        }).setOrigin(0.5);
+      }
 
       // Click to select/deselect
       slot.on('pointerdown', () => {

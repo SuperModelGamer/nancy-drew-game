@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { Colors, TextColors, FONT } from '../utils/constants';
+import { generateItemIcons } from '../utils/item-icons';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -48,6 +49,8 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Generate procedural item icons as textures
+    generateItemIcons(this);
     this.scene.start('TitleScene');
   }
 }
