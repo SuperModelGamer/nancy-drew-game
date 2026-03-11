@@ -36,8 +36,8 @@ const CONNECTIONS: [string, string][] = [
   ['lobby', 'basement'],
 ];
 
-// Size to display each medallion icon
-const MEDALLION_DISPLAY_SIZE = 100;
+// Size to display each medallion icon (height-based since icons are portrait with built-in labels)
+const MEDALLION_DISPLAY_SIZE = 110;
 
 export class MapScene extends Phaser.Scene {
   private currentRoom = '';
@@ -162,25 +162,30 @@ export class MapScene extends Phaser.Scene {
       const hasTexture = this.textures.exists(textureKey);
 
       if (hasTexture && !isLocked) {
-        // Use the medallion image
-        const medallion = this.add.image(0, -4, textureKey);
-        // Scale to fit our display size
-        const scale = MEDALLION_DISPLAY_SIZE / Math.max(medallion.width, medallion.height);
+        // Use the medallion image (new icons are portrait with built-in nameplate)
+        const medallion = this.add.image(0, -6, textureKey);
+        // Scale to fit our display size based on height (icons are taller than wide)
+        const scale = MEDALLION_DISPLAY_SIZE / medallion.height;
         medallion.setScale(scale);
         container.add(medallion);
 
-        // Current room glow ring
+        // The circular part of the medallion is roughly the top 75% of the image
+        const circleRadius = (MEDALLION_DISPLAY_SIZE * 0.38);
+        const circleOffsetY = -6 - (MEDALLION_DISPLAY_SIZE * 0.1);
+
+        // Current room glow ring (centered on the circular medallion part)
         if (isCurrentRoom) {
           const glowRing = this.add.graphics();
           glowRing.lineStyle(3, Colors.gold, 0.6);
-          glowRing.strokeCircle(0, -4, MEDALLION_DISPLAY_SIZE / 2 + 4);
+          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 4);
           glowRing.lineStyle(6, Colors.gold, 0.15);
-          glowRing.strokeCircle(0, -4, MEDALLION_DISPLAY_SIZE / 2 + 8);
+          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 8);
           container.addAt(glowRing, 0);
         }
 
-        // Invisible hit area over the medallion
-        const hitArea = this.add.rectangle(0, -4, MEDALLION_DISPLAY_SIZE, MEDALLION_DISPLAY_SIZE, 0x000000, 0);
+        // Invisible hit area over the full medallion (including nameplate)
+        const hitW = MEDALLION_DISPLAY_SIZE * (medallion.width / medallion.height);
+        const hitArea = this.add.rectangle(0, -6, hitW, MEDALLION_DISPLAY_SIZE, 0x000000, 0);
         hitArea.setInteractive({ useHandCursor: true });
         container.add(hitArea);
 
@@ -199,9 +204,9 @@ export class MapScene extends Phaser.Scene {
           }
         });
 
-        // "You are here" indicator
+        // "You are here" indicator (below the nameplate)
         if (isCurrentRoom) {
-          const hereText = this.add.text(0, MEDALLION_DISPLAY_SIZE / 2 + 6, '— you are here —', {
+          const hereText = this.add.text(0, MEDALLION_DISPLAY_SIZE / 2 - 2, '— you are here —', {
             fontFamily: FONT,
             fontSize: '9px',
             color: TextColors.gold,
