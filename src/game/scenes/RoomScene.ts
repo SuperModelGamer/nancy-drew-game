@@ -73,13 +73,23 @@ export class RoomScene extends Phaser.Scene {
     // Ambient atmosphere particles
     addAmbientParticles(this, this.currentRoom.id);
 
-    // Room name banner
+    // ─── Header gradient strip behind room name ───
+    const headerGrad = this.add.graphics();
+    for (let i = 0; i < 70; i++) {
+      const alpha = 0.7 * (1 - i / 70);
+      headerGrad.fillStyle(0x0a0a12, alpha);
+      headerGrad.fillRect(0, i, width, 1);
+    }
+    headerGrad.setDepth(1);
+
+    // Room name banner (on top of header gradient)
     const banner = this.add.text(width / 2, 30, this.currentRoom.name, {
       fontFamily: FONT,
       fontSize: '20px',
       color: TextColors.gold,
     });
     banner.setOrigin(0.5);
+    banner.setDepth(2);
 
     // Room description on first visit
     const descText = this.add.text(width / 2, 58, this.currentRoom.description, {
@@ -91,6 +101,7 @@ export class RoomScene extends Phaser.Scene {
       align: 'center',
     });
     descText.setOrigin(0.5, 0);
+    descText.setDepth(2);
     this.tweens.add({
       targets: descText,
       alpha: 0,
@@ -421,7 +432,8 @@ export class RoomScene extends Phaser.Scene {
     const textHeight = textObj.height;
     bg.setSize(width * 0.8, Math.max(50, textHeight + 30));
 
-    this.descriptionBox.setPosition(width / 2, height - 60);
+    // Position above the toolbar bar (52px bar + 10px margin)
+    this.descriptionBox.setPosition(width / 2, height - 90);
     this.descriptionBox.setVisible(true);
     this.descriptionBox.setAlpha(0);
 
