@@ -113,8 +113,7 @@ export class TitleScene extends Phaser.Scene {
   private startNewGame(): void {
     this.cameras.main.fadeOut(500, 0, 0, 0);
     this.time.delayedCall(500, () => {
-      this.scene.start('RoomScene', { roomId: 'lobby' });
-      this.scene.launch('UIScene');
+      this.scene.start('IntroScene');
     });
   }
 
