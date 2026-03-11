@@ -1,15 +1,50 @@
 import Phaser from 'phaser';
-import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { Colors, TextColors, FONT } from '../utils/constants';
+
+// ─── Slide Configuration ────────────────────────────────────────────────────
+// Each slide can have: background image, parallax zoom/pan, audio cues,
+// cinematic effects, and text with different reveal styles.
+
+interface CameraMotion {
+  // Start/end scale for slow zoom (1.0 = normal, 1.15 = 15% zoom in)
+  scaleFrom?: number;
+  scaleTo?: number;
+  // Pan offset (pixels to drift during slide)
+  panX?: number;
+  panY?: number;
+}
+
+interface AudioCue {
+  key: string;       // Phaser audio key
+  delay?: number;    // ms after slide starts
+  volume?: number;
+  loop?: boolean;
+}
+
+interface CinematicEffect {
+  type: 'screenShake' | 'ghostFlicker' | 'spotlight' | 'heartbeat' | 'flashWhite';
+  delay?: number;    // ms after slide starts
+  duration?: number;
+}
 
 interface IntroSlide {
   lines: string[];
   effect?: 'typewriter' | 'fade' | 'dramatic';
   pauseAfter?: number;
-  bgColor?: number;
+  // Visual
+  bgImage?: string;             // texture key for background image
+  bgTint?: number;              // tint color overlay on background
+  bgAlpha?: number;             // background opacity (default 0.5)
+  camera?: CameraMotion;        // slow zoom/pan
   fogIntensity?: number;
+  // Audio
+  audio?: AudioCue[];
+  // Cinematic
+  effects?: CinematicEffect[];
 }
 
 const INTRO_SLIDES: IntroSlide[] = [
+  // ─── ACT I: The Night of the Murder (1928) ────────────────────────────────
   {
     lines: [
       'October 31, 1928.',
@@ -20,7 +55,12 @@ const INTRO_SLIDES: IntroSlide[] = [
     ],
     effect: 'typewriter',
     pauseAfter: 2000,
-    bgColor: 0x000000,
+    bgImage: 'intro_stage_1928',
+    bgAlpha: 0.4,
+    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -10 },
+    audio: [
+      { key: 'ambient_theater', volume: 0.3, loop: true },
+    ],
   },
   {
     lines: [
@@ -35,6 +75,16 @@ const INTRO_SLIDES: IntroSlide[] = [
     ],
     effect: 'typewriter',
     pauseAfter: 2500,
+    bgImage: 'intro_goblet',
+    bgAlpha: 0.35,
+    camera: { scaleFrom: 1.05, scaleTo: 1.2, panY: 5 },
+    audio: [
+      { key: 'sfx_goblet', delay: 1500, volume: 0.5 },
+      { key: 'sfx_thud', delay: 3500, volume: 0.4 },
+    ],
+    effects: [
+      { type: 'screenShake', delay: 3500, duration: 300 },
+    ],
   },
   {
     lines: [
@@ -46,13 +96,21 @@ const INTRO_SLIDES: IntroSlide[] = [
     ],
     effect: 'fade',
     pauseAfter: 2500,
+    bgImage: 'intro_stage_empty',
+    bgAlpha: 0.3,
+    camera: { scaleFrom: 1.0, scaleTo: 1.05, panX: -15 },
   },
+
+  // ─── ACT II: Present Day ──────────────────────────────────────────────────
   {
     lines: [
       'Nearly a century later...',
     ],
     effect: 'dramatic',
     pauseAfter: 2000,
+    effects: [
+      { type: 'flashWhite', delay: 0, duration: 400 },
+    ],
   },
   {
     lines: [
@@ -64,8 +122,16 @@ const INTRO_SLIDES: IntroSlide[] = [
     ],
     effect: 'fade',
     pauseAfter: 2500,
+    bgImage: 'intro_exterior',
+    bgAlpha: 0.35,
+    camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: -8 },
     fogIntensity: 0.08,
+    effects: [
+      { type: 'screenShake', delay: 4000, duration: 400 },
+    ],
   },
+
+  // ─── ACT III: The Ghost ───────────────────────────────────────────────────
   {
     lines: [
       'And the ghost has returned.',
@@ -77,7 +143,16 @@ const INTRO_SLIDES: IntroSlide[] = [
     ],
     effect: 'typewriter',
     pauseAfter: 2500,
+    bgImage: 'intro_ghost',
+    bgAlpha: 0.3,
+    camera: { scaleFrom: 1.0, scaleTo: 1.1, panY: 5 },
     fogIntensity: 0.15,
+    audio: [
+      { key: 'sfx_ghost_whisper', delay: 800, volume: 0.3 },
+    ],
+    effects: [
+      { type: 'ghostFlicker', delay: 500, duration: 6000 },
+    ],
   },
   {
     lines: [
@@ -88,7 +163,15 @@ const INTRO_SLIDES: IntroSlide[] = [
     ],
     effect: 'fade',
     pauseAfter: 2000,
+    bgImage: 'intro_phone',
+    bgAlpha: 0.3,
+    camera: { scaleFrom: 1.0, scaleTo: 1.05, panX: 10 },
+    audio: [
+      { key: 'sfx_phone_ring', delay: 1500, volume: 0.4 },
+    ],
   },
+
+  // ─── ACT IV: The Call ─────────────────────────────────────────────────────
   {
     lines: [
       '"Nancy, please come quickly.',
@@ -99,6 +182,9 @@ const INTRO_SLIDES: IntroSlide[] = [
     ],
     effect: 'typewriter',
     pauseAfter: 2500,
+    bgImage: 'intro_phone',
+    bgAlpha: 0.25,
+    camera: { scaleFrom: 1.05, scaleTo: 1.12, panX: -5 },
   },
   {
     lines: [
@@ -112,9 +198,17 @@ const INTRO_SLIDES: IntroSlide[] = [
     ],
     effect: 'fade',
     pauseAfter: 2000,
+    bgImage: 'intro_doors',
+    bgAlpha: 0.35,
+    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -5 },
     fogIntensity: 0.05,
+    audio: [
+      { key: 'sfx_door_creak', delay: 200, volume: 0.5 },
+    ],
   },
 ];
+
+// ─── IntroScene Class ───────────────────────────────────────────────────────
 
 export class IntroScene extends Phaser.Scene {
   private slideIndex = 0;
@@ -124,6 +218,16 @@ export class IntroScene extends Phaser.Scene {
   private fogOverlay!: Phaser.GameObjects.Rectangle;
   private skipHint!: Phaser.GameObjects.Text;
   private abortSlide = false;
+
+  // Background image layers
+  private currentBg: Phaser.GameObjects.Image | null = null;
+  private bgDarken!: Phaser.GameObjects.Rectangle;
+
+  // Active audio tracks (so we can stop them on skip/transition)
+  private activeSounds: Phaser.Sound.BaseSound[] = [];
+
+  // Ghost flicker target (for the effect)
+  private ghostOverlay: Phaser.GameObjects.Rectangle | null = null;
 
   constructor() {
     super({ key: 'IntroScene' });
@@ -136,13 +240,20 @@ export class IntroScene extends Phaser.Scene {
     this.canSkip = false;
     this.abortSlide = false;
     this.currentTexts = [];
+    this.activeSounds = [];
+    this.currentBg = null;
+    this.ghostOverlay = null;
 
-    // Black background
-    this.add.rectangle(width / 2, height / 2, width, height, 0x000000);
+    // Base black background
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000).setDepth(0);
+
+    // Background darkening layer (sits between bg image and text)
+    this.bgDarken = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.6);
+    this.bgDarken.setDepth(0.5);
 
     // Subtle fog overlay
     this.fogOverlay = this.add.rectangle(width / 2, height / 2, width, height, Colors.fog, 0);
-    this.fogOverlay.setDepth(1);
+    this.fogOverlay.setDepth(3);
 
     // Ambient particles (dust motes)
     this.createDustParticles();
@@ -170,7 +281,6 @@ export class IntroScene extends Phaser.Scene {
 
     // Click handler
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      // Don't advance slides when clicking the skip button area
       if (pointer.x > width - 80 && pointer.y < 50) return;
       this.handleClick();
     });
@@ -189,17 +299,17 @@ export class IntroScene extends Phaser.Scene {
     });
   }
 
+  // ─── Dust Particles ─────────────────────────────────────────────────────
+
   private createDustParticles(): void {
     const { width, height } = this.cameras.main;
-    // Create floating dust motes using simple graphics
     for (let i = 0; i < 20; i++) {
       const x = Phaser.Math.Between(0, width);
       const y = Phaser.Math.Between(0, height);
       const size = Phaser.Math.Between(1, 3);
       const mote = this.add.circle(x, y, size, 0xc9a84c, Phaser.Math.FloatBetween(0.05, 0.15));
-      mote.setDepth(2);
+      mote.setDepth(4);
 
-      // Slow drift animation
       this.tweens.add({
         targets: mote,
         x: x + Phaser.Math.Between(-80, 80),
@@ -213,17 +323,19 @@ export class IntroScene extends Phaser.Scene {
     }
   }
 
+  // ─── Input Handling ─────────────────────────────────────────────────────
+
   private handleClick(): void {
     if (!this.canSkip) return;
 
     if (this.isAnimating) {
-      // Skip current animation — show all text immediately
       this.abortSlide = true;
     } else {
-      // Advance to next slide
       this.nextSlide();
     }
   }
+
+  // ─── Slide Display (master controller) ──────────────────────────────────
 
   private async showSlide(): Promise<void> {
     if (this.slideIndex >= INTRO_SLIDES.length) {
@@ -239,6 +351,9 @@ export class IntroScene extends Phaser.Scene {
     this.currentTexts.forEach(t => t.destroy());
     this.currentTexts = [];
 
+    // Transition background image
+    this.transitionBackground(slide);
+
     // Update fog
     if (slide.fogIntensity !== undefined) {
       this.tweens.add({
@@ -248,6 +363,13 @@ export class IntroScene extends Phaser.Scene {
       });
     }
 
+    // Trigger audio cues
+    this.triggerAudio(slide);
+
+    // Trigger cinematic effects
+    this.triggerEffects(slide);
+
+    // Show text
     const { width, height } = this.cameras.main;
     const totalLines = slide.lines.length;
     const lineHeight = 32;
@@ -263,11 +385,239 @@ export class IntroScene extends Phaser.Scene {
 
     this.isAnimating = false;
 
-    // Auto-advance after pause (if not skipped)
     if (!this.abortSlide) {
       await this.wait(slide.pauseAfter || 2000);
     }
   }
+
+  // ─── Background Image System ────────────────────────────────────────────
+
+  private transitionBackground(slide: IntroSlide): void {
+    const { width, height } = this.cameras.main;
+
+    // Fade out old background
+    if (this.currentBg) {
+      const oldBg = this.currentBg;
+      this.tweens.add({
+        targets: oldBg,
+        alpha: 0,
+        duration: 800,
+        onComplete: () => oldBg.destroy(),
+      });
+      this.currentBg = null;
+    }
+
+    if (!slide.bgImage || !this.textures.exists(slide.bgImage)) return;
+
+    const bgAlpha = slide.bgAlpha ?? 0.5;
+    const bg = this.add.image(width / 2, height / 2, slide.bgImage);
+    bg.setDepth(0.2);
+    bg.setAlpha(0);
+
+    // Scale to cover the screen (with slight oversize for pan room)
+    const scaleX = (width * 1.2) / bg.width;
+    const scaleY = (height * 1.2) / bg.height;
+    const baseScale = Math.max(scaleX, scaleY);
+    bg.setScale(baseScale);
+
+    // Apply tint if specified
+    if (slide.bgTint !== undefined) {
+      bg.setTint(slide.bgTint);
+    }
+
+    // Fade in
+    this.tweens.add({
+      targets: bg,
+      alpha: bgAlpha,
+      duration: 1200,
+    });
+
+    // Parallax camera motion (slow zoom + pan)
+    if (slide.camera) {
+      const cam = slide.camera;
+      const startScale = baseScale * (cam.scaleFrom ?? 1.0);
+      const endScale = baseScale * (cam.scaleTo ?? 1.0);
+      const panX = cam.panX ?? 0;
+      const panY = cam.panY ?? 0;
+
+      bg.setScale(startScale);
+
+      // Duration based on slide text length (longer text = longer motion)
+      const motionDuration = (slide.pauseAfter ?? 2000) + slide.lines.length * 800;
+
+      this.tweens.add({
+        targets: bg,
+        scaleX: endScale,
+        scaleY: endScale,
+        x: width / 2 + panX,
+        y: height / 2 + panY,
+        duration: motionDuration,
+        ease: 'Sine.easeInOut',
+      });
+    }
+
+    this.currentBg = bg;
+  }
+
+  // ─── Audio System ───────────────────────────────────────────────────────
+
+  private triggerAudio(slide: IntroSlide): void {
+    if (!slide.audio) return;
+
+    for (const cue of slide.audio) {
+      // Only play if the audio key is loaded
+      if (!this.cache.audio.exists(cue.key)) continue;
+
+      const delay = cue.delay ?? 0;
+
+      this.time.delayedCall(delay, () => {
+        if (this.abortSlide) return;
+
+        const sound = this.sound.add(cue.key, {
+          volume: cue.volume ?? 0.3,
+          loop: cue.loop ?? false,
+        });
+        sound.play();
+        this.activeSounds.push(sound);
+      });
+    }
+  }
+
+  private stopAllSounds(): void {
+    for (const s of this.activeSounds) {
+      if (s.isPlaying) {
+        s.stop();
+      }
+      s.destroy();
+    }
+    this.activeSounds = [];
+  }
+
+  // ─── Cinematic Effects ──────────────────────────────────────────────────
+
+  private triggerEffects(slide: IntroSlide): void {
+    if (!slide.effects) return;
+
+    for (const fx of slide.effects) {
+      this.time.delayedCall(fx.delay ?? 0, () => {
+        if (this.abortSlide) return;
+
+        switch (fx.type) {
+          case 'screenShake':
+            this.screenShake(fx.duration ?? 300);
+            break;
+          case 'ghostFlicker':
+            this.ghostFlicker(fx.duration ?? 4000);
+            break;
+          case 'spotlight':
+            this.spotlightBeam(fx.duration ?? 3000);
+            break;
+          case 'heartbeat':
+            this.heartbeatPulse(fx.duration ?? 4000);
+            break;
+          case 'flashWhite':
+            this.flashWhite(fx.duration ?? 300);
+            break;
+        }
+      });
+    }
+  }
+
+  private screenShake(duration: number): void {
+    this.cameras.main.shake(duration, 0.008);
+  }
+
+  private ghostFlicker(duration: number): void {
+    const { width, height } = this.cameras.main;
+
+    // Create a semi-transparent white overlay that flickers
+    if (!this.ghostOverlay) {
+      this.ghostOverlay = this.add.rectangle(
+        width / 2, height / 2, width, height, 0xccccff, 0,
+      );
+      this.ghostOverlay.setDepth(2);
+    }
+
+    const flickerCount = Math.floor(duration / 600);
+    for (let i = 0; i < flickerCount; i++) {
+      const delay = i * Phaser.Math.Between(400, 800);
+      if (delay > duration) break;
+
+      this.time.delayedCall(delay, () => {
+        if (!this.ghostOverlay || this.abortSlide) return;
+        this.tweens.add({
+          targets: this.ghostOverlay,
+          fillAlpha: { from: Phaser.Math.FloatBetween(0.03, 0.08), to: 0 },
+          duration: Phaser.Math.Between(150, 350),
+          ease: 'Sine.easeOut',
+        });
+      });
+    }
+  }
+
+  private spotlightBeam(duration: number): void {
+    const { width, height } = this.cameras.main;
+    const spotlight = this.add.graphics();
+    spotlight.setDepth(2.5);
+    spotlight.setAlpha(0);
+
+    // Draw a cone of light
+    spotlight.fillStyle(0xffffcc, 0.06);
+    spotlight.fillTriangle(
+      width / 2, 0,
+      width / 2 - 80, height * 0.7,
+      width / 2 + 80, height * 0.7,
+    );
+
+    this.tweens.add({
+      targets: spotlight,
+      alpha: { from: 0, to: 1 },
+      duration: 1000,
+      yoyo: true,
+      hold: duration - 2000,
+      onComplete: () => spotlight.destroy(),
+    });
+  }
+
+  private heartbeatPulse(duration: number): void {
+    const { width, height } = this.cameras.main;
+    const pulse = this.add.rectangle(width / 2, height / 2, width, height, 0x330000, 0);
+    pulse.setDepth(2);
+
+    const beats = Math.floor(duration / 1000);
+    for (let i = 0; i < beats; i++) {
+      this.time.delayedCall(i * 1000, () => {
+        if (this.abortSlide) {
+          pulse.destroy();
+          return;
+        }
+        this.tweens.add({
+          targets: pulse,
+          fillAlpha: { from: 0.06, to: 0 },
+          duration: 400,
+          ease: 'Sine.easeOut',
+        });
+      });
+    }
+
+    this.time.delayedCall(duration, () => pulse.destroy());
+  }
+
+  private flashWhite(duration: number): void {
+    const { width, height } = this.cameras.main;
+    const flash = this.add.rectangle(width / 2, height / 2, width, height, 0xffffff, 0);
+    flash.setDepth(8);
+
+    this.tweens.add({
+      targets: flash,
+      fillAlpha: { from: 0.2, to: 0 },
+      duration,
+      ease: 'Cubic.easeOut',
+      onComplete: () => flash.destroy(),
+    });
+  }
+
+  // ─── Text Effects ───────────────────────────────────────────────────────
 
   private typewriterSlide(lines: string[], startY: number, width: number, lineHeight: number): Promise<void> {
     return new Promise<void>((resolve) => {
@@ -275,7 +625,6 @@ export class IntroScene extends Phaser.Scene {
 
       const showNextLine = () => {
         if (this.abortSlide || lineIndex >= lines.length) {
-          // Show all remaining lines instantly
           for (let i = lineIndex; i < lines.length; i++) {
             if (lines[i] === '') continue;
             const existing = this.currentTexts.find(t => t.getData('lineIndex') === i);
@@ -348,7 +697,6 @@ export class IntroScene extends Phaser.Scene {
         return;
       }
 
-      // Stagger fade in
       textsToFade.forEach((t, i) => {
         this.tweens.add({
           targets: t,
@@ -394,13 +742,12 @@ export class IntroScene extends Phaser.Scene {
   }
 
   private createLineText(x: number, y: number, text: string): Phaser.GameObjects.Text {
-    // Check if this is a quote line (starts with ")
     const isQuote = text.startsWith('"') || text.startsWith('\u201c');
     const isStageDirection = text.startsWith('On stage') || text.startsWith('She ') || text.startsWith('You ');
 
     let color: string = TextColors.light;
     let style = 'normal';
-    let size = '17px';
+    const size = '17px';
 
     if (isQuote) {
       color = TextColors.gold;
@@ -416,10 +763,19 @@ export class IntroScene extends Phaser.Scene {
       color,
       fontStyle: style,
       align: 'center',
+      shadow: {
+        offsetX: 0,
+        offsetY: 2,
+        color: '#000000',
+        blur: 6,
+        fill: true,
+      },
     }).setOrigin(0.5).setDepth(5);
 
     return t;
   }
+
+  // ─── Navigation ─────────────────────────────────────────────────────────
 
   private wait(ms: number): Promise<void> {
     return new Promise<void>((resolve) => {
@@ -428,7 +784,6 @@ export class IntroScene extends Phaser.Scene {
         return;
       }
       const event = this.time.delayedCall(ms, () => resolve());
-      // Allow skipping to cancel the wait
       const checkAbort = this.time.addEvent({
         delay: 50,
         repeat: Math.ceil(ms / 50),
@@ -444,7 +799,6 @@ export class IntroScene extends Phaser.Scene {
   }
 
   private nextSlide(): void {
-    // Fade out current texts
     const fadeOutTargets = [...this.currentTexts];
 
     if (fadeOutTargets.length === 0) {
@@ -468,12 +822,14 @@ export class IntroScene extends Phaser.Scene {
 
   private skipToGame(): void {
     this.canSkip = false;
+    this.stopAllSounds();
     this.transitionToGame();
   }
 
   private transitionToGame(): void {
     this.canSkip = false;
     this.input.removeAllListeners();
+    this.stopAllSounds();
 
     const { width, height } = this.cameras.main;
 
@@ -483,6 +839,15 @@ export class IntroScene extends Phaser.Scene {
       alpha: 0,
       duration: 600,
     });
+
+    // Fade out background
+    if (this.currentBg) {
+      this.tweens.add({
+        targets: this.currentBg,
+        alpha: 0,
+        duration: 600,
+      });
+    }
 
     // Brief white flash then fade to black
     const flash = this.add.rectangle(width / 2, height / 2, width, height, 0xffffff, 0);

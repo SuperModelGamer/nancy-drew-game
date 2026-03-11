@@ -75,6 +75,35 @@ export class BootScene extends Phaser.Scene {
     for (const [itemId, filename] of Object.entries(itemIcons)) {
       this.load.image(`item_icon_${itemId}`, `assets/ui/items/${filename}.png`);
     }
+
+    // Load intro cinematic background images (gracefully skipped if files don't exist)
+    const introImages = [
+      'intro_stage_1928', 'intro_goblet', 'intro_stage_empty',
+      'intro_exterior', 'intro_lobby_dark', 'intro_ghost',
+      'intro_phone', 'intro_doors',
+    ];
+    for (const key of introImages) {
+      this.load.image(key, `assets/intro/${key}.png`);
+    }
+
+    // Load intro audio (gracefully skipped if files don't exist)
+    const introAudio = [
+      'ambient_theater', 'sfx_goblet', 'sfx_thud',
+      'sfx_ghost_whisper', 'sfx_phone_ring', 'sfx_door_creak',
+      'sfx_heartbeat', 'music_intro',
+    ];
+    for (const key of introAudio) {
+      this.load.audio(key, [`audio/${key}.mp3`, `audio/${key}.ogg`]);
+    }
+
+    // Suppress load errors for optional intro assets (images + audio)
+    this.load.on('loaderror', (file: Phaser.Loader.File) => {
+      if (file.key.startsWith('intro_') || file.key.startsWith('sfx_') ||
+          file.key.startsWith('ambient_') || file.key.startsWith('music_')) {
+        // Silently ignore — intro works without these assets
+        return;
+      }
+    });
   }
 
   create(): void {
