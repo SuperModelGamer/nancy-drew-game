@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
+import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 
 interface RoomDef {
   id: string;
@@ -52,12 +54,10 @@ export class MapScene extends Phaser.Scene {
     this.roomCards.clear();
 
     // --- Full-screen overlay to block clicks through to RoomScene ---
-    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);
-    overlay.setDepth(390);
-    overlay.setInteractive();
+    const overlay = createOverlay(this, 0.8, Depths.mapOverlay);
 
     // --- Content container depth ---
-    const contentDepth = 391;
+    const contentDepth = Depths.mapContent;
 
     // --- Main panel background ---
     const panelW = Math.min(780, width - 60);

@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { DialogueSystem } from '../systems/DialogueSystem';
+import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 
 interface SuspectProfile {
   id: string;
@@ -113,30 +115,22 @@ export class SuspectScene extends Phaser.Scene {
     const { width, height } = this.cameras.main;
 
     // Overlay
-    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);
-    overlay.setInteractive();
-    overlay.setDepth(380);
+    const overlay = createOverlay(this, 0.8, Depths.suspectOverlay);
 
     this.container = this.add.container(0, 0);
-    this.container.setDepth(381);
+    this.container.setDepth(Depths.suspectContent);
 
     // Title
     this.add.text(width / 2, 40, 'Suspect Profiles', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '24px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'bold',
-    }).setOrigin(0.5).setDepth(381);
+    }).setOrigin(0.5).setDepth(Depths.suspectContent);
 
     // Close button
-    const closeBtn = this.add.text(width - 40, 30, '✕', {
-      fontFamily: 'Georgia, serif',
-      fontSize: '24px',
-      color: '#8a7a5a',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true }).setDepth(381);
-    closeBtn.on('pointerdown', () => this.scene.stop());
-    closeBtn.on('pointerover', () => closeBtn.setColor('#c9a84c'));
-    closeBtn.on('pointerout', () => closeBtn.setColor('#8a7a5a'));
+    const closeBtn = createCloseButton(this, width - 40, 30, () => this.scene.stop(), '24px');
+    closeBtn.setDepth(Depths.suspectContent);
 
     // Suspect cards across the top
     const cardWidth = 140;
@@ -148,31 +142,31 @@ export class SuspectScene extends Phaser.Scene {
       const y = 130;
 
       // Card background
-      const card = this.add.rectangle(x, y, cardWidth, 100, 0x1a1a2e, 0.95);
+      const card = this.add.rectangle(x, y, cardWidth, 100, Colors.sceneBg, 0.95);
       card.setStrokeStyle(i === this.selectedIndex ? 2 : 1, suspect.color, i === this.selectedIndex ? 0.9 : 0.4);
       card.setInteractive({ useHandCursor: true });
 
       // Icon circle
       const iconCircle = this.add.ellipse(x, y - 20, 40, 40, suspect.color, 0.3);
       const iconText = this.add.text(x, y - 20, suspect.icon, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '22px',
-        color: '#ffffff',
+        color: TextColors.white,
         fontStyle: 'bold',
       }).setOrigin(0.5);
 
       // Name
       const name = this.add.text(x, y + 20, suspect.name.split(' ')[0], {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '13px',
-        color: '#e0d5c0',
+        color: TextColors.light,
       }).setOrigin(0.5);
 
       // Role
       const role = this.add.text(x, y + 38, suspect.role, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '10px',
-        color: '#8a7a5a',
+        color: TextColors.goldDim,
         fontStyle: 'italic',
       }).setOrigin(0.5);
 
@@ -183,15 +177,15 @@ export class SuspectScene extends Phaser.Scene {
         this.scene.restart();
       });
 
-      card.on('pointerover', () => card.setFillStyle(0x2a2a4e));
-      card.on('pointerout', () => card.setFillStyle(0x1a1a2e, 0.95));
+      card.on('pointerover', () => card.setFillStyle(Colors.hoverBg));
+      card.on('pointerout', () => card.setFillStyle(Colors.sceneBg, 0.95));
 
       this.container.add([card, iconCircle, iconText, name, role]);
     });
 
     // Show first suspect's detail
     this.detailPanel = this.add.container(width / 2, height / 2 + 80);
-    this.detailPanel.setDepth(381);
+    this.detailPanel.setDepth(Depths.suspectContent);
     this.showSuspectDetail(SUSPECTS[this.selectedIndex]);
   }
 
@@ -203,22 +197,22 @@ export class SuspectScene extends Phaser.Scene {
     const panelH = 350;
 
     // Background
-    const bg = this.add.rectangle(0, 0, panelW, panelH, 0x0a0a1a, 0.97);
+    const bg = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.97);
     bg.setStrokeStyle(2, suspect.color, 0.6);
     this.detailPanel.add(bg);
 
     // Name & details header
     this.detailPanel.add(this.add.text(0, -panelH / 2 + 25, suspect.name, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '22px',
       color: `#${suspect.color.toString(16).padStart(6, '0')}`,
       fontStyle: 'bold',
     }).setOrigin(0.5));
 
     this.detailPanel.add(this.add.text(0, -panelH / 2 + 52, `${suspect.role} — ${suspect.age} — ${suspect.location}`, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '13px',
-      color: '#8a7a5a',
+      color: TextColors.goldDim,
       fontStyle: 'italic',
     }).setOrigin(0.5));
 
@@ -227,9 +221,9 @@ export class SuspectScene extends Phaser.Scene {
 
     // Known facts
     this.detailPanel.add(this.add.text(-panelW / 2 + 30, -panelH / 2 + 85, 'Known Facts:', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '14px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'bold',
     }));
 
@@ -243,11 +237,11 @@ export class SuspectScene extends Phaser.Scene {
         dialogue.hasTriggeredEvent(fact.requiresFlag);
 
       const bullet = unlocked ? '◆' : '◇';
-      const color = unlocked ? '#e0d5c0' : '#3a3a4a';
+      const color = unlocked ? TextColors.light : TextColors.hidden;
       const displayText = unlocked ? fact.text : '[Undiscovered]';
 
       const text = this.add.text(-panelW / 2 + 30, y, `${bullet} ${displayText}`, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '13px',
         color,
         wordWrap: { width: panelW - 70 },
@@ -264,9 +258,9 @@ export class SuspectScene extends Phaser.Scene {
     ).length;
 
     this.detailPanel.add(this.add.text(panelW / 2 - 30, panelH / 2 - 25, `${discoveredFacts}/${totalFacts} discovered`, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '12px',
-      color: '#5a5a5a',
+      color: TextColors.muted,
       fontStyle: 'italic',
     }).setOrigin(1, 0.5));
   }
