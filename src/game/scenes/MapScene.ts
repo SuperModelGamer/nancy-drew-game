@@ -37,7 +37,7 @@ const CONNECTIONS: [string, string][] = [
 ];
 
 // Size to display each medallion icon (height-based since icons are portrait with built-in labels)
-const MEDALLION_DISPLAY_SIZE = 110;
+const MEDALLION_DISPLAY_SIZE = 130;
 
 export class MapScene extends Phaser.Scene {
   private currentRoom = '';
@@ -61,8 +61,8 @@ export class MapScene extends Phaser.Scene {
     const contentDepth = Depths.mapContent;
 
     // --- Panel dimensions ---
-    const panelW = Math.min(820, width - 40);
-    const panelH = Math.min(600, height - 60);
+    const panelW = Math.min(900, width - 40);
+    const panelH = Math.min(660, height - 40);
     const panelX = width / 2;
     const panelY = height / 2 + 10;
 
@@ -113,8 +113,8 @@ export class MapScene extends Phaser.Scene {
     const chapter = SaveSystem.getInstance().getChapter();
     const gridOriginX = panelX;
     const gridOriginY = panelY + 18;
-    const cellW = 155;
-    const cellH = 120;
+    const cellW = 170;
+    const cellH = 140;
     const gridCols = 5;
     const gridRows = 4;
     const gridW = gridCols * cellW;
@@ -170,17 +170,44 @@ export class MapScene extends Phaser.Scene {
         container.add(medallion);
 
         // The circular part of the medallion is roughly the top 75% of the image
-        const circleRadius = (MEDALLION_DISPLAY_SIZE * 0.38);
+        const circleRadius = (MEDALLION_DISPLAY_SIZE * 0.36);
         const circleOffsetY = -6 - (MEDALLION_DISPLAY_SIZE * 0.1);
 
-        // Current room glow ring (centered on the circular medallion part)
+        // Current room: dramatic multi-layered glow (Nancy Drew style)
         if (isCurrentRoom) {
           const glowRing = this.add.graphics();
-          glowRing.lineStyle(3, Colors.gold, 0.6);
-          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 4);
-          glowRing.lineStyle(6, Colors.gold, 0.15);
-          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 8);
+
+          // Outermost soft bloom — wide, faint warm white
+          glowRing.lineStyle(20, 0xfff4d0, 0.08);
+          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 18);
+
+          // Outer glow — warm amber
+          glowRing.lineStyle(12, 0xffcc44, 0.15);
+          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 12);
+
+          // Mid glow — bright gold
+          glowRing.lineStyle(6, 0xffd866, 0.35);
+          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 6);
+
+          // Inner bright ring — crisp white-gold
+          glowRing.lineStyle(3, 0xffeebb, 0.7);
+          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 2);
+
+          // Core highlight ring — near-white
+          glowRing.lineStyle(1.5, 0xfff8e0, 0.9);
+          glowRing.strokeCircle(0, circleOffsetY, circleRadius);
+
           container.addAt(glowRing, 0);
+
+          // Pulsing animation on the glow
+          this.tweens.add({
+            targets: glowRing,
+            alpha: { from: 1, to: 0.5 },
+            duration: 1200,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+          });
         }
 
         // Invisible hit area over the full medallion (including nameplate)
@@ -206,13 +233,16 @@ export class MapScene extends Phaser.Scene {
 
         // "You are here" indicator (below the nameplate)
         if (isCurrentRoom) {
-          const hereText = this.add.text(0, MEDALLION_DISPLAY_SIZE / 2 - 2, '— you are here —', {
+          // Slightly enlarge the current room medallion
+          medallion.setScale(scale * 1.05);
+
+          const hereText = this.add.text(0, MEDALLION_DISPLAY_SIZE / 2 + 2, '— you are here —', {
             fontFamily: FONT,
-            fontSize: '9px',
-            color: TextColors.gold,
+            fontSize: '10px',
+            color: '#fff4d0',
           });
           hereText.setOrigin(0.5);
-          hereText.setAlpha(0.8);
+          hereText.setAlpha(0.9);
           container.add(hereText);
         }
       } else {
