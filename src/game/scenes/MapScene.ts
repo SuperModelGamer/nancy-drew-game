@@ -1,12 +1,11 @@
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
-import { createCloseButton, createOverlay } from '../utils/ui-helpers';
+import { createOverlay } from '../utils/ui-helpers';
 
 interface RoomDef {
   id: string;
   name: string;
-  icon: string;
   color: number;
   requiresChapter?: number;
   gridX: number;
@@ -14,14 +13,14 @@ interface RoomDef {
 }
 
 const ROOMS: RoomDef[] = [
-  { id: 'catwalk',          name: 'Catwalk',           icon: '🔦', color: 0x8a8a8a, gridX: 1, gridY: 0 },
-  { id: 'projection_booth', name: 'Projection Booth',  icon: '🎬', color: 0x7bc98a, gridX: 3, gridY: 0 },
-  { id: 'backstage',        name: 'Backstage',         icon: '⚙️', color: 0xc9947b, gridX: 0, gridY: 1 },
-  { id: 'auditorium',       name: 'Auditorium',        icon: '🎭', color: 0x7ba3c9, gridX: 2, gridY: 1 },
-  { id: 'managers_office',  name: "Manager's Office",  icon: '📋', color: 0xc97b7b, gridX: 4, gridY: 1 },
-  { id: 'dressing_room',    name: 'Dressing Room',     icon: '💄', color: 0xb4a0d4, gridX: 1, gridY: 2 },
-  { id: 'lobby',            name: 'Grand Lobby',       icon: '🏛️', color: Colors.gold, gridX: 2, gridY: 2 },
-  { id: 'basement',         name: 'Basement',          icon: '🚪', color: 0x5a5a7a, requiresChapter: 4, gridX: 2, gridY: 3 },
+  { id: 'catwalk',          name: 'Catwalk',           color: 0x8a8a8a, gridX: 1, gridY: 0 },
+  { id: 'projection_booth', name: 'Projection Booth',  color: 0x7bc98a, gridX: 3, gridY: 0 },
+  { id: 'backstage',        name: 'Backstage',         color: 0xc9947b, gridX: 0, gridY: 1 },
+  { id: 'auditorium',       name: 'Auditorium',        color: 0x7ba3c9, gridX: 2, gridY: 1 },
+  { id: 'managers_office',  name: "Manager's Office",  color: 0xc97b7b, gridX: 4, gridY: 1 },
+  { id: 'dressing_room',    name: 'Dressing Room',     color: 0xb4a0d4, gridX: 1, gridY: 2 },
+  { id: 'lobby',            name: 'Grand Lobby',       color: Colors.gold, gridX: 2, gridY: 2 },
+  { id: 'basement',         name: 'Basement',          color: 0x5a5a7a, requiresChapter: 4, gridX: 2, gridY: 3 },
 ];
 
 const CONNECTIONS: [string, string][] = [
@@ -36,6 +35,9 @@ const CONNECTIONS: [string, string][] = [
   ['dressing_room', 'lobby'],
   ['lobby', 'basement'],
 ];
+
+// Size to display each medallion icon
+const MEDALLION_DISPLAY_SIZE = 100;
 
 export class MapScene extends Phaser.Scene {
   private currentRoom = '';
@@ -53,42 +55,44 @@ export class MapScene extends Phaser.Scene {
     const { width, height } = this.cameras.main;
     this.roomCards.clear();
 
-    // --- Full-screen overlay to block clicks through to RoomScene ---
-    const overlay = createOverlay(this, 0.8, Depths.mapOverlay);
+    // --- Full-screen overlay ---
+    createOverlay(this, 0.8, Depths.mapOverlay);
 
-    // --- Content container depth ---
     const contentDepth = Depths.mapContent;
 
-    // --- Main panel background ---
-    const panelW = Math.min(780, width - 60);
-    const panelH = Math.min(560, height - 80);
+    // --- Panel dimensions ---
+    const panelW = Math.min(820, width - 40);
+    const panelH = Math.min(600, height - 60);
     const panelX = width / 2;
     const panelY = height / 2 + 10;
 
-    const panelBg = this.add.rectangle(panelX, panelY, panelW, panelH, Colors.panelBg, 1);
-    panelBg.setStrokeStyle(2, Colors.gold, 0.6);
-    panelBg.setDepth(contentDepth);
+    // --- Draw dark aged parchment background ---
+    this.drawParchmentBackground(panelX, panelY, panelW, panelH, contentDepth);
 
-    // Decorative inner border
-    const innerBorder = this.add.rectangle(panelX, panelY, panelW - 12, panelH - 12, Colors.sceneBg, 0);
-    innerBorder.setStrokeStyle(1, Colors.gold, 0.25);
-    innerBorder.setDepth(contentDepth);
+    // --- Art deco border frame ---
+    this.drawArtDecoBorder(panelX, panelY, panelW, panelH, contentDepth);
 
     // --- Title ---
-    const titleY = panelY - panelH / 2 + 32;
-    const titleText = this.add.text(panelX, titleY, 'Theater Map', {
+    const titleY = panelY - panelH / 2 + 36;
+    const titleText = this.add.text(panelX, titleY, 'THE MONARCH THEATRE', {
       fontFamily: FONT,
-      fontSize: '26px',
+      fontSize: '22px',
       color: TextColors.gold,
+      letterSpacing: 6,
     });
     titleText.setOrigin(0.5);
-    titleText.setDepth(contentDepth);
+    titleText.setDepth(contentDepth + 1);
 
-    // Small decorative line under title
+    // Decorative lines flanking the title
     const lineGfx = this.add.graphics();
-    lineGfx.setDepth(contentDepth);
-    lineGfx.lineStyle(1, Colors.gold, 0.4);
-    lineGfx.lineBetween(panelX - 80, titleY + 18, panelX + 80, titleY + 18);
+    lineGfx.setDepth(contentDepth + 1);
+    lineGfx.lineStyle(1, Colors.gold, 0.5);
+    const titleHalfW = titleText.width / 2 + 16;
+    lineGfx.lineBetween(panelX - titleHalfW - 60, titleY, panelX - titleHalfW, titleY);
+    lineGfx.lineBetween(panelX + titleHalfW, titleY, panelX + titleHalfW + 60, titleY);
+    // Small diamond accents
+    this.drawDiamond(lineGfx, panelX - titleHalfW - 64, titleY, 4, Colors.gold, 0.5);
+    this.drawDiamond(lineGfx, panelX + titleHalfW + 64, titleY, 4, Colors.gold, 0.5);
 
     // --- Close button ---
     const closeBtnX = panelX + panelW / 2 - 28;
@@ -96,35 +100,34 @@ export class MapScene extends Phaser.Scene {
     const closeBtn = this.add.text(closeBtnX, closeBtnY, '✕', {
       fontFamily: FONT,
       fontSize: '22px',
-      color: TextColors.light,
+      color: TextColors.goldDim,
     });
     closeBtn.setOrigin(0.5);
-    closeBtn.setDepth(contentDepth);
+    closeBtn.setDepth(contentDepth + 2);
     closeBtn.setInteractive({ useHandCursor: true });
     closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
-    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.light));
+    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
     closeBtn.on('pointerdown', () => this.scene.stop());
 
-    // --- Compute room card positions ---
+    // --- Room grid layout ---
     const chapter = SaveSystem.getInstance().getChapter();
     const gridOriginX = panelX;
-    const gridOriginY = panelY + 14;
-    const cellW = 148;
-    const cellH = 108;
+    const gridOriginY = panelY + 18;
+    const cellW = 155;
+    const cellH = 120;
     const gridCols = 5;
     const gridRows = 4;
     const gridW = gridCols * cellW;
     const gridH = gridRows * cellH;
 
-    const getRoomCenter = (room: RoomDef): { x: number; y: number } => {
-      const x = gridOriginX - gridW / 2 + room.gridX * cellW + cellW / 2;
-      const y = gridOriginY - gridH / 2 + room.gridY * cellH + cellH / 2 + 16;
-      return { x, y };
-    };
+    const getRoomCenter = (room: RoomDef): { x: number; y: number } => ({
+      x: gridOriginX - gridW / 2 + room.gridX * cellW + cellW / 2,
+      y: gridOriginY - gridH / 2 + room.gridY * cellH + cellH / 2 + 16,
+    });
 
-    // --- Draw connecting lines between adjacent rooms ---
-    const linesGfx = this.add.graphics();
-    linesGfx.setDepth(contentDepth);
+    // --- Connection paths (gold hallway lines) ---
+    const pathGfx = this.add.graphics();
+    pathGfx.setDepth(contentDepth + 1);
 
     for (const [idA, idB] of CONNECTIONS) {
       const roomA = ROOMS.find((r) => r.id === idA);
@@ -134,136 +137,270 @@ export class MapScene extends Phaser.Scene {
       const a = getRoomCenter(roomA);
       const b = getRoomCenter(roomB);
 
-      // Draw a subtle gold connection line
-      linesGfx.lineStyle(1.5, Colors.gold, 0.2);
-      linesGfx.lineBetween(a.x, a.y, b.x, b.y);
+      // Outer glow line
+      pathGfx.lineStyle(4, Colors.gold, 0.08);
+      pathGfx.lineBetween(a.x, a.y, b.x, b.y);
 
-      // Small dots at endpoints
-      linesGfx.fillStyle(Colors.gold, 0.3);
-      linesGfx.fillCircle(a.x, a.y, 2);
-      linesGfx.fillCircle(b.x, b.y, 2);
+      // Main connection line
+      pathGfx.lineStyle(2, Colors.gold, 0.25);
+      pathGfx.lineBetween(a.x, a.y, b.x, b.y);
+
+      // Dashed center highlight
+      this.drawDashedLine(pathGfx, a.x, a.y, b.x, b.y, 6, 4, Colors.gold, 0.12);
     }
 
-    // --- Create room cards ---
+    // --- Place medallion icons ---
     for (const room of ROOMS) {
       const pos = getRoomCenter(room);
       const isCurrentRoom = room.id === this.currentRoom;
       const isLocked = room.requiresChapter !== undefined && chapter < room.requiresChapter;
 
       const container = this.add.container(pos.x, pos.y);
-      container.setDepth(contentDepth);
+      container.setDepth(contentDepth + 2);
 
-      const cardW = 130;
-      const cardH = 90;
+      const textureKey = `map_${room.id}`;
+      const hasTexture = this.textures.exists(textureKey);
 
-      // Card background
-      const cardColor = isLocked ? Colors.sceneBg : Colors.sceneBg;
-      const cardBg = this.add.rectangle(0, 0, cardW, cardH, cardColor, isLocked ? 0.5 : 0.9);
-      const borderColor = isCurrentRoom ? Colors.gold : room.color;
-      const borderAlpha = isCurrentRoom ? 1 : (isLocked ? 0.25 : 0.5);
-      const borderWidth = isCurrentRoom ? 2.5 : 1.5;
-      cardBg.setStrokeStyle(borderWidth, borderColor, borderAlpha);
-      container.add(cardBg);
+      if (hasTexture && !isLocked) {
+        // Use the medallion image
+        const medallion = this.add.image(0, -4, textureKey);
+        // Scale to fit our display size
+        const scale = MEDALLION_DISPLAY_SIZE / Math.max(medallion.width, medallion.height);
+        medallion.setScale(scale);
+        container.add(medallion);
 
-      // Current-room glow highlight
-      if (isCurrentRoom) {
-        const glow = this.add.rectangle(0, 0, cardW + 6, cardH + 6, room.color, 0.08);
-        glow.setStrokeStyle(1, Colors.gold, 0.3);
-        container.addAt(glow, 0);
-      }
+        // Current room glow ring
+        if (isCurrentRoom) {
+          const glowRing = this.add.graphics();
+          glowRing.lineStyle(3, Colors.gold, 0.6);
+          glowRing.strokeCircle(0, -4, MEDALLION_DISPLAY_SIZE / 2 + 4);
+          glowRing.lineStyle(6, Colors.gold, 0.15);
+          glowRing.strokeCircle(0, -4, MEDALLION_DISPLAY_SIZE / 2 + 8);
+          container.addAt(glowRing, 0);
+        }
 
-      // Colored accent bar at top of card
-      const accentBar = this.add.rectangle(0, -cardH / 2 + 3, cardW - 4, 4, room.color, isLocked ? 0.15 : 0.6);
-      container.add(accentBar);
+        // Invisible hit area over the medallion
+        const hitArea = this.add.rectangle(0, -4, MEDALLION_DISPLAY_SIZE, MEDALLION_DISPLAY_SIZE, 0x000000, 0);
+        hitArea.setInteractive({ useHandCursor: true });
+        container.add(hitArea);
 
-      // Room icon
-      const displayIcon = isLocked ? '🔒' : room.icon;
-      const iconText = this.add.text(0, -12, displayIcon, {
-        fontSize: '24px',
-      });
-      iconText.setOrigin(0.5);
-      iconText.setAlpha(isLocked ? 0.4 : 1);
-      container.add(iconText);
-
-      // Room name
-      const nameColor = isLocked ? TextColors.mutedBlue : TextColors.light;
-      const nameText = this.add.text(0, 18, room.name, {
-        fontFamily: FONT,
-        fontSize: '12px',
-        color: nameColor,
-        align: 'center',
-        wordWrap: { width: cardW - 16 },
-      });
-      nameText.setOrigin(0.5, 0);
-      container.add(nameText);
-
-      // "You are here" indicator
-      if (isCurrentRoom) {
-        const hereText = this.add.text(0, cardH / 2 - 12, '— you are here —', {
-          fontFamily: FONT,
-          fontSize: '8px',
-          color: TextColors.gold,
-        });
-        hereText.setOrigin(0.5);
-        hereText.setAlpha(0.7);
-        container.add(hereText);
-      }
-
-      // Locked subtitle
-      if (isLocked) {
-        const lockText = this.add.text(0, cardH / 2 - 12, `Chapter ${room.requiresChapter}`, {
-          fontFamily: FONT,
-          fontSize: '8px',
-          color: TextColors.mutedBlue,
-        });
-        lockText.setOrigin(0.5);
-        container.add(lockText);
-      }
-
-      // Make the card interactive
-      cardBg.setInteractive({ useHandCursor: !isLocked });
-      container.setSize(cardW, cardH);
-
-      if (!isLocked) {
-        cardBg.on('pointerover', () => {
+        // Hover effects
+        hitArea.on('pointerover', () => {
           if (room.id !== this.currentRoom) {
-            cardBg.setFillStyle(0x24243a, 1);
-            cardBg.setStrokeStyle(2, room.color, 0.9);
-            nameText.setColor('#ffffff');
+            medallion.setScale(scale * 1.08);
           }
         });
-
-        cardBg.on('pointerout', () => {
-          if (room.id !== this.currentRoom) {
-            cardBg.setFillStyle(Colors.sceneBg, 0.9);
-            cardBg.setStrokeStyle(1.5, room.color, 0.5);
-            nameText.setColor(TextColors.light);
-          }
+        hitArea.on('pointerout', () => {
+          medallion.setScale(scale);
         });
-
-        cardBg.on('pointerdown', () => {
+        hitArea.on('pointerdown', () => {
           if (room.id !== this.currentRoom) {
             this.navigateToRoom(room.id);
           }
         });
+
+        // "You are here" indicator
+        if (isCurrentRoom) {
+          const hereText = this.add.text(0, MEDALLION_DISPLAY_SIZE / 2 + 6, '— you are here —', {
+            fontFamily: FONT,
+            fontSize: '9px',
+            color: TextColors.gold,
+          });
+          hereText.setOrigin(0.5);
+          hereText.setAlpha(0.8);
+          container.add(hereText);
+        }
+      } else {
+        // Fallback: locked room or missing texture — draw a simple card
+        const cardW = 100;
+        const cardH = 80;
+
+        const cardBg = this.add.rectangle(0, 0, cardW, cardH, 0x0a0a1a, 0.7);
+        cardBg.setStrokeStyle(1.5, isLocked ? 0x3a3a4a : room.color, isLocked ? 0.4 : 0.5);
+        container.add(cardBg);
+
+        const lockIcon = this.add.text(0, -10, '🔒', { fontSize: '20px' });
+        lockIcon.setOrigin(0.5);
+        lockIcon.setAlpha(0.4);
+        container.add(lockIcon);
+
+        const nameText = this.add.text(0, 14, room.name, {
+          fontFamily: FONT,
+          fontSize: '10px',
+          color: TextColors.mutedBlue,
+          align: 'center',
+        });
+        nameText.setOrigin(0.5, 0);
+        container.add(nameText);
+
+        if (isLocked && room.requiresChapter) {
+          const lockText = this.add.text(0, 30, `Chapter ${room.requiresChapter}`, {
+            fontFamily: FONT,
+            fontSize: '8px',
+            color: TextColors.mutedBlue,
+          });
+          lockText.setOrigin(0.5);
+          lockText.setAlpha(0.6);
+          container.add(lockText);
+        }
       }
 
       this.roomCards.set(room.id, container);
     }
 
-    // --- Subtitle text at the bottom ---
-    const subtitleY = panelY + panelH / 2 - 20;
+    // --- Subtitle ---
+    const subtitleY = panelY + panelH / 2 - 22;
     const subtitle = this.add.text(panelX, subtitleY, 'Select a location to travel', {
       fontFamily: FONT,
       fontSize: '11px',
-      color: TextColors.light,
+      color: TextColors.goldDim,
     });
     subtitle.setOrigin(0.5);
-    subtitle.setAlpha(0.4);
-    subtitle.setDepth(contentDepth);
+    subtitle.setAlpha(0.5);
+    subtitle.setDepth(contentDepth + 1);
 
     // --- Fade in ---
     this.cameras.main.fadeIn(200, 0, 0, 0);
+  }
+
+  /**
+   * Draw a dark aged parchment texture as the map background.
+   */
+  private drawParchmentBackground(
+    cx: number, cy: number, w: number, h: number, depth: number,
+  ): void {
+    const gfx = this.add.graphics();
+    gfx.setDepth(depth);
+
+    const left = cx - w / 2;
+    const top = cy - h / 2;
+
+    // Base dark parchment color
+    gfx.fillStyle(0x1a1610, 1);
+    gfx.fillRect(left, top, w, h);
+
+    // Layered noise-like patches for aged texture
+    const patchColors = [0x1e1a14, 0x16120e, 0x201c14, 0x14100c, 0x221e16];
+    for (let i = 0; i < 40; i++) {
+      const px = left + Math.random() * w;
+      const py = top + Math.random() * h;
+      const pw = 30 + Math.random() * 120;
+      const ph = 20 + Math.random() * 80;
+      gfx.fillStyle(patchColors[i % patchColors.length], 0.3 + Math.random() * 0.3);
+      gfx.fillRect(px - pw / 2, py - ph / 2, pw, ph);
+    }
+
+    // Subtle horizontal grain lines
+    gfx.lineStyle(1, 0x2a2418, 0.15);
+    for (let y = top + 10; y < top + h; y += 8 + Math.random() * 6) {
+      const x1 = left + Math.random() * 20;
+      const x2 = left + w - Math.random() * 20;
+      gfx.lineBetween(x1, y, x2, y);
+    }
+
+    // Warm vignette overlay — darker at edges
+    // Top edge
+    gfx.fillStyle(0x0a0806, 0.5);
+    gfx.fillRect(left, top, w, 40);
+    gfx.fillStyle(0x0a0806, 0.3);
+    gfx.fillRect(left, top, w, 80);
+    // Bottom edge
+    gfx.fillStyle(0x0a0806, 0.5);
+    gfx.fillRect(left, top + h - 40, w, 40);
+    gfx.fillStyle(0x0a0806, 0.3);
+    gfx.fillRect(left, top + h - 80, w, 80);
+    // Left edge
+    gfx.fillStyle(0x0a0806, 0.4);
+    gfx.fillRect(left, top, 30, h);
+    // Right edge
+    gfx.fillStyle(0x0a0806, 0.4);
+    gfx.fillRect(left + w - 30, top, 30, h);
+
+    // Faint gold wash in the center
+    gfx.fillStyle(Colors.gold, 0.03);
+    gfx.fillRect(cx - w / 4, cy - h / 4, w / 2, h / 2);
+  }
+
+  /**
+   * Draw an art deco styled border frame.
+   */
+  private drawArtDecoBorder(
+    cx: number, cy: number, w: number, h: number, depth: number,
+  ): void {
+    const gfx = this.add.graphics();
+    gfx.setDepth(depth + 1);
+
+    const left = cx - w / 2;
+    const top = cy - h / 2;
+
+    // Outer border
+    gfx.lineStyle(3, Colors.gold, 0.7);
+    gfx.strokeRect(left, top, w, h);
+
+    // Inner border
+    gfx.lineStyle(1, Colors.gold, 0.3);
+    gfx.strokeRect(left + 8, top + 8, w - 16, h - 16);
+
+    // Corner accents — art deco diamonds
+    const corners = [
+      { x: left + 8, y: top + 8 },
+      { x: left + w - 8, y: top + 8 },
+      { x: left + 8, y: top + h - 8 },
+      { x: left + w - 8, y: top + h - 8 },
+    ];
+    for (const c of corners) {
+      this.drawDiamond(gfx, c.x, c.y, 6, Colors.gold, 0.5);
+    }
+
+    // Art deco line accents at top corners
+    const accentLen = 40;
+    gfx.lineStyle(1, Colors.gold, 0.4);
+    // Top-left
+    gfx.lineBetween(left + 16, top + 16, left + 16 + accentLen, top + 16);
+    gfx.lineBetween(left + 16, top + 16, left + 16, top + 16 + accentLen);
+    // Top-right
+    gfx.lineBetween(left + w - 16, top + 16, left + w - 16 - accentLen, top + 16);
+    gfx.lineBetween(left + w - 16, top + 16, left + w - 16, top + 16 + accentLen);
+    // Bottom-left
+    gfx.lineBetween(left + 16, top + h - 16, left + 16 + accentLen, top + h - 16);
+    gfx.lineBetween(left + 16, top + h - 16, left + 16, top + h - 16 - accentLen);
+    // Bottom-right
+    gfx.lineBetween(left + w - 16, top + h - 16, left + w - 16 - accentLen, top + h - 16);
+    gfx.lineBetween(left + w - 16, top + h - 16, left + w - 16, top + h - 16 - accentLen);
+  }
+
+  private drawDiamond(
+    gfx: Phaser.GameObjects.Graphics,
+    cx: number, cy: number, size: number,
+    color: number, alpha: number,
+  ): void {
+    gfx.fillStyle(color, alpha);
+    gfx.fillTriangle(cx, cy - size, cx + size, cy, cx, cy + size);
+    gfx.fillTriangle(cx, cy - size, cx - size, cy, cx, cy + size);
+  }
+
+  private drawDashedLine(
+    gfx: Phaser.GameObjects.Graphics,
+    x1: number, y1: number, x2: number, y2: number,
+    dashLen: number, gapLen: number,
+    color: number, alpha: number,
+  ): void {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const nx = dx / dist;
+    const ny = dy / dist;
+    let pos = 0;
+
+    gfx.lineStyle(1, color, alpha);
+    while (pos < dist) {
+      const segEnd = Math.min(pos + dashLen, dist);
+      gfx.lineBetween(
+        x1 + nx * pos, y1 + ny * pos,
+        x1 + nx * segEnd, y1 + ny * segEnd,
+      );
+      pos = segEnd + gapLen;
+    }
   }
 
   private navigateToRoom(roomId: string): void {

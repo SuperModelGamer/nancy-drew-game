@@ -46,6 +46,12 @@ export class BootScene extends Phaser.Scene {
     for (const suspect of suspects) {
       this.load.image(`portrait_${suspect}`, `assets/portraits/${suspect}.png`);
     }
+
+    // Load map room medallion icons
+    const mapRooms = ['lobby', 'auditorium', 'backstage', 'dressing_room', 'projection_booth', 'catwalk', 'basement', 'managers_office'];
+    for (const room of mapRooms) {
+      this.load.image(`map_${room}`, `assets/ui/map/${room}.png`);
+    }
   }
 
   create(): void {
