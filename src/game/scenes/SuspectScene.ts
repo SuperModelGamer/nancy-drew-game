@@ -152,8 +152,9 @@ export class SuspectScene extends Phaser.Scene {
       if (this.textures.exists(portraitKey)) {
         const portrait = this.add.image(x, y - 20, portraitKey);
         portrait.setDisplaySize(44, 44);
-        const mask = this.add.ellipse(x, y - 20, 44, 44, 0xffffff).setVisible(false);
-        portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, mask));
+        const maskGraphics = this.make.graphics({});
+        maskGraphics.fillCircle(x, y - 20, 22);
+        portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGraphics));
         const ring = this.add.ellipse(x, y - 20, 46, 46).setStrokeStyle(2, suspect.color, 0.8).setFillStyle(0x000000, 0);
         iconElements = [portrait, ring];
       } else {
@@ -222,10 +223,9 @@ export class SuspectScene extends Phaser.Scene {
     if (hasPortrait) {
       const detailPortrait = this.add.image(-panelW / 2 + 70, -panelH / 2 + 70, detailPortraitKey);
       detailPortrait.setDisplaySize(portraitSize, portraitSize);
-      const detailMask = this.add.ellipse(-panelW / 2 + 70, -panelH / 2 + 70, portraitSize, portraitSize, 0xffffff).setVisible(false);
-      // Position mask relative to detail panel
-      this.detailPanel.add(detailMask);
-      detailPortrait.setMask(new Phaser.Display.Masks.GeometryMask(this, detailMask));
+      const detailMaskGraphics = this.make.graphics({});
+      detailMaskGraphics.fillCircle(-panelW / 2 + 70, -panelH / 2 + 70, portraitSize / 2);
+      detailPortrait.setMask(new Phaser.Display.Masks.GeometryMask(this, detailMaskGraphics));
       const detailRing = this.add.ellipse(-panelW / 2 + 70, -panelH / 2 + 70, portraitSize + 4, portraitSize + 4).setStrokeStyle(2, suspect.color, 0.8).setFillStyle(0x000000, 0);
       this.detailPanel.add([detailPortrait, detailRing]);
     }

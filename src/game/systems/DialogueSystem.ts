@@ -143,13 +143,14 @@ export class DialogueSystem {
 
       const portrait = this.scene.add.image(portraitX, portraitY, portraitKey);
       portrait.setDisplaySize(portraitSize, portraitSize);
-      const mask = this.scene.add.ellipse(portraitX, portraitY, portraitSize, portraitSize, 0xffffff).setVisible(false);
-      portrait.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, mask));
+      const maskGraphics = this.scene.make.graphics({});
+      maskGraphics.fillCircle(portraitX, portraitY, portraitSize / 2);
+      portrait.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, maskGraphics));
       const speakerColorHex = parseInt(this.getSpeakerColor(line.speaker).replace('#', ''), 16);
       const ring = this.scene.add.ellipse(portraitX, portraitY, portraitSize + 4, portraitSize + 4)
         .setStrokeStyle(2, speakerColorHex, 0.8)
         .setFillStyle(0x000000, 0);
-      this.container.add([mask, portrait, ring]);
+      this.container.add([portrait, ring]);
     }
 
     // Speaker name with color coding
