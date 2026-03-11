@@ -194,28 +194,51 @@ export class UIScene extends Phaser.Scene {
     const panelH = 400;
     const panel = this.add.container(width / 2, height / 2);
 
-    const bg = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.97);
-    bg.setStrokeStyle(2, Colors.gold, 0.7);
-    bg.setInteractive(); // block clicks through
-    panel.add(bg);
+    // Aged paper background
+    const paper = this.add.rectangle(0, 0, panelW, panelH, Colors.paper, 0.95);
+    paper.setStrokeStyle(2, Colors.paperBorder, 0.8);
+    paper.setInteractive(); // block clicks through
+    panel.add(paper);
+
+    // Paper texture — subtle stain patches for aged feel
+    const stains = this.add.graphics();
+    stains.fillStyle(Colors.paperBorder, 0.08);
+    stains.fillCircle(-panelW / 4, -panelH / 4, 40);
+    stains.fillCircle(panelW / 3, panelH / 5, 30);
+    stains.fillEllipse(-panelW / 6, panelH / 3, 60, 25);
+    // Faint ruled lines
+    stains.lineStyle(1, Colors.paperBorder, 0.15);
+    for (let ly = -panelH / 2 + 65; ly < panelH / 2 - 20; ly += 22) {
+      stains.lineBetween(-panelW / 2 + 25, ly, panelW / 2 - 25, ly);
+    }
+    // Red margin line
+    stains.lineStyle(1, 0xcc6666, 0.2);
+    stains.lineBetween(-panelW / 2 + 55, -panelH / 2 + 10, -panelW / 2 + 55, panelH / 2 - 10);
+    panel.add(stains);
 
     const title = this.add.text(0, -panelH / 2 + 25, 'Nancy\'s Journal', {
-      fontFamily: FONT,
-      fontSize: '20px',
-      color: TextColors.gold,
-      fontStyle: 'bold',
+      fontFamily: '\'Palatino Linotype\', \'Book Antiqua\', Palatino, Georgia, serif',
+      fontSize: '22px',
+      color: '#3a2a1a',
+      fontStyle: 'italic',
     }).setOrigin(0.5);
     panel.add(title);
+
+    // Decorative underline
+    const underline = this.add.graphics();
+    underline.lineStyle(1, 0x3a2a1a, 0.4);
+    underline.lineBetween(-60, -panelH / 2 + 40, 60, -panelH / 2 + 40);
+    panel.add(underline);
 
     // Close button
     const closeBtn = this.add.text(panelW / 2 - 20, -panelH / 2 + 15, '✕', {
       fontFamily: FONT,
       fontSize: '20px',
-      color: TextColors.goldDim,
+      color: '#6a5a4a',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     closeBtn.on('pointerdown', () => this.toggleJournal());
-    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
-    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
+    closeBtn.on('pointerover', () => closeBtn.setColor('#3a2a1a'));
+    closeBtn.on('pointerout', () => closeBtn.setColor('#6a5a4a'));
     panel.add(closeBtn);
 
     panel.setDepth(Depths.journalPanel);
@@ -345,20 +368,21 @@ export class UIScene extends Phaser.Scene {
   }
 
   private refreshJournalPanel(): void {
-    // Clear old entries (keep bg, title, closeBtn = 3 elements)
-    while (this.journalPanel.length > 3) {
-      this.journalPanel.removeAt(3, true);
+    // Clear old entries (keep bg, title, underline, stains, closeBtn = 5 elements)
+    while (this.journalPanel.length > 5) {
+      this.journalPanel.removeAt(5, true);
     }
 
     const save = SaveSystem.getInstance();
     const journal = save.getJournal();
     const panelW = Math.min(this.cameras.main.width * 0.9, 600);
+    const journalFont = '\'Palatino Linotype\', \'Book Antiqua\', Palatino, Georgia, serif';
 
     if (journal.length === 0) {
       const empty = this.add.text(0, 0, 'No entries yet.\n\nExplore the theater and talk to people\nto fill Nancy\'s journal.', {
-        fontFamily: FONT,
+        fontFamily: journalFont,
         fontSize: '14px',
-        color: TextColors.muted,
+        color: '#6a5a4a',
         fontStyle: 'italic',
         align: 'center',
         lineSpacing: 4,
@@ -369,20 +393,24 @@ export class UIScene extends Phaser.Scene {
 
     let y = -130;
     journal.forEach((entry, i) => {
-      const bullet = this.add.text(-panelW / 2 + 30, y, `${i + 1}.`, {
-        fontFamily: FONT,
+      // Slight random offset for handwritten feel
+      const xJitter = ((i * 7) % 5) - 2;
+
+      const bullet = this.add.text(-panelW / 2 + 62 + xJitter, y, `${i + 1}.`, {
+        fontFamily: journalFont,
         fontSize: '13px',
-        color: TextColors.gold,
+        color: '#5a3a2a',
+        fontStyle: 'italic',
       });
-      const text = this.add.text(-panelW / 2 + 55, y, entry, {
-        fontFamily: FONT,
+      const text = this.add.text(-panelW / 2 + 82 + xJitter, y, entry, {
+        fontFamily: journalFont,
         fontSize: '13px',
-        color: TextColors.light,
-        wordWrap: { width: panelW - 100 },
-        lineSpacing: 2,
+        color: '#2a1a0a',
+        wordWrap: { width: panelW - 130 },
+        lineSpacing: 3,
       });
       this.journalPanel.add([bullet, text]);
-      y += text.height + 10;
+      y += text.height + 12;
     });
   }
 }
