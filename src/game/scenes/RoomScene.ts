@@ -10,6 +10,7 @@ import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { drawRoomBackground } from '../utils/room-backgrounds';
 import { showTutorialIfNeeded } from '../utils/tutorial';
 import { Cursors, CursorType } from '../utils/cursors';
+import { addAmbientParticles } from '../utils/ambient-particles';
 
 interface Hotspot {
   id: string;
@@ -67,6 +68,9 @@ export class RoomScene extends Phaser.Scene {
     } else {
       drawRoomBackground(this, this.currentRoom.id);
     }
+
+    // Ambient atmosphere particles
+    addAmbientParticles(this, this.currentRoom.id);
 
     // Room name banner
     const banner = this.add.text(width / 2, 30, this.currentRoom.name, {
