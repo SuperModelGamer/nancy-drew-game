@@ -11,6 +11,7 @@ import { drawRoomBackground } from '../utils/room-backgrounds';
 import { showTutorialIfNeeded } from '../utils/tutorial';
 import { Cursors, CursorType } from '../utils/cursors';
 import { addAmbientParticles } from '../utils/ambient-particles';
+import { UISounds } from '../utils/sounds';
 
 interface Hotspot {
   id: string;
@@ -254,8 +255,9 @@ export class RoomScene extends Phaser.Scene {
         this.input.setDefaultCursor(Cursors.default);
       });
 
-      // Click/tap handler with sparkle feedback
+      // Click/tap handler with sparkle feedback and sound
       bg.on('pointerdown', () => {
+        UISounds.click();
         this.playClickSparkle(hotspot.x, hotspot.y, hotspotColor);
         this.handleHotspot(hotspot);
       });
@@ -296,6 +298,7 @@ export class RoomScene extends Phaser.Scene {
             this.showDescription('You already have this.');
           } else {
             inventory.addItem(hotspot.itemId);
+            UISounds.itemPickup();
             this.showDescription(`Picked up: ${hotspot.label}`);
             this.usedHotspots.add(hotspot.id);
             this.events.emit('item-picked-up', hotspot.itemId);
@@ -555,6 +558,7 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private navigateToRoom(roomId: string): void {
+    UISounds.doorTransition();
     SaveSystem.getInstance().setCurrentRoom(roomId);
     SaveSystem.getInstance().save();
     this.playCurtainClose(() => {

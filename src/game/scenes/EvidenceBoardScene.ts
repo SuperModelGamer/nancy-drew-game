@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { PuzzleSystem } from '../systems/PuzzleSystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { UISounds } from '../utils/sounds';
 
 interface EvidenceCard {
   id: string;
@@ -332,6 +333,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
     const correct = PuzzleSystem.getInstance().checkAnswer('evidence_board', answer);
 
     if (correct) {
+      UISounds.puzzleSolve();
       this.feedbackText.setColor('#4ade80');
       this.feedbackText.setText('Case Closed!');
       this.hintText.setText('');
@@ -367,6 +369,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
         this.scene.stop();
       });
     } else {
+      UISounds.wrongAnswer();
       this.feedbackText.setColor('#ff6b6b');
       this.feedbackText.setText("That's not quite right...");
 

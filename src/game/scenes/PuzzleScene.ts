@@ -4,6 +4,7 @@ import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { UISounds } from '../utils/sounds';
 
 export class PuzzleScene extends Phaser.Scene {
   private puzzleId!: string;
@@ -433,6 +434,7 @@ export class PuzzleScene extends Phaser.Scene {
     const correct = puzzleSystem.checkAnswer(this.puzzleId, answer);
 
     if (correct) {
+      UISounds.puzzleSolve();
       this.feedbackText.setColor('#4ade80');
       this.feedbackText.setText('Correct!');
       this.hintText.setText('');
@@ -459,6 +461,7 @@ export class PuzzleScene extends Phaser.Scene {
         this.closePuzzle();
       });
     } else {
+      UISounds.wrongAnswer();
       this.feedbackText.setColor('#ff6b6b');
       this.feedbackText.setText('That\'s not right...');
 

@@ -4,6 +4,7 @@ import { SaveSystem } from '../systems/SaveSystem';
 import { ChapterSystem } from '../systems/ChapterSystem';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { UISounds } from '../utils/sounds';
 
 export class UIScene extends Phaser.Scene {
   private inventoryBar!: Phaser.GameObjects.Container;
@@ -120,6 +121,7 @@ export class UIScene extends Phaser.Scene {
 
     this.inventoryOpen = !this.inventoryOpen;
     if (this.inventoryOpen) {
+      UISounds.panelOpen();
       this.refreshInventoryPanel();
       this.inventoryPanel.setVisible(true);
       this.inventoryPanel.setAlpha(0);
@@ -144,6 +146,7 @@ export class UIScene extends Phaser.Scene {
 
     this.journalOpen = !this.journalOpen;
     if (this.journalOpen) {
+      UISounds.panelOpen();
       this.refreshJournalPanel();
       this.journalPanel.setVisible(true);
       this.journalPanel.setAlpha(0);
