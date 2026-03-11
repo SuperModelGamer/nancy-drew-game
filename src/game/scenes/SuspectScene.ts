@@ -122,10 +122,12 @@ export class SuspectScene extends Phaser.Scene {
     this.container.setDepth(Depths.suspectContent);
 
     // ─── Main dossier panel (case-file look) ───
+    const TOOLBAR_H = 52;
     const panelW = Math.min(width * 0.92, 900);
-    const panelH = Math.min(height * 0.88, 650);
+    const usableH = height - TOOLBAR_H - 20; // leave room for bottom toolbar
+    const panelH = Math.min(usableH * 0.92, 600);
     const panelX = width / 2;
-    const panelY = height / 2;
+    const panelY = (height - TOOLBAR_H) / 2; // center in usable area above toolbar
 
     // Outer panel — dark with gold border
     const outerBg = this.add.rectangle(panelX, panelY, panelW, panelH, Colors.panelBg, 0.97);
@@ -161,11 +163,13 @@ export class SuspectScene extends Phaser.Scene {
     closeBtn.setDepth(Depths.suspectContent);
 
     // ─── Suspect tabs (left sidebar style) ───
-    const tabW = 160;
-    const tabStartX = panelX - panelW / 2 + tabW / 2 + 12;
-    const tabStartY = panelY - panelH / 2 + headerH + 15;
-    const tabH = 90;
-    const tabSpacing = tabH + 8;
+    const tabW = 150;
+    const tabStartX = panelX - panelW / 2 + tabW / 2 + 10;
+    const tabStartY = panelY - panelH / 2 + headerH + 10;
+    const availableTabH = panelH - headerH - 20;
+    const tabCount = SUSPECTS.length;
+    const tabSpacing = Math.min(80, Math.floor(availableTabH / tabCount));
+    const tabH = tabSpacing - 6;
 
     this.tabElements = [];
 
@@ -187,38 +191,40 @@ export class SuspectScene extends Phaser.Scene {
 
       // Portrait (small, in the tab)
       const portraitKey = `portrait_${suspect.id}`;
-      const portraitX = tabStartX - tabW / 2 + 30;
+      const portraitX = tabStartX - tabW / 2 + 26;
+      const pSize = Math.min(34, tabH - 10);
+      const pRadius = pSize / 2;
       if (this.textures.exists(portraitKey)) {
         const portrait = this.add.image(portraitX, ty, portraitKey);
-        portrait.setDisplaySize(40, 40);
+        portrait.setDisplaySize(pSize, pSize);
         const maskGfx = this.make.graphics({});
-        maskGfx.fillCircle(portraitX, ty, 20);
+        maskGfx.fillCircle(portraitX, ty, pRadius);
         portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
-        const ring = this.add.ellipse(portraitX, ty, 42, 42)
+        const ring = this.add.ellipse(portraitX, ty, pSize + 2, pSize + 2)
           .setStrokeStyle(isSelected ? 2 : 1.5, suspect.color, isSelected ? 0.9 : 0.5)
           .setFillStyle(0x000000, 0);
         this.container.add([portrait, ring]);
       } else {
-        const iconCircle = this.add.ellipse(portraitX, ty, 40, 40, suspect.color, 0.2);
+        const iconCircle = this.add.ellipse(portraitX, ty, pSize, pSize, suspect.color, 0.2);
         const iconText = this.add.text(portraitX, ty, suspect.icon, {
-          fontFamily: FONT, fontSize: '20px', color: TextColors.white, fontStyle: 'bold',
+          fontFamily: FONT, fontSize: '16px', color: TextColors.white, fontStyle: 'bold',
         }).setOrigin(0.5);
         this.container.add([iconCircle, iconText]);
       }
 
       // Name (first name only in tab)
       const firstName = suspect.name.split(' ')[0];
-      const tabName = this.add.text(tabStartX + 10, ty - 12, firstName, {
+      const tabName = this.add.text(tabStartX + 6, ty - 8, firstName, {
         fontFamily: FONT,
-        fontSize: isSelected ? '14px' : '13px',
+        fontSize: isSelected ? '13px' : '12px',
         color: isSelected ? TextColors.light : TextColors.goldDim,
         fontStyle: isSelected ? 'bold' : 'normal',
       }).setOrigin(0, 0.5);
 
       // Role beneath name
-      const tabRole = this.add.text(tabStartX + 10, ty + 8, suspect.role, {
+      const tabRole = this.add.text(tabStartX + 6, ty + 8, suspect.role, {
         fontFamily: FONT,
-        fontSize: '10px',
+        fontSize: '9px',
         color: isSelected ? `#${suspect.color.toString(16).padStart(6, '0')}` : TextColors.muted,
         fontStyle: 'italic',
       }).setOrigin(0, 0.5);
@@ -229,7 +235,7 @@ export class SuspectScene extends Phaser.Scene {
       const discovered = suspect.facts.filter(f =>
         !f.requiresFlag || save.getFlag(f.requiresFlag) || dialogue.hasTriggeredEvent(f.requiresFlag)
       ).length;
-      const badgeText = this.add.text(tabStartX + tabW / 2 - 14, ty + tabH / 2 - 10,
+      const badgeText = this.add.text(tabStartX + tabW / 2 - 10, ty + tabH / 2 - 6,
         `${discovered}/${suspect.facts.length}`, {
           fontFamily: FONT, fontSize: '9px', color: TextColors.muted,
         }).setOrigin(1, 1);
@@ -252,7 +258,7 @@ export class SuspectScene extends Phaser.Scene {
     });
 
     // ─── Detail panel area (right side) ───
-    const detailX = panelX - panelW / 2 + tabW + 30 + (panelW - tabW - 40) / 2;
+    const detailX = panelX - panelW / 2 + tabW + 28 + (panelW - tabW - 40) / 2;
     const detailY = panelY + headerH / 2;
     this.detailPanel = this.add.container(detailX, detailY);
     this.detailPanel.setDepth(Depths.suspectContent);
@@ -279,10 +285,13 @@ export class SuspectScene extends Phaser.Scene {
     this.detailPanel.removeAll(true);
 
     const { width, height } = this.cameras.main;
+    const TOOLBAR_H2 = 52;
+    const usableH = height - TOOLBAR_H2 - 20;
     const panelW = Math.min(width * 0.92, 900);
-    const tabW = 160;
+    const panelH2 = Math.min(usableH * 0.92, 600);
+    const tabW = 150;
     const detailW = panelW - tabW - 50;
-    const detailH = Math.min(height * 0.88, 650) - 80;
+    const detailH = panelH2 - 80;
 
     // Detail background
     const detailBg = this.add.rectangle(0, 0, detailW, detailH, 0x0e0e1e, 0.6);
@@ -294,7 +303,7 @@ export class SuspectScene extends Phaser.Scene {
     const hasPortrait = this.textures.exists(`portrait_${suspect.id}`);
 
     // Large portrait
-    const portraitSize = 90;
+    const portraitSize = 70;
     const portraitX = -detailW / 2 + 25 + portraitSize / 2;
     if (hasPortrait) {
       const portrait = this.add.image(portraitX, headerY + portraitSize / 2, `portrait_${suspect.id}`);
