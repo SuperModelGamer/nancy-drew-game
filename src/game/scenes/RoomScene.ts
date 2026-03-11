@@ -58,8 +58,14 @@ export class RoomScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
-    // Room background - procedural art (will be replaced with real images when available)
-    drawRoomBackground(this, this.currentRoom.id);
+    // Room background - use real image if available, fall back to procedural art
+    const bgKey = `bg_${this.currentRoom.id}`;
+    if (this.textures.exists(bgKey)) {
+      const bg = this.add.image(width / 2, height / 2, bgKey);
+      bg.setDisplaySize(width, height);
+    } else {
+      drawRoomBackground(this, this.currentRoom.id);
+    }
 
     // Room name banner
     const banner = this.add.text(width / 2, 30, this.currentRoom.name, {
