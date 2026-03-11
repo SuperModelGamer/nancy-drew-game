@@ -13,8 +13,13 @@ export class TitleScene extends Phaser.Scene {
     const save = SaveSystem.getInstance();
     const hasSave = save.hasSave();
 
-    // Dark moody background
+    // Cover image background
     this.cameras.main.setBackgroundColor('#0a0a0f');
+    if (this.textures.exists('cover')) {
+      const cover = this.add.image(width / 2, height / 2, 'cover');
+      cover.setDisplaySize(width, height);
+      cover.setAlpha(0.6); // Dim slightly so text is readable
+    }
 
     // Title text
     const title = this.add.text(width / 2, height * 0.25, 'NANCY DREW', {
