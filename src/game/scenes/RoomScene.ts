@@ -7,6 +7,8 @@ import { SaveSystem } from '../systems/SaveSystem';
 import { ScriptedEventScene } from './ScriptedEventScene';
 import { ChapterSystem } from '../systems/ChapterSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { drawRoomBackground } from '../utils/room-backgrounds';
+import { showTutorialIfNeeded } from '../utils/tutorial';
 
 interface Hotspot {
   id: string;
@@ -56,8 +58,8 @@ export class RoomScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
-    // Room background - placeholder colored rectangle until real art exists
-    this.add.rectangle(width / 2, height / 2, width, height, Colors.sceneBg);
+    // Room background - procedural art (will be replaced with real images when available)
+    drawRoomBackground(this, this.currentRoom.id);
 
     // Room name banner
     const banner = this.add.text(width / 2, 30, this.currentRoom.name, {
@@ -130,6 +132,8 @@ export class RoomScene extends Phaser.Scene {
     // Check for scripted events after fade-in
     this.cameras.main.once('camerafadeincomplete', () => {
       this.checkScriptedEvents();
+      // Show tutorial on first visit
+      showTutorialIfNeeded(this);
     });
   }
 
