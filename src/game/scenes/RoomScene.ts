@@ -141,6 +141,15 @@ export class RoomScene extends Phaser.Scene {
       // Show tutorial on first visit
       showTutorialIfNeeded(this);
     });
+
+    // Hotspot editor toggle (backtick key)
+    this.input.keyboard!.on('keydown-BACKQUOTE', () => {
+      if (this.scene.isActive('HotspotEditorScene')) {
+        this.scene.stop('HotspotEditorScene');
+      } else {
+        this.scene.launch('HotspotEditorScene', { roomId: this.currentRoom.id });
+      }
+    });
   }
 
   private checkScriptedEvents(): void {
