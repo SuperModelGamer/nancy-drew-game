@@ -11,7 +11,7 @@ interface SaveData {
   dialogue: ReturnType<DialogueSystem['toJSON']>;
   puzzles: ReturnType<PuzzleSystem['toJSON']>;
   journal: string[];
-  flags: Record<string, boolean>;
+  flags: Record<string, boolean | string>;
 }
 
 const SAVE_KEY = 'nancy-drew-save';
@@ -22,7 +22,7 @@ export class SaveSystem {
   private currentRoom = 'foyer';
   private chapter = 1;
   private journal: string[] = [];
-  private flags: Record<string, boolean> = {};
+  private flags: Record<string, boolean | string> = {};
 
   static getInstance(): SaveSystem {
     if (!SaveSystem.instance) {
@@ -57,11 +57,11 @@ export class SaveSystem {
     return [...this.journal];
   }
 
-  setFlag(flag: string, value: boolean): void {
+  setFlag(flag: string, value: boolean | string): void {
     this.flags[flag] = value;
   }
 
-  getFlag(flag: string): boolean {
+  getFlag(flag: string): boolean | string {
     return this.flags[flag] ?? false;
   }
 
