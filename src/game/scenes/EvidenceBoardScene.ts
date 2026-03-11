@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { PuzzleSystem } from '../systems/PuzzleSystem';
 import { SaveSystem } from '../systems/SaveSystem';
+import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 
 interface EvidenceCard {
   id: string;
@@ -45,10 +46,10 @@ export class EvidenceBoardScene extends Phaser.Scene {
     // Dark overlay
     const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);
     overlay.setInteractive();
-    overlay.setDepth(410);
+    overlay.setDepth(Depths.evidenceOverlay);
 
     this.boardContainer = this.add.container(0, 0);
-    this.boardContainer.setDepth(411);
+    this.boardContainer.setDepth(Depths.evidenceContent);
 
     // Corkboard background
     const boardW = Math.min(width * 0.92, 1000);
@@ -67,42 +68,42 @@ export class EvidenceBoardScene extends Phaser.Scene {
 
     // Title
     this.boardContainer.add(this.add.text(boardX, boardY - boardH / 2 + 30, 'Evidence Board', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '24px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'bold',
     }).setOrigin(0.5));
 
     // Subtitle
     this.boardContainer.add(this.add.text(boardX, boardY - boardH / 2 + 55, 'Arrange the evidence in chronological order to solve both cases', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '13px',
-      color: '#e0d5c0',
+      color: TextColors.light,
       fontStyle: 'italic',
     }).setOrigin(0.5));
 
     // Close button
     const closeBtn = this.add.text(boardX + boardW / 2 - 25, boardY - boardH / 2 + 20, '✕', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '24px',
-      color: '#8a7a5a',
+      color: TextColors.goldDim,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     closeBtn.on('pointerdown', () => this.scene.stop());
-    closeBtn.on('pointerover', () => closeBtn.setColor('#c9a84c'));
-    closeBtn.on('pointerout', () => closeBtn.setColor('#8a7a5a'));
+    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
+    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
     this.boardContainer.add(closeBtn);
 
     // Timeline labels
     const timelineY = boardY - boardH / 2 + 85;
     this.boardContainer.add(this.add.text(boardX - boardW / 4, timelineY, '1928 — The Murder', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '14px',
       color: '#c97b7b',
       fontStyle: 'bold',
     }).setOrigin(0.5));
 
     this.boardContainer.add(this.add.text(boardX + boardW / 4, timelineY, 'Modern Day — The Cover-up', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '14px',
       color: '#7ba3c9',
       fontStyle: 'bold',
@@ -110,7 +111,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
 
     // Timeline line
     const gfx = this.add.graphics();
-    gfx.lineStyle(2, 0xc9a84c, 0.4);
+    gfx.lineStyle(2, Colors.gold, 0.4);
     const lineY = timelineY + 20;
     gfx.lineBetween(boardX - boardW / 2 + 50, lineY, boardX + boardW / 2 - 50, lineY);
     this.boardContainer.add(gfx);
@@ -126,13 +127,13 @@ export class EvidenceBoardScene extends Phaser.Scene {
       const zx = zoneStartX + i * zoneSpacing;
 
       const zone = this.add.rectangle(zx, zoneY, zoneW, zoneH, 0x4A3520, 0.5);
-      zone.setStrokeStyle(2, 0xc9a84c, 0.4);
+      zone.setStrokeStyle(2, Colors.gold, 0.4);
       this.boardContainer.add(zone);
 
       this.boardContainer.add(this.add.text(zx, zoneY - zoneH / 2 - 10, `${i + 1}`, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '12px',
-        color: '#c9a84c',
+        color: TextColors.gold,
       }).setOrigin(0.5));
 
       this.dropZones.push({ x: zx, y: zoneY, cardId: null });
@@ -140,7 +141,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
 
     // Feedback text
     this.feedbackText = this.add.text(boardX, boardY + boardH / 2 - 65, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '15px',
       color: '#ff6b6b',
       align: 'center',
@@ -149,9 +150,9 @@ export class EvidenceBoardScene extends Phaser.Scene {
 
     // Hint text
     this.hintText = this.add.text(boardX, boardY + boardH / 2 - 40, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '13px',
-      color: '#8a7a5a',
+      color: TextColors.goldDim,
       fontStyle: 'italic',
       wordWrap: { width: boardW - 80 },
       align: 'center',
@@ -174,11 +175,11 @@ export class EvidenceBoardScene extends Phaser.Scene {
     this.input.on('drag', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container, dragX: number, dragY: number) => {
       gameObject.x = dragX;
       gameObject.y = dragY;
-      gameObject.setDepth(412);
+      gameObject.setDepth(Depths.evidenceDrag);
     });
 
     this.input.on('dragend', (_pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.Container) => {
-      gameObject.setDepth(411);
+      gameObject.setDepth(Depths.evidenceContent);
       const cardId = gameObject.getData('cardId') as string;
       const startIdx = gameObject.getData('startIndex') as number;
 
@@ -239,7 +240,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
     // Year tag
     const yearColor = card.year === '1928' ? '#8b1a1a' : '#1a4a8b';
     container.add(this.add.text(w / 2 - 5, -h / 2 + 3, card.year, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '9px',
       color: yearColor,
       fontStyle: 'bold',
@@ -250,7 +251,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
 
     // Label
     container.add(this.add.text(0, 8, card.label, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '10px',
       color: '#2a2a2a',
       fontStyle: 'bold',
@@ -259,7 +260,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
 
     // Description
     container.add(this.add.text(0, 28, card.description, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '8px',
       color: '#4a4a4a',
       align: 'center',

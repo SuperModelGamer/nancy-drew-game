@@ -409,12 +409,12 @@ export class RoomScene extends Phaser.Scene {
     const container = this.add.container(width / 2, 0);
 
     const bg = this.add.rectangle(0, 0, width * 0.8, 50, 0x000000, 0.85);
-    bg.setStrokeStyle(1, 0xc9a84c, 0.5);
+    bg.setStrokeStyle(1, Colors.gold, 0.5);
 
     const text = this.add.text(0, 0, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '15px',
-      color: '#e0d5c0',
+      color: TextColors.light,
       align: 'center',
       wordWrap: { width: width * 0.75 },
       lineSpacing: 3,

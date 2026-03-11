@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { TextColors, FONT } from '../utils/constants';
 
 interface EndingData {
   ending: string;
@@ -65,9 +66,9 @@ export class EndingScene extends Phaser.Scene {
 
     // Title — fades in first
     const title = this.add.text(width / 2, 80, content.title, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '42px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       align: 'center',
     });
     title.setOrigin(0.5);
@@ -82,10 +83,10 @@ export class EndingScene extends Phaser.Scene {
     // Subtitle — fades in after 1.5s
     currentDelay = 1500;
     const subtitle = this.add.text(width / 2, 130, content.subtitle, {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '18px',
       fontStyle: 'italic',
-      color: '#8a7a5a',
+      color: TextColors.goldDim,
       align: 'center',
     });
     subtitle.setOrigin(0.5);
@@ -107,9 +108,9 @@ export class EndingScene extends Phaser.Scene {
 
     for (let i = 0; i < content.paragraphs.length; i++) {
       const para = this.add.text(width / 2, nextY, content.paragraphs[i], {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '15px',
-        color: '#e0d5c0',
+        color: TextColors.light,
         align: 'center',
         wordWrap: { width: 600 },
         lineSpacing: 4,
@@ -131,10 +132,10 @@ export class EndingScene extends Phaser.Scene {
 
     // "— The End —" after all paragraphs
     const theEnd = this.add.text(width / 2, nextY + 30, '\u2014 The End \u2014', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '22px',
       fontStyle: 'italic',
-      color: '#c9a84c',
+      color: TextColors.gold,
       align: 'center',
     });
     theEnd.setOrigin(0.5);
@@ -149,9 +150,9 @@ export class EndingScene extends Phaser.Scene {
     // "Return to Title" button after another 2s
     currentDelay += 2000;
     const returnButton = this.add.text(width / 2, nextY + 80, 'Return to Title', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '18px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       align: 'center',
     });
     returnButton.setOrigin(0.5);
@@ -159,10 +160,10 @@ export class EndingScene extends Phaser.Scene {
     returnButton.setInteractive({ useHandCursor: true });
 
     returnButton.on('pointerover', () => {
-      returnButton.setStyle({ color: '#e0d5c0' });
+      returnButton.setStyle({ color: TextColors.light });
     });
     returnButton.on('pointerout', () => {
-      returnButton.setStyle({ color: '#c9a84c' });
+      returnButton.setStyle({ color: TextColors.gold });
     });
     returnButton.on('pointerdown', () => {
       this.scene.stop('RoomScene');
@@ -183,20 +184,20 @@ export class EndingScene extends Phaser.Scene {
     const creditsY = nextY + 130;
 
     const creditTitle = this.add.text(width / 2, creditsY, 'Nancy Drew: The Last Curtain Call', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '13px',
       fontStyle: 'italic',
-      color: '#5a5a5a',
+      color: TextColors.muted,
       align: 'center',
     });
     creditTitle.setOrigin(0.5);
     creditTitle.setAlpha(0);
 
     const creditAuthor = this.add.text(width / 2, creditsY + 24, 'Created by Carley Beck', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '13px',
       fontStyle: 'italic',
-      color: '#5a5a5a',
+      color: TextColors.muted,
       align: 'center',
     });
     creditAuthor.setOrigin(0.5);

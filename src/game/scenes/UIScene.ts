@@ -3,6 +3,7 @@ import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import { ChapterSystem } from '../systems/ChapterSystem';
 import itemsData from '../data/items.json';
+import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 
 export class UIScene extends Phaser.Scene {
   private inventoryBar!: Phaser.GameObjects.Container;
@@ -22,13 +23,13 @@ export class UIScene extends Phaser.Scene {
 
     // Inventory button (bottom-left) - 48px minimum tap target
     const invBtn = this.add.container(50, height - 40);
-    const invBg = this.add.rectangle(0, 0, 80, 48, 0x1a1a2e, 0.9);
-    invBg.setStrokeStyle(1, 0xc9a84c, 0.6);
+    const invBg = this.add.rectangle(0, 0, 80, 48, Colors.sceneBg, 0.9);
+    invBg.setStrokeStyle(1, Colors.gold, 0.6);
     invBg.setInteractive({ useHandCursor: true });
     const invText = this.add.text(0, 0, 'Items', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '16px',
-      color: '#c9a84c',
+      color: TextColors.gold,
     }).setOrigin(0.5);
     invBtn.add([invBg, invText]);
 
@@ -36,9 +37,9 @@ export class UIScene extends Phaser.Scene {
 
     // Chapter indicator (top-center)
     const chapterLabel = this.add.text(width / 2, 12, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '12px',
-      color: '#5a5a5a',
+      color: TextColors.muted,
       fontStyle: 'italic',
     }).setOrigin(0.5, 0).setDepth(50);
     const updateChapter = () => {
@@ -51,13 +52,13 @@ export class UIScene extends Phaser.Scene {
 
     // Journal button (bottom-right) - 48px minimum tap target
     this.journalButton = this.add.container(width - 50, height - 40);
-    const journalBg = this.add.rectangle(0, 0, 80, 48, 0x1a1a2e, 0.9);
-    journalBg.setStrokeStyle(1, 0xc9a84c, 0.6);
+    const journalBg = this.add.rectangle(0, 0, 80, 48, Colors.sceneBg, 0.9);
+    journalBg.setStrokeStyle(1, Colors.gold, 0.6);
     journalBg.setInteractive({ useHandCursor: true });
     const journalText = this.add.text(0, 0, 'Journal', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '16px',
-      color: '#c9a84c',
+      color: TextColors.gold,
     }).setOrigin(0.5);
     this.journalButton.add([journalBg, journalText]);
 
@@ -65,11 +66,11 @@ export class UIScene extends Phaser.Scene {
 
     // Suspects button (bottom-center-left)
     const suspectsBtn = this.add.container(width / 2 - 55, height - 40);
-    const suspectsBg = this.add.rectangle(0, 0, 90, 48, 0x1a1a2e, 0.9);
+    const suspectsBg = this.add.rectangle(0, 0, 90, 48, Colors.sceneBg, 0.9);
     suspectsBg.setStrokeStyle(1, 0xb4a0d4, 0.6);
     suspectsBg.setInteractive({ useHandCursor: true });
     const suspectsText = this.add.text(0, 0, 'Suspects', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '15px',
       color: '#b4a0d4',
     }).setOrigin(0.5);
@@ -80,13 +81,13 @@ export class UIScene extends Phaser.Scene {
 
     // Map button (bottom-center-right)
     const mapBtn = this.add.container(width / 2 + 55, height - 40);
-    const mapBg = this.add.rectangle(0, 0, 80, 48, 0x1a1a2e, 0.9);
-    mapBg.setStrokeStyle(1, 0x7ba3c9, 0.6);
+    const mapBg = this.add.rectangle(0, 0, 80, 48, Colors.sceneBg, 0.9);
+    mapBg.setStrokeStyle(1, Colors.mapBlue, 0.6);
     mapBg.setInteractive({ useHandCursor: true });
     const mapText = this.add.text(0, 0, 'Map', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '15px',
-      color: '#7ba3c9',
+      color: TextColors.edwin,
     }).setOrigin(0.5);
     mapBtn.add([mapBg, mapText]);
     mapBg.on('pointerdown', () => {
@@ -163,27 +164,27 @@ export class UIScene extends Phaser.Scene {
     const panelH = 220;
     const panel = this.add.container(width / 2, height - 190);
 
-    const bg = this.add.rectangle(0, 0, panelW, panelH, 0x0a0a1a, 0.95);
-    bg.setStrokeStyle(2, 0xc9a84c, 0.7);
+    const bg = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.95);
+    bg.setStrokeStyle(2, Colors.gold, 0.7);
     panel.add(bg);
 
     const title = this.add.text(0, -panelH / 2 + 20, 'Evidence', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '18px',
-      color: '#c9a84c',
+      color: TextColors.gold,
     }).setOrigin(0.5);
     panel.add(title);
 
     // Deselect hint
     const hint = this.add.text(0, -panelH / 2 + 42, 'Click an item to select it for use. Click again to deselect.', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '11px',
-      color: '#5a5a5a',
+      color: TextColors.muted,
       fontStyle: 'italic',
     }).setOrigin(0.5);
     panel.add(hint);
 
-    panel.setDepth(300);
+    panel.setDepth(Depths.inventoryPanel);
     return panel;
   }
 
@@ -193,31 +194,31 @@ export class UIScene extends Phaser.Scene {
     const panelH = 400;
     const panel = this.add.container(width / 2, height / 2);
 
-    const bg = this.add.rectangle(0, 0, panelW, panelH, 0x0a0a1a, 0.97);
-    bg.setStrokeStyle(2, 0xc9a84c, 0.7);
+    const bg = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.97);
+    bg.setStrokeStyle(2, Colors.gold, 0.7);
     bg.setInteractive(); // block clicks through
     panel.add(bg);
 
     const title = this.add.text(0, -panelH / 2 + 25, 'Nancy\'s Journal', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '20px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'bold',
     }).setOrigin(0.5);
     panel.add(title);
 
     // Close button
     const closeBtn = this.add.text(panelW / 2 - 20, -panelH / 2 + 15, '✕', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '20px',
-      color: '#8a7a5a',
+      color: TextColors.goldDim,
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     closeBtn.on('pointerdown', () => this.toggleJournal());
-    closeBtn.on('pointerover', () => closeBtn.setColor('#c9a84c'));
-    closeBtn.on('pointerout', () => closeBtn.setColor('#8a7a5a'));
+    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
+    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
     panel.add(closeBtn);
 
-    panel.setDepth(350);
+    panel.setDepth(Depths.journalPanel);
     return panel;
   }
 
@@ -226,29 +227,29 @@ export class UIScene extends Phaser.Scene {
     const panelW = Math.min(width * 0.85, 500);
     const panel = this.add.container(width / 2, 150);
 
-    const bg = this.add.rectangle(0, 0, panelW, 100, 0x0a0a1a, 0.95);
-    bg.setStrokeStyle(1, 0xc9a84c, 0.5);
+    const bg = this.add.rectangle(0, 0, panelW, 100, Colors.panelBg, 0.95);
+    bg.setStrokeStyle(1, Colors.gold, 0.5);
     panel.add(bg);
 
     const nameText = this.add.text(0, -25, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '16px',
-      color: '#c9a84c',
+      color: TextColors.gold,
       fontStyle: 'bold',
     }).setOrigin(0.5);
     panel.add(nameText);
 
     const descText = this.add.text(0, 5, '', {
-      fontFamily: 'Georgia, serif',
+      fontFamily: FONT,
       fontSize: '13px',
-      color: '#e0d5c0',
+      color: TextColors.light,
       wordWrap: { width: panelW - 40 },
       lineSpacing: 2,
       align: 'center',
     }).setOrigin(0.5, 0);
     panel.add(descText);
 
-    panel.setDepth(310);
+    panel.setDepth(Depths.itemDescPanel);
     return panel;
   }
 
@@ -279,17 +280,17 @@ export class UIScene extends Phaser.Scene {
       const y = startY + row * (slotSize + 20);
 
       const isSelected = selectedItem === itemId;
-      const borderColor = isSelected ? 0x4ade80 : 0xc9a84c;
+      const borderColor = isSelected ? Colors.success : Colors.gold;
       const borderAlpha = isSelected ? 0.9 : 0.4;
 
-      const slot = this.add.rectangle(x, y, slotSize, slotSize, 0x1a1a2e, 0.8);
+      const slot = this.add.rectangle(x, y, slotSize, slotSize, Colors.sceneBg, 0.8);
       slot.setStrokeStyle(isSelected ? 2 : 1, borderColor, borderAlpha);
       slot.setInteractive({ useHandCursor: true });
 
       const label = this.add.text(x, y + slotSize / 2 + 8, itemData.name, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '10px',
-        color: isSelected ? '#4ade80' : '#c9a84c',
+        color: isSelected ? TextColors.success : TextColors.gold,
         align: 'center',
         wordWrap: { width: slotSize + 10 },
       }).setOrigin(0.5, 0);
@@ -311,11 +312,11 @@ export class UIScene extends Phaser.Scene {
 
       // Hover to show description
       slot.on('pointerover', () => {
-        slot.setFillStyle(0x2a2a4e);
+        slot.setFillStyle(Colors.hoverBg);
         this.showItemDescription(itemData);
       });
       slot.on('pointerout', () => {
-        slot.setFillStyle(0x1a1a2e, 0.8);
+        slot.setFillStyle(Colors.sceneBg, 0.8);
       });
 
       this.inventoryPanel.add([slot, label, icon]);
@@ -347,9 +348,9 @@ export class UIScene extends Phaser.Scene {
 
     if (journal.length === 0) {
       const empty = this.add.text(0, 0, 'No entries yet.\n\nExplore the theater and talk to people\nto fill Nancy\'s journal.', {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '14px',
-        color: '#5a5a5a',
+        color: TextColors.muted,
         fontStyle: 'italic',
         align: 'center',
         lineSpacing: 4,
@@ -361,14 +362,14 @@ export class UIScene extends Phaser.Scene {
     let y = -130;
     journal.forEach((entry, i) => {
       const bullet = this.add.text(-panelW / 2 + 30, y, `${i + 1}.`, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '13px',
-        color: '#c9a84c',
+        color: TextColors.gold,
       });
       const text = this.add.text(-panelW / 2 + 55, y, entry, {
-        fontFamily: 'Georgia, serif',
+        fontFamily: FONT,
         fontSize: '13px',
-        color: '#e0d5c0',
+        color: TextColors.light,
         wordWrap: { width: panelW - 100 },
         lineSpacing: 2,
       });
