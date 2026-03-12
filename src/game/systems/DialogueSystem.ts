@@ -501,15 +501,15 @@ export class DialogueSystem {
     const totalH = visibleChoices.length * (CHOICE_H + 10) - 10;
     const startY = height * 0.5 - totalH / 2;
 
-    // Header text
+    // Header text — must be in the container so it's cleaned up on next render
     const headerY = startY - 40;
-    this.scene.add.text(width / 2, headerY, 'What would you like to say?', {
+    const header = this.scene.add.text(width / 2, headerY, 'What would you like to say?', {
       fontFamily: FONT,
       fontSize: '16px',
       color: TextColors.goldDim,
       fontStyle: 'italic',
-    }).setOrigin(0.5).setDepth(Depths.dialogueBox);
-    // (header is outside container but at same depth — acceptable since container owns the overlay)
+    }).setOrigin(0.5);
+    this.container.add(header);
 
     visibleChoices.forEach((choice, i) => {
       const itemAvailable = !choice.requiredItem || inventory.hasItem(choice.requiredItem);
