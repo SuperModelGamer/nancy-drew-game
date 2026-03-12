@@ -1,12 +1,12 @@
-// Custom PNG cursors matching the game's 1920s gold art style
-// Each cursor is a 48x48 PNG with a defined hotspot (x, y from top-left)
+// Custom PNG cursors matching the game's 1920s gold art deco style
+// Each cursor is a 64x64 PNG with a defined hotspot (x, y from top-left)
 
 const pngCursor = (filename: string, hotX: number, hotY: number): string =>
   `url("assets/ui/cursors/${filename}.png") ${hotX} ${hotY}, auto`;
 
 export const Cursors = {
   /** Default scene cursor — gold art deco pointer arrow */
-  default: pngCursor('pointer', 4, 2),
+  default: pngCursor('pointer', 6, 3),
 
   /** Inspecting clues and objects — gold spyglass */
   inspect: pngCursor('spyglass', 32, 32),
@@ -15,10 +15,10 @@ export const Cursors = {
   navigate: pngCursor('door', 32, 32),
 
   /** Talking to NPCs — gold speech bubble */
-  talk: pngCursor('chat', 32, 28),
+  talk: pngCursor('chat', 32, 32),
 
   /** Picking up items — gold grabbing hand */
-  pickup: pngCursor('grab', 32, 28),
+  pickup: pngCursor('grab', 32, 32),
 
   /** Locked objects — gold padlock */
   locked: pngCursor('lock', 32, 32),
