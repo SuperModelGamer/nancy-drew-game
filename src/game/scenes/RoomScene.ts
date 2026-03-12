@@ -129,8 +129,9 @@ export class RoomScene extends Phaser.Scene {
       this.checkScriptedEvents();
     });
 
-    // Hotspot editor toggle (backtick key)
-    this.input.keyboard!.on('keydown-BACKQUOTE', () => {
+    // Hotspot editor toggle (Shift+Q)
+    this.input.keyboard!.on('keydown-Q', (event: KeyboardEvent) => {
+      if (!event.shiftKey) return;
       if (this.scene.isActive('HotspotEditorScene')) {
         this.scene.stop('HotspotEditorScene');
       } else {
@@ -428,57 +429,80 @@ export class RoomScene extends Phaser.Scene {
   private showDescription(text: string): void {
     const { width, height } = this.cameras.main;
 
-    // Update and show the description box
-    const textObj = this.descriptionBox.getAt(1) as Phaser.GameObjects.Text;
-    textObj.setText(text);
+    // Destroy previous description box if visible
+    if (this.descriptionBox) {
+      this.descriptionBox.destroy();
+    }
 
-    // Resize background to fit text
-    const bg = this.descriptionBox.getAt(0) as Phaser.GameObjects.Rectangle;
-    const textHeight = textObj.height;
-    bg.setSize(width * 0.8, Math.max(50, textHeight + 30));
+    // Create a centered modal overlay
+    const container = this.add.container(0, 0);
+    container.setDepth(Depths.descriptionBox);
+    this.descriptionBox = container;
 
-    // Position above the toolbar bar (52px bar + 10px margin)
-    this.descriptionBox.setPosition(width / 2, height - 90);
-    this.descriptionBox.setVisible(true);
-    this.descriptionBox.setAlpha(0);
+    // Dark backdrop — click anywhere to dismiss
+    const backdrop = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
+    backdrop.setInteractive({ cursor: POINTER_CURSOR });
+    container.add(backdrop);
 
+    // Text box in center
+    const maxTextW = Math.min(width * 0.7, 800);
+    const textObj = this.add.text(width / 2, height / 2 - 20, text, {
+      fontFamily: FONT,
+      fontSize: '26px',
+      color: TextColors.light,
+      align: 'center',
+      wordWrap: { width: maxTextW },
+      lineSpacing: 6,
+    });
+    textObj.setOrigin(0.5);
+    container.add(textObj);
+
+    // Background panel behind text
+    const padX = 50, padY = 40;
+    const bgW = Math.min(textObj.width + padX * 2, width * 0.8);
+    const bgH = textObj.height + padY * 2 + 30;
+    const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.92);
+    bg.setStrokeStyle(1.5, Colors.gold, 0.4);
+    container.sendToBack(backdrop);
+    container.moveTo(bg, 1); // behind text, in front of backdrop
+
+    // "Click anywhere to continue" prompt
+    const prompt = this.add.text(width / 2, height / 2 - 20 + bgH / 2 - 18, '— click anywhere to continue —', {
+      fontFamily: FONT,
+      fontSize: '16px',
+      color: TextColors.goldDim,
+      fontStyle: 'italic',
+    }).setOrigin(0.5);
+    container.add(prompt);
+
+    // Pulse the prompt
     this.tweens.add({
-      targets: this.descriptionBox,
-      alpha: 1,
-      duration: 200,
+      targets: prompt,
+      alpha: { from: 1, to: 0.4 },
+      duration: 900,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
     });
 
-    // Auto-hide based on text length
-    const displayTime = Math.max(3000, text.length * 40);
-    this.time.delayedCall(displayTime, () => {
+    // Fade in
+    container.setAlpha(0);
+    this.tweens.add({ targets: container, alpha: 1, duration: 200 });
+
+    // Click anywhere to dismiss
+    backdrop.on('pointerdown', () => {
       this.tweens.add({
-        targets: this.descriptionBox,
+        targets: container,
         alpha: 0,
-        duration: 300,
-        onComplete: () => this.descriptionBox.setVisible(false),
+        duration: 200,
+        onComplete: () => container.destroy(),
       });
     });
   }
 
   private createDescriptionBox(): Phaser.GameObjects.Container {
-    const { width } = this.cameras.main;
-    const container = this.add.container(width / 2, 0);
-
-    const bg = this.add.rectangle(0, 0, width * 0.8, 50, 0x000000, 0.85);
-    bg.setStrokeStyle(1, Colors.gold, 0.5);
-
-    const text = this.add.text(0, 0, '', {
-      fontFamily: FONT,
-      fontSize: '22px',
-      color: TextColors.light,
-      align: 'center',
-      wordWrap: { width: width * 0.75 },
-      lineSpacing: 3,
-    });
-    text.setOrigin(0.5);
-
-    container.add([bg, text]);
-    return container;
+    // Now created dynamically in showDescription, return empty container as placeholder
+    return this.add.container(0, 0);
   }
 
   private getHotspotColor(type: string): number {
