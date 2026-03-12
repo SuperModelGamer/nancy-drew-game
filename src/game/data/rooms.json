@@ -78,7 +78,7 @@
           "height": 110,
           "label": "Wall Paintings",
           "type": "inspect",
-          "description": "Dozens of playbills spanning decades. One is framed in gold: 'THE CRIMSON VEIL — Starring Margaux Fontaine — Final Performance, October 31, 1928.' Someone has placed fresh flowers beneath it."
+          "description": "Dozens of playbills spanning decades. One is framed in gold: 'THE CRIMSON VEIL — Starring Margaux Fontaine — Final Performance, October 31, 1928.' Someone has placed fresh flowers beneath it. Other notable bills: 'The Secret of the Old Clock — A Musical Revue,' 'Treasure in the Royal Tower — An Alpine Mystery,' and 'Danger on Deception Island.' The Monarch hosted touring companies from all over."
         },
         {
           "id": "lobby_old_poster",
@@ -88,7 +88,7 @@
           "height": 110,
           "label": "Faded Poster",
           "type": "inspect",
-          "description": "A half-torn touring poster: 'BLACKMOOR PLAYERS present: The Penvellyn Curse — A Tale of Alchemy and Shadows.' Someone's written in pencil at the bottom: 'Brilliant. Almost too real. —M.F.' Margaux Fontaine saw this show."
+          "description": "A half-torn touring poster: 'BLACKMOOR PLAYERS present: The Penvellyn Curse — A Tale of Alchemy and Shadows.' Someone's written in pencil at the bottom: 'Brilliant. Almost too real. —M.F.' Margaux Fontaine saw this show. Next to it, a smaller playbill advertises 'Mystico the Magnificent — One Night Only!' with a cartoon magician in a top hat."
         },
         {
           "id": "lobby_vivian",
@@ -118,7 +118,7 @@
           "height": 40,
           "label": "Guest Ledger",
           "type": "inspect",
-          "description": "The guest ledger is open to recent entries. Most are Ashworth's contractors. But one entry, repeated weekly for fifteen years, reads simply: 'E. Hale — Research.' The handwriting is meticulous. Obsessive."
+          "description": "The guest ledger is open to recent entries. Most are Ashworth's contractors. But one entry, repeated weekly for fifteen years, reads simply: 'E. Hale — Research.' The handwriting is meticulous. Obsessive. An older page has guest signatures from a 1990s gala — 'F. & J. Hardy, Bayport' and 'S. Joon — still looking!!!' with three exclamation marks."
         },
         {
           "id": "lobby_coat_check",
@@ -503,7 +503,7 @@
           "height": 90,
           "label": "Call Board",
           "type": "inspect",
-          "description": "The stage manager's call board — where cast announcements are posted. Ancient notices layer over each other. One recent note in Stella's writing: 'INVENTORY DISCREPANCY — Missing: 3 Tiffany lamps, 1 silver candelabra, 2 gilt frames (est. value: $4,200). DO NOT DISCUSS.' She's tracking what she's sold."
+          "description": "The stage manager's call board — where cast announcements are posted. Ancient notices layer over each other. One recent note in Stella's writing: 'INVENTORY DISCREPANCY — Missing: 3 Tiffany lamps, 1 silver candelabra, 2 gilt frames (est. value: $4,200). DO NOT DISCUSS.' She's tracking what she's sold. Pinned underneath, a faded flyer: 'KOKO KRINGLE — Official Candy of the Monarch Theatre. A Taste You Won't Forget!' There's a half-eaten Koko Kringle wrapper in the trash can."
         },
         {
           "id": "bs_stella_lockbox",
@@ -677,7 +677,7 @@
           "height": 50,
           "label": "Old Book",
           "type": "inspect",
-          "description": "A leather-bound volume wedged behind the settee cushion: 'The Alchemist's Apprentice — A Study of Poisons and Their Remedies, 1890.' Several pages are dog-eared. One section on antimony compounds is heavily annotated in Margaux's handwriting: 'These are my symptoms exactly.'"
+          "description": "A leather-bound volume wedged behind the settee cushion: 'The Alchemist's Apprentice — A Study of Poisons and Their Remedies, 1890.' Several pages are dog-eared. One section on antimony compounds is heavily annotated in Margaux's handwriting: 'These are my symptoms exactly.' A bookplate inside reads: 'From the library of the Penvellyn Family, Blackmoor Manor.' That family and their fascination with alchemy..."
         },
         {
           "id": "dr_dead_roses",
@@ -746,7 +746,7 @@
           "height": 100,
           "label": "Film Reels",
           "type": "inspect",
-          "description": "Pairs of large film reels mounted on the wall. The celluloid is degraded but the labels are still legible — newsreels and short features from the 1920s and 30s."
+          "description": "Pairs of large film reels mounted on the wall. The celluloid is degraded but the labels are still legible — newsreels and short features from the 1920s and 30s. One reel is labeled 'SHADOW RANCH RODEO FOOTAGE — 1932.' Another: 'WAVERLY ACADEMY SPRING RECITAL.' Someone collected films from all over."
         },
         {
           "id": "pb_window",
@@ -828,7 +828,7 @@
           "height": 40,
           "label": "Wall Scratches",
           "type": "inspect",
-          "description": "Scratched into the wall by decades of bored projectionists: initials, dates, crude drawings. One reads 'M.F. + J.H. 1927 ♥' — Margaux Fontaine and her mysterious lover J. Another, newer: 'E.H. was here. For her.' Edwin."
+          "description": "Scratched into the wall by decades of bored projectionists: initials, dates, crude drawings. One reads 'M.F. + J.H. 1927 ♥' — Margaux Fontaine and her mysterious lover J. Another, newer: 'E.H. was here. For her.' Edwin. And in the corner, scratched with what looks like a key: 'SONNY JOON WAS HERE — THE TRUTH IS OUT THERE' surrounded by tiny alien doodles. That name keeps turning up everywhere."
         },
         {
           "id": "pb_back",
@@ -1061,7 +1061,7 @@
           "itemId": "edwins_notebook",
           "onceOnly": true,
           "description": "A leather notebook tucked behind the lighting board's hidden compartment. The first page reads: 'The Ghost Project — E.H.' Pages of research, timelines, diagrams of the theater's hidden passage system.",
-          "showWhen": "catwalk_access"
+          "showWhen": "edwins_notebook"
         },
         {
           "id": "cw_view_down",

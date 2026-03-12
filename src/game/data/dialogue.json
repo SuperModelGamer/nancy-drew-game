@@ -178,9 +178,36 @@
             { "speaker": "Vivian", "text": "..." },
             { "speaker": "Vivian", "text": "That's... that's me. I was four years old." },
             { "speaker": "Vivian", "text": "'To my little star.' She called me that. Every time she held me." },
-            { "speaker": "Vivian", "text": "She kept it in the trunk. All these years. She locked it away because she knew... she knew she wouldn't be coming back." },
+            { "speaker": "Vivian", "text": "She kept it in the trunk. All these years. She locked it away because she knew... she knew she wouldn't be coming back." }
+          ],
+          "choices": [
+            {
+              "text": "She wanted to protect what mattered most.",
+              "nextNode": "locket_comfort"
+            },
+            {
+              "text": "Vivian — do you know who killed her?",
+              "nextNode": "locket_suspicion"
+            }
+          ]
+        },
+        {
+          "id": "locket_comfort",
+          "lines": [
             { "speaker": "Nancy", "text": "She wanted to protect what mattered most." },
-            { "speaker": "Vivian", "text": "I've been waiting seventy years to know what happened to her. I've lived my whole life in this theater because I couldn't leave her behind. Don't let this building come down without the truth coming out. Please." }
+            { "speaker": "Vivian", "text": "I've been waiting seventy years to know what happened to her. I've lived my whole life in this theater because I couldn't leave her behind." },
+            { "speaker": "Vivian", "text": "There are private archives in my office — Margaux's personal effects, letters, photographs. I've never let anyone touch them. Take whatever you need." },
+            { "speaker": "Vivian", "text": "Don't let this building come down without the truth coming out. Please." }
+          ],
+          "triggerEvent": "vivian_full_trust"
+        },
+        {
+          "id": "locket_suspicion",
+          "lines": [
+            { "speaker": "Vivian", "text": "I was four years old when she died. I remember the screaming. I remember someone carrying me out of the theater." },
+            { "speaker": "Vivian", "text": "I've always suspected Cecilia. She was the understudy. She took the role. She never looked back. But I could never prove it." },
+            { "speaker": "Nancy", "text": "I'm going to find the proof. I promise." },
+            { "speaker": "Vivian", "text": "My office — there are private archives. Margaux's personal effects. Take whatever you need. Just bring me the truth." }
           ],
           "triggerEvent": "vivian_full_trust"
         }
@@ -517,8 +544,36 @@
           "lines": [
             { "speaker": "Stella", "text": "I knew about the passages — the effects manual mentions them. But I've never seen a complete map like this." },
             { "speaker": "Stella", "text": "Look — this passage connects the basement to the dressing room. And this one goes from behind the orchestra pit to the lobby. Someone could move through the entire building without ever being seen in the open." },
-            { "speaker": "Nancy", "text": "Someone like our ghost." },
-            { "speaker": "Stella", "text": "Exactly. And if you want to get to the catwalk, I can unlock the ladder for you. There's a lighting board up there that controls the whole stage. If someone's been running a light show, that's where they set it up." }
+            { "speaker": "Nancy", "text": "Someone like our ghost." }
+          ],
+          "choices": [
+            {
+              "text": "Have you ever been in the passages yourself?",
+              "nextNode": "stella_passage_experience"
+            },
+            {
+              "text": "Can you get me to the catwalk?",
+              "nextNode": "stella_catwalk"
+            }
+          ]
+        },
+        {
+          "id": "stella_passage_experience",
+          "lines": [
+            { "speaker": "Stella", "text": "Once. Last month I heard footsteps behind the backstage wall at 2 AM. I told myself it was the building settling." },
+            { "speaker": "Stella", "text": "But buildings don't settle in rhythm. Someone was walking. And they knew exactly where they were going." },
+            { "speaker": "Nancy", "text": "Someone who's studied these blueprints." },
+            { "speaker": "Stella", "text": "There's only one person who knows this theater well enough to navigate those passages in the dark. And he's been here every day for fifteen years." },
+            { "speaker": "Stella", "text": "You need to get to the catwalk. I'll unlock the ladder for you. There's a lighting board up there — if someone's been running a light show, that's where they set it up." }
+          ],
+          "triggerEvent": "catwalk_access"
+        },
+        {
+          "id": "stella_catwalk",
+          "lines": [
+            { "speaker": "Stella", "text": "Exactly what I was thinking. I'll unlock the ladder for you. There's a lighting board up there that controls the whole stage. If someone's been running a light show, that's where they set it up." },
+            { "speaker": "Nancy", "text": "Thank you, Stella. You've been more helpful than you know." },
+            { "speaker": "Stella", "text": "Just... be careful up there. The catwalk is original 1920s construction. And whatever you find — remember that not everyone in this theater is a villain. Some of us are just trying to survive." }
           ],
           "triggerEvent": "catwalk_access"
         }
@@ -907,6 +962,14 @@
               "nextNode": "historical_society"
             },
             {
+              "text": "Call Ned.",
+              "nextNode": "ned"
+            },
+            {
+              "text": "Try the Hardy boys' number.",
+              "nextNode": "hardy_boys"
+            },
+            {
               "text": "Hang up.",
               "nextNode": "hangup"
             }
@@ -918,7 +981,11 @@
             { "speaker": "Bess", "text": "Nancy! How's the haunted theater? George and I looked it up — the Monarch Theatre was designed by the same architect who built the Ryerson Opera House. He loved hidden passages." },
             { "speaker": "George", "text": "I ran some searches. Cecilia Drake had a long career after 1928. She won three theater awards and never once mentioned Margaux Fontaine in any interview. Not once in forty years." },
             { "speaker": "Bess", "text": "That's suspicious, right? If your mentor died tragically and you took over her role, you'd at least mention her?" },
-            { "speaker": "Nancy", "text": "Unless you had a reason to forget her. Thanks, you two. I'll call back when I know more." }
+            { "speaker": "Nancy", "text": "Definitely. Oh — the stage tech here, Diego, has been really helpful. He knows the theater inside and out." },
+            { "speaker": "Bess", "text": "Diego? Is he cute?" },
+            { "speaker": "George", "text": "Bess!" },
+            { "speaker": "Bess", "text": "What? It's a valid investigative question!" },
+            { "speaker": "Nancy", "text": "I'll call back when I know more. About the case, Bess. The case." }
           ],
           "nextNode": "start",
           "triggerEvent": "called_friends"
@@ -948,6 +1015,27 @@
           ],
           "nextNode": "start",
           "triggerEvent": "called_historical_society"
+        },
+        {
+          "id": "ned",
+          "lines": [
+            { "speaker": "Ned", "text": "Nancy! I was hoping you'd call. How's the haunted theater?" },
+            { "speaker": "Nancy", "text": "Complicated. There's a murder from 1928, a modern poisoning, a fake ghost, and the building might be demolished in three days." },
+            { "speaker": "Ned", "text": "So... a normal Tuesday for you. Just promise me you'll be careful? Old buildings have a way of falling apart at the worst possible moment." },
+            { "speaker": "Nancy", "text": "I always am. Well, mostly." },
+            { "speaker": "Ned", "text": "That's what worries me. Call me when you solve it — I know you will." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "called_ned"
+        },
+        {
+          "id": "hardy_boys",
+          "lines": [
+            { "speaker": "Nancy", "text": "I dial a number I've had memorized for years. It rings twice, then clicks to voicemail." },
+            { "speaker": "Nancy", "text": "'You've reached Frank and Joe Hardy. We're probably on a case. Leave a message and we'll call you back — unless we're tied up. Literally. Again.' *beep*" },
+            { "speaker": "Nancy", "text": "Hey, it's Nancy. I'm at the Monarch Theatre in River Heights — haunted theater, 1928 murder, the works. If you're ever in town, I could use a second opinion. Or a third. Talk soon." }
+          ],
+          "nextNode": "start"
         },
         {
           "id": "hangup",

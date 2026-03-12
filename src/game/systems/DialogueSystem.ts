@@ -55,6 +55,7 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
   called_friends: 'Called Bess and George — Bess is researching antimony poisoning, George is looking into the Hale family history.',
   called_dad: 'Called Dad. He said antimony poisoning cases from the 1920s were often ruled accidental. The police may not have investigated Margaux\'s death properly.',
   called_historical_society: 'The Historical Society confirmed the Monarch is eligible for landmark status — which would block Ashworth\'s demolition. Someone doesn\'t want that to happen.',
+  called_ned: 'Called Ned. He told me to be careful — old buildings fall apart at the worst moments. He\'s right, but I can\'t stop now.',
 };
 
 export class DialogueSystem {
@@ -308,6 +309,7 @@ export class DialogueSystem {
       'Bess': '#d4a0b4',
       'George': '#a0c9a0',
       'Carson Drew': '#c9b87b',
+      'Ned': '#7bb5c9',
       'Receptionist': '#8a8a8a',
     };
     return colors[speaker] || TextColors.gold;

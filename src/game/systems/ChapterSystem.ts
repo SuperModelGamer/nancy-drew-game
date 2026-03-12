@@ -95,6 +95,12 @@ export class ChapterSystem {
       if (allMet) {
         save.setChapter(milestone.chapter);
         save.addJournalEntry(milestone.journalEntry);
+
+        // When Chapter 5 begins, unlock the evidence board in the basement
+        if (milestone.chapter === 5) {
+          save.setFlag('case_near_close', true);
+        }
+
         save.save();
         newChapter = milestone.chapter;
       }
