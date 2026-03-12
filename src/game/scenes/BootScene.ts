@@ -126,11 +126,23 @@ export class BootScene extends Phaser.Scene {
       this.load.audio(key, [`audio/${key}.mp3`, `audio/${key}.ogg`]);
     }
 
+    // Load dialogue UI assets (optional — procedural fallbacks exist)
+    const dlgAssets: Record<string, string> = {
+      dlg_box: 'dialogue-box',
+      dlg_nameplate: 'nameplate',
+      dlg_portrait_frame: 'portrait-frame-lg',
+      dlg_choice_btn: 'choice-btn',
+      dlg_continue_arrow: 'continue-arrow',
+    };
+    for (const [key, filename] of Object.entries(dlgAssets)) {
+      this.load.image(key, `assets/ui/dialogue/${filename}.png`);
+    }
+
     // Suppress load errors for optional intro assets (images + audio)
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       if (file.key.startsWith('intro_') || file.key.startsWith('sfx_') ||
           file.key.startsWith('ambient_') || file.key.startsWith('music_') ||
-          file.key.startsWith('ui_')) {
+          file.key.startsWith('ui_') || file.key.startsWith('dlg_')) {
         // Silently ignore — intro works without these assets
         return;
       }
