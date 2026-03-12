@@ -11,6 +11,7 @@ import { drawRoomBackground } from '../utils/room-backgrounds';
 import { showTutorialIfNeeded } from '../utils/tutorial';
 import { Cursors, CursorType, HAND_CURSOR } from '../utils/cursors';
 import { addAmbientParticles } from '../utils/ambient-particles';
+import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 import itemsData from '../data/items.json';
 import { UISounds } from '../utils/sounds';
 
@@ -74,41 +75,8 @@ export class RoomScene extends Phaser.Scene {
     // Ambient atmosphere particles
     addAmbientParticles(this, this.currentRoom.id);
 
-    // ─── Header gradient strip behind room name ───
-    const headerGrad = this.add.graphics();
-    for (let i = 0; i < 70; i++) {
-      const alpha = 0.7 * (1 - i / 70);
-      headerGrad.fillStyle(0x0a0a12, alpha);
-      headerGrad.fillRect(0, i, width, 1);
-    }
-    headerGrad.setDepth(1);
-
-    // Room name banner (on top of header gradient)
-    const banner = this.add.text(width / 2, 30, this.currentRoom.name, {
-      fontFamily: FONT,
-      fontSize: '20px',
-      color: TextColors.gold,
-    });
-    banner.setOrigin(0.5);
-    banner.setDepth(2);
-
-    // Room description on first visit
-    const descText = this.add.text(width / 2, 58, this.currentRoom.description, {
-      fontFamily: FONT,
-      fontSize: '12px',
-      color: TextColors.goldDim,
-      fontStyle: 'italic',
-      wordWrap: { width: width * 0.8 },
-      align: 'center',
-    });
-    descText.setOrigin(0.5, 0);
-    descText.setDepth(2);
-    this.tweens.add({
-      targets: descText,
-      alpha: 0,
-      delay: 4000,
-      duration: 1000,
-    });
+    // ─── Room Entry Announcement (centered, click-to-continue) ───
+    this.showRoomAnnouncement(width, height);
 
     // Create hotspots (filtered by showWhen)
     this.createHotspots();
@@ -225,7 +193,7 @@ export class RoomScene extends Phaser.Scene {
       // Label starts hidden, fades in on hover
       const label = this.add.text(0, h / 2 + 10, hotspot.label, {
         fontFamily: FONT,
-        fontSize: '12px',
+        fontSize: '14px',
         color: TextColors.gold,
         align: 'center',
       });
@@ -574,6 +542,108 @@ export class RoomScene extends Phaser.Scene {
       ease: 'Power2',
       onComplete: () => onComplete(),
     });
+  }
+
+  private showRoomAnnouncement(width: number, height: number): void {
+    const container = this.add.container(0, 0);
+    container.setDepth(Depths.scriptedEvent - 1); // High z-order, just below scripted events
+
+    // Full-screen dark overlay
+    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
+    container.add(overlay);
+
+    // Decorative elements
+    const gfx = this.add.graphics();
+    container.add(gfx);
+
+    // Room name — large, centered, gold
+    const roomName = this.add.text(width / 2, height * 0.38, this.currentRoom.name.toUpperCase(), {
+      fontFamily: FONT,
+      fontSize: '36px',
+      color: DecoTextColors.goldBright,
+      fontStyle: 'bold',
+      letterSpacing: 6,
+      align: 'center',
+      shadow: {
+        offsetX: 0,
+        offsetY: 0,
+        color: '#c9a84c',
+        blur: 10,
+        fill: true,
+      },
+    }).setOrigin(0.5);
+    container.add(roomName);
+
+    // Decorative divider above name
+    drawDecoDivider(gfx, width / 2, height * 0.38 - 32, width * 0.4, DecoColors.gold, 0.5);
+
+    // Decorative divider below name
+    drawDecoDivider(gfx, width / 2, height * 0.38 + 32, width * 0.4, DecoColors.gold, 0.5);
+
+    // Room description — readable size, centered below
+    const desc = this.add.text(width / 2, height * 0.52, this.currentRoom.description, {
+      fontFamily: FONT,
+      fontSize: '17px',
+      color: DecoTextColors.cream,
+      fontStyle: 'italic',
+      wordWrap: { width: width * 0.65 },
+      align: 'center',
+      lineSpacing: 6,
+    }).setOrigin(0.5);
+    container.add(desc);
+
+    // "Click to continue" prompt
+    const prompt = this.add.text(width / 2, height * 0.72, '— Click to continue —', {
+      fontFamily: FONT,
+      fontSize: '14px',
+      color: DecoTextColors.goldDim,
+      fontStyle: 'italic',
+    }).setOrigin(0.5);
+    container.add(prompt);
+
+    // Pulse the prompt
+    this.tweens.add({
+      targets: prompt,
+      alpha: { from: 1, to: 0.4 },
+      duration: 1000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+
+    // Fade in the whole announcement
+    container.setAlpha(0);
+    this.tweens.add({
+      targets: container,
+      alpha: 1,
+      duration: 400,
+      ease: 'Power2',
+    });
+
+    // Click anywhere to dismiss
+    overlay.setInteractive({ cursor: HAND_CURSOR });
+    overlay.on('pointerdown', () => {
+      this.tweens.add({
+        targets: container,
+        alpha: 0,
+        duration: 300,
+        onComplete: () => container.destroy(),
+      });
+    });
+
+    // Also allow spacebar/enter to dismiss
+    const dismissKey = (event: KeyboardEvent) => {
+      if (event.code === 'Space' || event.code === 'Enter') {
+        this.tweens.add({
+          targets: container,
+          alpha: 0,
+          duration: 300,
+          onComplete: () => container.destroy(),
+        });
+        this.input.keyboard!.off('keydown', dismissKey);
+      }
+    };
+    this.input.keyboard!.on('keydown', dismissKey);
   }
 
   private navigateToRoom(roomId: string): void {

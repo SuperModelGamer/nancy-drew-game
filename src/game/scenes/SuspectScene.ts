@@ -4,6 +4,7 @@ import { DialogueSystem } from '../systems/DialogueSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
+import { drawArtDecoFrame, drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 
 interface SuspectProfile {
   id: string;
@@ -133,33 +134,45 @@ export class SuspectScene extends Phaser.Scene {
     const panelX = width / 2;
     const panelY = panelH / 2 + 8;
 
-    // Background — aged dark leather dossier
-    const bg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x12111a, 0.97);
-    bg.setStrokeStyle(1.5, Colors.gold, 0.35);
-    this.container.add(bg);
+    // Background — art deco framed dossier
+    const panelLeft = panelX - panelW / 2;
+    const panelTop = panelY - panelH / 2;
+    const decoFrame = drawArtDecoFrame(this, panelLeft, panelTop, panelW, panelH, {
+      color: DecoColors.gold,
+      alpha: 0.4,
+      cornerSize: 32,
+      doubleBorder: true,
+      fillColor: DecoColors.navyMid,
+      fillAlpha: 0.97,
+    });
+    this.container.add(decoFrame);
 
     // ─── Header bar ───
-    const headerH = 44;
+    const headerH = 48;
     const headerY = panelY - panelH / 2 + headerH / 2;
 
-    const headerBg = this.add.rectangle(panelX, headerY, panelW - 2, headerH, 0x0e0d16, 1);
+    const headerBg = this.add.rectangle(panelX, headerY, panelW - 8, headerH, DecoColors.navy, 1);
     this.container.add(headerBg);
+
+    // Header bottom border
+    const headerLine = this.add.graphics();
+    headerLine.lineStyle(1, DecoColors.gold, 0.3);
+    headerLine.lineBetween(panelLeft + 4, panelTop + headerH, panelLeft + panelW - 4, panelTop + headerH);
+    this.container.add(headerLine);
 
     const title = this.add.text(panelX, headerY, 'CASE FILE — SUSPECT DOSSIERS', {
       fontFamily: FONT,
-      fontSize: '15px',
-      color: TextColors.gold,
+      fontSize: '16px',
+      color: DecoTextColors.goldBright,
       fontStyle: 'bold',
-      letterSpacing: 4,
+      letterSpacing: 5,
     }).setOrigin(0.5);
     this.container.add(title);
 
-    // Decorative lines
-    const lineGfx = this.add.graphics();
-    lineGfx.lineStyle(1, Colors.gold, 0.25);
-    lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - 200, headerY);
-    lineGfx.lineBetween(panelX + 200, headerY, panelX + panelW / 2 - 20, headerY);
-    this.container.add(lineGfx);
+    // Decorative divider flanking title
+    const divGfxHeader = this.add.graphics();
+    drawDecoDivider(divGfxHeader, panelX, headerY, panelW * 0.6, DecoColors.gold, 0.25);
+    this.container.add(divGfxHeader);
 
     // Close button
     if (this.textures.exists('ui_close_btn')) {
@@ -347,7 +360,7 @@ export class SuspectScene extends Phaser.Scene {
       chipBg.setStrokeStyle(1, suspect.color, 0.2);
       this.container.add(chipBg);
       const chipLabel = this.add.text(portraitX, chipY, `${chip.icon}  ${chip.label}`, {
-        fontFamily: FONT, fontSize: '12px', color: TextColors.goldDim,
+        fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim,
       }).setOrigin(0.5);
       this.container.add(chipLabel);
     });
@@ -375,7 +388,7 @@ export class SuspectScene extends Phaser.Scene {
     }
 
     this.container.add(this.add.text(portraitX, progressY + 14, `${discovered} / ${total} facts discovered`, {
-      fontFamily: FONT, fontSize: '11px', color: TextColors.muted, fontStyle: 'italic',
+      fontFamily: FONT, fontSize: '13px', color: TextColors.muted, fontStyle: 'italic',
     }).setOrigin(0.5));
 
     // ── Right column: Known Facts ──
@@ -399,10 +412,9 @@ export class SuspectScene extends Phaser.Scene {
       letterSpacing: 3,
     }));
 
-    // Divider under header
+    // Divider under header (art deco)
     const divGfx = this.add.graphics();
-    divGfx.lineStyle(1, Colors.gold, 0.2);
-    divGfx.lineBetween(rightX + 20, factsHeaderY + 22, rightX + rightW - 20, factsHeaderY + 22);
+    drawDecoDivider(divGfx, rightCx, factsHeaderY + 22, rightW - 40, DecoColors.gold, 0.25);
     this.container.add(divGfx);
 
     // Facts list
