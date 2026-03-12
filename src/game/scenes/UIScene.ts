@@ -30,6 +30,8 @@ export class UIScene extends Phaser.Scene {
   private selectedItemId: string | null = null;
   // Track items container for refresh
   private itemsGrid!: Phaser.GameObjects.Container;
+  // Cached layout dimensions from createInventoryPanel
+  private layout = { leftX: 0, contentTop: 0, contentH: 0, leftW: 0, rightW: 0, rightX: 0 };
 
   constructor() {
     super({ key: 'UIScene' });
@@ -128,6 +130,7 @@ export class UIScene extends Phaser.Scene {
     this.inventoryOpen = !this.inventoryOpen;
     if (this.inventoryOpen) {
       UISounds.panelOpen();
+      this.resetDetailPanel();
       this.refreshInventoryGrid();
       this.inventoryContainer.setVisible(true);
       this.inventoryContainer.setAlpha(0);
@@ -297,12 +300,7 @@ export class UIScene extends Phaser.Scene {
     container.add(hint);
 
     // Store layout info for refresh
-    container.setData('leftX', leftX);
-    container.setData('contentTop', contentTop);
-    container.setData('contentH', contentH);
-    container.setData('leftW', leftW);
-    container.setData('rightW', rightW);
-    container.setData('rightX', rightX);
+    this.layout = { leftX, contentTop, contentH, leftW, rightW, rightX };
 
     return container;
   }
@@ -315,10 +313,7 @@ export class UIScene extends Phaser.Scene {
     const items = inventory.getItems();
     const selectedItem = inventory.getSelectedItem();
 
-    const leftX = this.inventoryContainer.getData('leftX') as number;
-    const contentTop = this.inventoryContainer.getData('contentTop') as number;
-    const contentH = this.inventoryContainer.getData('contentH') as number;
-    const leftW = this.inventoryContainer.getData('leftW') as number;
+    const { leftX, contentTop, contentH, leftW } = this.layout;
 
     // Grid layout: 3 columns
     const cols = 3;
@@ -370,10 +365,7 @@ export class UIScene extends Phaser.Scene {
       let icon: Phaser.GameObjects.GameObject;
       if (this.textures.exists(iconKey)) {
         const img = this.add.image(x, y, iconKey);
-        // Scale to fit while maintaining aspect ratio
-        const tex = this.textures.get(iconKey).getSourceImage();
-        const scale = Math.min(imgSize / tex.width, imgSize / tex.height);
-        img.setScale(scale);
+        this.scaleImageToFit(img, imgSize);
         icon = img;
       } else {
         icon = this.add.text(x, y, itemData.icon || '?', {
@@ -430,6 +422,21 @@ export class UIScene extends Phaser.Scene {
     });
   }
 
+  private resetDetailPanel(): void {
+    this.selectedItemId = null;
+    this.detailPlaceholder.setVisible(true);
+    this.detailName.setVisible(false);
+    this.detailKeyBadge.setVisible(false);
+    this.detailDesc.setVisible(false);
+    if (this.detailImage) this.detailImage.setVisible(false);
+  }
+
+  private scaleImageToFit(img: Phaser.GameObjects.Image, maxSize: number): void {
+    const tex = img.texture.getSourceImage();
+    const scale = Math.min(maxSize / tex.width, maxSize / tex.height);
+    img.setScale(scale);
+  }
+
   private showItemDetail(itemId: string): void {
     if (this.selectedItemId === itemId) return;
     this.selectedItemId = itemId;
@@ -437,9 +444,7 @@ export class UIScene extends Phaser.Scene {
     const itemData = itemMap.get(itemId);
     if (!itemData) return;
 
-    const rightX = this.inventoryContainer.getData('rightX') as number;
-    const rightW = this.inventoryContainer.getData('rightW') as number;
-    const contentTop = this.inventoryContainer.getData('contentTop') as number;
+    const { rightX, rightW, contentTop } = this.layout;
     const detailCenterX = rightX + rightW / 2;
 
     // Hide placeholder
@@ -470,13 +475,12 @@ export class UIScene extends Phaser.Scene {
         this.detailImage = img;
         this.inventoryContainer.add(img);
       }
-      const tex = this.textures.get(iconKey).getSourceImage();
-      const scale = Math.min(imgMaxSize / tex.width, imgMaxSize / tex.height);
-      this.detailImage.setScale(scale);
+      this.scaleImageToFit(this.detailImage, imgMaxSize);
       this.detailImage.setVisible(true);
 
       // Position description below image
-      const imgBottom = descY + 20 + tex.height * scale + 16;
+      const tex = this.detailImage.texture.getSourceImage();
+      const imgBottom = descY + 20 + tex.height * this.detailImage.scaleY + 16;
       this.detailDesc.setPosition(detailCenterX, imgBottom);
     } else {
       if (this.detailImage) this.detailImage.setVisible(false);
