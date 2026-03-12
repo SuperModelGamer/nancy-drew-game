@@ -61,10 +61,10 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
 // ─── Layout Constants ───────────────────────────────────────────────────────
 const PORTRAIT_W = 160;
 const PORTRAIT_H = 200;
-const BOX_H = 220;
+const BOX_H = 200;
 const TEXT_SIZE = '20px';
 const SPEAKER_SIZE = '22px';
-const CHOICE_H = 52;
+const CHOICE_H = 56;
 const CHOICE_FONT = '17px';
 const TYPEWRITER_SPEED = 28; // ms per character
 
@@ -188,9 +188,29 @@ export class DialogueSystem {
 
     // ── Dialogue box background ──
     if (this.scene.textures.exists('dlg_box')) {
-      const boxBg = this.scene.add.image(width / 2, boxCenterY, 'dlg_box');
-      boxBg.setDisplaySize(boxW, BOX_H);
+      // The art deco banner asset is wide and thin — use it as a decorative frame
+      // scaled to fill width, with proportional height to preserve the gold corners
+      const tex = this.scene.textures.get('dlg_box').getSourceImage();
+      const assetRatio = tex.width / tex.height;
+      const bannerH = Math.round(boxW / assetRatio);
+
+      // Dark fill behind the full dialogue area (extends below the banner)
+      const bgGfx = this.scene.add.graphics();
+      const boxTop = boxCenterY - BOX_H / 2;
+      bgGfx.fillStyle(0x0e0c14, 0.92);
+      bgGfx.fillRoundedRect(boxLeft + 4, boxTop + bannerH * 0.4, boxW - 8, BOX_H - bannerH * 0.4 + 4, 4);
+      this.container.add(bgGfx);
+
+      // Art deco banner at the top of the dialogue area
+      const boxBg = this.scene.add.image(width / 2, boxTop + bannerH / 2, 'dlg_box');
+      boxBg.setDisplaySize(boxW, bannerH);
       this.container.add(boxBg);
+
+      // Bottom border line
+      const borderGfx = this.scene.add.graphics();
+      borderGfx.lineStyle(1.5, Colors.gold, 0.3);
+      borderGfx.lineBetween(boxLeft + 16, boxTop + BOX_H, boxLeft + boxW - 16, boxTop + BOX_H);
+      this.container.add(borderGfx);
     } else {
       // Procedural fallback: dark panel with gold border and inner glow
       const gfx = this.scene.add.graphics();
@@ -236,8 +256,13 @@ export class DialogueSystem {
 
       // Portrait frame (image or procedural)
       if (this.scene.textures.exists('dlg_portrait_frame')) {
-        const frame = this.scene.add.image(portraitX, portraitY, 'dlg_portrait_frame');
-        frame.setDisplaySize(PORTRAIT_W + 20, PORTRAIT_H + 20);
+        const frame = this.scene.add.image(portraitX, portraitY - 8, 'dlg_portrait_frame');
+        // Preserve the frame's aspect ratio (has crown accent at top)
+        const frameTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
+        const frameRatio = frameTex.width / frameTex.height;
+        const frameH = PORTRAIT_H + 30;
+        const frameW = frameH * frameRatio;
+        frame.setDisplaySize(frameW, frameH);
         this.container.add(frame);
       } else {
         // Procedural frame
@@ -292,8 +317,13 @@ export class DialogueSystem {
     const speakerColor = this.getSpeakerColor(line.speaker);
 
     if (this.scene.textures.exists('dlg_nameplate')) {
-      const nameplate = this.scene.add.image(textAreaLeft + 80, nameplateY, 'dlg_nameplate');
-      nameplate.setDisplaySize(200, 40);
+      // Preserve art deco banner proportions
+      const npTex = this.scene.textures.get('dlg_nameplate').getSourceImage();
+      const npRatio = npTex.width / npTex.height;
+      const npH = 42;
+      const npW = npH * npRatio;
+      const nameplate = this.scene.add.image(textAreaLeft + npW / 2 - 8, nameplateY, 'dlg_nameplate');
+      nameplate.setDisplaySize(npW, npH);
       nameplate.setOrigin(0.5);
       this.container.add(nameplate);
     } else {
@@ -488,7 +518,12 @@ export class DialogueSystem {
 
       if (this.scene!.textures.exists('dlg_choice_btn')) {
         btn = this.scene!.add.image(width / 2, y, 'dlg_choice_btn');
-        (btn as Phaser.GameObjects.Image).setDisplaySize(choiceW, CHOICE_H);
+        // Preserve the art deco banner's aspect ratio
+        const btnTex = this.scene!.textures.get('dlg_choice_btn').getSourceImage();
+        const btnRatio = btnTex.width / btnTex.height;
+        const btnH = CHOICE_H;
+        const btnW = Math.min(choiceW, btnH * btnRatio);
+        (btn as Phaser.GameObjects.Image).setDisplaySize(btnW, btnH);
       } else {
         // Procedural fallback
         btn = this.scene!.add.rectangle(width / 2, y, choiceW, CHOICE_H, 0x0e0c14, 0.92);
