@@ -129,8 +129,9 @@ export class RoomScene extends Phaser.Scene {
       this.checkScriptedEvents();
     });
 
-    // Hotspot editor toggle (backtick key)
-    this.input.keyboard!.on('keydown-BACKQUOTE', () => {
+    // Hotspot editor toggle (Shift+Q)
+    this.input.keyboard!.on('keydown-Q', (event: KeyboardEvent) => {
+      if (!event.shiftKey) return;
       if (this.scene.isActive('HotspotEditorScene')) {
         this.scene.stop('HotspotEditorScene');
       } else {
@@ -428,56 +429,82 @@ export class RoomScene extends Phaser.Scene {
   private showDescription(text: string): void {
     const { width, height } = this.cameras.main;
 
-    // Update and show the description box
-    const textObj = this.descriptionBox.getAt(1) as Phaser.GameObjects.Text;
+    // Update text
+    const textObj = this.descriptionBox.getAt(2) as Phaser.GameObjects.Text;
     textObj.setText(text);
 
-    // Resize background to fit text
-    const bg = this.descriptionBox.getAt(0) as Phaser.GameObjects.Rectangle;
+    // Resize panel background to fit text
+    const bg = this.descriptionBox.getAt(1) as Phaser.GameObjects.Rectangle;
+    const maxW = Math.min(800, width * 0.7);
+    textObj.setWordWrapWidth(maxW - 80);
     const textHeight = textObj.height;
-    bg.setSize(width * 0.8, Math.max(50, textHeight + 30));
+    const boxW = maxW;
+    const boxH = Math.max(100, textHeight + 70);
+    bg.setSize(boxW, boxH);
 
-    // Position above the toolbar bar (52px bar + 10px margin)
-    this.descriptionBox.setPosition(width / 2, height - 90);
+    // Resize the overlay
+    const overlay = this.descriptionBox.getAt(0) as Phaser.GameObjects.Rectangle;
+    overlay.setSize(width, height);
+
+    // Prompt text at bottom of box
+    const prompt = this.descriptionBox.getAt(3) as Phaser.GameObjects.Text;
+    prompt.setPosition(0, boxH / 2 - 20);
+
+    // Center on screen
+    this.descriptionBox.setPosition(width / 2, height / 2);
     this.descriptionBox.setVisible(true);
     this.descriptionBox.setAlpha(0);
 
     this.tweens.add({
       targets: this.descriptionBox,
       alpha: 1,
-      duration: 200,
+      duration: 250,
     });
+  }
 
-    // Auto-hide based on text length
-    const displayTime = Math.max(3000, text.length * 40);
-    this.time.delayedCall(displayTime, () => {
-      this.tweens.add({
-        targets: this.descriptionBox,
-        alpha: 0,
-        duration: 300,
-        onComplete: () => this.descriptionBox.setVisible(false),
-      });
+  private dismissDescription(): void {
+    if (!this.descriptionBox.visible) return;
+    this.tweens.add({
+      targets: this.descriptionBox,
+      alpha: 0,
+      duration: 200,
+      onComplete: () => this.descriptionBox.setVisible(false),
     });
   }
 
   private createDescriptionBox(): Phaser.GameObjects.Container {
-    const { width } = this.cameras.main;
-    const container = this.add.container(width / 2, 0);
+    const { width, height } = this.cameras.main;
+    const container = this.add.container(width / 2, height / 2);
 
-    const bg = this.add.rectangle(0, 0, width * 0.8, 50, 0x000000, 0.85);
-    bg.setStrokeStyle(1, Colors.gold, 0.5);
+    // Full-screen click-to-dismiss overlay
+    const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.6);
+    overlay.setInteractive({ cursor: POINTER_CURSOR });
+    overlay.on('pointerdown', () => this.dismissDescription());
 
-    const text = this.add.text(0, 0, '', {
+    // Centered panel
+    const bg = this.add.rectangle(0, 0, 800, 100, 0x0a0a14, 0.95);
+    bg.setStrokeStyle(2, Colors.gold, 0.5);
+
+    // Observation text
+    const text = this.add.text(0, -8, '', {
       fontFamily: FONT,
-      fontSize: '22px',
+      fontSize: '26px',
       color: TextColors.light,
       align: 'center',
-      wordWrap: { width: width * 0.75 },
-      lineSpacing: 3,
+      wordWrap: { width: 720 },
+      lineSpacing: 6,
     });
     text.setOrigin(0.5);
 
-    container.add([bg, text]);
+    // "Click to dismiss" prompt
+    const prompt = this.add.text(0, 0, '— click anywhere to continue —', {
+      fontFamily: FONT,
+      fontSize: '16px',
+      color: TextColors.muted,
+      fontStyle: 'italic',
+    }).setOrigin(0.5);
+
+    container.add([overlay, bg, text, prompt]);
     return container;
   }
 
