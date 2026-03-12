@@ -11,6 +11,7 @@ import { drawRoomBackground } from '../utils/room-backgrounds';
 import { showTutorialIfNeeded } from '../utils/tutorial';
 import { Cursors, CursorType, HAND_CURSOR } from '../utils/cursors';
 import { addAmbientParticles } from '../utils/ambient-particles';
+import itemsData from '../data/items.json';
 import { UISounds } from '../utils/sounds';
 
 interface Hotspot {
@@ -313,6 +314,11 @@ export class RoomScene extends Phaser.Scene {
             this.showDescription(`Picked up: ${hotspot.label}`);
             this.usedHotspots.add(hotspot.id);
             this.events.emit('item-picked-up', hotspot.itemId);
+            // Add journal entry for key evidence pickups
+            const item = itemsData.items.find(i => i.id === hotspot.itemId);
+            if (item) {
+              SaveSystem.getInstance().addJournalEntry(`Found ${item.name} in the ${this.currentRoom.name}.`);
+            }
           }
         }
         break;

@@ -457,6 +457,13 @@ export class PuzzleScene extends Phaser.Scene {
         }
       }
 
+      // Journal entry for solving the puzzle
+      if (puzzle) {
+        SaveSystem.getInstance().addJournalEntry(
+          `Solved "${puzzle.name}" — ${puzzle.unlocks === 'case_closed' ? 'the full timeline is clear now.' : 'this reveals new evidence.'}`
+        );
+      }
+
       // Close after a moment
       this.time.delayedCall(1500, () => {
         if (this.onSolvedCallback) this.onSolvedCallback();
