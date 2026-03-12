@@ -258,7 +258,7 @@ export class PuzzleScene extends Phaser.Scene {
     });
 
     // Clear button
-    const clearBtn = this.add.text(-60, btnY + 55, 'Clear', {
+    const clearBtn = this.add.text(-90, btnY + 83, 'Clear', {
       fontFamily: FONT,
       fontSize: '21px',
       color: TextColors.goldDim,
@@ -272,7 +272,7 @@ export class PuzzleScene extends Phaser.Scene {
     this.panel.add(clearBtn);
 
     // Submit button
-    this.addSubmitButton(60, btnY + 55, () => {
+    this.addSubmitButton(90, btnY + 83, () => {
       const answer = this.sequenceInput.join('-');
       this.submitAnswer(answer);
     });
@@ -280,11 +280,11 @@ export class PuzzleScene extends Phaser.Scene {
 
   private buildTextInputUI(_panelW: number, _panelH: number): void {
     // Text display area
-    const inputBg = this.add.rectangle(0, 30, 300, 48, Colors.sceneBg, 0.9);
+    const inputBg = this.add.rectangle(0, 45, 450, 72, Colors.sceneBg, 0.9);
     inputBg.setStrokeStyle(2, Colors.gold, 0.6);
     this.panel.add(inputBg);
 
-    this.textDisplay = this.add.text(0, 30, '|', {
+    this.textDisplay = this.add.text(0, 45, '|', {
       fontFamily: FONT,
       fontSize: '33px',
       color: TextColors.light,
@@ -317,16 +317,16 @@ export class PuzzleScene extends Phaser.Scene {
     // On-screen keyboard for mobile — letter grid
     const letters = 'abcdefghijklmnopqrstuvwxyz0123456789 ';
     const cols = 10;
-    const keySize = 28;
-    const keySpacing = 30;
+    const keySize = 42;
+    const keySpacing = 45;
     const startX = -(cols - 1) * keySpacing / 2;
-    const startY = 80;
+    const startY = 120;
 
     letters.split('').forEach((char, i) => {
       const col = i % cols;
       const row = Math.floor(i / cols);
       const x = startX + col * keySpacing;
-      const y = startY + row * (keySize + 6);
+      const y = startY + row * (keySize + 9);
 
       const keyBg = this.add.rectangle(x, y, keySize, keySize, Colors.sceneBg, 0.8);
       keyBg.setStrokeStyle(1, Colors.gold, 0.4);
@@ -351,9 +351,9 @@ export class PuzzleScene extends Phaser.Scene {
     });
 
     // Backspace key
-    const bksX = startX + cols * keySpacing / 2 + 40;
-    const bksY = startY + 3 * (keySize + 6);
-    const bksBg = this.add.rectangle(bksX, bksY, 50, keySize, Colors.sceneBg, 0.8);
+    const bksX = startX + cols * keySpacing / 2 + 60;
+    const bksY = startY + 3 * (keySize + 9);
+    const bksBg = this.add.rectangle(bksX, bksY, 75, keySize, Colors.sceneBg, 0.8);
     bksBg.setStrokeStyle(1, Colors.gold, 0.4);
     bksBg.setInteractive({ cursor: POINTER_CURSOR });
     const bksText = this.add.text(bksX, bksY, '⌫', {
@@ -367,13 +367,13 @@ export class PuzzleScene extends Phaser.Scene {
     this.panel.add([bksBg, bksText]);
 
     // Submit
-    this.addSubmitButton(0, startY + 4 * (keySize + 6) + 10, () => {
+    this.addSubmitButton(0, startY + 4 * (keySize + 9) + 15, () => {
       this.submitAnswer(this.textInput);
     });
   }
 
   private addSubmitButton(x: number, y: number, onClick: () => void): void {
-    const btnBg = this.add.rectangle(x, y, 140, 44, Colors.gold, 0.2);
+    const btnBg = this.add.rectangle(x, y, 210, 66, Colors.gold, 0.2);
     btnBg.setStrokeStyle(2, Colors.gold, 0.7);
     btnBg.setInteractive({ cursor: POINTER_CURSOR });
 
@@ -477,7 +477,7 @@ export class PuzzleScene extends Phaser.Scene {
       // Shake effect
       this.tweens.add({
         targets: this.panel,
-        x: this.panel.x - 5,
+        x: this.panel.x - 8,
         duration: 50,
         yoyo: true,
         repeat: 3,
