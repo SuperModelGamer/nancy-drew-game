@@ -135,6 +135,34 @@ export class RoomScene extends Phaser.Scene {
         this.scene.launch('HotspotEditorScene', { roomId: this.currentRoom.id });
       }
     });
+
+    // Debug: Shift+U = unlock all rooms + max chapter (for hotspot editing)
+    this.input.keyboard!.on('keydown-U', (event: KeyboardEvent) => {
+      if (!event.shiftKey) return;
+      const save = SaveSystem.getInstance();
+      const allRooms = (roomsData.rooms as RoomData[]).map(r => r.id);
+      for (const id of allRooms) {
+        save.discoverRoom(id);
+      }
+      save.setChapter(5);
+      save.save();
+      console.log('%c[DEBUG] All rooms unlocked, chapter set to 5', 'color: #00ff88; font-weight: bold');
+      // Show confirmation toast
+      const toast = this.add.text(this.cameras.main.width / 2, 60, 'All rooms unlocked!', {
+        fontFamily: FONT,
+        fontSize: '16px',
+        color: '#00ff88',
+        backgroundColor: '#000000cc',
+        padding: { x: 12, y: 6 },
+      }).setOrigin(0.5).setDepth(999);
+      this.tweens.add({
+        targets: toast,
+        alpha: 0,
+        delay: 2000,
+        duration: 500,
+        onComplete: () => toast.destroy(),
+      });
+    });
   }
 
   private checkScriptedEvents(): void {
