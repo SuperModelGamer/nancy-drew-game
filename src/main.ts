@@ -20,11 +20,11 @@ const config: Phaser.Types.Core.GameConfig = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 1280,
-    height: 720,
+    width: 1920,
+    height: 1080,
     min: {
-      width: 320,
-      height: 180,
+      width: 480,
+      height: 270,
     },
   },
   scene: [BootScene, TitleScene, IntroScene, RoomScene, UIScene, PuzzleScene, ScriptedEventScene, SuspectScene, MapScene, EndingScene, EvidenceBoardScene, ChapterTransitionScene, HotspotEditorScene],

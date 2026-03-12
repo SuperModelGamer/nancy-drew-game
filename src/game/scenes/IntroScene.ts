@@ -263,7 +263,7 @@ export class IntroScene extends Phaser.Scene {
     // Skip hint (bottom right)
     this.skipHint = this.add.text(width - 20, height - 20, 'Click to continue', {
       fontFamily: FONT,
-      fontSize: '12px',
+      fontSize: '18px',
       color: TextColors.goldDim,
       fontStyle: 'italic',
     }).setOrigin(1, 1).setAlpha(0).setDepth(10);
@@ -271,7 +271,7 @@ export class IntroScene extends Phaser.Scene {
     // Skip button (top right)
     const skipBtn = this.add.text(width - 24, 24, 'SKIP ▸', {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.goldDim,
       letterSpacing: 2,
     }).setOrigin(1, 0).setAlpha(0).setDepth(10);
@@ -718,7 +718,7 @@ export class IntroScene extends Phaser.Scene {
       const line = lines[0] || '';
       const t = this.add.text(width / 2, startY + lineHeight, line, {
         fontFamily: FONT,
-        fontSize: '28px',
+        fontSize: '42px',
         color: TextColors.gold,
         fontStyle: 'italic',
         align: 'center',
@@ -749,7 +749,7 @@ export class IntroScene extends Phaser.Scene {
 
     let color: string = TextColors.light;
     let style = 'normal';
-    const size = '17px';
+    const size = '26px';
 
     if (isQuote) {
       color = TextColors.gold;

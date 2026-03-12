@@ -87,7 +87,7 @@ export class RoomScene extends Phaser.Scene {
     // Tooltip for hover
     this.tooltipText = this.add.text(0, 0, '', {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.white,
       backgroundColor: '#000000aa',
       padding: { x: 8, y: 4 },
@@ -103,7 +103,7 @@ export class RoomScene extends Phaser.Scene {
     // Selected item indicator (top-right)
     this.selectedItemIndicator = this.add.text(width - 20, 20, '', {
       fontFamily: FONT,
-      fontSize: '13px',
+      fontSize: '20px',
       color: TextColors.gold,
       fontStyle: 'italic',
     }).setOrigin(1, 0).setDepth(90);
@@ -152,7 +152,7 @@ export class RoomScene extends Phaser.Scene {
       // Show confirmation toast
       const toast = this.add.text(this.cameras.main.width / 2, 60, 'All rooms unlocked!', {
         fontFamily: FONT,
-        fontSize: '16px',
+        fontSize: '24px',
         color: '#00ff88',
         backgroundColor: '#000000cc',
         padding: { x: 12, y: 6 },
@@ -223,7 +223,7 @@ export class RoomScene extends Phaser.Scene {
       // Label starts hidden, fades in on hover
       const label = this.add.text(0, h / 2 + 10, hotspot.label, {
         fontFamily: FONT,
-        fontSize: '14px',
+        fontSize: '21px',
         color: TextColors.gold,
         align: 'center',
       });
@@ -469,7 +469,7 @@ export class RoomScene extends Phaser.Scene {
 
     const text = this.add.text(0, 0, '', {
       fontFamily: FONT,
-      fontSize: '15px',
+      fontSize: '22px',
       color: TextColors.light,
       align: 'center',
       wordWrap: { width: width * 0.75 },
@@ -589,7 +589,7 @@ export class RoomScene extends Phaser.Scene {
     // Room name — large, centered, gold (positioned below chandelier area)
     const roomName = this.add.text(width / 2, height * 0.45, this.currentRoom.name.toUpperCase(), {
       fontFamily: FONT,
-      fontSize: '36px',
+      fontSize: '54px',
       color: DecoTextColors.goldBright,
       fontStyle: 'bold',
       letterSpacing: 6,
@@ -613,7 +613,7 @@ export class RoomScene extends Phaser.Scene {
     // Room description — readable size, centered below
     const desc = this.add.text(width / 2, height * 0.58, this.currentRoom.description, {
       fontFamily: FONT,
-      fontSize: '17px',
+      fontSize: '26px',
       color: DecoTextColors.cream,
       fontStyle: 'italic',
       wordWrap: { width: width * 0.65 },
@@ -625,7 +625,7 @@ export class RoomScene extends Phaser.Scene {
     // "Click to continue" prompt
     const prompt = this.add.text(width / 2, height * 0.76, '— Click to continue —', {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: DecoTextColors.goldDim,
       fontStyle: 'italic',
     }).setOrigin(0.5);

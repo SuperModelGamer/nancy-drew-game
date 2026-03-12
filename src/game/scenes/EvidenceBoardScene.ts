@@ -57,67 +57,67 @@ export class EvidenceBoardScene extends Phaser.Scene {
     this.boardContainer.setDepth(Depths.evidenceContent);
 
     // Corkboard background
-    const boardW = Math.min(width * 0.92, 1000);
-    const boardH = Math.min(height * 0.85, 600);
+    const boardW = Math.min(width * 0.92, 1500);
+    const boardH = Math.min(height * 0.85, 900);
     const boardX = width / 2;
     const boardY = height / 2;
 
     const corkBg = this.add.rectangle(boardX, boardY, boardW, boardH, 0x6B4F2A, 0.97);
-    corkBg.setStrokeStyle(4, 0x4A3520);
+    corkBg.setStrokeStyle(6, 0x4A3520);
     this.boardContainer.add(corkBg);
 
     // Inner frame
-    const innerFrame = this.add.rectangle(boardX, boardY, boardW - 16, boardH - 16, 0x7B5F3A, 0.3);
-    innerFrame.setStrokeStyle(2, 0x8B6914, 0.5);
+    const innerFrame = this.add.rectangle(boardX, boardY, boardW - 24, boardH - 24, 0x7B5F3A, 0.3);
+    innerFrame.setStrokeStyle(3, 0x8B6914, 0.5);
     this.boardContainer.add(innerFrame);
 
     // Title
-    this.boardContainer.add(this.add.text(boardX, boardY - boardH / 2 + 30, 'Evidence Board', {
+    this.boardContainer.add(this.add.text(boardX, boardY - boardH / 2 + 45, 'Evidence Board', {
       fontFamily: FONT,
-      fontSize: '24px',
+      fontSize: '36px',
       color: TextColors.gold,
       fontStyle: 'bold',
     }).setOrigin(0.5));
 
     // Subtitle
-    this.boardContainer.add(this.add.text(boardX, boardY - boardH / 2 + 55, 'Arrange the evidence in chronological order to solve both cases', {
+    this.boardContainer.add(this.add.text(boardX, boardY - boardH / 2 + 82, 'Arrange the evidence in chronological order to solve both cases', {
       fontFamily: FONT,
-      fontSize: '13px',
+      fontSize: '20px',
       color: TextColors.light,
       fontStyle: 'italic',
     }).setOrigin(0.5));
 
     // Close button
-    const closeBtn = createCloseButton(this, boardX + boardW / 2 - 25, boardY - boardH / 2 + 20, () => this.scene.stop(), 44);
+    const closeBtn = createCloseButton(this, boardX + boardW / 2 - 38, boardY - boardH / 2 + 30, () => this.scene.stop(), 66);
     this.boardContainer.add(closeBtn);
 
     // Timeline labels
-    const timelineY = boardY - boardH / 2 + 85;
+    const timelineY = boardY - boardH / 2 + 127;
     this.boardContainer.add(this.add.text(boardX - boardW / 4, timelineY, '1928 — The Murder', {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: '#c97b7b',
       fontStyle: 'bold',
     }).setOrigin(0.5));
 
     this.boardContainer.add(this.add.text(boardX + boardW / 4, timelineY, 'Modern Day — The Cover-up', {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: '#7ba3c9',
       fontStyle: 'bold',
     }).setOrigin(0.5));
 
     // Timeline line
     const gfx = this.add.graphics();
-    gfx.lineStyle(2, Colors.gold, 0.4);
-    const lineY = timelineY + 20;
+    gfx.lineStyle(3, Colors.gold, 0.4);
+    const lineY = timelineY + 30;
     gfx.lineBetween(boardX - boardW / 2 + 50, lineY, boardX + boardW / 2 - 50, lineY);
     this.boardContainer.add(gfx);
 
     // Drop zones (6 slots)
-    const zoneW = 130;
-    const zoneH = 90;
-    const zoneY = timelineY + 80;
+    const zoneW = 195;
+    const zoneH = 135;
+    const zoneY = timelineY + 120;
     const zoneSpacing = (boardW - 100) / 6;
     const zoneStartX = boardX - boardW / 2 + 50 + zoneSpacing / 2;
 
@@ -128,9 +128,9 @@ export class EvidenceBoardScene extends Phaser.Scene {
       zone.setStrokeStyle(2, Colors.gold, 0.4);
       this.boardContainer.add(zone);
 
-      this.boardContainer.add(this.add.text(zx, zoneY - zoneH / 2 - 10, `${i + 1}`, {
+      this.boardContainer.add(this.add.text(zx, zoneY - zoneH / 2 - 15, `${i + 1}`, {
         fontFamily: FONT,
-        fontSize: '12px',
+        fontSize: '18px',
         color: TextColors.gold,
       }).setOrigin(0.5));
 
@@ -142,28 +142,28 @@ export class EvidenceBoardScene extends Phaser.Scene {
     this.boardContainer.add(this.stringGraphics);
 
     // Feedback text
-    this.feedbackText = this.add.text(boardX, boardY + boardH / 2 - 65, '', {
+    this.feedbackText = this.add.text(boardX, boardY + boardH / 2 - 97, '', {
       fontFamily: FONT,
-      fontSize: '15px',
+      fontSize: '22px',
       color: '#ff6b6b',
       align: 'center',
     }).setOrigin(0.5);
     this.boardContainer.add(this.feedbackText);
 
     // Hint text
-    this.hintText = this.add.text(boardX, boardY + boardH / 2 - 40, '', {
+    this.hintText = this.add.text(boardX, boardY + boardH / 2 - 60, '', {
       fontFamily: FONT,
-      fontSize: '13px',
+      fontSize: '20px',
       color: TextColors.goldDim,
       fontStyle: 'italic',
-      wordWrap: { width: boardW - 80 },
+      wordWrap: { width: boardW - 120 },
       align: 'center',
     }).setOrigin(0.5);
     this.boardContainer.add(this.hintText);
 
     // Shuffled evidence cards at bottom
     const shuffled = Phaser.Utils.Array.Shuffle([...EVIDENCE_CARDS]);
-    const cardY = boardY + boardH / 2 - 130;
+    const cardY = boardY + boardH / 2 - 195;
     const cardSpacing = (boardW - 80) / 6;
     const cardStartX = boardX - boardW / 2 + 40 + cardSpacing / 2;
 
@@ -193,7 +193,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
 
       // Find nearest zone
       let nearestZone = -1;
-      let nearestDist = 80;
+      let nearestDist = 120;
       this.dropZones.forEach((zone, i) => {
         const dist = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, zone.x, zone.y);
         if (dist < nearestDist && zone.cardId === null) {
@@ -239,33 +239,33 @@ export class EvidenceBoardScene extends Phaser.Scene {
     container.add(bg);
 
     // Push pin
-    container.add(this.add.ellipse(0, -h / 2 + 8, 10, 10, 0xcc2222, 0.9));
+    container.add(this.add.ellipse(0, -h / 2 + 12, 15, 15, 0xcc2222, 0.9));
 
     // Year tag
     const yearColor = card.year === '1928' ? '#8b1a1a' : '#1a4a8b';
-    container.add(this.add.text(w / 2 - 5, -h / 2 + 3, card.year, {
+    container.add(this.add.text(w / 2 - 8, -h / 2 + 5, card.year, {
       fontFamily: FONT,
-      fontSize: '9px',
+      fontSize: '14px',
       color: yearColor,
       fontStyle: 'bold',
     }).setOrigin(1, 0));
 
     // Icon
-    container.add(this.add.text(0, -15, card.icon, { fontSize: '22px' }).setOrigin(0.5));
+    container.add(this.add.text(0, -22, card.icon, { fontSize: '33px' }).setOrigin(0.5));
 
     // Label
     container.add(this.add.text(0, 8, card.label, {
       fontFamily: FONT,
-      fontSize: '10px',
+      fontSize: '15px',
       color: '#2a2a2a',
       fontStyle: 'bold',
       align: 'center',
     }).setOrigin(0.5));
 
     // Description
-    container.add(this.add.text(0, 28, card.description, {
+    container.add(this.add.text(0, 42, card.description, {
       fontFamily: FONT,
-      fontSize: '8px',
+      fontSize: '12px',
       color: '#4a4a4a',
       align: 'center',
       lineSpacing: 1,
@@ -300,9 +300,9 @@ export class EvidenceBoardScene extends Phaser.Scene {
       // Only draw string between consecutive slots
       if (b.index - a.index === 1) {
         // Red yarn with slight sag (quadratic curve)
-        this.stringGraphics.lineStyle(2, Colors.redString, 0.6);
+        this.stringGraphics.lineStyle(3, Colors.redString, 0.6);
         const midX = (a.x + b.x) / 2;
-        const midY = (a.y + b.y) / 2 + 12; // sag downward
+        const midY = (a.y + b.y) / 2 + 18; // sag downward
         this.stringGraphics.beginPath();
         this.stringGraphics.moveTo(a.x, a.y);
         // Approximate bezier with line segments for the sag
@@ -315,8 +315,8 @@ export class EvidenceBoardScene extends Phaser.Scene {
 
         // Push pin dots at connection points
         this.stringGraphics.fillStyle(Colors.pushPin, 0.8);
-        this.stringGraphics.fillCircle(a.x, a.y, 4);
-        this.stringGraphics.fillCircle(b.x, b.y, 4);
+        this.stringGraphics.fillCircle(a.x, a.y, 6);
+        this.stringGraphics.fillCircle(b.x, b.y, 6);
       }
     }
   }
@@ -343,8 +343,8 @@ export class EvidenceBoardScene extends Phaser.Scene {
         const a = this.dropZones[i];
         const b = this.dropZones[i + 1];
         const midX = (a.x + b.x) / 2;
-        const midY = (a.y + b.y) / 2 + 12;
-        this.stringGraphics.lineStyle(2.5, Colors.redString, 0.9);
+        const midY = (a.y + b.y) / 2 + 18;
+        this.stringGraphics.lineStyle(3.5, Colors.redString, 0.9);
         this.stringGraphics.beginPath();
         this.stringGraphics.moveTo(a.x, a.y);
         for (let t = 0; t <= 1; t += 0.1) {
@@ -354,8 +354,8 @@ export class EvidenceBoardScene extends Phaser.Scene {
         }
         this.stringGraphics.strokePath();
         this.stringGraphics.fillStyle(Colors.pushPin, 1);
-        this.stringGraphics.fillCircle(a.x, a.y, 5);
-        this.stringGraphics.fillCircle(b.x, b.y, 5);
+        this.stringGraphics.fillCircle(a.x, a.y, 7);
+        this.stringGraphics.fillCircle(b.x, b.y, 7);
       }
 
       this.cardContainers.forEach(c => c.disableInteractive());

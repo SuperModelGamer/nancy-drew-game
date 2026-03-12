@@ -35,8 +35,8 @@ const SCRIPTED_EVENTS: ScriptedEvent[] = [
       { action: 'fog', duration: 3000, intensity: 0.6 },
       { action: 'text', text: 'A cold mist rolls across the stage from nowhere.', duration: 2500 },
       { action: 'wait', duration: 500 },
-      { action: 'spotlight', x: 640, y: 300, duration: 4000 },
-      { action: 'figure', x: 640, y: 280, duration: 4000 },
+      { action: 'spotlight', x: 960, y: 450, duration: 4000 },
+      { action: 'figure', x: 960, y: 420, duration: 4000 },
       { action: 'text', text: 'A figure in white stands center stage, bathed in a pale spotlight.', speaker: '', duration: 3000 },
       { action: 'wait', duration: 1000 },
       { action: 'text', text: 'She turns toward you. For a moment, you see her face — beautiful, sorrowful, familiar from a hundred playbills.', duration: 3500 },
@@ -147,7 +147,7 @@ export class ScriptedEventScene extends Phaser.Scene {
     this.container.add(this.fogOverlay);
 
     // Spotlight (starts invisible)
-    this.spotlightGfx = this.add.ellipse(0, 0, 120, 180, 0xffffcc, 0);
+    this.spotlightGfx = this.add.ellipse(0, 0, 180, 270, 0xffffcc, 0);
     this.container.add(this.spotlightGfx);
 
     // Ghost figure (starts invisible)
@@ -156,22 +156,22 @@ export class ScriptedEventScene extends Phaser.Scene {
     this.container.add(this.figureGfx);
 
     // Text box
-    this.textBox = this.add.container(width / 2, height - 80);
+    this.textBox = this.add.container(width / 2, height - 120);
     this.textBox.setAlpha(0);
 
-    const textBg = this.add.rectangle(0, 0, width * 0.85, 70, 0x000000, 0.9);
+    const textBg = this.add.rectangle(0, 0, width * 0.85, 105, 0x000000, 0.9);
     textBg.setStrokeStyle(1, Colors.gold, 0.5);
 
-    this.speakerText = this.add.text(-width * 0.4 + 20, -20, '', {
+    this.speakerText = this.add.text(-width * 0.4 + 20, -30, '', {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.gold,
       fontStyle: 'bold',
     });
 
-    this.textContent = this.add.text(0, 5, '', {
+    this.textContent = this.add.text(0, 8, '', {
       fontFamily: FONT,
-      fontSize: '15px',
+      fontSize: '22px',
       color: TextColors.light,
       fontStyle: 'italic',
       wordWrap: { width: width * 0.8 },
@@ -186,17 +186,17 @@ export class ScriptedEventScene extends Phaser.Scene {
   }
 
   private createGhostFigure(): Phaser.GameObjects.Container {
-    const figure = this.add.container(640, 280);
+    const figure = this.add.container(960, 420);
 
     // Simple ghost silhouette using shapes
     // Head
-    const head = this.add.ellipse(0, -60, 30, 35, 0xffffff, 0.7);
+    const head = this.add.ellipse(0, -90, 45, 52, 0xffffff, 0.7);
     // Body (trapezoid-ish using rectangle)
-    const body = this.add.rectangle(0, -10, 40, 80, 0xffffff, 0.5);
+    const body = this.add.rectangle(0, -15, 60, 120, 0xffffff, 0.5);
     // Flowing bottom
-    const skirt = this.add.triangle(0, 40, -35, 0, 35, 0, 0, 30, 0xffffff, 0.3);
+    const skirt = this.add.triangle(0, 60, -52, 0, 52, 0, 0, 45, 0xffffff, 0.3);
     // Glow
-    const glow = this.add.ellipse(0, -10, 80, 140, 0xccccff, 0.15);
+    const glow = this.add.ellipse(0, -15, 120, 210, 0xccccff, 0.15);
 
     figure.add([glow, skirt, body, head]);
     return figure;
@@ -232,7 +232,7 @@ export class ScriptedEventScene extends Phaser.Scene {
         break;
 
       case 'spotlight':
-        this.spotlightGfx.setPosition(step.x || 640, step.y || 300);
+        this.spotlightGfx.setPosition(step.x || 960, step.y || 450);
         this.tweens.add({
           targets: this.spotlightGfx,
           fillAlpha: 0.3,
@@ -247,7 +247,7 @@ export class ScriptedEventScene extends Phaser.Scene {
         break;
 
       case 'figure':
-        this.figureGfx.setPosition(step.x || 640, step.y || 280);
+        this.figureGfx.setPosition(step.x || 960, step.y || 420);
         this.tweens.add({
           targets: this.figureGfx,
           alpha: 0.8,
@@ -259,7 +259,7 @@ export class ScriptedEventScene extends Phaser.Scene {
         // Gentle float animation
         this.tweens.add({
           targets: this.figureGfx,
-          y: (step.y || 280) - 10,
+          y: (step.y || 420) - 15,
           duration: 2000,
           yoyo: true,
           ease: 'Sine.easeInOut',
