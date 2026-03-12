@@ -254,9 +254,11 @@
           "lines": [
             { "speaker": "Edwin", "text": "Missing props? That's... concerning. Some of those pieces are historically significant — the Tiffany lamps alone date to 1923, and the candelabra is original to the opening gala." },
             { "speaker": "Nancy", "text": "Stella seems worried about it." },
-            { "speaker": "Edwin", "text": "Stella has her — well, she has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are connected. The props are a — a separate matter entirely." },
-            { "speaker": "Nancy", "text": "You seem very sure they're separate." },
-            { "speaker": "Edwin", "text": "I'm a historian. I know how to sort through noise to find the signal. Trust me on this one — the answer to this mystery is on the stage, not on a prop shelf. I'd stake my reputation on it. What's left of it." }
+            { "speaker": "Edwin", "text": "Stella has her — well, she has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are the real mystery. The props are a — a separate matter entirely. A distraction." },
+            { "speaker": "Nancy", "text": "You seem very sure they're separate. How would you know that unless you knew what was actually going on?" },
+            { "speaker": "Edwin", "text": "I — that's not what I — I'm a historian, Nancy. I know how to sort through noise to find the signal. That's literally my job. I'm not hiding anything, if that's what you're implying. I'm trying to help you prioritize." },
+            { "speaker": "Nancy", "text": "I didn't say you were hiding anything." },
+            { "speaker": "Edwin", "text": "No. No, you didn't. I just — forget I said that. The answer to this mystery is on the stage, not on a prop shelf. I'd stake my reputation on it. What's left of it." }
           ],
           "nextNode": "end"
         },
@@ -325,21 +327,24 @@
         {
           "id": "effects_challenge",
           "lines": [
-            { "speaker": "Edwin", "text": "You've read the — you've actually read the effects manual? Impressive. Most people wouldn't bother with a century-old technical document." },
-            { "speaker": "Edwin", "text": "Yes, theoretically, someone could use the old systems to stage a convincing ghost. Fog machines, the trapdoor — which is a Graves & Sons counterweight model, very reliable — proper lighting..." },
-            { "speaker": "Edwin", "text": "But they'd need extensive knowledge of the building. They'd need to have — to have practiced. Extensively. And they'd need a reason." },
+            { "speaker": "Edwin", "text": "You've read the — you've actually read the effects manual? The whole thing? That's... thorough." },
+            { "speaker": "Edwin", "text": "Yes, theoretically, someone could use the old systems to stage a convincing ghost. Fog machines, the trapdoor — which is a Graves & Sons counterweight model, very reliable — proper lighting. It would be — it would be quite an undertaking." },
+            { "speaker": "Edwin", "text": "But they'd need extensive knowledge of the building. Months of preparation. They'd need to have — to have practiced. Extensively. Not that I've thought about it in detail. I'm just — speaking generally. As a historian." },
             { "speaker": "Nancy", "text": "Like saving the theater from demolition?" },
-            { "speaker": "Edwin", "text": "...That would certainly be a reason. Hypothetically speaking." }
+            { "speaker": "Edwin", "text": "...That would certainly be a reason. Hypothetically speaking. But you'd want to — I mean, a person would want to look at all the suspects before jumping to conclusions. That's just good detective work, isn't it?" }
           ],
           "nextNode": "end"
         },
         {
           "id": "last_night",
           "lines": [
-            { "speaker": "Edwin", "text": "I was in my usual seat — row G, center — reviewing my notes. Around ten o'clock, I heard a crash from the manager's office. By the time I got there, Ashworth was on the floor." },
-            { "speaker": "Edwin", "text": "Stella called the ambulance. The rest of us waited. It was... unsettling." },
+            { "speaker": "Edwin", "text": "I was in my usual seat — row G, center — reviewing my notes. Chapter twelve revisions, if that matters. Around ten o'clock — well, closer to ten-fifteen, maybe ten-ten — I heard a crash from the manager's office." },
+            { "speaker": "Nancy", "text": "That's a fifteen-minute window you're not sure about." },
+            { "speaker": "Edwin", "text": "I — I wasn't watching the clock. I was working. By the time I got there, Ashworth was on the floor. Stella called the ambulance. The rest of us waited. It was... unsettling." },
             { "speaker": "Nancy", "text": "Did you notice anything else? Anyone missing?" },
-            { "speaker": "Edwin", "text": "Everyone was accounted for. But this is a big building with many hidden corners. Someone could have slipped away without being seen." }
+            { "speaker": "Edwin", "text": "Everyone was — well, I can't say everyone was accounted for. It's a big building. Many hidden corners. Someone could have slipped away and come back without anyone noticing. Hypothetically." },
+            { "speaker": "Nancy", "text": "You said 'hypothetically.'" },
+            { "speaker": "Edwin", "text": "I said what I said. I'm trying to be helpful, Nancy. That's all." }
           ],
           "nextNode": "start"
         },
@@ -426,10 +431,11 @@
         {
           "id": "missing_props",
           "lines": [
+            { "speaker": "Stella", "text": "Missing? No. Nothing's missing. Everything is exactly where it —" },
             { "speaker": "Stella", "text": "..." },
-            { "speaker": "Stella", "text": "Some things have... been relocated. For safekeeping. Look — valuable antique props, irreplaceable costumes — they shouldn't be destroyed with the building. That's just common sense." },
+            { "speaker": "Stella", "text": "Okay. Some things have been... relocated. For safekeeping. Look — valuable antique props, irreplaceable costumes — they shouldn't be destroyed with the building. That's just common sense. Anyone would do the same." },
             { "speaker": "Nancy", "text": "Relocated where, exactly?" },
-            { "speaker": "Stella", "text": "Does it matter? Those props are irreplaceable. I did what I had to do. That doesn't make me a poisoner. I'm tired, Nancy, not homicidal." }
+            { "speaker": "Stella", "text": "Does it matter? I'm not going to stand here and justify basic preservation to a detective who's supposed to be investigating a poisoning. Those props are irreplaceable. I did what I had to do. That doesn't make me a poisoner. I'm tired, Nancy, not homicidal." }
           ],
           "choices": [
             {
@@ -452,11 +458,13 @@
         {
           "id": "lockbox_confronted",
           "lines": [
-            { "speaker": "Stella", "text": "You opened my — how did you even —" },
+            { "speaker": "Stella", "text": "You opened my — that was locked. How did you even — you know what, it doesn't matter." },
+            { "speaker": "Stella", "text": "I didn't do anything wrong. I didn't —" },
             { "speaker": "Stella", "text": "..." },
-            { "speaker": "Stella", "text": "Fine. Yes. My mother has stage four lymphoma. The bills are... you know what, I'm not going to apologize. Those props were going to be smashed into dust in three days anyway. At least this way someone — at least my mom gets something." },
+            { "speaker": "Stella", "text": "Fine. Yes. My mother has stage four lymphoma. The bills are — you want a number? $47,000 and counting. So yes. I sold some props. Props that were going to be smashed into dust in three days anyway. At least this way someone — at least my mom gets something out of this disaster." },
             { "speaker": "Nancy", "text": "I'm not here about the props, Stella. I'm here about the poisoning." },
-            { "speaker": "Stella", "text": "I know who's been in the basement. I've known for weeks. I wrote him a note. He ignored it." },
+            { "speaker": "Stella", "text": "Then why are you opening my lockbox? Why are you digging through my —" },
+            { "speaker": "Stella", "text": "No. You know what. Fine. You want the truth? I know who's been in the basement. I've known for weeks. I wrote him a note. He ignored it." },
             { "speaker": "Nancy", "text": "Who?" },
             { "speaker": "Stella", "text": "Edwin. It's always been Edwin." }
           ],
@@ -477,12 +485,13 @@
         {
           "id": "confronted_note",
           "lines": [
-            { "speaker": "Stella", "text": "Where did you find that?" },
+            { "speaker": "Stella", "text": "Where did you find that? That was — I put that under —" },
             { "speaker": "Nancy", "text": "On the stage floor. 'Stop now or I go to the police — S.M.' You wrote it." },
-            { "speaker": "Stella", "text": "I wrote it three days ago. Slipped it under the basement door. Whoever's down there never responded." },
+            { "speaker": "Stella", "text": "It could be anyone's initials. Sandra Mitchell, Steve — no. Fine. I wrote it. Three days ago. Slipped it under the basement door. Whoever's down there never responded." },
             { "speaker": "Nancy", "text": "You know who's in the basement." },
-            { "speaker": "Stella", "text": "I have a pretty good idea. But I need to know — are you going to report what I've done? The props?" },
-            { "speaker": "Nancy", "text": "I'm interested in the truth, Stella. All of it." }
+            { "speaker": "Stella", "text": "I don't — I'm not sure. I have suspicions. But I need to know something first. Are you going to report what I've done? The props?" },
+            { "speaker": "Nancy", "text": "I'm interested in the truth, Stella. All of it." },
+            { "speaker": "Stella", "text": "The truth. Right. Because that always works out so well for the person telling it." }
           ],
           "choices": [
             {
@@ -731,7 +740,8 @@
           "lines": [
             { "speaker": "Ashworth", "text": "Oh, wonderful. Another vulture. What do you want? I'm on a deadline — literally." },
             { "speaker": "Nancy", "text": "Nancy Drew. I'm here to find out who poisoned you, Mr. Ashworth." },
-            { "speaker": "Ashworth", "text": "Ha. Take your pick. Everyone in this building wants me dead. The old actress, the historian, even my own stage manager. This theater is full of people who'd rather see me in the ground than see one brick moved. I'm surrounded by — by fanatics and sentimentalists." }
+            { "speaker": "Ashworth", "text": "Ha. Take your pick. Everyone in this building wants me dead. The old actress, the historian, even my own stage manager. This theater is full of people who'd rather see me in the ground than see one brick moved." },
+            { "speaker": "Ashworth", "text": "You want my opinion? Start with Hale. The man's been circling this building like a vulture for fifteen years. He's got keys he shouldn't have, he knows rooms that aren't on the blueprints, and he looks at me like I'm a war criminal for filing a demolition permit. Start with Hale." }
           ],
           "choices": [
             {
