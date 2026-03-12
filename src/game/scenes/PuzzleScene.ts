@@ -58,6 +58,7 @@ export class PuzzleScene extends Phaser.Scene {
     }
 
     const { width, height } = this.cameras.main;
+    initSceneCursor(this);
 
     // Dark overlay
     this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);

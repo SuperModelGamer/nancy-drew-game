@@ -5,10 +5,14 @@ import { ChapterSystem } from '../systems/ChapterSystem';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
+import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
 
 // Height of the bottom toolbar strip
 const TOOLBAR_H = 52;
+
+// Pre-index items for O(1) lookup
+const itemMap = new Map(itemsData.items.map(i => [i.id, i]));
 
 export class UIScene extends Phaser.Scene {
   private inventoryBar!: Phaser.GameObjects.Container;
@@ -105,9 +109,13 @@ export class UIScene extends Phaser.Scene {
     this.journalPanel = this.createJournalPanel();
     this.journalPanel.setVisible(false);
 
-    // Listen for inventory changes
-    InventorySystem.getInstance().onChange(() => {
+    // Listen for inventory changes (clean up on shutdown to prevent leaks)
+    const onInventoryChange = () => {
       if (this.inventoryOpen) this.refreshInventoryGrid();
+    };
+    InventorySystem.getInstance().onChange(onInventoryChange);
+    this.events.on('shutdown', () => {
+      InventorySystem.getInstance().offChange(onInventoryChange);
     });
   }
 
@@ -165,8 +173,7 @@ export class UIScene extends Phaser.Scene {
     container.setDepth(Depths.inventoryPanel);
 
     // Full-screen dark overlay
-    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.88);
-    overlay.setInteractive(); // block clicks through
+    const overlay = createOverlay(this, 0.88);
     container.add(overlay);
 
     // Main panel dimensions — fill most of the screen, leave room for toolbar
@@ -204,14 +211,7 @@ export class UIScene extends Phaser.Scene {
     container.add(lineGfx);
 
     // Close button
-    const closeBtn = this.add.text(panelX + panelW / 2 - 22, headerY, '✕', {
-      fontFamily: FONT,
-      fontSize: '20px',
-      color: TextColors.goldDim,
-    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
-    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
-    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
-    closeBtn.on('pointerdown', () => this.toggleInventory());
+    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.toggleInventory(), '20px');
     container.add(closeBtn);
 
     // ─── Layout: left item grid + right detail panel ───
@@ -313,7 +313,6 @@ export class UIScene extends Phaser.Scene {
 
     const inventory = InventorySystem.getInstance();
     const items = inventory.getItems();
-    const allItems = itemsData.items;
     const selectedItem = inventory.getSelectedItem();
 
     const leftX = this.inventoryContainer.getData('leftX') as number;
@@ -347,7 +346,7 @@ export class UIScene extends Phaser.Scene {
     }
 
     items.forEach((itemId, index) => {
-      const itemData = allItems.find((i: { id: string }) => i.id === itemId);
+      const itemData = itemMap.get(itemId);
       if (!itemData) return;
 
       const col = index % cols;
@@ -432,10 +431,10 @@ export class UIScene extends Phaser.Scene {
   }
 
   private showItemDetail(itemId: string): void {
+    if (this.selectedItemId === itemId) return;
     this.selectedItemId = itemId;
 
-    const allItems = itemsData.items;
-    const itemData = allItems.find((i: { id: string }) => i.id === itemId);
+    const itemData = itemMap.get(itemId);
     if (!itemData) return;
 
     const rightX = this.inventoryContainer.getData('rightX') as number;
@@ -457,27 +456,30 @@ export class UIScene extends Phaser.Scene {
     // Update description — position below badge or name
     const descY = isKey ? contentTop + 68 : contentTop + 48;
 
-    // Update or create detail image
+    // Update or create detail image — reuse existing object when possible
     const iconKey = `item_icon_${itemId}`;
-    if (this.detailImage) {
-      this.detailImage.destroy();
-      this.detailImage = null;
-    }
 
     if (this.textures.exists(iconKey)) {
       const imgMaxSize = Math.min(rightW - 60, 220);
-      const img = this.add.image(detailCenterX, descY + 20, iconKey);
+      if (this.detailImage) {
+        this.detailImage.setTexture(iconKey);
+        this.detailImage.setPosition(detailCenterX, descY + 20);
+      } else {
+        const img = this.add.image(detailCenterX, descY + 20, iconKey);
+        img.setOrigin(0.5, 0);
+        this.detailImage = img;
+        this.inventoryContainer.add(img);
+      }
       const tex = this.textures.get(iconKey).getSourceImage();
       const scale = Math.min(imgMaxSize / tex.width, imgMaxSize / tex.height);
-      img.setScale(scale);
-      img.setOrigin(0.5, 0);
-      this.detailImage = img;
-      this.inventoryContainer.add(img);
+      this.detailImage.setScale(scale);
+      this.detailImage.setVisible(true);
 
       // Position description below image
       const imgBottom = descY + 20 + tex.height * scale + 16;
       this.detailDesc.setPosition(detailCenterX, imgBottom);
     } else {
+      if (this.detailImage) this.detailImage.setVisible(false);
       this.detailDesc.setPosition(detailCenterX, descY + 20);
     }
 

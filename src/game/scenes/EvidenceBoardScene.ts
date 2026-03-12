@@ -45,6 +45,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = this.cameras.main;
+    initSceneCursor(this);
 
     // Dark overlay
     const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.8);

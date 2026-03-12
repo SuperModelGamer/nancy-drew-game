@@ -58,6 +58,7 @@ export class EndingScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = this.cameras.main;
+    initSceneCursor(this);
     const content = ENDINGS[this.endingType] || ENDINGS.justice;
 
     // Full screen black background
