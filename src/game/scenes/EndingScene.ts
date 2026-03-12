@@ -21,6 +21,7 @@ const ENDINGS: Record<string, EndingContent> = {
       'The letters proving Cecilia Drake murdered Margaux Fontaine were submitted to the Historical Society. The 1928 case was officially reopened and closed — justice delivered nearly a century late.',
       'The Monarch Theatre was demolished on schedule. In its place, a small plaque reads: \'Here stood the Monarch Theatre, 1923–2026. Home of Margaux Fontaine, who deserved better.\'',
       'Vivian Delacroix moved to a small apartment downtown. She kept one thing from the theater: the playbill from opening night, 1923.',
+      'Before I left, Vivian took my hand. \'You kept your promise,\' she said. \'You found the truth. That the building is gone... I\'ve made my peace with that. Margaux lives in what we remember, not in bricks and velvet. Thank you, Nancy.\'',
     ],
   },
   exposure: {
@@ -31,6 +32,7 @@ const ENDINGS: Record<string, EndingContent> = {
       'Edwin faced charges for the poisoning but received a reduced sentence after cooperating fully. The judge called it \'a crime born of devotion, not malice.\'',
       'The Monarch Theatre was granted emergency landmark status. A restoration campaign raised $2.1 million in its first month. The theater reopened with a memorial performance of The Crimson Veil.',
       'Vivian Delacroix watched from the front row, in the same seat her godmother had performed for. For the first time in years, the Monarch\'s lights burned bright.',
+      'After the curtain fell, Vivian found me in the lobby. Her eyes were red but she was smiling. \'She would have loved this,\' she whispered. \'All those years I kept this theater alive, I thought I was doing it for her. But she was keeping me alive, too. Thank you for giving us both a curtain call.\'',
     ],
   },
   mercy: {
@@ -41,6 +43,7 @@ const ENDINGS: Record<string, EndingContent> = {
       'Nancy submitted Cecilia Drake\'s confession letter to the Historical Society without naming Edwin. The 1928 murder was exposed, but the ghost of the Monarch remained a mystery.',
       'Ashworth recovered fully. Shaken by the experience, he sold the theater to a preservation trust for $800,000 — far less than his insurance payout would have been. Some said he felt guilty. Others said he was afraid.',
       'The Monarch Theatre survived. Vivian Delacroix became its honorary director. She never asked Nancy what happened to Edwin. She didn\'t need to.',
+      'On my last night in River Heights, Vivian walked me to the door. \'I know you made a choice down there,\' she said quietly. \'I won\'t ask what it was. But the theater is still standing, and Margaux\'s name is in the light again. Whatever you decided... I think it was the right thing.\' She pressed the locket into my hand. \'Keep it. You earned it, little star.\'',
     ],
   },
 };

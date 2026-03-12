@@ -241,8 +241,24 @@
               "text": "Your grandfather was James Hale — Margaux's lover.",
               "nextNode": "grandfather",
               "requiredFlag": "learned_about_hale_family"
+            },
+            {
+              "text": "Stella says props have been going missing. Do you know anything about that?",
+              "nextNode": "edwin_on_props",
+              "requiredFlag": "learned_about_missing_props"
             }
           ]
+        },
+        {
+          "id": "edwin_on_props",
+          "lines": [
+            { "speaker": "Edwin", "text": "Missing props? That's... concerning. Some of those pieces are historically significant — they're original to the 1920s productions." },
+            { "speaker": "Nancy", "text": "Stella seems worried about it." },
+            { "speaker": "Edwin", "text": "Stella has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are connected. The props are a separate matter." },
+            { "speaker": "Nancy", "text": "You seem very sure they're separate." },
+            { "speaker": "Edwin", "text": "I'm a historian. I know how to sort through noise to find the signal. Trust me — the answer to this mystery is on the stage, not on a prop shelf." }
+          ],
+          "nextNode": "end"
         },
         {
           "id": "crimson_veil",
@@ -386,8 +402,26 @@
               "text": "I found your note to the basement intruder — 'Stop now or I go to the police.'",
               "nextNode": "confronted_note",
               "requiredFlag": "saw_threatening_note"
+            },
+            {
+              "text": "Edwin told me about The Crimson Veil — Margaux was poisoned on stage. Could someone fake a ghost using the old systems?",
+              "nextNode": "stella_on_ghost",
+              "requiredFlag": "learned_about_crimson_veil"
             }
           ]
+        },
+        {
+          "id": "stella_on_ghost",
+          "lines": [
+            { "speaker": "Stella", "text": "Edwin told you about The Crimson Veil? Of course he did. That man can't stop talking about 1928." },
+            { "speaker": "Stella", "text": "Could someone fake a ghost? Yes. Easily. The fog machines still work. The trapdoor mechanism is original and functional. The lighting board on the catwalk can create any effect you want." },
+            { "speaker": "Nancy", "text": "You sound like you've thought about it." },
+            { "speaker": "Stella", "text": "I'm a stage manager. It's literally my job to know how everything in this building works. But if you're asking whether I staged a ghost — no. I have enough problems without adding haunting to my résumé." },
+            { "speaker": "Nancy", "text": "Who else would know the systems well enough?" },
+            { "speaker": "Stella", "text": "Edwin knows this building better than I do. He's been studying it for fifteen years. He's mapped every passage, every mechanism, every hidden corner. If anyone could make a convincing ghost... it's him." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "effects_manual_location"
         },
         {
           "id": "missing_props",
@@ -880,14 +914,43 @@
         {
           "id": "poisoning",
           "lines": [
-            { "speaker": "Edwin", "text": "Ashworth found the basement. He saw my setup. He was going to call the police and accelerate the demolition — tear it down the next morning if he could." },
-            { "speaker": "Edwin", "text": "I used antimony tartrate — the same compound from Margaux's alchemy book. Non-lethal dose. Just enough to make him too ill to sign demolition orders for a few days." },
+            { "speaker": "Edwin", "text": "Ashworth found the basement two weeks ago. He saw everything — the costume, the fog controls, the letters. He laughed. He said: 'I'll have the wrecking ball here by morning.'" },
+            { "speaker": "Edwin", "text": "I panicked. I'd spent fifteen years on this. My grandfather spent fifty. And it was all about to be crushed into rubble by a man who saw a century of history as an insurance payout." },
+            { "speaker": "Nancy", "text": "So you poisoned him." },
+            { "speaker": "Edwin", "text": "I used antimony tartrate — the same compound from Margaux's alchemy book. I calculated a non-lethal dose. Just enough to make him too ill to sign the demolition orders." }
+          ],
+          "nextNode": "poisoning_guilt"
+        },
+        {
+          "id": "poisoning_guilt",
+          "lines": [
             { "speaker": "Nancy", "text": "You used the same poison that killed Margaux." },
-            { "speaker": "Edwin", "text": "...I know. The irony isn't lost on me." },
-            { "speaker": "Nancy", "text": "You poisoned a man, Edwin. You became exactly what you were investigating — someone who poisons people to get what they want." },
-            { "speaker": "Edwin", "text": "I saved a theater. I saved a woman's legacy. I saved the truth about a murder that went unsolved for a century." },
-            { "speaker": "Edwin", "text": "Was it wrong? Yes. Would I do it again?" },
-            { "speaker": "Edwin", "text": "...Yes." }
+            { "speaker": "Edwin", "text": "..." },
+            { "speaker": "Edwin", "text": "Do you think I don't know that?" },
+            { "speaker": "Edwin", "text": "I couldn't sleep for three days after. I sat down here in the dark, listening to make sure he was still breathing upstairs. Every time a pipe creaked, I thought — what if I got the dose wrong? What if he dies and I'm exactly what Cecilia was?" },
+            { "speaker": "Nancy", "text": "You poisoned a man, Edwin. You became exactly what you were investigating." },
+            { "speaker": "Edwin", "text": "I know. God, I know. My hands haven't stopped shaking since." }
+          ],
+          "choices": [
+            {
+              "text": "Was it worth it?",
+              "nextNode": "was_it_worth_it"
+            },
+            {
+              "text": "What do you want to happen now?",
+              "nextNode": "what_now"
+            }
+          ]
+        },
+        {
+          "id": "was_it_worth_it",
+          "lines": [
+            { "speaker": "Edwin", "text": "I saved a theater. I saved a woman's legacy. I found the truth about a murder that went unsolved for a century." },
+            { "speaker": "Edwin", "text": "Was it worth it?" },
+            { "speaker": "Edwin", "text": "...Ask me on a good day and I'll say yes. Ask me at three in the morning when I can hear Ashworth coughing through the floorboards and I'll say I don't know anymore." },
+            { "speaker": "Nancy", "text": "I'm asking you right now." },
+            { "speaker": "Edwin", "text": "Right now I'm a fifty-year-old man standing in a basement, waiting for a twenty-year-old detective to decide my fate. Right now I'm terrified. And I'm ashamed. And I'd do it all again tomorrow if it meant Margaux's name wasn't buried under concrete." },
+            { "speaker": "Edwin", "text": "That's the truth. I wish it were simpler." }
           ],
           "choices": [
             {
@@ -895,8 +958,34 @@
               "nextNode": "ending_justice"
             },
             {
-              "text": "Let's go public. The 1928 murder, the cover-up — all of it. Together.",
-              "nextNode": "ending_exposure"
+              "text": "Dad said proving a historical crime triggers emergency heritage review. Let's go public — all of it.",
+              "nextNode": "ending_exposure",
+              "requiredFlag": "called_dad"
+            },
+            {
+              "text": "Walk away, Edwin. Disappear. I'll make sure Margaux's story gets told.",
+              "nextNode": "ending_mercy"
+            }
+          ]
+        },
+        {
+          "id": "what_now",
+          "lines": [
+            { "speaker": "Edwin", "text": "Honestly? I don't know. I've been running on fifteen years of momentum and I don't know how to stop." },
+            { "speaker": "Edwin", "text": "Part of me wants to turn myself in. Part of me wants to run. Part of me wants to stand on that stage and tell the whole world what Cecilia Drake did." },
+            { "speaker": "Nancy", "text": "And what about what you did?" },
+            { "speaker": "Edwin", "text": "I'll carry that either way. Whether I'm in a jail cell or on a plane or standing in this theater — I'll carry it. I poisoned a man with the same compound that killed someone I loved. There's no version of my future where that doesn't haunt me." },
+            { "speaker": "Nancy", "text": "Then the question is what happens to the Monarch. And to Margaux's story." }
+          ],
+          "choices": [
+            {
+              "text": "I'm calling the police. You poisoned someone, Edwin.",
+              "nextNode": "ending_justice"
+            },
+            {
+              "text": "Dad said proving a historical crime triggers emergency heritage review. Let's go public — all of it.",
+              "nextNode": "ending_exposure",
+              "requiredFlag": "called_dad"
             },
             {
               "text": "Walk away, Edwin. Disappear. I'll make sure Margaux's story gets told.",
@@ -907,8 +996,11 @@
         {
           "id": "ending_justice",
           "lines": [
-            { "speaker": "Edwin", "text": "I understand. I knew this was how it might end." },
-            { "speaker": "Edwin", "text": "Just... promise me one thing. Make sure the letters get to the right people. Margaux deserves to be remembered for more than how she died." },
+            { "speaker": "Edwin", "text": "..." },
+            { "speaker": "Edwin", "text": "I've been waiting for someone to say that. Part of me is relieved." },
+            { "speaker": "Nancy", "text": "Edwin—" },
+            { "speaker": "Edwin", "text": "No, I mean it. I've been carrying this alone for weeks. The lying, the hiding, checking on Ashworth at night to make sure he was still alive. I can't keep doing this." },
+            { "speaker": "Edwin", "text": "Just... promise me one thing. Make sure Cecilia's letters get to the historical society. Margaux deserves to be remembered for more than how she died." },
             { "speaker": "Nancy", "text": "I promise." },
             { "speaker": "Edwin", "text": "My grandfather kept his promise for fifty years. You'll keep yours. I can tell." },
             { "speaker": "Nancy", "text": "Sometimes the truth isn't enough to save what we love. But it's always enough to matter." }
@@ -917,24 +1009,25 @@
         {
           "id": "ending_exposure",
           "lines": [
-            { "speaker": "Edwin", "text": "Together? You'd do that?" },
-            { "speaker": "Nancy", "text": "The world should know what happened to Margaux Fontaine. And they should know what you did to protect her memory — all of it. The heroism and the crime." },
-            { "speaker": "Edwin", "text": "I'll face whatever comes. But the Monarch..." },
-            { "speaker": "Nancy", "text": "We'll give it the best chance we can. The 1928 murder, the cover-up, the landmark petition — we put it all in front of the public and let them decide." },
-            { "speaker": "Edwin", "text": "Then let's give the Monarch one last opening night." },
-            { "speaker": "Nancy", "text": "The Monarch's lights came on for the first time in years. Not for a ghost — for the woman who deserved to be remembered." }
+            { "speaker": "Edwin", "text": "Together? You'd... you'd do that?" },
+            { "speaker": "Nancy", "text": "The world should know what happened to Margaux Fontaine. And they should know what you did to protect her memory — the sacrifice and the crime. All of it." },
+            { "speaker": "Edwin", "text": "I'll face whatever comes. The arrest, the trial, whatever. But the Monarch—" },
+            { "speaker": "Nancy", "text": "The 1928 murder, the cover-up, your grandfather's research, the landmark petition — we put it all in front of the public and let them decide what this building means." },
+            { "speaker": "Edwin", "text": "Vivian will never forgive me for the poisoning. But maybe she'll understand why." },
+            { "speaker": "Nancy", "text": "Then let's give the Monarch one last opening night. Not for a ghost — for the woman who deserved to be remembered." }
           ]
         },
         {
           "id": "ending_mercy",
           "lines": [
-            { "speaker": "Edwin", "text": "You'd let me go?" },
+            { "speaker": "Edwin", "text": "You'd let me go? After what I did?" },
             { "speaker": "Nancy", "text": "I'm letting Margaux's story be told. What happens to you... that's between you and your conscience." },
-            { "speaker": "Edwin", "text": "...Thank you, Nancy. Tell Vivian I'm sorry I couldn't say goodbye." },
+            { "speaker": "Edwin", "text": "My conscience. Right." },
+            { "speaker": "Edwin", "text": "...Tell Vivian I'm sorry. For all of it. For hiding down here, for using Margaux's memory as a weapon, for not trusting her enough to ask for help. Tell her I'm sorry I couldn't say goodbye." },
             { "speaker": "Nancy", "text": "Edwin." },
             { "speaker": "Edwin", "text": "Yes?" },
             { "speaker": "Nancy", "text": "Your grandfather would be proud of what you found. Not how you found it. But what you found." },
-            { "speaker": "Edwin", "text": "I know. That's the part I'll have to live with." },
+            { "speaker": "Edwin", "text": "That's the kindest lie anyone's ever told me." },
             { "speaker": "Nancy", "text": "I told myself it was the right call. I still tell myself that. Most days, I believe it." }
           ]
         }

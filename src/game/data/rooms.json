@@ -128,7 +128,7 @@
           "height": 80,
           "label": "Coat Check",
           "type": "inspect",
-          "description": "An old coat check closet. Empty wooden hangers, a mothball smell, and — wait. There's a modern rain jacket on one hook. The pockets contain a granola bar wrapper and a receipt from a chemical supply company, dated last week."
+          "description": "An old coat check closet. Empty wooden hangers, a mothball smell, and — wait. There's a modern rain jacket on one hook. The pockets contain a granola bar wrapper and a receipt from a chemical supply company, dated last week. Items purchased: antimony tartrate, glycol fog fluid, UV-reactive paint. Paid in cash. The store address is three blocks from where Edwin Hale lives."
         },
         {
           "id": "lobby_art_deco_mirror",
@@ -1180,7 +1180,7 @@
           "height": 150,
           "label": "Stone Archway",
           "type": "inspect",
-          "description": "A section of the basement wall has been carefully dismantled, revealing a hidden alcove. Inside: a bundle of letters tied with ribbon — correspondence between Cecilia Drake and a pharmacist, dated October 1928. Also a small vial with crystalline residue. This is where Edwin found his proof."
+          "description": "A section of the basement wall has been carefully dismantled, revealing a hidden alcove. Inside: a bundle of letters tied with ribbon — correspondence between Cecilia Drake and a pharmacist, dated October 1928. Also a small vial with crystalline residue. Someone bricked these up in 1928 — probably Cecilia herself, hiding the evidence in the one place no one would look. Edwin found them six months ago when he noticed the mortar didn't match the rest of the wall."
         },
         {
           "id": "bm_cecilia_letter",
