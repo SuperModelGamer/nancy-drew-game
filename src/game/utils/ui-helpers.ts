@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { Colors, TextColors, FONT } from './constants';
+import { HAND_CURSOR } from './cursors';
 
 /**
  * Create a close button (✕) with hover highlight. Returns the text object.
@@ -15,7 +16,7 @@ export function createCloseButton(
     fontFamily: FONT,
     fontSize,
     color: TextColors.goldDim,
-  }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+  }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
 
   btn.on('pointerover', () => btn.setColor(TextColors.gold));
   btn.on('pointerout', () => btn.setColor(TextColors.goldDim));
@@ -55,7 +56,7 @@ export function createToolbarButton(
   const container = scene.add.container(x, y);
   const bg = scene.add.rectangle(0, 0, btnWidth, Sizes.minTapTarget, Colors.sceneBg, 0.9);
   bg.setStrokeStyle(1, accentColor, 0.6);
-  bg.setInteractive({ useHandCursor: true });
+  bg.setInteractive({ cursor: HAND_CURSOR });
 
   const text = scene.add.text(0, 0, label, {
     fontFamily: FONT,

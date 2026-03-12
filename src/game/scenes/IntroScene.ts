@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { Colors, TextColors, FONT } from '../utils/constants';
+import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 
 // ─── Slide Configuration ────────────────────────────────────────────────────
 // Each slide can have: background image, parallax zoom/pan, audio cues,
@@ -235,6 +236,7 @@ export class IntroScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = this.cameras.main;
+    initSceneCursor(this);
     this.slideIndex = 0;
     this.isAnimating = false;
     this.canSkip = false;
@@ -273,7 +275,7 @@ export class IntroScene extends Phaser.Scene {
       color: TextColors.goldDim,
       letterSpacing: 2,
     }).setOrigin(1, 0).setAlpha(0).setDepth(10);
-    skipBtn.setInteractive({ useHandCursor: true });
+    skipBtn.setInteractive({ cursor: HAND_CURSOR });
     skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.gold));
     skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.goldDim));
     skipBtn.on('pointerdown', () => this.skipToGame());

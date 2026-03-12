@@ -3,6 +3,7 @@ import dialogueData from '../data/dialogue.json';
 import { InventorySystem } from './InventorySystem';
 import { SaveSystem } from './SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { HAND_CURSOR } from '../utils/cursors';
 
 interface DialogueLine {
   speaker: string;
@@ -180,7 +181,7 @@ export class DialogueSystem {
       fontSize: '14px',
       color: TextColors.goldDim,
     }).setOrigin(1, 0.5);
-    advanceBtn.setInteractive({ useHandCursor: true });
+    advanceBtn.setInteractive({ cursor: HAND_CURSOR });
     advanceBtn.on('pointerdown', () => this.advance());
     this.container.add(advanceBtn);
 
@@ -190,7 +191,7 @@ export class DialogueSystem {
       fontSize: '13px',
       color: TextColors.muted,
     }).setOrigin(0, 0.5);
-    skipBtn.setInteractive({ useHandCursor: true });
+    skipBtn.setInteractive({ cursor: HAND_CURSOR });
     skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.goldDim));
     skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.muted));
     skipBtn.on('pointerdown', () => this.skipToEnd());
@@ -198,7 +199,7 @@ export class DialogueSystem {
 
     // Also allow tapping the box area to advance
     const hitArea = this.scene.add.rectangle(width / 2, boxY, width * 0.9, 180, Colors.darkBg, 0);
-    hitArea.setInteractive({ useHandCursor: true });
+    hitArea.setInteractive({ cursor: HAND_CURSOR });
     hitArea.on('pointerdown', () => this.advance());
     this.container.add(hitArea);
   }
@@ -235,7 +236,7 @@ export class DialogueSystem {
 
       const btn = this.scene!.add.rectangle(width / 2, y, width * 0.75, 38, Colors.sceneBg, 0.9);
       btn.setStrokeStyle(1, itemAvailable ? Colors.gold : 0x444444, 0.6);
-      if (itemAvailable) btn.setInteractive({ useHandCursor: true });
+      if (itemAvailable) btn.setInteractive({ cursor: HAND_CURSOR });
 
       let displayText = choice.text;
       if (choice.requiredItem && !itemAvailable) {

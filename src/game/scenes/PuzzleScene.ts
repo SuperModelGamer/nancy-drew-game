@@ -4,6 +4,7 @@ import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 import { UISounds } from '../utils/sounds';
 
 export class PuzzleScene extends Phaser.Scene {
@@ -118,7 +119,7 @@ export class PuzzleScene extends Phaser.Scene {
       fontFamily: FONT,
       fontSize: '22px',
       color: TextColors.goldDim,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
     closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
     closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
     closeBtn.on('pointerdown', () => this.closePuzzle());
@@ -162,7 +163,7 @@ export class PuzzleScene extends Phaser.Scene {
         fontFamily: FONT,
         fontSize: '24px',
         color: TextColors.gold,
-      }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
       upBtn.on('pointerdown', () => this.changeDial(i, 1));
       upBtn.on('pointerover', () => upBtn.setColor('#ffffff'));
       upBtn.on('pointerout', () => upBtn.setColor(TextColors.gold));
@@ -187,7 +188,7 @@ export class PuzzleScene extends Phaser.Scene {
         fontFamily: FONT,
         fontSize: '24px',
         color: TextColors.gold,
-      }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+      }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
       downBtn.on('pointerdown', () => this.changeDial(i, -1));
       downBtn.on('pointerover', () => downBtn.setColor('#ffffff'));
       downBtn.on('pointerout', () => downBtn.setColor(TextColors.gold));
@@ -235,7 +236,7 @@ export class PuzzleScene extends Phaser.Scene {
       const color = this.getSequenceColor(option);
       const btnBg = this.add.rectangle(0, 0, btnSpacing - 10, 48, color, 0.7);
       btnBg.setStrokeStyle(2, Colors.gold, 0.6);
-      btnBg.setInteractive({ useHandCursor: true });
+      btnBg.setInteractive({ cursor: HAND_CURSOR });
 
       const btnText = this.add.text(0, 0, option.toUpperCase(), {
         fontFamily: FONT,
@@ -266,7 +267,7 @@ export class PuzzleScene extends Phaser.Scene {
       fontFamily: FONT,
       fontSize: '14px',
       color: TextColors.goldDim,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
     clearBtn.on('pointerdown', () => {
       this.sequenceInput = [];
       this.updateSequenceDisplay();
@@ -334,7 +335,7 @@ export class PuzzleScene extends Phaser.Scene {
 
       const keyBg = this.add.rectangle(x, y, keySize, keySize, Colors.sceneBg, 0.8);
       keyBg.setStrokeStyle(1, Colors.gold, 0.4);
-      keyBg.setInteractive({ useHandCursor: true });
+      keyBg.setInteractive({ cursor: HAND_CURSOR });
 
       const keyText = this.add.text(x, y, char === ' ' ? '␣' : char, {
         fontFamily: FONT,
@@ -359,7 +360,7 @@ export class PuzzleScene extends Phaser.Scene {
     const bksY = startY + 3 * (keySize + 6);
     const bksBg = this.add.rectangle(bksX, bksY, 50, keySize, Colors.sceneBg, 0.8);
     bksBg.setStrokeStyle(1, Colors.gold, 0.4);
-    bksBg.setInteractive({ useHandCursor: true });
+    bksBg.setInteractive({ cursor: HAND_CURSOR });
     const bksText = this.add.text(bksX, bksY, '⌫', {
       fontSize: '16px',
       color: TextColors.gold,
@@ -379,7 +380,7 @@ export class PuzzleScene extends Phaser.Scene {
   private addSubmitButton(x: number, y: number, onClick: () => void): void {
     const btnBg = this.add.rectangle(x, y, 140, 44, Colors.gold, 0.2);
     btnBg.setStrokeStyle(2, Colors.gold, 0.7);
-    btnBg.setInteractive({ useHandCursor: true });
+    btnBg.setInteractive({ cursor: HAND_CURSOR });
 
     const btnText = this.add.text(x, y, 'Submit', {
       fontFamily: FONT,

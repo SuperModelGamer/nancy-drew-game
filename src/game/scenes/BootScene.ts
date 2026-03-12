@@ -54,26 +54,27 @@ export class BootScene extends Phaser.Scene {
     }
 
     // Load real item icons (texture key matches item_icon_{id} so procedural fallback is skipped)
-    const itemIcons: Record<string, string> = {
-      master_key: 'master_key',
-      magnifying_glass: 'magnifying_glass',
-      playbill_1928: 'playbill_1928',
-      effects_manual: 'stage_effects_manual',
-      margaux_diary: 'diary',
-      annotated_script: 'annotated_script',
-      poisoned_teacup: 'teacup',
-      blueprints: 'blueprint',
-      basement_key: 'basement_key',
-      edwins_notebook: 'eh_notebook',
-      fog_machine_part: 'fog_machine_part',
-      cecilia_letter: 'sealed_envelope',
-      stella_records: 'clipboard',
-      ashworth_files: 'briefcase',
-      chemical_receipt: 'torn_receipt',
-      margaux_locket: 'gold_locket',
+    // Primary: new high-quality assets from assets/items/
+    const itemIconsHQ: Record<string, string> = {
+      master_key: 'nicekey',
+      magnifying_glass: 'mglass',
+      playbill_1928: '1928page',
+      effects_manual: 'stageeffects',
+      margaux_diary: 'leatherbook',
+      annotated_script: 'Scroll',
+      poisoned_teacup: 'Teacup',
+      blueprints: 'Page3',
+      basement_key: 'Key',
+      edwins_notebook: 'EH Book',
+      fog_machine_part: 'Machine',
+      cecilia_letter: 'Letter',
+      stella_records: 'Clipboard',
+      ashworth_files: 'Briefcase',
+      chemical_receipt: 'Page',
+      margaux_locket: 'Locket',
     };
-    for (const [itemId, filename] of Object.entries(itemIcons)) {
-      this.load.image(`item_icon_${itemId}`, `assets/ui/items/${filename}.png`);
+    for (const [itemId, filename] of Object.entries(itemIconsHQ)) {
+      this.load.image(`item_icon_${itemId}`, `assets/items/${filename}.png`);
     }
 
     // Load intro cinematic background images (gracefully skipped if files don't exist)

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { ChapterSystem } from '../systems/ChapterSystem';
 import { Colors, TextColors, FONT } from '../utils/constants';
+import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 
 export class TitleScene extends Phaser.Scene {
   private settingsContainer!: Phaser.GameObjects.Container;
@@ -135,6 +136,9 @@ export class TitleScene extends Phaser.Scene {
       color: TextColors.credit,
     }).setOrigin(0.5);
 
+    // Set custom cursor
+    initSceneCursor(this);
+
     // Fade in
     this.cameras.main.fadeIn(1000, 0, 0, 0);
   }
@@ -149,7 +153,7 @@ export class TitleScene extends Phaser.Scene {
     // Button background — semi-transparent dark panel
     const bg = this.add.rectangle(0, 0, w, h, 0x0a0a1a, primary ? 0.85 : 0.7);
     bg.setStrokeStyle(primary ? 2 : 1, primary ? Colors.gold : Colors.goldDim, primary ? 0.8 : 0.4);
-    bg.setInteractive({ useHandCursor: true });
+    bg.setInteractive({ cursor: HAND_CURSOR });
 
     // Button label
     const text = this.add.text(0, subtitle ? -7 : 0, label, {
@@ -239,7 +243,7 @@ export class TitleScene extends Phaser.Scene {
     // Close button
     const closeBg = this.add.rectangle(0, 140, 120, 44, Colors.sceneBg, 0.9);
     closeBg.setStrokeStyle(1, Colors.gold, 0.5);
-    closeBg.setInteractive({ useHandCursor: true });
+    closeBg.setInteractive({ cursor: HAND_CURSOR });
     const closeText = this.add.text(0, 140, 'Close', {
       fontFamily: FONT,
       fontSize: '16px',
@@ -290,11 +294,11 @@ export class TitleScene extends Phaser.Scene {
 
     const speedLeft = this.add.text(80, -50, '◀', {
       fontFamily: FONT, fontSize: '16px', color: TextColors.goldDim,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
 
     const speedRight = this.add.text(170, -50, '▶', {
       fontFamily: FONT, fontSize: '16px', color: TextColors.goldDim,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
 
     const updateSpeed = (dir: number) => {
       currentSpeed = (currentSpeed + dir + speeds.length) % speeds.length;
@@ -316,7 +320,7 @@ export class TitleScene extends Phaser.Scene {
 
     const hlLabel = this.add.text(150, 0, hlState ? 'ON' : 'OFF', {
       fontFamily: FONT, fontSize: '15px', color: hlState ? TextColors.success : TextColors.goldDim,
-    }).setOrigin(1, 0.5).setInteractive({ useHandCursor: true });
+    }).setOrigin(1, 0.5).setInteractive({ cursor: HAND_CURSOR });
 
     hlLabel.on('pointerdown', () => {
       hlState = !hlState;
@@ -330,7 +334,7 @@ export class TitleScene extends Phaser.Scene {
     // Delete save data
     const deleteBg = this.add.rectangle(0, 60, 200, 38, 0x1a0a0a, 0.8);
     deleteBg.setStrokeStyle(1, Colors.error, 0.4);
-    deleteBg.setInteractive({ useHandCursor: true });
+    deleteBg.setInteractive({ cursor: HAND_CURSOR });
     const deleteText = this.add.text(0, 60, 'Delete Save Data', {
       fontFamily: FONT, fontSize: '14px', color: TextColors.error,
     }).setOrigin(0.5);
@@ -350,7 +354,7 @@ export class TitleScene extends Phaser.Scene {
     // Close button
     const closeBg = this.add.rectangle(0, 110, 120, 44, Colors.sceneBg, 0.9);
     closeBg.setStrokeStyle(1, Colors.gold, 0.5);
-    closeBg.setInteractive({ useHandCursor: true });
+    closeBg.setInteractive({ cursor: HAND_CURSOR });
     const closeText = this.add.text(0, 110, 'Close', {
       fontFamily: FONT, fontSize: '16px', color: TextColors.gold,
     }).setOrigin(0.5);
@@ -384,7 +388,7 @@ export class TitleScene extends Phaser.Scene {
     // Confirm
     const yesBg = this.add.rectangle(-80, 40, 120, 44, Colors.danger, 0.8);
     yesBg.setStrokeStyle(1, Colors.gold, 0.5);
-    yesBg.setInteractive({ useHandCursor: true });
+    yesBg.setInteractive({ cursor: HAND_CURSOR });
     const yesText = this.add.text(-80, 40, 'Yes', {
       fontFamily: FONT,
       fontSize: '16px',
@@ -401,7 +405,7 @@ export class TitleScene extends Phaser.Scene {
     // Cancel
     const noBg = this.add.rectangle(80, 40, 120, 44, Colors.sceneBg, 0.8);
     noBg.setStrokeStyle(1, Colors.gold, 0.5);
-    noBg.setInteractive({ useHandCursor: true });
+    noBg.setInteractive({ cursor: HAND_CURSOR });
     const noText = this.add.text(80, 40, 'Cancel', {
       fontFamily: FONT,
       fontSize: '16px',

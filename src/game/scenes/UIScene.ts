@@ -4,6 +4,7 @@ import { SaveSystem } from '../systems/SaveSystem';
 import { ChapterSystem } from '../systems/ChapterSystem';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 import { UISounds } from '../utils/sounds';
 
 // Height of the bottom toolbar strip
@@ -14,9 +15,17 @@ export class UIScene extends Phaser.Scene {
   private journalButton!: Phaser.GameObjects.Container;
   private inventoryOpen = false;
   private journalOpen = false;
-  private inventoryPanel!: Phaser.GameObjects.Container;
+  private inventoryContainer!: Phaser.GameObjects.Container;
   private journalPanel!: Phaser.GameObjects.Container;
-  private itemDescPanel!: Phaser.GameObjects.Container;
+  // Detail panel elements (right side of inventory)
+  private detailImage!: Phaser.GameObjects.Image | null;
+  private detailName!: Phaser.GameObjects.Text;
+  private detailDesc!: Phaser.GameObjects.Text;
+  private detailKeyBadge!: Phaser.GameObjects.Container;
+  private detailPlaceholder!: Phaser.GameObjects.Text;
+  private selectedItemId: string | null = null;
+  // Track items container for refresh
+  private itemsGrid!: Phaser.GameObjects.Container;
 
   constructor() {
     super({ key: 'UIScene' });
@@ -24,27 +33,23 @@ export class UIScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = this.cameras.main;
+    initSceneCursor(this);
     const barY = height - TOOLBAR_H / 2;
 
     // ─── Bottom toolbar background strip ───
-    // Gradient fade: transparent at top → solid dark at bottom
     const barBg = this.add.graphics();
-    // Top fade zone (20px above the bar)
     for (let i = 0; i < 20; i++) {
       const alpha = (i / 20) * 0.85;
       barBg.fillStyle(0x0a0a12, alpha);
       barBg.fillRect(0, height - TOOLBAR_H - 20 + i, width, 1);
     }
-    // Solid bar background
     barBg.fillStyle(0x0a0a12, 0.85);
     barBg.fillRect(0, height - TOOLBAR_H, width, TOOLBAR_H);
-    // Gold accent line at top of bar
     barBg.lineStyle(1, Colors.gold, 0.25);
     barBg.lineBetween(0, height - TOOLBAR_H, width, height - TOOLBAR_H);
     barBg.setDepth(Depths.tooltip - 1);
 
     // ─── Toolbar buttons ───
-    // All buttons sit on the bar, evenly spaced
     const btnStyle = { fontFamily: FONT, fontSize: '14px' };
     const buttons = [
       { label: 'Items', color: TextColors.gold, borderColor: Colors.gold, x: width * 0.12, action: () => this.toggleInventory() },
@@ -59,7 +64,7 @@ export class UIScene extends Phaser.Scene {
 
       const bg = this.add.rectangle(0, 0, 100, 36, 0x0a0a12, 0);
       bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
-      bg.setInteractive({ useHandCursor: true });
+      bg.setInteractive({ cursor: HAND_CURSOR });
 
       const text = this.add.text(0, 0, btn.label, {
         ...btnStyle,
@@ -79,7 +84,7 @@ export class UIScene extends Phaser.Scene {
       bg.on('pointerdown', btn.action);
     });
 
-    // ─── Chapter indicator (top-center, on dark strip) ───
+    // ─── Chapter indicator (top-center) ───
     const chapterLabel = this.add.text(width / 2, 12, '', {
       fontFamily: FONT,
       fontSize: '12px',
@@ -94,18 +99,15 @@ export class UIScene extends Phaser.Scene {
     this.events.on('wake', updateChapter);
 
     // ─── Panels (hidden by default) ───
-    this.inventoryPanel = this.createInventoryPanel();
-    this.inventoryPanel.setVisible(false);
+    this.inventoryContainer = this.createInventoryPanel();
+    this.inventoryContainer.setVisible(false);
 
     this.journalPanel = this.createJournalPanel();
     this.journalPanel.setVisible(false);
 
-    this.itemDescPanel = this.createItemDescPanel();
-    this.itemDescPanel.setVisible(false);
-
     // Listen for inventory changes
     InventorySystem.getInstance().onChange(() => {
-      this.refreshInventoryPanel();
+      if (this.inventoryOpen) this.refreshInventoryGrid();
     });
   }
 
@@ -118,26 +120,24 @@ export class UIScene extends Phaser.Scene {
     this.inventoryOpen = !this.inventoryOpen;
     if (this.inventoryOpen) {
       UISounds.panelOpen();
-      this.refreshInventoryPanel();
-      this.inventoryPanel.setVisible(true);
-      this.inventoryPanel.setAlpha(0);
-      this.tweens.add({ targets: this.inventoryPanel, alpha: 1, duration: 200 });
+      this.refreshInventoryGrid();
+      this.inventoryContainer.setVisible(true);
+      this.inventoryContainer.setAlpha(0);
+      this.tweens.add({ targets: this.inventoryContainer, alpha: 1, duration: 200 });
     } else {
       this.tweens.add({
-        targets: this.inventoryPanel,
+        targets: this.inventoryContainer,
         alpha: 0,
         duration: 200,
-        onComplete: () => this.inventoryPanel.setVisible(false),
+        onComplete: () => this.inventoryContainer.setVisible(false),
       });
-      this.itemDescPanel.setVisible(false);
     }
   }
 
   private toggleJournal(): void {
     if (this.inventoryOpen) {
       this.inventoryOpen = false;
-      this.inventoryPanel.setVisible(false);
-      this.itemDescPanel.setVisible(false);
+      this.inventoryContainer.setVisible(false);
     }
 
     this.journalOpen = !this.journalOpen;
@@ -157,87 +157,381 @@ export class UIScene extends Phaser.Scene {
     }
   }
 
+  // ─── Full-screen Evidence Panel ───────────────────────────────────────────
+
   private createInventoryPanel(): Phaser.GameObjects.Container {
     const { width, height } = this.cameras.main;
-    const panelW = Math.min(width * 0.9, 600);
-    const panelH = 220;
-    // Position above the toolbar
-    const panel = this.add.container(width / 2, height - TOOLBAR_H - panelH / 2 - 10);
+    const container = this.add.container(0, 0);
+    container.setDepth(Depths.inventoryPanel);
 
-    const bg = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.95);
-    bg.setStrokeStyle(2, Colors.gold, 0.7);
-    panel.add(bg);
+    // Full-screen dark overlay
+    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.88);
+    overlay.setInteractive(); // block clicks through
+    container.add(overlay);
 
-    const title = this.add.text(0, -panelH / 2 + 20, 'Evidence', {
+    // Main panel dimensions — fill most of the screen, leave room for toolbar
+    const panelW = Math.min(width - 40, 1100);
+    const panelH = height - TOOLBAR_H - 30;
+    const panelX = width / 2;
+    const panelY = panelH / 2 + 10;
+
+    // Panel background
+    const panelBg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x12111a, 0.97);
+    panelBg.setStrokeStyle(1.5, Colors.gold, 0.35);
+    container.add(panelBg);
+
+    // ─── Header ───
+    const headerH = 44;
+    const headerY = panelY - panelH / 2 + headerH / 2;
+
+    const headerBg = this.add.rectangle(panelX, headerY, panelW - 2, headerH, 0x0e0d16, 1);
+    container.add(headerBg);
+
+    const title = this.add.text(panelX, headerY, 'CASE FILE — EVIDENCE', {
       fontFamily: FONT,
-      fontSize: '18px',
+      fontSize: '15px',
       color: TextColors.gold,
+      fontStyle: 'bold',
+      letterSpacing: 4,
     }).setOrigin(0.5);
-    panel.add(title);
+    container.add(title);
 
-    // Deselect hint
-    const hint = this.add.text(0, -panelH / 2 + 42, 'Click an item to select it for use. Click again to deselect.', {
+    // Decorative header lines
+    const lineGfx = this.add.graphics();
+    lineGfx.lineStyle(1, Colors.gold, 0.25);
+    lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - 160, headerY);
+    lineGfx.lineBetween(panelX + 160, headerY, panelX + panelW / 2 - 20, headerY);
+    container.add(lineGfx);
+
+    // Close button
+    const closeBtn = this.add.text(panelX + panelW / 2 - 22, headerY, '✕', {
+      fontFamily: FONT,
+      fontSize: '20px',
+      color: TextColors.goldDim,
+    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
+    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
+    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
+    closeBtn.on('pointerdown', () => this.toggleInventory());
+    container.add(closeBtn);
+
+    // ─── Layout: left item grid + right detail panel ───
+    const contentTop = headerY + headerH / 2 + 12;
+    const contentBottom = panelY + panelH / 2 - 14;
+    const contentH = contentBottom - contentTop;
+    const leftW = panelW * 0.55;
+    const rightW = panelW - leftW - 30;
+    const leftX = panelX - panelW / 2 + 15;
+    const rightX = leftX + leftW + 15;
+
+    // ─── Items grid container (will be populated by refresh) ───
+    this.itemsGrid = this.add.container(0, 0);
+    container.add(this.itemsGrid);
+
+    // ─── Right detail panel ───
+    const detailCenterX = rightX + rightW / 2;
+    const detailCenterY = contentTop + contentH / 2;
+
+    // Detail background
+    const detailBg = this.add.rectangle(detailCenterX, detailCenterY, rightW, contentH, 0x0e0d16, 0.7);
+    detailBg.setStrokeStyle(1, Colors.gold, 0.15);
+    container.add(detailBg);
+
+    // Placeholder text (shown when no item selected)
+    this.detailPlaceholder = this.add.text(detailCenterX, detailCenterY, 'Select an item to inspect', {
+      fontFamily: FONT,
+      fontSize: '14px',
+      color: TextColors.muted,
+      fontStyle: 'italic',
+      align: 'center',
+    }).setOrigin(0.5);
+    container.add(this.detailPlaceholder);
+
+    // Detail image (created on demand)
+    this.detailImage = null;
+
+    // Detail name
+    this.detailName = this.add.text(detailCenterX, contentTop + 20, '', {
+      fontFamily: FONT,
+      fontSize: '20px',
+      color: TextColors.gold,
+      fontStyle: 'bold',
+      align: 'center',
+    }).setOrigin(0.5, 0);
+    container.add(this.detailName);
+
+    // Key item badge
+    this.detailKeyBadge = this.add.container(detailCenterX, contentTop + 48);
+    const badgeBg = this.add.rectangle(0, 0, 100, 22, Colors.gold, 0.12);
+    badgeBg.setStrokeStyle(1, Colors.gold, 0.3);
+    const badgeText = this.add.text(0, 0, '★  KEY EVIDENCE', {
+      fontFamily: FONT,
+      fontSize: '10px',
+      color: TextColors.gold,
+      letterSpacing: 1,
+    }).setOrigin(0.5);
+    this.detailKeyBadge.add([badgeBg, badgeText]);
+    this.detailKeyBadge.setVisible(false);
+    container.add(this.detailKeyBadge);
+
+    // Detail description
+    this.detailDesc = this.add.text(detailCenterX, contentTop + 80, '', {
+      fontFamily: FONT,
+      fontSize: '14px',
+      color: TextColors.light,
+      wordWrap: { width: rightW - 40 },
+      lineSpacing: 5,
+      align: 'center',
+    }).setOrigin(0.5, 0);
+    container.add(this.detailDesc);
+
+    // Hint at bottom of detail panel
+    const hintY = contentBottom - 20;
+    const hint = this.add.text(detailCenterX, hintY, 'Click an item to select it for use.\nClick again to deselect.', {
       fontFamily: FONT,
       fontSize: '11px',
       color: TextColors.muted,
       fontStyle: 'italic',
-    }).setOrigin(0.5);
-    panel.add(hint);
+      align: 'center',
+      lineSpacing: 2,
+    }).setOrigin(0.5, 1);
+    container.add(hint);
 
-    panel.setDepth(Depths.inventoryPanel);
-    return panel;
+    // Store layout info for refresh
+    container.setData('leftX', leftX);
+    container.setData('contentTop', contentTop);
+    container.setData('contentH', contentH);
+    container.setData('leftW', leftW);
+    container.setData('rightW', rightW);
+    container.setData('rightX', rightX);
+
+    return container;
   }
+
+  private refreshInventoryGrid(): void {
+    // Clear old item cards
+    this.itemsGrid.removeAll(true);
+
+    const inventory = InventorySystem.getInstance();
+    const items = inventory.getItems();
+    const allItems = itemsData.items;
+    const selectedItem = inventory.getSelectedItem();
+
+    const leftX = this.inventoryContainer.getData('leftX') as number;
+    const contentTop = this.inventoryContainer.getData('contentTop') as number;
+    const contentH = this.inventoryContainer.getData('contentH') as number;
+    const leftW = this.inventoryContainer.getData('leftW') as number;
+
+    // Grid layout: 3 columns
+    const cols = 3;
+    const cardW = Math.floor((leftW - 20) / cols) - 8;
+    const cardH = cardW + 30; // square image + name below
+    const gap = 10;
+    const gridStartX = leftX + 10;
+    const gridStartY = contentTop + 8;
+
+    if (items.length === 0) {
+      const emptyText = this.add.text(
+        leftX + leftW / 2, contentTop + contentH / 2,
+        'No evidence collected yet.\n\nExplore the theater to find items.',
+        {
+          fontFamily: FONT,
+          fontSize: '14px',
+          color: TextColors.muted,
+          fontStyle: 'italic',
+          align: 'center',
+          lineSpacing: 4,
+        }
+      ).setOrigin(0.5);
+      this.itemsGrid.add(emptyText);
+      return;
+    }
+
+    items.forEach((itemId, index) => {
+      const itemData = allItems.find((i: { id: string }) => i.id === itemId);
+      if (!itemData) return;
+
+      const col = index % cols;
+      const row = Math.floor(index / cols);
+      const x = gridStartX + col * (cardW + gap) + cardW / 2;
+      const y = gridStartY + row * (cardH + gap) + cardW / 2;
+
+      const isSelected = selectedItem === itemId;
+      const isInspected = this.selectedItemId === itemId;
+
+      // Card background
+      const cardBg = this.add.rectangle(x, y + 10, cardW, cardH, 0x15141e, 0.9);
+      const borderColor = isSelected ? Colors.success : (isInspected ? Colors.gold : Colors.goldDim);
+      const borderAlpha = isSelected ? 0.9 : (isInspected ? 0.7 : 0.2);
+      cardBg.setStrokeStyle(isSelected || isInspected ? 2 : 1, borderColor, borderAlpha);
+      cardBg.setInteractive({ cursor: HAND_CURSOR });
+
+      // Item image — larger and prominent
+      const iconKey = `item_icon_${itemId}`;
+      const imgSize = cardW - 20;
+      let icon: Phaser.GameObjects.GameObject;
+      if (this.textures.exists(iconKey)) {
+        const img = this.add.image(x, y, iconKey);
+        // Scale to fit while maintaining aspect ratio
+        const tex = this.textures.get(iconKey).getSourceImage();
+        const scale = Math.min(imgSize / tex.width, imgSize / tex.height);
+        img.setScale(scale);
+        icon = img;
+      } else {
+        icon = this.add.text(x, y, itemData.icon || '?', {
+          fontSize: '48px',
+        }).setOrigin(0.5);
+      }
+
+      // Item name below image
+      const label = this.add.text(x, y + cardW / 2 + 4, itemData.name, {
+        fontFamily: FONT,
+        fontSize: '11px',
+        color: isSelected ? TextColors.success : TextColors.gold,
+        align: 'center',
+        wordWrap: { width: cardW - 8 },
+      }).setOrigin(0.5, 0);
+
+      // Selected indicator
+      if (isSelected) {
+        const selBadge = this.add.text(x + cardW / 2 - 6, y - cardW / 2 + 10, '✓', {
+          fontFamily: FONT,
+          fontSize: '14px',
+          color: TextColors.success,
+          fontStyle: 'bold',
+        }).setOrigin(0.5);
+        this.itemsGrid.add(selBadge);
+      }
+
+      // Click to select/deselect for use + show detail
+      cardBg.on('pointerdown', () => {
+        if (selectedItem === itemId) {
+          inventory.selectItem(null);
+        } else {
+          inventory.selectItem(itemId);
+        }
+        this.showItemDetail(itemId);
+      });
+
+      // Hover effects
+      cardBg.on('pointerover', () => {
+        cardBg.setFillStyle(0x1e1d2e, 1);
+        cardBg.setStrokeStyle(2, Colors.gold, 0.6);
+        this.showItemDetail(itemId);
+      });
+      cardBg.on('pointerout', () => {
+        if (this.selectedItemId !== itemId) {
+          cardBg.setFillStyle(0x15141e, 0.9);
+          const bc = (selectedItem === itemId) ? Colors.success : Colors.goldDim;
+          const ba = (selectedItem === itemId) ? 0.9 : 0.2;
+          cardBg.setStrokeStyle((selectedItem === itemId) ? 2 : 1, bc, ba);
+        }
+      });
+
+      this.itemsGrid.add([cardBg, icon, label]);
+    });
+  }
+
+  private showItemDetail(itemId: string): void {
+    this.selectedItemId = itemId;
+
+    const allItems = itemsData.items;
+    const itemData = allItems.find((i: { id: string }) => i.id === itemId);
+    if (!itemData) return;
+
+    const rightX = this.inventoryContainer.getData('rightX') as number;
+    const rightW = this.inventoryContainer.getData('rightW') as number;
+    const contentTop = this.inventoryContainer.getData('contentTop') as number;
+    const detailCenterX = rightX + rightW / 2;
+
+    // Hide placeholder
+    this.detailPlaceholder.setVisible(false);
+
+    // Update name
+    this.detailName.setText(itemData.name);
+    this.detailName.setVisible(true);
+
+    // Update key badge
+    const isKey = (itemData as { isKeyItem?: boolean }).isKeyItem;
+    this.detailKeyBadge.setVisible(!!isKey);
+
+    // Update description — position below badge or name
+    const descY = isKey ? contentTop + 68 : contentTop + 48;
+
+    // Update or create detail image
+    const iconKey = `item_icon_${itemId}`;
+    if (this.detailImage) {
+      this.detailImage.destroy();
+      this.detailImage = null;
+    }
+
+    if (this.textures.exists(iconKey)) {
+      const imgMaxSize = Math.min(rightW - 60, 220);
+      const img = this.add.image(detailCenterX, descY + 20, iconKey);
+      const tex = this.textures.get(iconKey).getSourceImage();
+      const scale = Math.min(imgMaxSize / tex.width, imgMaxSize / tex.height);
+      img.setScale(scale);
+      img.setOrigin(0.5, 0);
+      this.detailImage = img;
+      this.inventoryContainer.add(img);
+
+      // Position description below image
+      const imgBottom = descY + 20 + tex.height * scale + 16;
+      this.detailDesc.setPosition(detailCenterX, imgBottom);
+    } else {
+      this.detailDesc.setPosition(detailCenterX, descY + 20);
+    }
+
+    this.detailDesc.setText(itemData.description);
+    this.detailDesc.setVisible(true);
+  }
+
+  // ─── Journal Panel ──────────────────────────────────────────────────────
 
   private createJournalPanel(): Phaser.GameObjects.Container {
     const { width, height } = this.cameras.main;
     const panelW = Math.min(width * 0.9, 600);
     const panelH = 400;
-    // Center vertically but stay above toolbar
     const panelY = Math.min(height / 2, height - TOOLBAR_H - panelH / 2 - 15);
     const panel = this.add.container(width / 2, panelY);
 
     // Aged paper background
     const paper = this.add.rectangle(0, 0, panelW, panelH, Colors.paper, 0.95);
     paper.setStrokeStyle(2, Colors.paperBorder, 0.8);
-    paper.setInteractive(); // block clicks through
+    paper.setInteractive();
     panel.add(paper);
 
-    // Paper texture — subtle stain patches for aged feel
+    // Paper texture — subtle stain patches
     const stains = this.add.graphics();
     stains.fillStyle(Colors.paperBorder, 0.08);
     stains.fillCircle(-panelW / 4, -panelH / 4, 40);
     stains.fillCircle(panelW / 3, panelH / 5, 30);
     stains.fillEllipse(-panelW / 6, panelH / 3, 60, 25);
-    // Faint ruled lines
     stains.lineStyle(1, Colors.paperBorder, 0.15);
     for (let ly = -panelH / 2 + 65; ly < panelH / 2 - 20; ly += 22) {
       stains.lineBetween(-panelW / 2 + 25, ly, panelW / 2 - 25, ly);
     }
-    // Red margin line
     stains.lineStyle(1, 0xcc6666, 0.2);
     stains.lineBetween(-panelW / 2 + 55, -panelH / 2 + 10, -panelW / 2 + 55, panelH / 2 - 10);
     panel.add(stains);
 
-    const title = this.add.text(0, -panelH / 2 + 25, 'Nancy\'s Journal', {
+    const titleText = this.add.text(0, -panelH / 2 + 25, 'Nancy\'s Journal', {
       fontFamily: '\'Palatino Linotype\', \'Book Antiqua\', Palatino, Georgia, serif',
       fontSize: '22px',
       color: '#3a2a1a',
       fontStyle: 'italic',
     }).setOrigin(0.5);
-    panel.add(title);
+    panel.add(titleText);
 
-    // Decorative underline
     const underline = this.add.graphics();
     underline.lineStyle(1, 0x3a2a1a, 0.4);
     underline.lineBetween(-60, -panelH / 2 + 40, 60, -panelH / 2 + 40);
     panel.add(underline);
 
-    // Close button
     const closeBtn = this.add.text(panelW / 2 - 20, -panelH / 2 + 15, '✕', {
       fontFamily: FONT,
       fontSize: '20px',
       color: '#6a5a4a',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
     closeBtn.on('pointerdown', () => this.toggleJournal());
     closeBtn.on('pointerover', () => closeBtn.setColor('#3a2a1a'));
     closeBtn.on('pointerout', () => closeBtn.setColor('#6a5a4a'));
@@ -247,130 +541,8 @@ export class UIScene extends Phaser.Scene {
     return panel;
   }
 
-  private createItemDescPanel(): Phaser.GameObjects.Container {
-    const { width } = this.cameras.main;
-    const panelW = Math.min(width * 0.85, 500);
-    const panel = this.add.container(width / 2, 150);
-
-    const bg = this.add.rectangle(0, 0, panelW, 100, Colors.panelBg, 0.95);
-    bg.setStrokeStyle(1, Colors.gold, 0.5);
-    panel.add(bg);
-
-    const nameText = this.add.text(0, -25, '', {
-      fontFamily: FONT,
-      fontSize: '16px',
-      color: TextColors.gold,
-      fontStyle: 'bold',
-    }).setOrigin(0.5);
-    panel.add(nameText);
-
-    const descText = this.add.text(0, 5, '', {
-      fontFamily: FONT,
-      fontSize: '13px',
-      color: TextColors.light,
-      wordWrap: { width: panelW - 40 },
-      lineSpacing: 2,
-      align: 'center',
-    }).setOrigin(0.5, 0);
-    panel.add(descText);
-
-    panel.setDepth(Depths.itemDescPanel);
-    return panel;
-  }
-
-  private refreshInventoryPanel(): void {
-    // Clear old item displays (keep bg, title, hint = 3 elements)
-    while (this.inventoryPanel.length > 3) {
-      this.inventoryPanel.removeAt(3, true);
-    }
-
-    const inventory = InventorySystem.getInstance();
-    const items = inventory.getItems();
-    const allItems = itemsData.items;
-    const selectedItem = inventory.getSelectedItem();
-
-    const cols = 6;
-    const slotSize = 70;
-    const spacing = 80;
-    const startX = -(Math.min(items.length, cols) - 1) * spacing / 2;
-    const startY = 20;
-
-    items.forEach((itemId, index) => {
-      const itemData = allItems.find((i: { id: string }) => i.id === itemId);
-      if (!itemData) return;
-
-      const col = index % cols;
-      const row = Math.floor(index / cols);
-      const x = startX + col * spacing;
-      const y = startY + row * (slotSize + 20);
-
-      const isSelected = selectedItem === itemId;
-      const borderColor = isSelected ? Colors.success : Colors.gold;
-      const borderAlpha = isSelected ? 0.9 : 0.4;
-
-      const slot = this.add.rectangle(x, y, slotSize, slotSize, Colors.sceneBg, 0.8);
-      slot.setStrokeStyle(isSelected ? 2 : 1, borderColor, borderAlpha);
-      slot.setInteractive({ useHandCursor: true });
-
-      const label = this.add.text(x, y + slotSize / 2 + 8, itemData.name, {
-        fontFamily: FONT,
-        fontSize: '10px',
-        color: isSelected ? TextColors.success : TextColors.gold,
-        align: 'center',
-        wordWrap: { width: slotSize + 10 },
-      }).setOrigin(0.5, 0);
-
-      // Use procedural icon texture if available, fall back to emoji
-      const iconKey = `item_icon_${itemId}`;
-      let icon: Phaser.GameObjects.GameObject;
-      if (this.textures.exists(iconKey)) {
-        const img = this.add.image(x, y, iconKey).setDisplaySize(40, 40);
-        icon = img;
-      } else {
-        icon = this.add.text(x, y, itemData.icon || '?', {
-          fontSize: '28px',
-        }).setOrigin(0.5);
-      }
-
-      // Click to select/deselect
-      slot.on('pointerdown', () => {
-        if (selectedItem === itemId) {
-          inventory.selectItem(null);
-          this.itemDescPanel.setVisible(false);
-        } else {
-          inventory.selectItem(itemId);
-          this.showItemDescription(itemData);
-        }
-      });
-
-      // Hover to show description
-      slot.on('pointerover', () => {
-        slot.setFillStyle(Colors.hoverBg);
-        this.showItemDescription(itemData);
-      });
-      slot.on('pointerout', () => {
-        slot.setFillStyle(Colors.sceneBg, 0.8);
-      });
-
-      this.inventoryPanel.add([slot, label, icon]);
-    });
-  }
-
-  private showItemDescription(itemData: { name: string; description: string }): void {
-    const nameText = this.itemDescPanel.getAt(1) as Phaser.GameObjects.Text;
-    const descText = this.itemDescPanel.getAt(2) as Phaser.GameObjects.Text;
-    nameText.setText(itemData.name);
-    descText.setText(itemData.description);
-
-    // Resize bg to fit
-    const bg = this.itemDescPanel.getAt(0) as Phaser.GameObjects.Rectangle;
-    bg.setSize(bg.width, Math.max(80, descText.height + 50));
-
-    this.itemDescPanel.setVisible(true);
-  }
-
   private refreshJournalPanel(): void {
-    // Clear old entries (keep bg, title, underline, stains, closeBtn = 5 elements)
+    // Clear old entries (keep bg, stains, title, underline, closeBtn = 5 elements)
     while (this.journalPanel.length > 5) {
       this.journalPanel.removeAt(5, true);
     }
@@ -395,7 +567,6 @@ export class UIScene extends Phaser.Scene {
 
     let y = -130;
     journal.forEach((entry, i) => {
-      // Slight random offset for handwritten feel
       const xJitter = ((i * 7) % 5) - 2;
 
       const bullet = this.add.text(-panelW / 2 + 62 + xJitter, y, `${i + 1}.`, {

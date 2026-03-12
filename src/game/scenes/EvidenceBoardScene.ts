@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { PuzzleSystem } from '../systems/PuzzleSystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 import { UISounds } from '../utils/sounds';
 
 interface EvidenceCard {
@@ -89,7 +90,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
       fontFamily: FONT,
       fontSize: '24px',
       color: TextColors.goldDim,
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
     closeBtn.on('pointerdown', () => this.scene.stop());
     closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
     closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
@@ -278,7 +279,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
     container.setSize(w, h);
     container.setData('cardId', card.id);
     container.setData('startIndex', index);
-    container.setInteractive({ draggable: true, useHandCursor: true });
+    container.setInteractive({ draggable: true, cursor: HAND_CURSOR });
 
     this.boardContainer.add(container);
     this.cardContainers.push(container);
