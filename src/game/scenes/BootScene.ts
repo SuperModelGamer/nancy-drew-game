@@ -23,7 +23,7 @@ export class BootScene extends Phaser.Scene {
 
     const loadingText = this.add.text(width / 2, barY - 30, 'Loading...', {
       fontFamily: FONT,
-      fontSize: '18px',
+      fontSize: '27px',
       color: TextColors.gold,
     });
     loadingText.setOrigin(0.5);

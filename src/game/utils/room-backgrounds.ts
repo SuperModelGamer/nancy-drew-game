@@ -467,7 +467,7 @@ function drawCatwalk(scene: Phaser.Scene, gfx: Phaser.GameObjects.Graphics, w: n
   }
 
   // Lighting instruments hanging
-  const lightPositions = [200, 400, 640, 880, 1080];
+  const lightPositions = [w * 0.15, w * 0.31, w * 0.5, w * 0.69, w * 0.85];
   lightPositions.forEach((lx) => {
     // Pipe
     gfx.lineStyle(2, 0x555560, 0.5);

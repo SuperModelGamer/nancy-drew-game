@@ -104,10 +104,9 @@ const SUSPECTS: SuspectProfile[] = [
   },
 ];
 
-// Canvas is 1280×720. Toolbar is 52px at bottom.
-const TOOLBAR_H = 52;
-const W = 1280;
-const H = 720;
+// Toolbar height matching UIScene
+const TOOLBAR_H = 96;
+const BOTTOM_MARGIN = 12;
 
 export class SuspectScene extends Phaser.Scene {
   private container!: Phaser.GameObjects.Container;
@@ -129,10 +128,10 @@ export class SuspectScene extends Phaser.Scene {
 
     // ─── Main panel ───
     // Leave 52px for toolbar + 8px padding at bottom, 8px at top
-    const panelW = 1100;
-    const panelH = height - TOOLBAR_H - 16;
+    const panelW = Math.min(1650, width - 60);
+    const panelH = height - TOOLBAR_H - BOTTOM_MARGIN - 24;
     const panelX = width / 2;
-    const panelY = panelH / 2 + 8;
+    const panelY = panelH / 2 + 12;
 
     // Background — art deco framed dossier
     const panelLeft = panelX - panelW / 2;
@@ -148,10 +147,10 @@ export class SuspectScene extends Phaser.Scene {
     this.container.add(decoFrame);
 
     // ─── Header bar ───
-    const headerH = 48;
+    const headerH = 72;
     const headerY = panelY - panelH / 2 + headerH / 2;
 
-    const headerBg = this.add.rectangle(panelX, headerY, panelW - 8, headerH, DecoColors.navy, 1);
+    const headerBg = this.add.rectangle(panelX, headerY, panelW - 12, headerH, DecoColors.navy, 1);
     this.container.add(headerBg);
 
     // Header bottom border
@@ -162,10 +161,10 @@ export class SuspectScene extends Phaser.Scene {
 
     const title = this.add.text(panelX, headerY, 'CASE FILE — SUSPECT DOSSIERS', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '24px',
       color: DecoTextColors.goldBright,
       fontStyle: 'bold',
-      letterSpacing: 5,
+      letterSpacing: 7,
     }).setOrigin(0.5);
     this.container.add(title);
 
@@ -175,13 +174,13 @@ export class SuspectScene extends Phaser.Scene {
     this.container.add(divGfxHeader);
 
     // Close button
-    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.scene.stop(), 44);
+    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 33, headerY, () => this.scene.stop(), 66);
     closeBtn.setDepth(Depths.suspectContent);
 
     // ─── Suspect tabs (horizontal strip below header) ───
-    const tabStripY = headerY + headerH / 2 + 40;
-    const tabW = 190;
-    const tabGap = 12;
+    const tabStripY = headerY + headerH / 2 + 60;
+    const tabW = 285;
+    const tabGap = 18;
     const totalTabsW = SUSPECTS.length * tabW + (SUSPECTS.length - 1) * tabGap;
     const tabStartX = panelX - totalTabsW / 2 + tabW / 2;
 
@@ -191,31 +190,31 @@ export class SuspectScene extends Phaser.Scene {
       const colorHex = `#${suspect.color.toString(16).padStart(6, '0')}`;
 
       // Tab card
-      const tabBg = this.add.rectangle(tx, tabStripY, tabW, 54,
+      const tabBg = this.add.rectangle(tx, tabStripY, tabW, 81,
         isSelected ? 0x1e1d2e : 0x15141e, isSelected ? 1 : 0.85);
       tabBg.setStrokeStyle(isSelected ? 2 : 1, suspect.color, isSelected ? 0.7 : 0.2);
       tabBg.setInteractive({ cursor: POINTER_CURSOR });
 
       // Bottom accent bar when selected
       if (isSelected) {
-        const accent = this.add.rectangle(tx, tabStripY + 27 - 2, tabW, 3, suspect.color, 0.8);
+        const accent = this.add.rectangle(tx, tabStripY + 40 - 3, tabW, 4, suspect.color, 0.8);
         this.container.add(accent);
       }
 
       // Small portrait
-      const portraitX = tx - tabW / 2 + 24;
+      const portraitX = tx - tabW / 2 + 36;
       const portraitKey = `portrait_${suspect.id}`;
       if (this.textures.exists(portraitKey)) {
         const portrait = this.add.image(portraitX, tabStripY, portraitKey);
-        portrait.setDisplaySize(36, 36);
+        portrait.setDisplaySize(54, 54);
         const maskGfx = this.make.graphics({});
-        maskGfx.fillCircle(portraitX, tabStripY, 18);
+        maskGfx.fillCircle(portraitX, tabStripY, 27);
         portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
         this.container.add(portrait);
       } else {
-        const circle = this.add.ellipse(portraitX, tabStripY, 36, 36, suspect.color, 0.15);
+        const circle = this.add.ellipse(portraitX, tabStripY, 54, 54, suspect.color, 0.15);
         const letter = this.add.text(portraitX, tabStripY, suspect.icon, {
-          fontFamily: FONT, fontSize: '18px', color: colorHex, fontStyle: 'bold',
+          fontFamily: FONT, fontSize: '27px', color: colorHex, fontStyle: 'bold',
         }).setOrigin(0.5);
         this.container.add([circle, letter]);
       }
@@ -224,15 +223,15 @@ export class SuspectScene extends Phaser.Scene {
       const firstName = suspect.name.split(' ')[0];
       const nameText = this.add.text(tx + 2, tabStripY - 10, firstName, {
         fontFamily: FONT,
-        fontSize: isSelected ? '15px' : '14px',
+        fontSize: isSelected ? '22px' : '21px',
         color: isSelected ? TextColors.light : TextColors.goldDim,
         fontStyle: isSelected ? 'bold' : 'normal',
       }).setOrigin(0.5, 0.5);
 
       // Role
-      const roleText = this.add.text(tx + 2, tabStripY + 10, suspect.role, {
+      const roleText = this.add.text(tx + 2, tabStripY + 15, suspect.role, {
         fontFamily: FONT,
-        fontSize: '10px',
+        fontSize: '15px',
         color: isSelected ? colorHex : TextColors.muted,
         fontStyle: 'italic',
       }).setOrigin(0.5, 0.5);
@@ -252,10 +251,10 @@ export class SuspectScene extends Phaser.Scene {
     });
 
     // ─── Detail area (below tabs) ───
-    const detailTop = tabStripY + 42;
-    const detailBottom = panelY + panelH / 2 - 14;
+    const detailTop = tabStripY + 63;
+    const detailBottom = panelY + panelH / 2 - 21;
     const detailH = detailBottom - detailTop;
-    const detailW = panelW - 60;
+    const detailW = panelW - 90;
     const detailCenterX = panelX;
     const detailCenterY = detailTop + detailH / 2;
 
@@ -275,19 +274,19 @@ export class SuspectScene extends Phaser.Scene {
     const dialogue = DialogueSystem.getInstance();
 
     // ── Left column: portrait + info card ──
-    const leftW = 280;
+    const leftW = 420;
     const leftX = cx - dw / 2;
 
     // Portrait card background
-    const cardH = Math.min(dh - 10, 480);
+    const cardH = Math.min(dh - 15, 720);
     const cardY = cy;
     const cardBg = this.add.rectangle(leftX + leftW / 2, cardY, leftW, cardH, 0x0e0d16, 0.7);
     cardBg.setStrokeStyle(1, suspect.color, 0.2);
     this.container.add(cardBg);
 
     // Large portrait
-    const portraitSize = 160;
-    const portraitY = cardY - cardH / 2 + 20 + portraitSize / 2;
+    const portraitSize = 240;
+    const portraitY = cardY - cardH / 2 + 30 + portraitSize / 2;
     const portraitX = leftX + leftW / 2;
     const portraitKey = `portrait_${suspect.id}`;
 
@@ -297,17 +296,17 @@ export class SuspectScene extends Phaser.Scene {
       const maskGfx = this.make.graphics({});
       maskGfx.fillRoundedRect(
         portraitX - portraitSize / 2, portraitY - portraitSize / 2,
-        portraitSize, portraitSize, 10
+        portraitSize, portraitSize, 15
       );
       portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
       this.container.add(portrait);
 
       // Portrait frame
       const frame = this.add.graphics();
-      frame.lineStyle(2, suspect.color, 0.5);
+      frame.lineStyle(3, suspect.color, 0.5);
       frame.strokeRoundedRect(
         portraitX - portraitSize / 2, portraitY - portraitSize / 2,
-        portraitSize, portraitSize, 10
+        portraitSize, portraitSize, 15
       );
       this.container.add(frame);
     } else {
@@ -315,42 +314,42 @@ export class SuspectScene extends Phaser.Scene {
       const iconBg = this.add.rectangle(portraitX, portraitY, portraitSize, portraitSize, suspect.color, 0.1);
       iconBg.setStrokeStyle(2, suspect.color, 0.3);
       const iconText = this.add.text(portraitX, portraitY, suspect.icon, {
-        fontFamily: FONT, fontSize: '60px', color: colorHex, fontStyle: 'bold',
+        fontFamily: FONT, fontSize: '90px', color: colorHex, fontStyle: 'bold',
       }).setOrigin(0.5);
       this.container.add([iconBg, iconText]);
     }
 
     // Name (below portrait)
-    const nameY = portraitY + portraitSize / 2 + 20;
+    const nameY = portraitY + portraitSize / 2 + 30;
     this.container.add(this.add.text(portraitX, nameY, suspect.name, {
       fontFamily: FONT,
-      fontSize: '20px',
+      fontSize: '30px',
       color: colorHex,
       fontStyle: 'bold',
       align: 'center',
     }).setOrigin(0.5));
 
     // Role
-    this.container.add(this.add.text(portraitX, nameY + 26, suspect.role, {
+    this.container.add(this.add.text(portraitX, nameY + 39, suspect.role, {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.light,
       fontStyle: 'italic',
     }).setOrigin(0.5));
 
     // Info chips
-    const chipStartY = nameY + 56;
+    const chipStartY = nameY + 84;
     const chips = [
       { label: `Age: ${suspect.age}`, icon: '◈' },
       { label: suspect.location, icon: '◉' },
     ];
     chips.forEach((chip, i) => {
-      const chipY = chipStartY + i * 30;
-      const chipBg = this.add.rectangle(portraitX, chipY, 200, 24, suspect.color, 0.08);
+      const chipY = chipStartY + i * 45;
+      const chipBg = this.add.rectangle(portraitX, chipY, 300, 36, suspect.color, 0.08);
       chipBg.setStrokeStyle(1, suspect.color, 0.2);
       this.container.add(chipBg);
       const chipLabel = this.add.text(portraitX, chipY, `${chip.icon}  ${chip.label}`, {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim,
+        fontFamily: FONT, fontSize: '21px', color: TextColors.goldDim,
       }).setOrigin(0.5);
       this.container.add(chipLabel);
     });
@@ -361,9 +360,9 @@ export class SuspectScene extends Phaser.Scene {
     ).length;
     const total = suspect.facts.length;
 
-    const progressY = chipStartY + 80;
-    const progressW = 200;
-    const progressH = 5;
+    const progressY = chipStartY + 120;
+    const progressW = 300;
+    const progressH = 7;
 
     const trackBg = this.add.rectangle(portraitX, progressY, progressW, progressH, 0x1a1a2e, 1);
     this.container.add(trackBg);
@@ -377,13 +376,13 @@ export class SuspectScene extends Phaser.Scene {
       this.container.add(fill);
     }
 
-    this.container.add(this.add.text(portraitX, progressY + 14, `${discovered} / ${total} facts discovered`, {
-      fontFamily: FONT, fontSize: '13px', color: TextColors.muted, fontStyle: 'italic',
+    this.container.add(this.add.text(portraitX, progressY + 21, `${discovered} / ${total} facts discovered`, {
+      fontFamily: FONT, fontSize: '20px', color: TextColors.muted, fontStyle: 'italic',
     }).setOrigin(0.5));
 
     // ── Right column: Known Facts ──
-    const rightX = leftX + leftW + 24;
-    const rightW = dw - leftW - 24;
+    const rightX = leftX + leftW + 36;
+    const rightW = dw - leftW - 36;
     const rightCx = rightX + rightW / 2;
 
     // Facts panel background
@@ -393,23 +392,23 @@ export class SuspectScene extends Phaser.Scene {
     this.container.add(factsBg);
 
     // Section header
-    const factsHeaderY = cy - factsPanelH / 2 + 24;
-    this.container.add(this.add.text(rightX + 20, factsHeaderY, 'KNOWN FACTS', {
+    const factsHeaderY = cy - factsPanelH / 2 + 36;
+    this.container.add(this.add.text(rightX + 30, factsHeaderY, 'KNOWN FACTS', {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.gold,
       fontStyle: 'bold',
-      letterSpacing: 3,
+      letterSpacing: 5,
     }));
 
     // Divider under header (art deco)
     const divGfx = this.add.graphics();
-    drawDecoDivider(divGfx, rightCx, factsHeaderY + 22, rightW - 40, DecoColors.gold, 0.25);
+    drawDecoDivider(divGfx, rightCx, factsHeaderY + 33, rightW - 60, DecoColors.gold, 0.25);
     this.container.add(divGfx);
 
     // Facts list
-    let y = factsHeaderY + 40;
-    const factMaxW = rightW - 60;
+    let y = factsHeaderY + 60;
+    const factMaxW = rightW - 90;
 
     suspect.facts.forEach((fact, idx) => {
       const unlocked = !fact.requiresFlag ||
@@ -418,22 +417,22 @@ export class SuspectScene extends Phaser.Scene {
 
       // Alternating subtle row tint
       if (idx % 2 === 0) {
-        const rowBg = this.add.rectangle(rightCx, y + 10, rightW - 20, 36, suspect.color, 0.03);
+        const rowBg = this.add.rectangle(rightCx, y + 15, rightW - 30, 54, suspect.color, 0.03);
         this.container.add(rowBg);
       }
 
       // Bullet
       const bullet = unlocked ? '◆' : '◇';
       const bulletColor = unlocked ? colorHex : TextColors.hidden;
-      this.container.add(this.add.text(rightX + 24, y, bullet, {
-        fontFamily: FONT, fontSize: '14px', color: bulletColor,
+      this.container.add(this.add.text(rightX + 36, y, bullet, {
+        fontFamily: FONT, fontSize: '21px', color: bulletColor,
       }));
 
       // Fact text
       const displayText = unlocked ? fact.text : '— Undiscovered —';
-      const factText = this.add.text(rightX + 46, y, displayText, {
+      const factText = this.add.text(rightX + 69, y, displayText, {
         fontFamily: FONT,
-        fontSize: '14px',
+        fontSize: '21px',
         color: unlocked ? TextColors.light : TextColors.hidden,
         fontStyle: unlocked ? 'normal' : 'italic',
         wordWrap: { width: factMaxW },
@@ -441,7 +440,7 @@ export class SuspectScene extends Phaser.Scene {
       });
       this.container.add(factText);
 
-      y += Math.max(factText.height + 14, 36);
+      y += Math.max(factText.height + 21, 54);
     });
   }
 }

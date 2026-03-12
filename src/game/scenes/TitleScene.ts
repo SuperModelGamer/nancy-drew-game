@@ -43,7 +43,7 @@ export class TitleScene extends Phaser.Scene {
     if (this.textures.exists('title_graphic')) {
       const titleImg = this.add.image(contentX, height * 0.22, 'title_graphic');
       // Scale to fit nicely — target about 420px wide
-      const targetW = Math.min(420, width * 0.42);
+      const targetW = Math.min(630, width * 0.42);
       const scale = targetW / titleImg.width;
       titleImg.setScale(scale);
 
@@ -60,18 +60,18 @@ export class TitleScene extends Phaser.Scene {
       // Fallback: procedural text title if image missing
       this.add.text(contentX, height * 0.12, 'A  N A N C Y  D R E W  M Y S T E R Y', {
         fontFamily: FONT,
-        fontSize: '11px',
+        fontSize: '17px',
         color: '#b8a472',
-        letterSpacing: 5,
+        letterSpacing: 7,
       }).setOrigin(0.5).setAlpha(0.8);
 
       this.add.text(contentX, height * 0.22, 'THE LAST\nCURTAIN CALL', {
         fontFamily: FONT,
-        fontSize: '42px',
+        fontSize: '63px',
         color: '#e8c55a',
         fontStyle: 'bold',
         align: 'center',
-        lineSpacing: 6,
+        lineSpacing: 9,
         shadow: { offsetX: 0, offsetY: 0, color: '#c9a84c', blur: 12, fill: true },
       }).setOrigin(0.5);
     }
@@ -79,7 +79,7 @@ export class TitleScene extends Phaser.Scene {
     // ── Decorative line under title ──
     const decoLine = this.add.graphics();
     decoLine.lineStyle(1, Colors.gold, 0.35);
-    const decoW = 280;
+    const decoW = 420;
     const decoY = height * 0.35;
     decoLine.lineBetween(contentX - decoW / 2, decoY, contentX + decoW / 2, decoY);
     this.drawDiamond(decoLine, contentX - decoW / 2 - 4, decoY, 3, Colors.gold, 0.35);
@@ -87,9 +87,9 @@ export class TitleScene extends Phaser.Scene {
 
     // ── Menu buttons — right-of-center, below title ──
     const menuX = contentX;
-    const btnDisplayW = 340;
-    const btnDisplayH = 70;
-    const btnGap = 14;
+    const btnDisplayW = 510;
+    const btnDisplayH = 105;
+    const btnGap = 21;
 
     // Build menu items with texture keys
     const menuItems: { label: string; textureKey: string; action: () => void; primary?: boolean; subtitle?: string }[] = [];
@@ -154,7 +154,7 @@ export class TitleScene extends Phaser.Scene {
     // ── Credits ──
     this.add.text(contentX, height - 20, 'Created by Carley Beck', {
       fontFamily: FONT,
-      fontSize: '10px',
+      fontSize: '15px',
       color: '#555566',
     }).setOrigin(0.5);
 
@@ -193,9 +193,9 @@ export class TitleScene extends Phaser.Scene {
 
       // Subtitle overlay (e.g., chapter name under Continue)
       if (subtitle) {
-        const sub = this.add.text(0, h / 2 + 10, subtitle, {
+        const sub = this.add.text(0, h / 2 + 15, subtitle, {
           fontFamily: FONT,
-          fontSize: '11px',
+          fontSize: '17px',
           color: TextColors.goldDim,
           fontStyle: 'italic',
         }).setOrigin(0.5);
@@ -260,14 +260,14 @@ export class TitleScene extends Phaser.Scene {
 
       const text = this.add.text(0, subtitle ? -7 : 0, label, {
         fontFamily: FONT,
-        fontSize: primary ? '19px' : '16px',
+        fontSize: primary ? '28px' : '24px',
         color: primary ? '#e8c55a' : TextColors.light,
       }).setOrigin(0.5);
       container.add([bg, text]);
 
       if (subtitle) {
         const sub = this.add.text(0, 12, subtitle, {
-          fontFamily: FONT, fontSize: '10px', color: TextColors.goldDim, fontStyle: 'italic',
+          fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim, fontStyle: 'italic',
         }).setOrigin(0.5);
         container.add(sub);
       }
@@ -325,13 +325,13 @@ export class TitleScene extends Phaser.Scene {
     dimmer.setInteractive();
     container.add(dimmer);
 
-    const box = this.add.rectangle(0, 0, 520, 340, Colors.panelBg, 0.97);
+    const box = this.add.rectangle(0, 0, 780, 510, Colors.panelBg, 0.97);
     box.setStrokeStyle(2, Colors.gold, 0.7);
     container.add(box);
 
     const titleText = this.add.text(0, -140, 'How to Play', {
       fontFamily: FONT,
-      fontSize: '22px',
+      fontSize: '33px',
       color: '#e8c55a',
       fontStyle: 'bold',
     }).setOrigin(0.5);
@@ -349,7 +349,7 @@ export class TitleScene extends Phaser.Scene {
 
     const helpText = this.add.text(0, -10, helpLines.join('\n\n'), {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.light,
       align: 'center',
       lineSpacing: 2,
@@ -358,12 +358,12 @@ export class TitleScene extends Phaser.Scene {
     container.add(helpText);
 
     // Close button
-    const closeBg = this.add.rectangle(0, 140, 120, 44, Colors.sceneBg, 0.9);
+    const closeBg = this.add.rectangle(0, 210, 180, 66, Colors.sceneBg, 0.9);
     closeBg.setStrokeStyle(1, Colors.gold, 0.5);
     closeBg.setInteractive({ cursor: POINTER_CURSOR });
-    const closeText = this.add.text(0, 140, 'Close', {
+    const closeText = this.add.text(0, 210, 'Close', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '24px',
       color: TextColors.gold,
     }).setOrigin(0.5);
     closeBg.on('pointerover', () => closeBg.setFillStyle(Colors.hoverBg));
@@ -381,13 +381,13 @@ export class TitleScene extends Phaser.Scene {
     dimmer.setInteractive();
     container.add(dimmer);
 
-    const box = this.add.rectangle(0, 0, 440, 340, Colors.panelBg, 0.97);
+    const box = this.add.rectangle(0, 0, 660, 510, Colors.panelBg, 0.97);
     box.setStrokeStyle(2, Colors.gold, 0.7);
     container.add(box);
 
-    const titleText = this.add.text(0, -145, 'Settings', {
+    const titleText = this.add.text(0, -217, 'Settings', {
       fontFamily: FONT,
-      fontSize: '22px',
+      fontSize: '33px',
       color: '#e8c55a',
       fontStyle: 'bold',
     }).setOrigin(0.5);
@@ -396,16 +396,16 @@ export class TitleScene extends Phaser.Scene {
     // ── Divider under title ──
     const divGfx = this.add.graphics();
     divGfx.lineStyle(1, Colors.gold, 0.3);
-    divGfx.lineBetween(-100, -120, 100, -120);
+    divGfx.lineBetween(-150, -180, 150, -180);
     container.add(divGfx);
 
-    const rowY = (row: number) => -90 + row * 48;
+    const rowY = (row: number) => -135 + row * 72;
 
     // ── 1. Dialogue Speed ──
     // Controls how fast dialogue text types out character by character
     {
-      const label = this.add.text(-170, rowY(0), 'Dialogue Speed', {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.light,
+      const label = this.add.text(-255, rowY(0), 'Dialogue Speed', {
+        fontFamily: FONT, fontSize: '21px', color: TextColors.light,
       }).setOrigin(0, 0.5);
       container.add(label);
 
@@ -419,16 +419,16 @@ export class TitleScene extends Phaser.Scene {
       let idx = speeds.indexOf(raw as string);
       if (idx === -1) idx = 1;
 
-      const valText = this.add.text(140, rowY(0), speedLabels[speeds[idx]], {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.gold,
+      const valText = this.add.text(210, rowY(0), speedLabels[speeds[idx]], {
+        fontFamily: FONT, fontSize: '21px', color: TextColors.gold,
       }).setOrigin(0.5);
       container.add(valText);
 
-      const leftArr = this.add.text(90, rowY(0), '◀', {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim,
+      const leftArr = this.add.text(135, rowY(0), '◀', {
+        fontFamily: FONT, fontSize: '21px', color: TextColors.goldDim,
       }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
-      const rightArr = this.add.text(190, rowY(0), '▶', {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim,
+      const rightArr = this.add.text(285, rowY(0), '▶', {
+        fontFamily: FONT, fontSize: '21px', color: TextColors.goldDim,
       }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
 
       const update = (dir: number) => {
@@ -444,19 +444,19 @@ export class TitleScene extends Phaser.Scene {
     // ── 2. Clue Shimmer ──
     // When ON, undiscovered hotspots gently shimmer so the player knows where to look
     {
-      const label = this.add.text(-170, rowY(1), 'Clue Shimmer', {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.light,
+      const label = this.add.text(-255, rowY(1), 'Clue Shimmer', {
+        fontFamily: FONT, fontSize: '21px', color: TextColors.light,
       }).setOrigin(0, 0.5);
       container.add(label);
 
-      const desc = this.add.text(-170, rowY(1) + 16, 'Highlights undiscovered clues', {
-        fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+      const desc = this.add.text(-255, rowY(1) + 24, 'Highlights undiscovered clues', {
+        fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue,
       }).setOrigin(0, 0.5);
       container.add(desc);
 
       let on = save.getFlag('setting_highlights') !== false;
-      const valText = this.add.text(140, rowY(1), on ? 'ON' : 'OFF', {
-        fontFamily: FONT, fontSize: '14px', color: on ? TextColors.success : TextColors.goldDim,
+      const valText = this.add.text(210, rowY(1), on ? 'ON' : 'OFF', {
+        fontFamily: FONT, fontSize: '21px', color: on ? TextColors.success : TextColors.goldDim,
       }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
       container.add(valText);
 
@@ -471,20 +471,20 @@ export class TitleScene extends Phaser.Scene {
     // ── 3. Auto-Save ──
     // When ON, the game auto-saves when entering a new room or completing a puzzle
     {
-      const label = this.add.text(-170, rowY(2), 'Auto-Save', {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.light,
+      const label = this.add.text(-255, rowY(2), 'Auto-Save', {
+        fontFamily: FONT, fontSize: '21px', color: TextColors.light,
       }).setOrigin(0, 0.5);
       container.add(label);
 
-      const desc = this.add.text(-170, rowY(2) + 16, 'Saves on room change and puzzle completion', {
-        fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+      const desc = this.add.text(-255, rowY(2) + 24, 'Saves on room change and puzzle completion', {
+        fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue,
       }).setOrigin(0, 0.5);
       container.add(desc);
 
       // Default auto-save to ON
       let on = save.getFlag('setting_autosave') !== false;
-      const valText = this.add.text(140, rowY(2), on ? 'ON' : 'OFF', {
-        fontFamily: FONT, fontSize: '14px', color: on ? TextColors.success : TextColors.goldDim,
+      const valText = this.add.text(210, rowY(2), on ? 'ON' : 'OFF', {
+        fontFamily: FONT, fontSize: '21px', color: on ? TextColors.success : TextColors.goldDim,
       }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
       container.add(valText);
 
@@ -504,11 +504,11 @@ export class TitleScene extends Phaser.Scene {
 
     // ── Delete save data ──
     {
-      const deleteBg = this.add.rectangle(0, rowY(3) + 10, 200, 36, 0x1a0a0a, 0.8);
+      const deleteBg = this.add.rectangle(0, rowY(3) + 10, 300, 54, 0x1a0a0a, 0.8);
       deleteBg.setStrokeStyle(1, Colors.error, 0.4);
       deleteBg.setInteractive({ cursor: POINTER_CURSOR });
       const deleteText = this.add.text(0, rowY(3) + 10, 'Delete Save Data', {
-        fontFamily: FONT, fontSize: '13px', color: TextColors.error,
+        fontFamily: FONT, fontSize: '20px', color: TextColors.error,
       }).setOrigin(0.5);
 
       deleteBg.on('pointerover', () => deleteBg.setFillStyle(0x2a0a0a, 0.9));
@@ -524,11 +524,11 @@ export class TitleScene extends Phaser.Scene {
     }
 
     // ── Close button ──
-    const closeBg = this.add.rectangle(0, 140, 120, 40, Colors.sceneBg, 0.9);
+    const closeBg = this.add.rectangle(0, 210, 180, 60, Colors.sceneBg, 0.9);
     closeBg.setStrokeStyle(1, Colors.gold, 0.5);
     closeBg.setInteractive({ cursor: POINTER_CURSOR });
-    const closeText = this.add.text(0, 140, 'Close', {
-      fontFamily: FONT, fontSize: '15px', color: TextColors.gold,
+    const closeText = this.add.text(0, 210, 'Close', {
+      fontFamily: FONT, fontSize: '22px', color: TextColors.gold,
     }).setOrigin(0.5);
     closeBg.on('pointerover', () => closeBg.setFillStyle(Colors.hoverBg));
     closeBg.on('pointerout', () => closeBg.setFillStyle(Colors.sceneBg, 0.9));
@@ -544,13 +544,13 @@ export class TitleScene extends Phaser.Scene {
     dimmer.setInteractive();
     container.add(dimmer);
 
-    const box = this.add.rectangle(0, 0, 400, 180, Colors.panelBg, 0.97);
+    const box = this.add.rectangle(0, 0, 600, 270, Colors.panelBg, 0.97);
     box.setStrokeStyle(2, Colors.gold, 0.7);
     container.add(box);
 
-    const text = this.add.text(0, -40, 'Start a new investigation?\nYour current progress will be lost.', {
+    const text = this.add.text(0, -60, 'Start a new investigation?\nYour current progress will be lost.', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '24px',
       color: TextColors.light,
       align: 'center',
       lineSpacing: 4,
@@ -558,12 +558,12 @@ export class TitleScene extends Phaser.Scene {
     container.add(text);
 
     // Confirm
-    const yesBg = this.add.rectangle(-80, 40, 120, 44, Colors.danger, 0.8);
+    const yesBg = this.add.rectangle(-120, 60, 180, 66, Colors.danger, 0.8);
     yesBg.setStrokeStyle(1, Colors.gold, 0.5);
     yesBg.setInteractive({ cursor: POINTER_CURSOR });
-    const yesText = this.add.text(-80, 40, 'Yes', {
+    const yesText = this.add.text(-120, 60, 'Yes', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '24px',
       color: TextColors.light,
     }).setOrigin(0.5);
     yesBg.on('pointerover', () => yesBg.setFillStyle(0xaa0000));
@@ -575,12 +575,12 @@ export class TitleScene extends Phaser.Scene {
     container.add([yesBg, yesText]);
 
     // Cancel
-    const noBg = this.add.rectangle(80, 40, 120, 44, Colors.sceneBg, 0.8);
+    const noBg = this.add.rectangle(120, 60, 180, 66, Colors.sceneBg, 0.8);
     noBg.setStrokeStyle(1, Colors.gold, 0.5);
     noBg.setInteractive({ cursor: POINTER_CURSOR });
-    const noText = this.add.text(80, 40, 'Cancel', {
+    const noText = this.add.text(120, 60, 'Cancel', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '24px',
       color: TextColors.gold,
     }).setOrigin(0.5);
     noBg.on('pointerover', () => noBg.setFillStyle(Colors.hoverBg));

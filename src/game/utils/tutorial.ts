@@ -25,23 +25,23 @@ export function showTutorialIfNeeded(scene: Phaser.Scene): void {
   container.add(dimmer);
 
   // Panel
-  const panelW = 520;
-  const panelH = 420;
+  const panelW = 780;
+  const panelH = 630;
   const panel = scene.add.rectangle(width / 2, height / 2, panelW, panelH, Colors.panelBg, 0.97);
   panel.setStrokeStyle(2, Colors.gold, 0.5);
   container.add(panel);
 
   // Title
-  const title = scene.add.text(width / 2, height / 2 - panelH / 2 + 30, 'How to Investigate', {
+  const title = scene.add.text(width / 2, height / 2 - panelH / 2 + 45, 'How to Investigate', {
     fontFamily: FONT,
-    fontSize: '22px',
+    fontSize: '33px',
     color: TextColors.gold,
     fontStyle: 'bold',
   }).setOrigin(0.5);
   container.add(title);
 
   // Decorative line
-  const line = scene.add.rectangle(width / 2, height / 2 - panelH / 2 + 55, 200, 1, Colors.gold);
+  const line = scene.add.rectangle(width / 2, height / 2 - panelH / 2 + 82, 300, 1, Colors.gold);
   line.setAlpha(0.3);
   container.add(line);
 
@@ -56,34 +56,34 @@ export function showTutorialIfNeeded(scene: Phaser.Scene): void {
     { icon: '💡', text: 'Select an item, then click a hotspot to use it there' },
   ];
 
-  const startY = height / 2 - panelH / 2 + 80;
+  const startY = height / 2 - panelH / 2 + 120;
   tips.forEach((tip, i) => {
-    const y = startY + i * 40;
+    const y = startY + i * 60;
 
-    const icon = scene.add.text(width / 2 - panelW / 2 + 40, y, tip.icon, {
-      fontSize: '18px',
+    const icon = scene.add.text(width / 2 - panelW / 2 + 60, y, tip.icon, {
+      fontSize: '27px',
     }).setOrigin(0, 0);
     container.add(icon);
 
-    const text = scene.add.text(width / 2 - panelW / 2 + 75, y + 2, tip.text, {
+    const text = scene.add.text(width / 2 - panelW / 2 + 112, y + 2, tip.text, {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.light,
-      wordWrap: { width: panelW - 100 },
+      wordWrap: { width: panelW - 150 },
     }).setOrigin(0, 0);
     container.add(text);
   });
 
   // Dismiss button
-  const btnY = height / 2 + panelH / 2 - 45;
-  const btnBg = scene.add.rectangle(width / 2, btnY, 200, 44, Colors.sceneBg);
+  const btnY = height / 2 + panelH / 2 - 67;
+  const btnBg = scene.add.rectangle(width / 2, btnY, 300, 66, Colors.sceneBg);
   btnBg.setStrokeStyle(2, Colors.gold, 0.6);
   btnBg.setInteractive({ cursor: POINTER_CURSOR });
   container.add(btnBg);
 
   const btnText = scene.add.text(width / 2, btnY, 'Begin Investigation', {
     fontFamily: FONT,
-    fontSize: '16px',
+    fontSize: '24px',
     color: TextColors.gold,
   }).setOrigin(0.5);
   container.add(btnText);

@@ -12,7 +12,7 @@ export function createCloseButton(
   x: number,
   y: number,
   onClose: () => void,
-  size = 44,
+  size = 66,
 ): Phaser.GameObjects.Container {
   const container = scene.add.container(x, y);
 
@@ -168,7 +168,7 @@ export function createToolbarButton(
   accentColor: number,
   accentColorStr: string,
   onClick: () => void,
-  btnWidth = 80,
+  btnWidth = 120,
 ): Phaser.GameObjects.Container {
   const container = scene.add.container(x, y);
   const bg = scene.add.rectangle(0, 0, btnWidth, Sizes.minTapTarget, Colors.sceneBg, 0.9);
@@ -177,7 +177,7 @@ export function createToolbarButton(
 
   const text = scene.add.text(0, 0, label, {
     fontFamily: FONT,
-    fontSize: '15px',
+    fontSize: '22px',
     color: accentColorStr,
   }).setOrigin(0.5);
 
