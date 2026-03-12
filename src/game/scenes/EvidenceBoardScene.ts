@@ -3,6 +3,7 @@ import { PuzzleSystem } from '../systems/PuzzleSystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
+import { createCloseButton } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
 
 interface EvidenceCard {
@@ -87,14 +88,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
     }).setOrigin(0.5));
 
     // Close button
-    const closeBtn = this.add.text(boardX + boardW / 2 - 25, boardY - boardH / 2 + 20, '✕', {
-      fontFamily: FONT,
-      fontSize: '24px',
-      color: TextColors.goldDim,
-    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
-    closeBtn.on('pointerdown', () => this.scene.stop());
-    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
-    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
+    const closeBtn = createCloseButton(this, boardX + boardW / 2 - 25, boardY - boardH / 2 + 20, () => this.scene.stop(), 44);
     this.boardContainer.add(closeBtn);
 
     // Timeline labels

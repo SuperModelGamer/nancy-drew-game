@@ -5,6 +5,7 @@ import { SaveSystem } from '../systems/SaveSystem';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
+import { createCloseButton } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
 
 export class PuzzleScene extends Phaser.Scene {
@@ -116,14 +117,7 @@ export class PuzzleScene extends Phaser.Scene {
     this.panel.add(this.hintText);
 
     // Close button
-    const closeBtn = this.add.text(panelW / 2 - 20, -panelH / 2 + 15, '✕', {
-      fontFamily: FONT,
-      fontSize: '22px',
-      color: TextColors.goldDim,
-    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
-    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
-    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
-    closeBtn.on('pointerdown', () => this.closePuzzle());
+    const closeBtn = createCloseButton(this, panelW / 2 - 20, -panelH / 2 + 15, () => this.closePuzzle(), 44);
     this.panel.add(closeBtn);
 
     // Build the puzzle UI based on type
