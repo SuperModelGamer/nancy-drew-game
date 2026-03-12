@@ -584,8 +584,8 @@ export class RoomScene extends Phaser.Scene {
     const gfx = this.add.graphics();
     container.add(gfx);
 
-    // Room name — large, centered, gold
-    const roomName = this.add.text(width / 2, height * 0.38, this.currentRoom.name.toUpperCase(), {
+    // Room name — large, centered, gold (positioned below chandelier area)
+    const roomName = this.add.text(width / 2, height * 0.45, this.currentRoom.name.toUpperCase(), {
       fontFamily: FONT,
       fontSize: '36px',
       color: DecoTextColors.goldBright,
@@ -603,13 +603,13 @@ export class RoomScene extends Phaser.Scene {
     container.add(roomName);
 
     // Decorative divider above name
-    drawDecoDivider(gfx, width / 2, height * 0.38 - 32, width * 0.4, DecoColors.gold, 0.5);
+    drawDecoDivider(gfx, width / 2, height * 0.45 - 32, width * 0.4, DecoColors.gold, 0.5);
 
     // Decorative divider below name
-    drawDecoDivider(gfx, width / 2, height * 0.38 + 32, width * 0.4, DecoColors.gold, 0.5);
+    drawDecoDivider(gfx, width / 2, height * 0.45 + 32, width * 0.4, DecoColors.gold, 0.5);
 
     // Room description — readable size, centered below
-    const desc = this.add.text(width / 2, height * 0.52, this.currentRoom.description, {
+    const desc = this.add.text(width / 2, height * 0.58, this.currentRoom.description, {
       fontFamily: FONT,
       fontSize: '17px',
       color: DecoTextColors.cream,
@@ -621,7 +621,7 @@ export class RoomScene extends Phaser.Scene {
     container.add(desc);
 
     // "Click to continue" prompt
-    const prompt = this.add.text(width / 2, height * 0.72, '— Click to continue —', {
+    const prompt = this.add.text(width / 2, height * 0.76, '— Click to continue —', {
       fontFamily: FONT,
       fontSize: '14px',
       color: DecoTextColors.goldDim,

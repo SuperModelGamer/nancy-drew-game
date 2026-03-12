@@ -58,6 +58,16 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
   called_ned: 'Called Ned. He told me to be careful — old buildings fall apart at the worst moments. He\'s right, but I can\'t stop now.',
 };
 
+// ─── Layout Constants ───────────────────────────────────────────────────────
+const PORTRAIT_W = 160;
+const PORTRAIT_H = 200;
+const BOX_H = 200;
+const TEXT_SIZE = '20px';
+const SPEAKER_SIZE = '22px';
+const CHOICE_H = 56;
+const CHOICE_FONT = '17px';
+const TYPEWRITER_SPEED = 28; // ms per character
+
 export class DialogueSystem {
   private static instance: DialogueSystem;
   private active = false;
@@ -67,6 +77,15 @@ export class DialogueSystem {
   private scene: Phaser.Scene | null = null;
   private container: Phaser.GameObjects.Container | null = null;
   private triggeredEvents: Set<string> = new Set();
+
+  // Typewriter state
+  private typewriterTimer: Phaser.Time.TimerEvent | null = null;
+  private isTyping = false;
+  private fullLineText = '';
+  private dialogueTextObj: Phaser.GameObjects.Text | null = null;
+
+  // Track current speaker for entrance animations
+  private lastSpeaker = '';
 
   static getInstance(): DialogueSystem {
     if (!DialogueSystem.instance) {
@@ -85,6 +104,7 @@ export class DialogueSystem {
     this.currentLineIndex = 0;
     this.active = true;
     this.scene = scene;
+    this.lastSpeaker = '';
 
     this.showDialogueUI();
     this.showCurrentLine();
@@ -95,21 +115,8 @@ export class DialogueSystem {
 
     this.destroyUI();
 
-    const { width, height } = this.scene.cameras.main;
     this.container = this.scene.add.container(0, 0);
     this.container.setDepth(Depths.dialogueBox);
-
-    // Dim overlay
-    const overlay = this.scene.add.rectangle(width / 2, height / 2, width, height, Colors.darkBg, 0.5);
-    overlay.setInteractive(); // block clicks through
-    this.container.add(overlay);
-
-    // Dialogue box
-    const boxH = 180;
-    const boxY = height - boxH / 2 - 20;
-    const box = this.scene.add.rectangle(width / 2, boxY, width * 0.9, boxH, Colors.panelBg, 0.95);
-    box.setStrokeStyle(2, Colors.gold, 0.7);
-    this.container.add(box);
   }
 
   private showCurrentLine(): void {
@@ -125,10 +132,8 @@ export class DialogueSystem {
       const line = node.lines[this.currentLineIndex];
       this.renderLine(line);
     } else if (node.choices && node.choices.length > 0) {
-      // Filter choices by requiredItem and requiredFlag
       this.renderChoices(node.choices);
     } else {
-      // Trigger node-level events before advancing
       if (node.triggerEvent) {
         this.triggerEvent(node.triggerEvent);
       }
@@ -148,102 +153,340 @@ export class DialogueSystem {
     }
   }
 
+  // ─── Visual Novel Layout: Centered Dialogue ──────────────────────────────
+
   private renderLine(line: DialogueLine): void {
     if (!this.scene || !this.container) return;
 
-    // Remove old text elements (keep overlay and box)
-    while (this.container.length > 2) {
-      this.container.removeAt(2, true);
-    }
+    // Stop any in-progress typewriter
+    this.stopTypewriter();
+
+    // Clear everything except we'll rebuild from scratch
+    this.container.removeAll(true);
 
     const { width, height } = this.scene.cameras.main;
-    const boxY = height - 110;
 
-    // Portrait image (if available for this speaker)
+    // ── Dark overlay (stronger dim for focus) ──
+    const overlay = this.scene.add.rectangle(width / 2, height / 2, width, height, Colors.darkBg, 0.7);
+    overlay.setInteractive(); // block clicks through
+    this.container.add(overlay);
+
+    // ── Layout calculations ──
+    // Box is centered vertically in the lower 60% of the screen
+    const boxCenterY = height * 0.62;
+    const boxW = Math.min(880, width * 0.92);
+    const boxLeft = (width - boxW) / 2;
+
+    // Portrait area on the left
     const portraitKey = this.getSpeakerPortraitKey(line.speaker);
-    const portraitSize = 64;
-    let textOffsetX = width * 0.1;
+    const hasPortrait = portraitKey !== null && this.scene.textures.exists(portraitKey);
+    const portraitAreaW = hasPortrait ? PORTRAIT_W + 40 : 0;
 
-    if (portraitKey && this.scene.textures.exists(portraitKey)) {
-      const portraitX = width * 0.08;
-      const portraitY = boxY - 20;
-      textOffsetX = width * 0.16;
+    // Text area to the right of portrait
+    const textAreaLeft = boxLeft + portraitAreaW + 20;
+    const textAreaW = boxW - portraitAreaW - 40;
 
-      const portrait = this.scene.add.image(portraitX, portraitY, portraitKey);
-      portrait.setDisplaySize(portraitSize, portraitSize);
-      const maskGraphics = this.scene.make.graphics({});
-      maskGraphics.fillCircle(portraitX, portraitY, portraitSize / 2);
-      portrait.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, maskGraphics));
-      const speakerColorHex = parseInt(this.getSpeakerColor(line.speaker).replace('#', ''), 16);
-      const ring = this.scene.add.ellipse(portraitX, portraitY, portraitSize + 4, portraitSize + 4)
-        .setStrokeStyle(2, speakerColorHex, 0.8)
-        .setFillStyle(0x000000, 0);
-      this.container.add([portrait, ring]);
+    // ── Dialogue box background ──
+    if (this.scene.textures.exists('dlg_box')) {
+      // The art deco banner asset is wide and thin — use it as a decorative frame
+      // scaled to fill width, with proportional height to preserve the gold corners
+      const tex = this.scene.textures.get('dlg_box').getSourceImage();
+      const assetRatio = tex.width / tex.height;
+      const bannerH = Math.round(boxW / assetRatio);
+
+      // Dark fill behind the full dialogue area (extends below the banner)
+      const bgGfx = this.scene.add.graphics();
+      const boxTop = boxCenterY - BOX_H / 2;
+      bgGfx.fillStyle(0x0e0c14, 0.92);
+      bgGfx.fillRoundedRect(boxLeft + 4, boxTop + bannerH * 0.4, boxW - 8, BOX_H - bannerH * 0.4 + 4, 4);
+      this.container.add(bgGfx);
+
+      // Art deco banner at the top of the dialogue area
+      const boxBg = this.scene.add.image(width / 2, boxTop + bannerH / 2, 'dlg_box');
+      boxBg.setDisplaySize(boxW, bannerH);
+      this.container.add(boxBg);
+
+      // Bottom border line
+      const borderGfx = this.scene.add.graphics();
+      borderGfx.lineStyle(1.5, Colors.gold, 0.3);
+      borderGfx.lineBetween(boxLeft + 16, boxTop + BOX_H, boxLeft + boxW - 16, boxTop + BOX_H);
+      this.container.add(borderGfx);
+    } else {
+      // Procedural fallback: dark panel with gold border and inner glow
+      const gfx = this.scene.add.graphics();
+      const boxTop = boxCenterY - BOX_H / 2;
+
+      // Outer glow
+      gfx.fillStyle(Colors.gold, 0.04);
+      gfx.fillRoundedRect(boxLeft - 4, boxTop - 4, boxW + 8, BOX_H + 8, 6);
+
+      // Main background
+      gfx.fillStyle(0x0e0c14, 0.95);
+      gfx.fillRoundedRect(boxLeft, boxTop, boxW, BOX_H, 4);
+
+      // Gold border
+      gfx.lineStyle(2, Colors.gold, 0.6);
+      gfx.strokeRoundedRect(boxLeft, boxTop, boxW, BOX_H, 4);
+
+      // Inner border
+      gfx.lineStyle(1, Colors.gold, 0.15);
+      gfx.strokeRoundedRect(boxLeft + 6, boxTop + 6, boxW - 12, BOX_H - 12, 2);
+
+      // Corner accents (small diamond at each corner)
+      const corners = [
+        { x: boxLeft + 10, y: boxTop + 10 },
+        { x: boxLeft + boxW - 10, y: boxTop + 10 },
+        { x: boxLeft + 10, y: boxTop + BOX_H - 10 },
+        { x: boxLeft + boxW - 10, y: boxTop + BOX_H - 10 },
+      ];
+      for (const c of corners) {
+        gfx.fillStyle(Colors.gold, 0.4);
+        gfx.fillTriangle(c.x, c.y - 4, c.x + 4, c.y, c.x, c.y + 4);
+        gfx.fillTriangle(c.x, c.y - 4, c.x - 4, c.y, c.x, c.y + 4);
+      }
+
+      this.container.add(gfx);
     }
 
-    // Speaker name with color coding
+    // ── Portrait (large, on the left) ──
+    if (hasPortrait && portraitKey) {
+      const portraitX = boxLeft + 20 + PORTRAIT_W / 2;
+      const portraitY = boxCenterY - 6;
+      const isNewSpeaker = line.speaker !== this.lastSpeaker;
+
+      // Portrait frame (image or procedural)
+      if (this.scene.textures.exists('dlg_portrait_frame')) {
+        const frame = this.scene.add.image(portraitX, portraitY - 8, 'dlg_portrait_frame');
+        // Preserve the frame's aspect ratio (has crown accent at top)
+        const frameTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
+        const frameRatio = frameTex.width / frameTex.height;
+        const frameH = PORTRAIT_H + 30;
+        const frameW = frameH * frameRatio;
+        frame.setDisplaySize(frameW, frameH);
+        this.container.add(frame);
+      } else {
+        // Procedural frame
+        const frameGfx = this.scene.add.graphics();
+        const speakerColorHex = parseInt(this.getSpeakerColor(line.speaker).replace('#', ''), 16);
+        frameGfx.lineStyle(3, speakerColorHex, 0.7);
+        frameGfx.strokeRoundedRect(
+          portraitX - PORTRAIT_W / 2 - 4, portraitY - PORTRAIT_H / 2 - 4,
+          PORTRAIT_W + 8, PORTRAIT_H + 8, 4
+        );
+        frameGfx.lineStyle(1, Colors.gold, 0.3);
+        frameGfx.strokeRoundedRect(
+          portraitX - PORTRAIT_W / 2 - 8, portraitY - PORTRAIT_H / 2 - 8,
+          PORTRAIT_W + 16, PORTRAIT_H + 16, 6
+        );
+        this.container.add(frameGfx);
+      }
+
+      // Portrait image
+      const portrait = this.scene.add.image(portraitX, portraitY, portraitKey);
+      // Scale to fill the portrait area (crop to fit)
+      const texW = portrait.width;
+      const texH = portrait.height;
+      const scaleToFill = Math.max(PORTRAIT_W / texW, PORTRAIT_H / texH);
+      portrait.setScale(scaleToFill);
+
+      // Rectangular mask
+      const maskGraphics = this.scene.make.graphics({});
+      maskGraphics.fillRect(portraitX - PORTRAIT_W / 2, portraitY - PORTRAIT_H / 2, PORTRAIT_W, PORTRAIT_H);
+      portrait.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, maskGraphics));
+
+      this.container.add(portrait);
+
+      // Entrance animation for new speakers
+      if (isNewSpeaker) {
+        portrait.setAlpha(0);
+        portrait.x = portraitX - 30;
+        this.scene.tweens.add({
+          targets: portrait,
+          x: portraitX,
+          alpha: 1,
+          duration: 300,
+          ease: 'Power2',
+        });
+      }
+    }
+
+    this.lastSpeaker = line.speaker;
+
+    // ── Speaker nameplate ──
+    const nameplateY = boxCenterY - BOX_H / 2 - 16;
     const speakerColor = this.getSpeakerColor(line.speaker);
-    const speaker = this.scene.add.text(textOffsetX, boxY - 50, line.speaker, {
+
+    if (this.scene.textures.exists('dlg_nameplate')) {
+      // Preserve art deco banner proportions
+      const npTex = this.scene.textures.get('dlg_nameplate').getSourceImage();
+      const npRatio = npTex.width / npTex.height;
+      const npH = 42;
+      const npW = npH * npRatio;
+      const nameplate = this.scene.add.image(textAreaLeft + npW / 2 - 8, nameplateY, 'dlg_nameplate');
+      nameplate.setDisplaySize(npW, npH);
+      nameplate.setOrigin(0.5);
+      this.container.add(nameplate);
+    } else {
+      // Procedural nameplate
+      const npGfx = this.scene.add.graphics();
+      const npW = 180;
+      const npH = 32;
+      const npX = textAreaLeft;
+      const npY = nameplateY - npH / 2;
+      npGfx.fillStyle(0x0e0c14, 0.9);
+      npGfx.fillRoundedRect(npX, npY, npW, npH, 3);
+      const speakerHex = parseInt(speakerColor.replace('#', ''), 16);
+      npGfx.lineStyle(1.5, speakerHex, 0.6);
+      npGfx.strokeRoundedRect(npX, npY, npW, npH, 3);
+      this.container.add(npGfx);
+    }
+
+    const speakerText = this.scene.add.text(textAreaLeft + 12, nameplateY, line.speaker, {
       fontFamily: FONT,
-      fontSize: '18px',
+      fontSize: SPEAKER_SIZE,
       color: speakerColor,
       fontStyle: 'bold',
-    });
-    this.container.add(speaker);
-
-    // Dialogue text
-    const textWidth = portraitKey && this.scene.textures.exists(portraitKey) ? width * 0.72 : width * 0.8;
-    const text = this.scene.add.text(textOffsetX, boxY - 20, line.text, {
-      fontFamily: FONT,
-      fontSize: '16px',
-      color: TextColors.light,
-      wordWrap: { width: textWidth },
-      lineSpacing: 4,
-    });
-    this.container.add(text);
-
-    // Tap/click to advance - large hit area
-    const advanceBtn = this.scene.add.text(width * 0.85, boxY + 40, 'Continue ▸', {
-      fontFamily: FONT,
-      fontSize: '14px',
-      color: TextColors.goldDim,
-    }).setOrigin(1, 0.5);
-    advanceBtn.setInteractive({ cursor: HAND_CURSOR });
-    advanceBtn.on('pointerdown', () => this.advance());
-    this.container.add(advanceBtn);
-
-    // Skip button — fast-forward to choices or end of node
-    const skipBtn = this.scene.add.text(width * 0.15, boxY + 40, '▸▸ Skip', {
-      fontFamily: FONT,
-      fontSize: '13px',
-      color: TextColors.muted,
+      shadow: {
+        offsetX: 0,
+        offsetY: 0,
+        color: '#000000',
+        blur: 4,
+        fill: true,
+      },
     }).setOrigin(0, 0.5);
+    this.container.add(speakerText);
+
+    // ── Dialogue text (typewriter reveal) ──
+    const textY = boxCenterY - BOX_H / 2 + 28;
+    this.dialogueTextObj = this.scene.add.text(textAreaLeft, textY, '', {
+      fontFamily: FONT,
+      fontSize: TEXT_SIZE,
+      color: TextColors.light,
+      wordWrap: { width: textAreaW },
+      lineSpacing: 6,
+    });
+    this.container.add(this.dialogueTextObj);
+
+    // Start typewriter
+    this.fullLineText = line.text;
+    this.startTypewriter();
+
+    // ── Continue indicator (bottom-right of box) ──
+    const continueY = boxCenterY + BOX_H / 2 - 20;
+    const continueX = boxLeft + boxW - 24;
+
+    if (this.scene.textures.exists('dlg_continue_arrow')) {
+      const arrow = this.scene.add.image(continueX, continueY, 'dlg_continue_arrow');
+      arrow.setDisplaySize(24, 24);
+      this.scene.tweens.add({
+        targets: arrow,
+        alpha: { from: 1, to: 0.3 },
+        duration: 800,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+      this.container.add(arrow);
+    } else {
+      const arrow = this.scene.add.text(continueX, continueY, '▶', {
+        fontFamily: FONT,
+        fontSize: '16px',
+        color: TextColors.goldDim,
+      }).setOrigin(0.5);
+      this.scene.tweens.add({
+        targets: arrow,
+        alpha: { from: 1, to: 0.3 },
+        duration: 800,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+      this.container.add(arrow);
+    }
+
+    // ── Skip button (top-right of box) ──
+    const skipX = boxLeft + boxW - 16;
+    const skipY = boxCenterY - BOX_H / 2 + 16;
+    const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
+      fontFamily: FONT,
+      fontSize: '11px',
+      color: TextColors.muted,
+      letterSpacing: 1,
+    }).setOrigin(1, 0.5);
     skipBtn.setInteractive({ cursor: HAND_CURSOR });
     skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.goldDim));
     skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.muted));
     skipBtn.on('pointerdown', () => this.skipToEnd());
     this.container.add(skipBtn);
 
-    // Also allow tapping the box area to advance
-    const hitArea = this.scene.add.rectangle(width / 2, boxY, width * 0.9, 180, Colors.darkBg, 0);
+    // ── Click anywhere on box to advance ──
+    const hitArea = this.scene.add.rectangle(
+      width / 2, boxCenterY, boxW, BOX_H, 0x000000, 0
+    );
     hitArea.setInteractive({ cursor: HAND_CURSOR });
     hitArea.on('pointerdown', () => this.advance());
     this.container.add(hitArea);
+
+    // Also click overlay to advance (anywhere on screen)
+    overlay.on('pointerdown', () => this.advance());
   }
+
+  // ─── Typewriter Effect ────────────────────────────────────────────────────
+
+  private startTypewriter(): void {
+    if (!this.scene || !this.dialogueTextObj) return;
+
+    this.isTyping = true;
+    let charIndex = 0;
+
+    this.typewriterTimer = this.scene.time.addEvent({
+      delay: TYPEWRITER_SPEED,
+      repeat: this.fullLineText.length - 1,
+      callback: () => {
+        charIndex++;
+        if (this.dialogueTextObj) {
+          this.dialogueTextObj.setText(this.fullLineText.substring(0, charIndex));
+        }
+        if (charIndex >= this.fullLineText.length) {
+          this.isTyping = false;
+        }
+      },
+    });
+  }
+
+  private stopTypewriter(): void {
+    if (this.typewriterTimer) {
+      this.typewriterTimer.remove(false);
+      this.typewriterTimer = null;
+    }
+    this.isTyping = false;
+  }
+
+  private completeTypewriter(): void {
+    this.stopTypewriter();
+    if (this.dialogueTextObj) {
+      this.dialogueTextObj.setText(this.fullLineText);
+    }
+  }
+
+  // ─── Choice Rendering (Visual Novel Style) ───────────────────────────────
 
   private renderChoices(choices: DialogueChoice[]): void {
     if (!this.scene || !this.container) return;
 
-    while (this.container.length > 2) {
-      this.container.removeAt(2, true);
-    }
+    this.stopTypewriter();
+    this.container.removeAll(true);
 
     const { width, height } = this.scene.cameras.main;
     const inventory = InventorySystem.getInstance();
     const save = SaveSystem.getInstance();
 
-    // Filter out choices whose requiredFlag is not met (hide them entirely if flag-gated)
-    // But show requiredItem choices as grayed out so player knows they need something
+    // ── Dark overlay ──
+    const overlay = this.scene.add.rectangle(width / 2, height / 2, width, height, Colors.darkBg, 0.75);
+    overlay.setInteractive();
+    this.container.add(overlay);
+
+    // Filter choices
     const visibleChoices = choices.filter(choice => {
       if (choice.requiredFlag) {
         return save.getFlag(choice.requiredFlag) || this.triggeredEvents.has(choice.requiredFlag);
@@ -251,19 +494,43 @@ export class DialogueSystem {
       return true;
     });
 
-    // Calculate layout
-    const choiceHeight = 42;
-    const totalHeight = visibleChoices.length * choiceHeight;
-    const boxY = height - 20 - 90; // center of dialogue box
-    const startY = boxY - totalHeight / 2 + choiceHeight / 2;
+    // Layout — centered on screen
+    const choiceW = Math.min(680, width * 0.8);
+    const totalH = visibleChoices.length * (CHOICE_H + 10) - 10;
+    const startY = height * 0.5 - totalH / 2;
+
+    // Header text
+    const headerY = startY - 40;
+    this.scene.add.text(width / 2, headerY, 'What would you like to say?', {
+      fontFamily: FONT,
+      fontSize: '16px',
+      color: TextColors.goldDim,
+      fontStyle: 'italic',
+    }).setOrigin(0.5).setDepth(Depths.dialogueBox);
+    // (header is outside container but at same depth — acceptable since container owns the overlay)
 
     visibleChoices.forEach((choice, i) => {
       const itemAvailable = !choice.requiredItem || inventory.hasItem(choice.requiredItem);
-      const y = startY + i * choiceHeight;
+      const y = startY + i * (CHOICE_H + 10) + CHOICE_H / 2;
 
-      const btn = this.scene!.add.rectangle(width / 2, y, width * 0.75, 38, Colors.sceneBg, 0.9);
-      btn.setStrokeStyle(1, itemAvailable ? Colors.gold : 0x444444, 0.6);
-      if (itemAvailable) btn.setInteractive({ cursor: HAND_CURSOR });
+      // Choice button
+      let btn: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
+
+      if (this.scene!.textures.exists('dlg_choice_btn')) {
+        btn = this.scene!.add.image(width / 2, y, 'dlg_choice_btn');
+        // Preserve the art deco banner's aspect ratio
+        const btnTex = this.scene!.textures.get('dlg_choice_btn').getSourceImage();
+        const btnRatio = btnTex.width / btnTex.height;
+        const btnH = CHOICE_H;
+        const btnW = Math.min(choiceW, btnH * btnRatio);
+        (btn as Phaser.GameObjects.Image).setDisplaySize(btnW, btnH);
+      } else {
+        // Procedural fallback
+        btn = this.scene!.add.rectangle(width / 2, y, choiceW, CHOICE_H, 0x0e0c14, 0.92);
+        (btn as Phaser.GameObjects.Rectangle).setStrokeStyle(
+          1.5, itemAvailable ? Colors.gold : 0x444444, itemAvailable ? 0.5 : 0.3
+        );
+      }
 
       let displayText = choice.text;
       if (choice.requiredItem && !itemAvailable) {
@@ -272,20 +539,85 @@ export class DialogueSystem {
 
       const text = this.scene!.add.text(width / 2, y, displayText, {
         fontFamily: FONT,
-        fontSize: '14px',
+        fontSize: CHOICE_FONT,
         color: itemAvailable ? TextColors.gold : '#555555',
-        wordWrap: { width: width * 0.7 },
+        wordWrap: { width: choiceW - 40 },
+        align: 'center',
       }).setOrigin(0.5);
 
       if (itemAvailable) {
-        btn.on('pointerover', () => btn.setFillStyle(Colors.hoverBg));
-        btn.on('pointerout', () => btn.setFillStyle(Colors.sceneBg, 0.9));
-        btn.on('pointerdown', () => this.selectChoice(choice));
+        btn.setInteractive({ cursor: HAND_CURSOR });
+
+        // Hover: scale up + brighten
+        btn.on('pointerover', () => {
+          this.scene!.tweens.killTweensOf(btn);
+          this.scene!.tweens.killTweensOf(text);
+          this.scene!.tweens.add({
+            targets: [btn, text],
+            scaleX: 1.03,
+            scaleY: 1.03,
+            duration: 150,
+            ease: 'Back.easeOut',
+          });
+          if (btn instanceof Phaser.GameObjects.Rectangle) {
+            btn.setFillStyle(0x1a1a3e, 0.95);
+            btn.setStrokeStyle(2, Colors.gold, 0.8);
+          } else {
+            btn.setTint(0xffeecc);
+          }
+          text.setColor('#ffe8a0');
+        });
+
+        btn.on('pointerout', () => {
+          this.scene!.tweens.killTweensOf(btn);
+          this.scene!.tweens.killTweensOf(text);
+          this.scene!.tweens.add({
+            targets: [btn, text],
+            scaleX: 1,
+            scaleY: 1,
+            duration: 200,
+            ease: 'Back.easeOut',
+          });
+          if (btn instanceof Phaser.GameObjects.Rectangle) {
+            btn.setFillStyle(0x0e0c14, 0.92);
+            btn.setStrokeStyle(1.5, Colors.gold, 0.5);
+          } else {
+            btn.clearTint();
+          }
+          text.setColor(TextColors.gold);
+        });
+
+        // Press: push animation then select
+        btn.on('pointerdown', () => {
+          this.scene!.tweens.add({
+            targets: [btn, text],
+            scaleX: 0.97,
+            scaleY: 0.97,
+            duration: 60,
+            ease: 'Power2',
+            yoyo: true,
+            onComplete: () => this.selectChoice(choice),
+          });
+        });
       }
 
       this.container!.add([btn, text]);
+
+      // Staggered entrance animation
+      btn.setAlpha(0);
+      text.setAlpha(0);
+      this.scene!.tweens.add({
+        targets: [btn, text],
+        alpha: 1,
+        y: { from: y + 15, to: y },
+        duration: 300,
+        delay: i * 80,
+        ease: 'Power2',
+      });
     });
   }
+
+  // ─── Speaker Data ─────────────────────────────────────────────────────────
 
   private getSpeakerPortraitKey(speaker: string): string | null {
     const portraitMap: Record<string, string> = {
@@ -315,8 +647,16 @@ export class DialogueSystem {
     return colors[speaker] || TextColors.gold;
   }
 
+  // ─── Navigation ───────────────────────────────────────────────────────────
+
   private advance(): void {
     if (!this.currentDialogue) return;
+
+    // If typewriter is still running, complete it instantly on first click
+    if (this.isTyping) {
+      this.completeTypewriter();
+      return;
+    }
 
     this.currentLineIndex++;
     this.showCurrentLine();
@@ -328,15 +668,9 @@ export class DialogueSystem {
     const node = this.currentDialogue.nodes[this.currentNodeIndex];
     if (!node) return;
 
-    // Skip to choices (if node has them) or to the end of the node
-    if (node.choices && node.choices.length > 0) {
-      this.currentLineIndex = node.lines.length;
-      this.showCurrentLine();
-    } else {
-      // Skip entire node — trigger events and advance
-      this.currentLineIndex = node.lines.length;
-      this.showCurrentLine();
-    }
+    this.stopTypewriter();
+    this.currentLineIndex = node.lines.length;
+    this.showCurrentLine();
   }
 
   private selectChoice(choice: DialogueChoice): void {
@@ -358,10 +692,8 @@ export class DialogueSystem {
 
   private triggerEvent(eventId: string): void {
     this.triggeredEvents.add(eventId);
-    // Also set as a SaveSystem flag for persistence and cross-system access
     const save = SaveSystem.getInstance();
     save.setFlag(eventId, true);
-    // Write journal entry if one is defined for this event
     const journalEntry = EVENT_JOURNAL_ENTRIES[eventId];
     if (journalEntry) {
       save.addJournalEntry(journalEntry);
@@ -369,7 +701,6 @@ export class DialogueSystem {
   }
 
   private endDialogue(): void {
-    // Check if the last node has a triggerEvent
     if (this.currentDialogue) {
       const node = this.currentDialogue.nodes[this.currentNodeIndex];
       if (node?.triggerEvent) {
@@ -377,16 +708,20 @@ export class DialogueSystem {
       }
     }
 
+    this.stopTypewriter();
     this.active = false;
     this.currentDialogue = null;
+    this.lastSpeaker = '';
     this.destroyUI();
   }
 
   private destroyUI(): void {
+    this.stopTypewriter();
     if (this.container) {
       this.container.destroy();
       this.container = null;
     }
+    this.dialogueTextObj = null;
   }
 
   hasTriggeredEvent(eventId: string): boolean {

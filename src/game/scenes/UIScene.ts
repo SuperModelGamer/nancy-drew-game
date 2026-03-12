@@ -267,18 +267,8 @@ export class UIScene extends Phaser.Scene {
     container.add(divGfx);
 
     // Close button
-    if (this.textures.exists('ui_close_btn')) {
-      const closeBtnImg = this.add.image(panelX + panelW / 2 - 22, headerY, 'ui_close_btn');
-      closeBtnImg.setDisplaySize(30, 30);
-      closeBtnImg.setInteractive({ cursor: HAND_CURSOR });
-      closeBtnImg.on('pointerover', () => closeBtnImg.setScale(closeBtnImg.scaleX * 1.15));
-      closeBtnImg.on('pointerout', () => closeBtnImg.setDisplaySize(30, 30));
-      closeBtnImg.on('pointerdown', () => this.toggleInventory());
-      container.add(closeBtnImg);
-    } else {
-      const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.toggleInventory(), '20px');
-      container.add(closeBtn);
-    }
+    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.toggleInventory(), 44);
+    container.add(closeBtn);
 
     // ─── Layout: left item grid + right detail panel ───
     const contentTop = headerY + headerH / 2 + 12;
@@ -596,25 +586,8 @@ export class UIScene extends Phaser.Scene {
     underline.lineBetween(-60, -panelH / 2 + 40, 60, -panelH / 2 + 40);
     panel.add(underline);
 
-    if (this.textures.exists('ui_close_btn')) {
-      const closeBtnImg = this.add.image(panelW / 2 - 20, -panelH / 2 + 15, 'ui_close_btn');
-      closeBtnImg.setDisplaySize(28, 28);
-      closeBtnImg.setInteractive({ cursor: HAND_CURSOR });
-      closeBtnImg.on('pointerover', () => closeBtnImg.setScale(closeBtnImg.scaleX * 1.15));
-      closeBtnImg.on('pointerout', () => closeBtnImg.setDisplaySize(28, 28));
-      closeBtnImg.on('pointerdown', () => this.toggleJournal());
-      panel.add(closeBtnImg);
-    } else {
-      const closeBtn = this.add.text(panelW / 2 - 20, -panelH / 2 + 15, '✕', {
-        fontFamily: FONT,
-        fontSize: '20px',
-        color: '#6a5a4a',
-      }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
-      closeBtn.on('pointerdown', () => this.toggleJournal());
-      closeBtn.on('pointerover', () => closeBtn.setColor('#3a2a1a'));
-      closeBtn.on('pointerout', () => closeBtn.setColor('#6a5a4a'));
-      panel.add(closeBtn);
-    }
+    const closeBtn = createCloseButton(this, panelW / 2 - 20, -panelH / 2 + 15, () => this.toggleJournal(), 40);
+    panel.add(closeBtn);
 
     panel.setDepth(Depths.journalPanel);
     return panel;

@@ -175,18 +175,8 @@ export class SuspectScene extends Phaser.Scene {
     this.container.add(divGfxHeader);
 
     // Close button
-    if (this.textures.exists('ui_close_btn')) {
-      const closeBtnImg = this.add.image(panelX + panelW / 2 - 22, headerY, 'ui_close_btn');
-      closeBtnImg.setDisplaySize(30, 30);
-      closeBtnImg.setDepth(Depths.suspectContent);
-      closeBtnImg.setInteractive({ cursor: HAND_CURSOR });
-      closeBtnImg.on('pointerover', () => closeBtnImg.setScale(closeBtnImg.scaleX * 1.15));
-      closeBtnImg.on('pointerout', () => closeBtnImg.setDisplaySize(30, 30));
-      closeBtnImg.on('pointerdown', () => this.scene.stop());
-    } else {
-      const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.scene.stop(), '20px');
-      closeBtn.setDepth(Depths.suspectContent);
-    }
+    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.scene.stop(), 44);
+    closeBtn.setDepth(Depths.suspectContent);
 
     // ─── Suspect tabs (horizontal strip below header) ───
     const tabStripY = headerY + headerH / 2 + 40;

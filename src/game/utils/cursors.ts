@@ -9,25 +9,28 @@ export const Cursors = {
   default: pngCursor('pointer', 4, 2),
 
   /** Inspecting clues and objects — gold spyglass */
-  inspect: pngCursor('spyglass', 20, 16),
+  inspect: pngCursor('spyglass', 32, 32),
 
   /** Room navigation / doorways — gold door with arrow */
-  navigate: pngCursor('door', 30, 24),
+  navigate: pngCursor('door', 32, 32),
 
   /** Talking to NPCs — gold speech bubble */
-  talk: pngCursor('chat', 24, 18),
+  talk: pngCursor('chat', 32, 28),
 
   /** Picking up items — gold grabbing hand */
-  pickup: pngCursor('grab', 24, 20),
+  pickup: pngCursor('grab', 32, 28),
 
   /** Locked objects — gold padlock */
-  locked: pngCursor('lock', 24, 24),
+  locked: pngCursor('lock', 32, 32),
 } as const;
 
 export type CursorType = keyof typeof Cursors;
 
 /** CSS cursor string for clickable UI elements (buttons, close, menu) — gold open hand */
-export const HAND_CURSOR = pngCursor('hand', 24, 8);
+export const HAND_CURSOR = pngCursor('hand', 32, 12);
+
+/** CSS cursor string for the default gold pointer — use for close/X buttons instead of hand */
+export const POINTER_CURSOR = Cursors.default;
 
 /** Set cursor on the game canvas */
 export function setGameCursor(scene: Phaser.Scene, type: CursorType): void {

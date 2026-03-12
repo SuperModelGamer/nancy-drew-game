@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { Cursors, HAND_CURSOR, initSceneCursor } from '../utils/cursors';
-import { createOverlay } from '../utils/ui-helpers';
+import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 
 /**
  * Room definition with hand-placed positions reflecting the Monarch Theatre's
@@ -121,21 +121,8 @@ export class MapScene extends Phaser.Scene {
     const closeBtnX = panelX + panelW / 2 - 28;
     const closeBtnY = panelY - panelH / 2 + 28;
 
-    if (this.textures.exists('ui_close_btn')) {
-      const closeImg = this.add.image(closeBtnX, closeBtnY, 'ui_close_btn');
-      closeImg.setDisplaySize(32, 32).setDepth(contentDepth + 3);
-      closeImg.setInteractive({ cursor: HAND_CURSOR });
-      closeImg.on('pointerover', () => closeImg.setScale(closeImg.scaleX * 1.15));
-      closeImg.on('pointerout', () => closeImg.setDisplaySize(32, 32));
-      closeImg.on('pointerdown', () => this.scene.stop());
-    } else {
-      const closeBtn = this.add.text(closeBtnX, closeBtnY, '✕', {
-        fontFamily: FONT, fontSize: '22px', color: TextColors.goldDim,
-      }).setOrigin(0.5).setDepth(contentDepth + 3).setInteractive({ cursor: HAND_CURSOR });
-      closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
-      closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
-      closeBtn.on('pointerdown', () => this.scene.stop());
-    }
+    const closeBtnContainer = createCloseButton(this, closeBtnX, closeBtnY, () => this.scene.stop(), 44);
+    closeBtnContainer.setDepth(contentDepth + 3);
 
     // --- Content area (inside border, below title) ---
     const contentLeft = panelX - panelW / 2 + 50;

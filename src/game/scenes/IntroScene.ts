@@ -81,10 +81,10 @@ const INTRO_SLIDES: IntroSlide[] = [
     camera: { scaleFrom: 1.05, scaleTo: 1.2, panY: 5 },
     audio: [
       { key: 'sfx_goblet', delay: 1500, volume: 0.5 },
-      { key: 'sfx_thud', delay: 3500, volume: 0.4 },
+      { key: 'sfx_thud', delay: 5500, volume: 0.4 },
     ],
     effects: [
-      { type: 'screenShake', delay: 3500, duration: 300 },
+      { type: 'screenShake', delay: 5500, duration: 300 },
     ],
   },
   {
@@ -128,7 +128,7 @@ const INTRO_SLIDES: IntroSlide[] = [
     camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: -8 },
     fogIntensity: 0.08,
     effects: [
-      { type: 'screenShake', delay: 4000, duration: 400 },
+      { type: 'screenShake', delay: 5500, duration: 400 },
     ],
   },
 
