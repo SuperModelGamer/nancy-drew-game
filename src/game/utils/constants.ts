@@ -97,8 +97,8 @@ export const Depths = {
 
 // Common sizes
 export const Sizes = {
-  minTapTarget: 48,
-  buttonHeight: 48,
-  panelBorderWidth: 2,
-  toolbarY: 40, // offset from bottom
+  minTapTarget: 72,
+  buttonHeight: 72,
+  panelBorderWidth: 3,
+  toolbarY: 60, // offset from bottom
 } as const;

@@ -73,7 +73,7 @@ export class HotspotEditorScene extends Phaser.Scene {
     // Room selector (left/right arrows)
     this.roomSelector = this.add.text(width / 2, 18, `◀  ${this.currentRoom.name}  ▶`, {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: '#ffcc00',
     }).setOrigin(0.5).setDepth(951);
 
@@ -90,7 +90,7 @@ export class HotspotEditorScene extends Phaser.Scene {
     // Info text (bottom)
     this.infoText = this.add.text(width / 2, height - 14, 'Drag hotspots to move | Shift+drag edge to resize | E = export JSON | ` = close', {
       fontFamily: 'monospace',
-      fontSize: '11px',
+      fontSize: '17px',
       color: '#aaaaaa',
       backgroundColor: '#000000cc',
       padding: { x: 10, y: 4 },
@@ -99,7 +99,7 @@ export class HotspotEditorScene extends Phaser.Scene {
     // Close button
     const closeBtn = this.add.text(width - 20, 18, '✕', {
       fontFamily: FONT,
-      fontSize: '20px',
+      fontSize: '30px',
       color: '#ff6666',
     }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR }).setDepth(952);
     closeBtn.on('pointerdown', () => this.closeEditor());
@@ -170,7 +170,7 @@ export class HotspotEditorScene extends Phaser.Scene {
     // Label above
     const label = this.add.text(hotspot.x, hotspot.y - h / 2 - 12, hotspot.label, {
       fontFamily: 'monospace',
-      fontSize: '10px',
+      fontSize: '15px',
       color: '#ffffff',
       backgroundColor: '#000000aa',
       padding: { x: 3, y: 1 },
@@ -179,7 +179,7 @@ export class HotspotEditorScene extends Phaser.Scene {
     // Coordinates below
     const coords = this.add.text(hotspot.x, hotspot.y + h / 2 + 3, `${hotspot.x},${hotspot.y} ${w}×${h}`, {
       fontFamily: 'monospace',
-      fontSize: '9px',
+      fontSize: '14px',
       color: '#aaffaa',
       backgroundColor: '#000000aa',
       padding: { x: 3, y: 1 },
@@ -309,7 +309,7 @@ export class HotspotEditorScene extends Phaser.Scene {
     const { width } = this.cameras.main;
     const toast = this.add.text(width / 2, 50, message, {
       fontFamily: 'monospace',
-      fontSize: '13px',
+      fontSize: '20px',
       color: '#00ff88',
       backgroundColor: '#000000dd',
       padding: { x: 12, y: 6 },

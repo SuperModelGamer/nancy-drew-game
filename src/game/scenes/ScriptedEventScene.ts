@@ -35,8 +35,8 @@ const SCRIPTED_EVENTS: ScriptedEvent[] = [
       { action: 'fog', duration: 3000, intensity: 0.6 },
       { action: 'text', text: 'A cold mist rolls across the stage from nowhere.', duration: 2500 },
       { action: 'wait', duration: 500 },
-      { action: 'spotlight', x: 640, y: 300, duration: 4000 },
-      { action: 'figure', x: 640, y: 280, duration: 4000 },
+      { action: 'spotlight', x: 960, y: 450, duration: 4000 },
+      { action: 'figure', x: 960, y: 420, duration: 4000 },
       { action: 'text', text: 'A figure in white stands center stage, bathed in a pale spotlight.', speaker: '', duration: 3000 },
       { action: 'wait', duration: 1000 },
       { action: 'text', text: 'She turns toward you. For a moment, you see her face — beautiful, sorrowful, familiar from a hundred playbills.', duration: 3500 },
@@ -164,14 +164,14 @@ export class ScriptedEventScene extends Phaser.Scene {
 
     this.speakerText = this.add.text(-width * 0.4 + 20, -20, '', {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.gold,
       fontStyle: 'bold',
     });
 
     this.textContent = this.add.text(0, 5, '', {
       fontFamily: FONT,
-      fontSize: '15px',
+      fontSize: '23px',
       color: TextColors.light,
       fontStyle: 'italic',
       wordWrap: { width: width * 0.8 },
@@ -186,7 +186,8 @@ export class ScriptedEventScene extends Phaser.Scene {
   }
 
   private createGhostFigure(): Phaser.GameObjects.Container {
-    const figure = this.add.container(640, 280);
+    const { width, height } = this.cameras.main;
+    const figure = this.add.container(width / 2, height * 0.39);
 
     // Simple ghost silhouette using shapes
     // Head
@@ -232,7 +233,7 @@ export class ScriptedEventScene extends Phaser.Scene {
         break;
 
       case 'spotlight':
-        this.spotlightGfx.setPosition(step.x || 640, step.y || 300);
+        this.spotlightGfx.setPosition(step.x || this.cameras.main.width / 2, step.y || this.cameras.main.height * 0.42);
         this.tweens.add({
           targets: this.spotlightGfx,
           fillAlpha: 0.3,
@@ -247,7 +248,7 @@ export class ScriptedEventScene extends Phaser.Scene {
         break;
 
       case 'figure':
-        this.figureGfx.setPosition(step.x || 640, step.y || 280);
+        this.figureGfx.setPosition(step.x || this.cameras.main.width / 2, step.y || this.cameras.main.height * 0.39);
         this.tweens.add({
           targets: this.figureGfx,
           alpha: 0.8,
@@ -259,7 +260,7 @@ export class ScriptedEventScene extends Phaser.Scene {
         // Gentle float animation
         this.tweens.add({
           targets: this.figureGfx,
-          y: (step.y || 280) - 10,
+          y: (step.y || this.cameras.main.height * 0.39) - 15,
           duration: 2000,
           yoyo: true,
           ease: 'Sine.easeInOut',

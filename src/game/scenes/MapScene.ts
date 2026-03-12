@@ -65,7 +65,7 @@ const FLOOR_LABELS: { label: string; fy: number }[] = [
   { label: 'BELOW STAGE',    fy: 0.90 },
 ];
 
-const MEDALLION_SIZE = 110;
+const MEDALLION_SIZE = 165;
 
 export class MapScene extends Phaser.Scene {
   private currentRoom = '';
@@ -89,21 +89,21 @@ export class MapScene extends Phaser.Scene {
 
     const contentDepth = Depths.mapContent;
 
-    // --- Panel dimensions ---
-    const panelW = Math.min(960, width - 32);
-    const panelH = Math.min(700, height - 32);
+    // --- Panel dimensions (centered on screen) ---
+    const panelW = Math.min(1440, width - 48);
+    const panelH = Math.min(1050, height - 48);
     const panelX = width / 2;
-    const panelY = height / 2 + 10;
+    const panelY = height / 2;
 
     // --- Background ---
     this.drawParchmentBackground(panelX, panelY, panelW, panelH, contentDepth);
     this.drawArtDecoBorder(panelX, panelY, panelW, panelH, contentDepth);
 
     // --- Title ---
-    const titleY = panelY - panelH / 2 + 32;
+    const titleY = panelY - panelH / 2 + 48;
     const titleText = this.add.text(panelX, titleY, 'THE MONARCH THEATRE', {
       fontFamily: FONT,
-      fontSize: '20px',
+      fontSize: '30px',
       color: TextColors.gold,
       letterSpacing: 6,
     }).setOrigin(0.5).setDepth(contentDepth + 1);
@@ -118,24 +118,24 @@ export class MapScene extends Phaser.Scene {
     this.drawDiamond(lineGfx, panelX + thw + 64, titleY, 4, Colors.gold, 0.5);
 
     // --- Close button ---
-    const closeBtnX = panelX + panelW / 2 - 28;
-    const closeBtnY = panelY - panelH / 2 + 28;
+    const closeBtnX = panelX + panelW / 2 - 42;
+    const closeBtnY = panelY - panelH / 2 + 42;
 
-    const closeBtnContainer = createCloseButton(this, closeBtnX, closeBtnY, () => this.scene.stop(), 44);
+    const closeBtnContainer = createCloseButton(this, closeBtnX, closeBtnY, () => this.scene.stop(), 66);
     closeBtnContainer.setDepth(contentDepth + 3);
 
     // --- Content area (inside border, below title) ---
-    const contentLeft = panelX - panelW / 2 + 50;
-    const contentTop = titleY + 20;
-    const contentW = panelW - 100;
-    const contentH = panelH - 80;
+    const contentLeft = panelX - panelW / 2 + 75;
+    const contentTop = titleY + 30;
+    const contentW = panelW - 150;
+    const contentH = panelH - 120;
 
     // --- Floor level labels (left side) ---
     for (const fl of FLOOR_LABELS) {
       const labelY = contentTop + fl.fy * contentH;
       this.add.text(contentLeft - 8, labelY, fl.label, {
         fontFamily: FONT,
-        fontSize: '8px',
+        fontSize: '12px',
         color: TextColors.goldDim,
         letterSpacing: 2,
       }).setOrigin(1, 0.5).setDepth(contentDepth + 1).setAlpha(0.6);
@@ -259,12 +259,12 @@ export class MapScene extends Phaser.Scene {
           // Lock icon overlay for chapter-gated rooms
           if (isLocked) {
             const lockIcon = this.add.text(0, circleOffsetY, '🔒', {
-              fontSize: '24px',
+              fontSize: '36px',
             }).setOrigin(0.5).setAlpha(0.7);
             container.add(lockIcon);
 
             const lockLabel = this.add.text(0, MEDALLION_SIZE / 2 + 2, `Chapter ${room.requiresChapter}`, {
-              fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+              fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue,
             }).setOrigin(0.5).setAlpha(0.6);
             container.add(lockLabel);
           }
@@ -272,7 +272,7 @@ export class MapScene extends Phaser.Scene {
           // "You are here" indicator
           if (isCurrentRoom) {
             const hereText = this.add.text(0, MEDALLION_SIZE / 2 + 2, '— you are here —', {
-              fontFamily: FONT, fontSize: '10px', color: '#fff4d0',
+              fontFamily: FONT, fontSize: '15px', color: '#fff4d0',
             }).setOrigin(0.5).setAlpha(0.9);
             container.add(hereText);
           }
@@ -284,14 +284,14 @@ export class MapScene extends Phaser.Scene {
         // --- UNDISCOVERED ROOM: Shadowy silhouette with ? ---
         const silBg = this.add.graphics();
         silBg.fillStyle(0x0a0a1a, 0.6);
-        silBg.fillCircle(0, -12, 36);
-        silBg.lineStyle(1.5, Colors.gold, 0.15);
-        silBg.strokeCircle(0, -12, 36);
+        silBg.fillCircle(0, -18, 54);
+        silBg.lineStyle(2, Colors.gold, 0.15);
+        silBg.strokeCircle(0, -18, 54);
         container.add(silBg);
 
-        const questionMark = this.add.text(0, -14, '?', {
+        const questionMark = this.add.text(0, -21, '?', {
           fontFamily: FONT,
-          fontSize: '28px',
+          fontSize: '42px',
           color: TextColors.goldDim,
         }).setOrigin(0.5).setAlpha(0.4);
         container.add(questionMark);
@@ -306,8 +306,8 @@ export class MapScene extends Phaser.Scene {
           ease: 'Sine.easeInOut',
         });
 
-        const unknownLabel = this.add.text(0, 20, '???', {
-          fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+        const unknownLabel = this.add.text(0, 30, '???', {
+          fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue,
         }).setOrigin(0.5).setAlpha(0.4);
         container.add(unknownLabel);
       }
@@ -315,10 +315,10 @@ export class MapScene extends Phaser.Scene {
 
     // --- Discovery count ---
     const discovered = ROOMS.filter(r => save.isRoomDiscovered(r.id)).length;
-    const subtitleY = panelY + panelH / 2 - 20;
+    const subtitleY = panelY + panelH / 2 - 30;
     this.add.text(panelX, subtitleY, `${discovered} of ${ROOMS.length} locations discovered`, {
       fontFamily: FONT,
-      fontSize: '10px',
+      fontSize: '15px',
       color: TextColors.goldDim,
     }).setOrigin(0.5).setAlpha(0.5).setDepth(contentDepth + 1);
 
@@ -333,19 +333,19 @@ export class MapScene extends Phaser.Scene {
     isCurrent: boolean,
     isLocked: boolean,
   ): void {
-    const cardBg = this.add.rectangle(0, 0, 90, 70, 0x0a0a1a, 0.7);
+    const cardBg = this.add.rectangle(0, 0, 135, 105, 0x0a0a1a, 0.7);
     cardBg.setStrokeStyle(1.5, isLocked ? 0x3a3a4a : Colors.gold, isLocked ? 0.4 : 0.5);
     container.add(cardBg);
 
     const nameText = this.add.text(0, isCurrent ? -8 : 0, room.name, {
-      fontFamily: FONT, fontSize: '10px', color: isCurrent ? TextColors.gold : TextColors.mutedBlue,
-      align: 'center', wordWrap: { width: 80 },
+      fontFamily: FONT, fontSize: '15px', color: isCurrent ? TextColors.gold : TextColors.mutedBlue,
+      align: 'center', wordWrap: { width: 120 },
     }).setOrigin(0.5);
     container.add(nameText);
 
     if (isCurrent) {
       const hereText = this.add.text(0, 12, '— here —', {
-        fontFamily: FONT, fontSize: '9px', color: '#fff4d0',
+        fontFamily: FONT, fontSize: '14px', color: '#fff4d0',
       }).setOrigin(0.5).setAlpha(0.7);
       container.add(hereText);
     }
@@ -411,28 +411,28 @@ export class MapScene extends Phaser.Scene {
     gfx.lineStyle(3, Colors.gold, 0.7);
     gfx.strokeRect(left, top, w, h);
     gfx.lineStyle(1, Colors.gold, 0.3);
-    gfx.strokeRect(left + 8, top + 8, w - 16, h - 16);
+    gfx.strokeRect(left + 12, top + 12, w - 24, h - 24);
 
     const corners = [
-      { x: left + 8, y: top + 8 },
-      { x: left + w - 8, y: top + 8 },
-      { x: left + 8, y: top + h - 8 },
-      { x: left + w - 8, y: top + h - 8 },
+      { x: left + 12, y: top + 12 },
+      { x: left + w - 12, y: top + 12 },
+      { x: left + 12, y: top + h - 12 },
+      { x: left + w - 12, y: top + h - 12 },
     ];
     for (const c of corners) {
-      this.drawDiamond(gfx, c.x, c.y, 6, Colors.gold, 0.5);
+      this.drawDiamond(gfx, c.x, c.y, 9, Colors.gold, 0.5);
     }
 
-    const accentLen = 40;
+    const accentLen = 60;
     gfx.lineStyle(1, Colors.gold, 0.4);
-    gfx.lineBetween(left + 16, top + 16, left + 16 + accentLen, top + 16);
-    gfx.lineBetween(left + 16, top + 16, left + 16, top + 16 + accentLen);
-    gfx.lineBetween(left + w - 16, top + 16, left + w - 16 - accentLen, top + 16);
-    gfx.lineBetween(left + w - 16, top + 16, left + w - 16, top + 16 + accentLen);
-    gfx.lineBetween(left + 16, top + h - 16, left + 16 + accentLen, top + h - 16);
-    gfx.lineBetween(left + 16, top + h - 16, left + 16, top + h - 16 - accentLen);
-    gfx.lineBetween(left + w - 16, top + h - 16, left + w - 16 - accentLen, top + h - 16);
-    gfx.lineBetween(left + w - 16, top + h - 16, left + w - 16, top + h - 16 - accentLen);
+    gfx.lineBetween(left + 24, top + 24, left + 24 + accentLen, top + 24);
+    gfx.lineBetween(left + 24, top + 24, left + 24, top + 24 + accentLen);
+    gfx.lineBetween(left + w - 24, top + 24, left + w - 24 - accentLen, top + 24);
+    gfx.lineBetween(left + w - 24, top + 24, left + w - 24, top + 24 + accentLen);
+    gfx.lineBetween(left + 24, top + h - 24, left + 24 + accentLen, top + h - 24);
+    gfx.lineBetween(left + 24, top + h - 24, left + 24, top + h - 24 - accentLen);
+    gfx.lineBetween(left + w - 24, top + h - 24, left + w - 24 - accentLen, top + h - 24);
+    gfx.lineBetween(left + w - 24, top + h - 24, left + w - 24, top + h - 24 - accentLen);
   }
 
   private drawDiamond(

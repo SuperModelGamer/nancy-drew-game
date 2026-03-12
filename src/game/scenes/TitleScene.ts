@@ -60,14 +60,14 @@ export class TitleScene extends Phaser.Scene {
       // Fallback: procedural text title if image missing
       this.add.text(contentX, height * 0.12, 'A  N A N C Y  D R E W  M Y S T E R Y', {
         fontFamily: FONT,
-        fontSize: '11px',
+        fontSize: '17px',
         color: '#b8a472',
         letterSpacing: 5,
       }).setOrigin(0.5).setAlpha(0.8);
 
       this.add.text(contentX, height * 0.22, 'THE LAST\nCURTAIN CALL', {
         fontFamily: FONT,
-        fontSize: '42px',
+        fontSize: '63px',
         color: '#e8c55a',
         fontStyle: 'bold',
         align: 'center',
@@ -154,7 +154,7 @@ export class TitleScene extends Phaser.Scene {
     // ── Credits ──
     this.add.text(contentX, height - 20, 'Created by Carley Beck', {
       fontFamily: FONT,
-      fontSize: '10px',
+      fontSize: '15px',
       color: '#555566',
     }).setOrigin(0.5);
 
@@ -195,7 +195,7 @@ export class TitleScene extends Phaser.Scene {
       if (subtitle) {
         const sub = this.add.text(0, h / 2 + 10, subtitle, {
           fontFamily: FONT,
-          fontSize: '11px',
+          fontSize: '17px',
           color: TextColors.goldDim,
           fontStyle: 'italic',
         }).setOrigin(0.5);
@@ -267,7 +267,7 @@ export class TitleScene extends Phaser.Scene {
 
       if (subtitle) {
         const sub = this.add.text(0, 12, subtitle, {
-          fontFamily: FONT, fontSize: '10px', color: TextColors.goldDim, fontStyle: 'italic',
+          fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim, fontStyle: 'italic',
         }).setOrigin(0.5);
         container.add(sub);
       }
@@ -331,7 +331,7 @@ export class TitleScene extends Phaser.Scene {
 
     const titleText = this.add.text(0, -140, 'How to Play', {
       fontFamily: FONT,
-      fontSize: '22px',
+      fontSize: '33px',
       color: '#e8c55a',
       fontStyle: 'bold',
     }).setOrigin(0.5);
@@ -349,7 +349,7 @@ export class TitleScene extends Phaser.Scene {
 
     const helpText = this.add.text(0, -10, helpLines.join('\n\n'), {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.light,
       align: 'center',
       lineSpacing: 2,
@@ -363,7 +363,7 @@ export class TitleScene extends Phaser.Scene {
     closeBg.setInteractive({ cursor: POINTER_CURSOR });
     const closeText = this.add.text(0, 140, 'Close', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '24px',
       color: TextColors.gold,
     }).setOrigin(0.5);
     closeBg.on('pointerover', () => closeBg.setFillStyle(Colors.hoverBg));
@@ -387,7 +387,7 @@ export class TitleScene extends Phaser.Scene {
 
     const titleText = this.add.text(0, -145, 'Settings', {
       fontFamily: FONT,
-      fontSize: '22px',
+      fontSize: '33px',
       color: '#e8c55a',
       fontStyle: 'bold',
     }).setOrigin(0.5);
@@ -405,7 +405,7 @@ export class TitleScene extends Phaser.Scene {
     // Controls how fast dialogue text types out character by character
     {
       const label = this.add.text(-170, rowY(0), 'Dialogue Speed', {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.light,
+        fontFamily: FONT, fontSize: '21px', color: TextColors.light,
       }).setOrigin(0, 0.5);
       container.add(label);
 
@@ -420,15 +420,15 @@ export class TitleScene extends Phaser.Scene {
       if (idx === -1) idx = 1;
 
       const valText = this.add.text(140, rowY(0), speedLabels[speeds[idx]], {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.gold,
+        fontFamily: FONT, fontSize: '21px', color: TextColors.gold,
       }).setOrigin(0.5);
       container.add(valText);
 
       const leftArr = this.add.text(90, rowY(0), '◀', {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim,
+        fontFamily: FONT, fontSize: '21px', color: TextColors.goldDim,
       }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
       const rightArr = this.add.text(190, rowY(0), '▶', {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim,
+        fontFamily: FONT, fontSize: '21px', color: TextColors.goldDim,
       }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
 
       const update = (dir: number) => {
@@ -445,18 +445,18 @@ export class TitleScene extends Phaser.Scene {
     // When ON, undiscovered hotspots gently shimmer so the player knows where to look
     {
       const label = this.add.text(-170, rowY(1), 'Clue Shimmer', {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.light,
+        fontFamily: FONT, fontSize: '21px', color: TextColors.light,
       }).setOrigin(0, 0.5);
       container.add(label);
 
       const desc = this.add.text(-170, rowY(1) + 16, 'Highlights undiscovered clues', {
-        fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+        fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue,
       }).setOrigin(0, 0.5);
       container.add(desc);
 
       let on = save.getFlag('setting_highlights') !== false;
       const valText = this.add.text(140, rowY(1), on ? 'ON' : 'OFF', {
-        fontFamily: FONT, fontSize: '14px', color: on ? TextColors.success : TextColors.goldDim,
+        fontFamily: FONT, fontSize: '21px', color: on ? TextColors.success : TextColors.goldDim,
       }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
       container.add(valText);
 
@@ -472,19 +472,19 @@ export class TitleScene extends Phaser.Scene {
     // When ON, the game auto-saves when entering a new room or completing a puzzle
     {
       const label = this.add.text(-170, rowY(2), 'Auto-Save', {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.light,
+        fontFamily: FONT, fontSize: '21px', color: TextColors.light,
       }).setOrigin(0, 0.5);
       container.add(label);
 
       const desc = this.add.text(-170, rowY(2) + 16, 'Saves on room change and puzzle completion', {
-        fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+        fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue,
       }).setOrigin(0, 0.5);
       container.add(desc);
 
       // Default auto-save to ON
       let on = save.getFlag('setting_autosave') !== false;
       const valText = this.add.text(140, rowY(2), on ? 'ON' : 'OFF', {
-        fontFamily: FONT, fontSize: '14px', color: on ? TextColors.success : TextColors.goldDim,
+        fontFamily: FONT, fontSize: '21px', color: on ? TextColors.success : TextColors.goldDim,
       }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
       container.add(valText);
 
@@ -508,7 +508,7 @@ export class TitleScene extends Phaser.Scene {
       deleteBg.setStrokeStyle(1, Colors.error, 0.4);
       deleteBg.setInteractive({ cursor: POINTER_CURSOR });
       const deleteText = this.add.text(0, rowY(3) + 10, 'Delete Save Data', {
-        fontFamily: FONT, fontSize: '13px', color: TextColors.error,
+        fontFamily: FONT, fontSize: '20px', color: TextColors.error,
       }).setOrigin(0.5);
 
       deleteBg.on('pointerover', () => deleteBg.setFillStyle(0x2a0a0a, 0.9));
@@ -528,7 +528,7 @@ export class TitleScene extends Phaser.Scene {
     closeBg.setStrokeStyle(1, Colors.gold, 0.5);
     closeBg.setInteractive({ cursor: POINTER_CURSOR });
     const closeText = this.add.text(0, 140, 'Close', {
-      fontFamily: FONT, fontSize: '15px', color: TextColors.gold,
+      fontFamily: FONT, fontSize: '23px', color: TextColors.gold,
     }).setOrigin(0.5);
     closeBg.on('pointerover', () => closeBg.setFillStyle(Colors.hoverBg));
     closeBg.on('pointerout', () => closeBg.setFillStyle(Colors.sceneBg, 0.9));
@@ -550,7 +550,7 @@ export class TitleScene extends Phaser.Scene {
 
     const text = this.add.text(0, -40, 'Start a new investigation?\nYour current progress will be lost.', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '24px',
       color: TextColors.light,
       align: 'center',
       lineSpacing: 4,
@@ -563,7 +563,7 @@ export class TitleScene extends Phaser.Scene {
     yesBg.setInteractive({ cursor: POINTER_CURSOR });
     const yesText = this.add.text(-80, 40, 'Yes', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '24px',
       color: TextColors.light,
     }).setOrigin(0.5);
     yesBg.on('pointerover', () => yesBg.setFillStyle(0xaa0000));
@@ -580,7 +580,7 @@ export class TitleScene extends Phaser.Scene {
     noBg.setInteractive({ cursor: POINTER_CURSOR });
     const noText = this.add.text(80, 40, 'Cancel', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '24px',
       color: TextColors.gold,
     }).setOrigin(0.5);
     noBg.on('pointerover', () => noBg.setFillStyle(Colors.hoverBg));

@@ -10,7 +10,7 @@ import { UISounds } from '../utils/sounds';
 import { drawArtDecoFrame, drawDecoDivider, drawChevronTab, drawCornerOrnament, DecoColors, DecoTextColors } from '../utils/art-deco';
 
 // Height of the bottom toolbar strip (buttons + chapter label)
-const TOOLBAR_H = 64;
+const TOOLBAR_H = 96;
 
 // Pre-index items for O(1) lookup
 const itemMap = new Map(itemsData.items.map(i => [i.id, i]));
@@ -41,57 +41,63 @@ export class UIScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
     initSceneCursor(this);
-    const barY = height - TOOLBAR_H / 2;
+
+    // Add breathing room below toolbar so it doesn't touch the canvas bottom edge
+    const BOTTOM_MARGIN = 12;
+    const barY = height - TOOLBAR_H / 2 - BOTTOM_MARGIN;
 
     // ─── Bottom toolbar — solid border with integrated chapter label ───
-    const toolbarTop = height - TOOLBAR_H;
+    const toolbarTop = height - TOOLBAR_H - BOTTOM_MARGIN;
     const barBg = this.add.graphics();
 
     // Solid dark background (feels like a proper frame border, not floating)
     barBg.fillStyle(DecoColors.navy, 0.97);
     barBg.fillRect(0, toolbarTop, width, TOOLBAR_H);
+    // Fill below the toolbar to the canvas edge
+    barBg.fillStyle(0x05050a, 1);
+    barBg.fillRect(0, toolbarTop + TOOLBAR_H, width, BOTTOM_MARGIN + 2);
 
-    // Subtle gradient fade just above the bar (8px, very short)
-    for (let i = 0; i < 8; i++) {
-      barBg.fillStyle(DecoColors.navy, (i / 8) * 0.6);
-      barBg.fillRect(0, toolbarTop - 8 + i, width, 1);
+    // Subtle gradient fade just above the bar (12px, very short)
+    for (let i = 0; i < 12; i++) {
+      barBg.fillStyle(DecoColors.navy, (i / 12) * 0.6);
+      barBg.fillRect(0, toolbarTop - 12 + i, width, 1);
     }
 
     // Gold top border — double line for art deco feel
     barBg.lineStyle(2, DecoColors.gold, 0.5);
     barBg.lineBetween(0, toolbarTop, width, toolbarTop);
     barBg.lineStyle(0.5, DecoColors.gold, 0.2);
-    barBg.lineBetween(0, toolbarTop + 4, width, toolbarTop + 4);
+    barBg.lineBetween(0, toolbarTop + 6, width, toolbarTop + 6);
 
     // Center diamond accent on the top border
     barBg.fillStyle(DecoColors.gold, 0.5);
     barBg.fillPoints([
-      new Phaser.Geom.Point(width / 2, toolbarTop - 5),
-      new Phaser.Geom.Point(width / 2 + 5, toolbarTop),
-      new Phaser.Geom.Point(width / 2, toolbarTop + 5),
-      new Phaser.Geom.Point(width / 2 - 5, toolbarTop),
+      new Phaser.Geom.Point(width / 2, toolbarTop - 7),
+      new Phaser.Geom.Point(width / 2 + 7, toolbarTop),
+      new Phaser.Geom.Point(width / 2, toolbarTop + 7),
+      new Phaser.Geom.Point(width / 2 - 7, toolbarTop),
     ], true);
 
     barBg.setDepth(Depths.tooltip - 1);
 
     // ─── Story progress indicator — visual act tracker in toolbar center ───
     const TOTAL_ACTS = 5;
-    const progressY = toolbarTop + 12;
+    const progressY = toolbarTop + 18;
     const progressContainer = this.add.container(width / 2, progressY);
     progressContainer.setDepth(Depths.tooltip);
 
     // Act pip dots with connecting lines
-    const pipSpacing = 28;
+    const pipSpacing = 42;
     const totalPipW = (TOTAL_ACTS - 1) * pipSpacing;
     const pipStartX = -totalPipW / 2;
-    const pipR = 4;
+    const pipR = 6;
     const pipGfx = this.add.graphics();
     progressContainer.add(pipGfx);
 
     // Tooltip for act title (hidden by default)
     const actTooltip = this.add.text(0, 14, '', {
       fontFamily: FONT,
-      fontSize: '10px',
+      fontSize: '15px',
       color: DecoTextColors.cream,
       fontStyle: 'italic',
       letterSpacing: 1,
@@ -99,7 +105,7 @@ export class UIScene extends Phaser.Scene {
     progressContainer.add(actTooltip);
 
     // Hit area for hover to show act title
-    const progressHit = this.add.rectangle(0, 0, totalPipW + 40, 20, 0x000000, 0);
+    const progressHit = this.add.rectangle(0, 0, totalPipW + 60, 30, 0x000000, 0);
     progressHit.setInteractive({ cursor: POINTER_CURSOR });
     progressContainer.add(progressHit);
 
@@ -163,7 +169,7 @@ export class UIScene extends Phaser.Scene {
     this.events.on('wake', updateChapter);
 
     // ─── Toolbar buttons — positioned below progress indicator ───
-    const buttonY = toolbarTop + 42;
+    const buttonY = toolbarTop + 63;
 
     const buttons = [
       { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: width * 0.12, action: () => this.toggleInventory() },
@@ -178,36 +184,36 @@ export class UIScene extends Phaser.Scene {
 
       // Chevron-shaped button background
       const btnGfx = this.add.graphics();
-      drawChevronTab(btnGfx, 0, 0, 130, 34, {
+      drawChevronTab(btnGfx, 0, 0, 195, 51, {
         fillColor: DecoColors.navy,
         fillAlpha: 0.6,
         strokeColor: btn.color,
         strokeAlpha: 0.4,
-        chevronDepth: 5,
+        chevronDepth: 8,
       });
       container.add(btnGfx);
 
       // Hit area
-      const hitArea = this.add.rectangle(0, 0, 130, 34, 0x000000, 0);
+      const hitArea = this.add.rectangle(0, 0, 195, 51, 0x000000, 0);
       hitArea.setInteractive({ cursor: POINTER_CURSOR });
       hitArea.on('pointerover', () => {
         btnGfx.clear();
-        drawChevronTab(btnGfx, 0, 0, 130, 34, {
+        drawChevronTab(btnGfx, 0, 0, 195, 51, {
           fillColor: DecoColors.navyLight,
           fillAlpha: 0.8,
           strokeColor: btn.color,
           strokeAlpha: 0.8,
-          chevronDepth: 5,
+          chevronDepth: 8,
         });
       });
       hitArea.on('pointerout', () => {
         btnGfx.clear();
-        drawChevronTab(btnGfx, 0, 0, 130, 34, {
+        drawChevronTab(btnGfx, 0, 0, 195, 51, {
           fillColor: DecoColors.navy,
           fillAlpha: 0.6,
           strokeColor: btn.color,
           strokeAlpha: 0.4,
-          chevronDepth: 5,
+          chevronDepth: 8,
         });
       });
       hitArea.on('pointerdown', btn.action);
@@ -216,7 +222,7 @@ export class UIScene extends Phaser.Scene {
       const colorHex = `#${btn.color.toString(16).padStart(6, '0')}`;
       const text = this.add.text(0, 0, btn.label, {
         fontFamily: FONT,
-        fontSize: '13px',
+        fontSize: '20px',
         color: colorHex,
         fontStyle: 'bold',
         letterSpacing: 2,
@@ -300,10 +306,10 @@ export class UIScene extends Phaser.Scene {
     container.add(overlay);
 
     // Main panel dimensions — fill most of the screen, leave room for toolbar
-    const panelW = Math.min(width - 40, 1100);
-    const panelH = height - TOOLBAR_H - 30;
+    const panelW = Math.min(width - 60, 1650);
+    const panelH = height - TOOLBAR_H - 48;
     const panelX = width / 2;
-    const panelY = panelH / 2 + 10;
+    const panelY = panelH / 2 + 15;
 
     // Panel background with art deco frame
     const panelLeft = panelX - panelW / 2;
@@ -319,7 +325,7 @@ export class UIScene extends Phaser.Scene {
     container.add(decoFrame);
 
     // ─── Header ───
-    const headerH = 48;
+    const headerH = 72;
     const headerY = panelY - panelH / 2 + headerH / 2;
 
     const headerBg = this.add.rectangle(panelX, headerY, panelW - 8, headerH, DecoColors.navy, 1);
@@ -333,7 +339,7 @@ export class UIScene extends Phaser.Scene {
 
     const title = this.add.text(panelX, headerY, 'CASE FILE — EVIDENCE', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '24px',
       color: DecoTextColors.goldBright,
       fontStyle: 'bold',
       letterSpacing: 5,
@@ -346,17 +352,17 @@ export class UIScene extends Phaser.Scene {
     container.add(divGfx);
 
     // Close button
-    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.toggleInventory(), 44);
+    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 33, headerY, () => this.toggleInventory(), 66);
     container.add(closeBtn);
 
     // ─── Layout: left item grid + right detail panel ───
-    const contentTop = headerY + headerH / 2 + 12;
-    const contentBottom = panelY + panelH / 2 - 14;
+    const contentTop = headerY + headerH / 2 + 18;
+    const contentBottom = panelY + panelH / 2 - 21;
     const contentH = contentBottom - contentTop;
     const leftW = panelW * 0.55;
-    const rightW = panelW - leftW - 30;
-    const leftX = panelX - panelW / 2 + 15;
-    const rightX = leftX + leftW + 15;
+    const rightW = panelW - leftW - 45;
+    const leftX = panelX - panelW / 2 + 22;
+    const rightX = leftX + leftW + 22;
 
     // ─── Items grid container (will be populated by refresh) ───
     this.itemsGrid = this.add.container(0, 0);
@@ -374,7 +380,7 @@ export class UIScene extends Phaser.Scene {
     // Placeholder text (shown when no item selected)
     this.detailPlaceholder = this.add.text(detailCenterX, detailCenterY, 'Select an item to inspect', {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.muted,
       fontStyle: 'italic',
       align: 'center',
@@ -385,9 +391,9 @@ export class UIScene extends Phaser.Scene {
     this.detailImage = null;
 
     // Detail name
-    this.detailName = this.add.text(detailCenterX, contentTop + 20, '', {
+    this.detailName = this.add.text(detailCenterX, contentTop + 30, '', {
       fontFamily: FONT,
-      fontSize: '20px',
+      fontSize: '30px',
       color: TextColors.gold,
       fontStyle: 'bold',
       align: 'center',
@@ -395,12 +401,12 @@ export class UIScene extends Phaser.Scene {
     container.add(this.detailName);
 
     // Key item badge
-    this.detailKeyBadge = this.add.container(detailCenterX, contentTop + 48);
-    const badgeBg = this.add.rectangle(0, 0, 100, 22, Colors.gold, 0.12);
+    this.detailKeyBadge = this.add.container(detailCenterX, contentTop + 72);
+    const badgeBg = this.add.rectangle(0, 0, 150, 33, Colors.gold, 0.12);
     badgeBg.setStrokeStyle(1, Colors.gold, 0.3);
     const badgeText = this.add.text(0, 0, '★  KEY EVIDENCE', {
       fontFamily: FONT,
-      fontSize: '10px',
+      fontSize: '15px',
       color: TextColors.gold,
       letterSpacing: 1,
     }).setOrigin(0.5);
@@ -409,21 +415,21 @@ export class UIScene extends Phaser.Scene {
     container.add(this.detailKeyBadge);
 
     // Detail description
-    this.detailDesc = this.add.text(detailCenterX, contentTop + 80, '', {
+    this.detailDesc = this.add.text(detailCenterX, contentTop + 120, '', {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.light,
-      wordWrap: { width: rightW - 40 },
+      wordWrap: { width: rightW - 60 },
       lineSpacing: 5,
       align: 'center',
     }).setOrigin(0.5, 0);
     container.add(this.detailDesc);
 
     // Hint at bottom of detail panel
-    const hintY = contentBottom - 20;
+    const hintY = contentBottom - 30;
     const hint = this.add.text(detailCenterX, hintY, 'Click an item to select it for use.\nClick again to deselect.', {
       fontFamily: FONT,
-      fontSize: '11px',
+      fontSize: '17px',
       color: TextColors.muted,
       fontStyle: 'italic',
       align: 'center',
@@ -449,11 +455,11 @@ export class UIScene extends Phaser.Scene {
 
     // Grid layout: 3 columns
     const cols = 3;
-    const cardW = Math.floor((leftW - 20) / cols) - 8;
-    const cardH = cardW + 30; // square image + name below
-    const gap = 10;
-    const gridStartX = leftX + 10;
-    const gridStartY = contentTop + 8;
+    const cardW = Math.floor((leftW - 30) / cols) - 12;
+    const cardH = cardW + 45; // square image + name below
+    const gap = 15;
+    const gridStartX = leftX + 15;
+    const gridStartY = contentTop + 12;
 
     if (items.length === 0) {
       const emptyText = this.add.text(
@@ -461,7 +467,7 @@ export class UIScene extends Phaser.Scene {
         'No evidence collected yet.\n\nExplore the theater to find items.',
         {
           fontFamily: FONT,
-          fontSize: '14px',
+          fontSize: '21px',
           color: TextColors.muted,
           fontStyle: 'italic',
           align: 'center',
@@ -485,7 +491,7 @@ export class UIScene extends Phaser.Scene {
       const isInspected = this.selectedItemId === itemId;
 
       // Card background
-      const cardBg = this.add.rectangle(x, y + 10, cardW, cardH, 0x15141e, 0.9);
+      const cardBg = this.add.rectangle(x, y + 15, cardW, cardH, 0x15141e, 0.9);
       const borderColor = isSelected ? Colors.success : (isInspected ? Colors.gold : Colors.goldDim);
       const borderAlpha = isSelected ? 0.9 : (isInspected ? 0.7 : 0.2);
       cardBg.setStrokeStyle(isSelected || isInspected ? 2 : 1, borderColor, borderAlpha);
@@ -493,7 +499,7 @@ export class UIScene extends Phaser.Scene {
 
       // Item image — larger and prominent
       const iconKey = `item_icon_${itemId}`;
-      const imgSize = cardW - 20;
+      const imgSize = cardW - 30;
       let icon: Phaser.GameObjects.GameObject;
       if (this.textures.exists(iconKey)) {
         const img = this.add.image(x, y, iconKey);
@@ -501,24 +507,24 @@ export class UIScene extends Phaser.Scene {
         icon = img;
       } else {
         icon = this.add.text(x, y, itemData.icon || '?', {
-          fontSize: '48px',
+          fontSize: '72px',
         }).setOrigin(0.5);
       }
 
       // Item name below image
-      const label = this.add.text(x, y + cardW / 2 + 4, itemData.name, {
+      const label = this.add.text(x, y + cardW / 2 + 6, itemData.name, {
         fontFamily: FONT,
-        fontSize: '11px',
+        fontSize: '17px',
         color: isSelected ? TextColors.success : TextColors.gold,
         align: 'center',
-        wordWrap: { width: cardW - 8 },
+        wordWrap: { width: cardW - 12 },
       }).setOrigin(0.5, 0);
 
       // Selected indicator
       if (isSelected) {
-        const selBadge = this.add.text(x + cardW / 2 - 6, y - cardW / 2 + 10, '✓', {
+        const selBadge = this.add.text(x + cardW / 2 - 9, y - cardW / 2 + 15, '✓', {
           fontFamily: FONT,
-          fontSize: '14px',
+          fontSize: '21px',
           color: TextColors.success,
           fontStyle: 'bold',
         }).setOrigin(0.5);
@@ -627,9 +633,9 @@ export class UIScene extends Phaser.Scene {
 
   private createJournalPanel(): Phaser.GameObjects.Container {
     const { width, height } = this.cameras.main;
-    const panelW = Math.min(width * 0.9, 600);
-    const panelH = 400;
-    const panelY = Math.min(height / 2, height - TOOLBAR_H - panelH / 2 - 15);
+    const panelW = Math.min(width * 0.9, 900);
+    const panelH = 600;
+    const panelY = Math.min(height / 2, height - TOOLBAR_H - panelH / 2 - 22);
     const panel = this.add.container(width / 2, panelY);
 
     // Aged paper background
@@ -641,20 +647,20 @@ export class UIScene extends Phaser.Scene {
     // Paper texture — subtle stain patches
     const stains = this.add.graphics();
     stains.fillStyle(Colors.paperBorder, 0.08);
-    stains.fillCircle(-panelW / 4, -panelH / 4, 40);
-    stains.fillCircle(panelW / 3, panelH / 5, 30);
-    stains.fillEllipse(-panelW / 6, panelH / 3, 60, 25);
+    stains.fillCircle(-panelW / 4, -panelH / 4, 60);
+    stains.fillCircle(panelW / 3, panelH / 5, 45);
+    stains.fillEllipse(-panelW / 6, panelH / 3, 90, 38);
     stains.lineStyle(1, Colors.paperBorder, 0.15);
-    for (let ly = -panelH / 2 + 65; ly < panelH / 2 - 20; ly += 22) {
-      stains.lineBetween(-panelW / 2 + 25, ly, panelW / 2 - 25, ly);
+    for (let ly = -panelH / 2 + 98; ly < panelH / 2 - 30; ly += 33) {
+      stains.lineBetween(-panelW / 2 + 38, ly, panelW / 2 - 38, ly);
     }
     stains.lineStyle(1, 0xcc6666, 0.2);
-    stains.lineBetween(-panelW / 2 + 55, -panelH / 2 + 10, -panelW / 2 + 55, panelH / 2 - 10);
+    stains.lineBetween(-panelW / 2 + 82, -panelH / 2 + 15, -panelW / 2 + 82, panelH / 2 - 15);
     panel.add(stains);
 
-    const titleText = this.add.text(0, -panelH / 2 + 25, 'Nancy\'s Journal', {
+    const titleText = this.add.text(0, -panelH / 2 + 38, 'Nancy\'s Journal', {
       fontFamily: '\'Palatino Linotype\', \'Book Antiqua\', Palatino, Georgia, serif',
-      fontSize: '22px',
+      fontSize: '33px',
       color: '#3a2a1a',
       fontStyle: 'italic',
     }).setOrigin(0.5);
@@ -662,10 +668,10 @@ export class UIScene extends Phaser.Scene {
 
     const underline = this.add.graphics();
     underline.lineStyle(1, 0x3a2a1a, 0.4);
-    underline.lineBetween(-60, -panelH / 2 + 40, 60, -panelH / 2 + 40);
+    underline.lineBetween(-90, -panelH / 2 + 60, 90, -panelH / 2 + 60);
     panel.add(underline);
 
-    const closeBtn = createCloseButton(this, panelW / 2 - 20, -panelH / 2 + 15, () => this.toggleJournal(), 40);
+    const closeBtn = createCloseButton(this, panelW / 2 - 30, -panelH / 2 + 22, () => this.toggleJournal(), 60);
     panel.add(closeBtn);
 
     panel.setDepth(Depths.journalPanel);
@@ -680,13 +686,13 @@ export class UIScene extends Phaser.Scene {
 
     const save = SaveSystem.getInstance();
     const journal = save.getJournal();
-    const panelW = Math.min(this.cameras.main.width * 0.9, 600);
+    const panelW = Math.min(this.cameras.main.width * 0.9, 900);
     const journalFont = '\'Palatino Linotype\', \'Book Antiqua\', Palatino, Georgia, serif';
 
     if (journal.length === 0) {
       const empty = this.add.text(0, 0, 'No entries yet.\n\nExplore the theater and talk to people\nto fill Nancy\'s journal.', {
         fontFamily: journalFont,
-        fontSize: '14px',
+        fontSize: '21px',
         color: '#6a5a4a',
         fontStyle: 'italic',
         align: 'center',
@@ -696,19 +702,19 @@ export class UIScene extends Phaser.Scene {
       return;
     }
 
-    let y = -130;
+    let y = -200;
     journal.forEach((entry, i) => {
       const xJitter = ((i * 7) % 5) - 2;
 
       const bullet = this.add.text(-panelW / 2 + 62 + xJitter, y, `${i + 1}.`, {
         fontFamily: journalFont,
-        fontSize: '15px',
+        fontSize: '23px',
         color: '#5a3a2a',
         fontStyle: 'italic',
       });
       const text = this.add.text(-panelW / 2 + 82 + xJitter, y, entry, {
         fontFamily: journalFont,
-        fontSize: '15px',
+        fontSize: '23px',
         color: '#2a1a0a',
         wordWrap: { width: panelW - 130 },
         lineSpacing: 3,

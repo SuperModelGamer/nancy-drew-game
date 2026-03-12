@@ -59,13 +59,13 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
 };
 
 // ─── Layout Constants ───────────────────────────────────────────────────────
-const PORTRAIT_W = 160;
-const PORTRAIT_H = 200;
-const BOX_H = 260;
-const TEXT_SIZE = '20px';
-const SPEAKER_SIZE = '22px';
-const CHOICE_H = 56;
-const CHOICE_FONT = '17px';
+const PORTRAIT_W = 240;
+const PORTRAIT_H = 300;
+const BOX_H = 390;
+const TEXT_SIZE = '30px';
+const SPEAKER_SIZE = '33px';
+const CHOICE_H = 84;
+const CHOICE_FONT = '26px';
 const TYPEWRITER_SPEED = 28; // ms per character
 
 export class DialogueSystem {
@@ -172,19 +172,19 @@ export class DialogueSystem {
     this.container.add(overlay);
 
     // ── Layout calculations ──
-    // Box is centered vertically in the lower 60% of the screen
-    const boxCenterY = height * 0.62;
-    const boxW = Math.min(880, width * 0.92);
+    // Box sits in the lower portion of the screen, above the toolbar
+    const boxCenterY = height * 0.60;
+    const boxW = Math.min(1320, width * 0.92);
     const boxLeft = (width - boxW) / 2;
 
     // Portrait area on the left
     const portraitKey = this.getSpeakerPortraitKey(line.speaker);
     const hasPortrait = portraitKey !== null && this.scene.textures.exists(portraitKey);
-    const portraitAreaW = hasPortrait ? PORTRAIT_W + 40 : 0;
+    const portraitAreaW = hasPortrait ? PORTRAIT_W + 60 : 0;
 
     // Text area to the right of portrait
-    const textAreaLeft = boxLeft + portraitAreaW + 20;
-    const textAreaW = boxW - portraitAreaW - 40;
+    const textAreaLeft = boxLeft + portraitAreaW + 30;
+    const textAreaW = boxW - portraitAreaW - 60;
 
     // ── Dialogue box background ──
     if (this.scene.textures.exists('dlg_box')) {
@@ -250,19 +250,35 @@ export class DialogueSystem {
 
     // ── Portrait (large, on the left) — frame + image slide in together ──
     if (hasPortrait && portraitKey) {
-      const portraitX = boxLeft + 20 + PORTRAIT_W / 2;
-      const portraitY = boxCenterY - 6;
+      const boxTop = boxCenterY - BOX_H / 2;
+      const portraitX = boxLeft + 30 + PORTRAIT_W / 2;
+      // Center portrait vertically within the box content area
+      const portraitY = boxTop + BOX_H / 2;
       const isNewSpeaker = line.speaker !== this.lastSpeaker;
 
       // Group portrait and frame in a sub-container so they animate together
       const portraitGroup = this.scene.add.container(0, 0);
 
-      // Portrait frame (image or procedural)
+      // Portrait image (rendered first, behind frame)
+      const portrait = this.scene.add.image(portraitX, portraitY, portraitKey);
+      const texW = portrait.width;
+      const texH = portrait.height;
+      const scaleToFill = Math.max(PORTRAIT_W / texW, PORTRAIT_H / texH);
+      portrait.setScale(scaleToFill);
+
+      // Rectangular mask for portrait
+      const maskGraphics = this.scene.make.graphics({});
+      maskGraphics.fillRect(portraitX - PORTRAIT_W / 2, portraitY - PORTRAIT_H / 2, PORTRAIT_W, PORTRAIT_H);
+      portrait.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, maskGraphics));
+      portraitGroup.add(portrait);
+
+      // Portrait frame (on top of portrait)
       if (this.scene.textures.exists('dlg_portrait_frame')) {
-        const frame = this.scene.add.image(portraitX, portraitY - 8, 'dlg_portrait_frame');
+        const frame = this.scene.add.image(portraitX, portraitY, 'dlg_portrait_frame');
         const frameTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
         const frameRatio = frameTex.width / frameTex.height;
-        const frameH = PORTRAIT_H + 30;
+        // Size frame to tightly wrap the portrait with a small border
+        const frameH = PORTRAIT_H + 40;
         const frameW = frameH * frameRatio;
         frame.setDisplaySize(frameW, frameH);
         portraitGroup.add(frame);
@@ -272,36 +288,23 @@ export class DialogueSystem {
         const speakerColorHex = parseInt(this.getSpeakerColor(line.speaker).replace('#', ''), 16);
         frameGfx.lineStyle(3, speakerColorHex, 0.7);
         frameGfx.strokeRoundedRect(
-          portraitX - PORTRAIT_W / 2 - 4, portraitY - PORTRAIT_H / 2 - 4,
-          PORTRAIT_W + 8, PORTRAIT_H + 8, 4
+          portraitX - PORTRAIT_W / 2 - 6, portraitY - PORTRAIT_H / 2 - 6,
+          PORTRAIT_W + 12, PORTRAIT_H + 12, 4
         );
         frameGfx.lineStyle(1, Colors.gold, 0.3);
         frameGfx.strokeRoundedRect(
-          portraitX - PORTRAIT_W / 2 - 8, portraitY - PORTRAIT_H / 2 - 8,
-          PORTRAIT_W + 16, PORTRAIT_H + 16, 6
+          portraitX - PORTRAIT_W / 2 - 12, portraitY - PORTRAIT_H / 2 - 12,
+          PORTRAIT_W + 24, PORTRAIT_H + 24, 6
         );
         portraitGroup.add(frameGfx);
       }
-
-      // Portrait image
-      const portrait = this.scene.add.image(portraitX, portraitY, portraitKey);
-      const texW = portrait.width;
-      const texH = portrait.height;
-      const scaleToFill = Math.max(PORTRAIT_W / texW, PORTRAIT_H / texH);
-      portrait.setScale(scaleToFill);
-
-      // Rectangular mask
-      const maskGraphics = this.scene.make.graphics({});
-      maskGraphics.fillRect(portraitX - PORTRAIT_W / 2, portraitY - PORTRAIT_H / 2, PORTRAIT_W, PORTRAIT_H);
-      portrait.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, maskGraphics));
-      portraitGroup.add(portrait);
 
       this.container.add(portraitGroup);
 
       // Entrance animation for new speakers — whole group slides in
       if (isNewSpeaker) {
         portraitGroup.setAlpha(0);
-        portraitGroup.x = -30;
+        portraitGroup.x = -45;
         this.scene.tweens.add({
           targets: portraitGroup,
           x: 0,
@@ -315,35 +318,39 @@ export class DialogueSystem {
     this.lastSpeaker = line.speaker;
 
     // ── Speaker nameplate ──
-    const nameplateY = boxCenterY - BOX_H / 2 - 16;
+    const nameplateY = boxCenterY - BOX_H / 2 - 24;
     const speakerColor = this.getSpeakerColor(line.speaker);
+
+    // Center nameplate over the text area
+    const nameplateCenterX = textAreaLeft + textAreaW / 2;
 
     if (this.scene.textures.exists('dlg_nameplate')) {
       // Preserve art deco banner proportions
       const npTex = this.scene.textures.get('dlg_nameplate').getSourceImage();
       const npRatio = npTex.width / npTex.height;
-      const npH = 42;
+      const npH = 63;
       const npW = npH * npRatio;
-      const nameplate = this.scene.add.image(textAreaLeft + npW / 2 - 8, nameplateY, 'dlg_nameplate');
+      const nameplate = this.scene.add.image(nameplateCenterX, nameplateY, 'dlg_nameplate');
       nameplate.setDisplaySize(npW, npH);
       nameplate.setOrigin(0.5);
       this.container.add(nameplate);
     } else {
       // Procedural nameplate
       const npGfx = this.scene.add.graphics();
-      const npW = 180;
-      const npH = 32;
-      const npX = textAreaLeft;
+      const npW = 270;
+      const npH = 48;
+      const npX = nameplateCenterX - npW / 2;
       const npY = nameplateY - npH / 2;
       npGfx.fillStyle(0x0e0c14, 0.9);
-      npGfx.fillRoundedRect(npX, npY, npW, npH, 3);
+      npGfx.fillRoundedRect(npX, npY, npW, npH, 4);
       const speakerHex = parseInt(speakerColor.replace('#', ''), 16);
-      npGfx.lineStyle(1.5, speakerHex, 0.6);
-      npGfx.strokeRoundedRect(npX, npY, npW, npH, 3);
+      npGfx.lineStyle(2, speakerHex, 0.6);
+      npGfx.strokeRoundedRect(npX, npY, npW, npH, 4);
       this.container.add(npGfx);
     }
 
-    const speakerText = this.scene.add.text(textAreaLeft + 12, nameplateY, line.speaker, {
+    // Speaker name text — centered in the nameplate
+    const speakerText = this.scene.add.text(nameplateCenterX, nameplateY, line.speaker, {
       fontFamily: FONT,
       fontSize: SPEAKER_SIZE,
       color: speakerColor,
@@ -352,15 +359,15 @@ export class DialogueSystem {
         offsetX: 0,
         offsetY: 0,
         color: '#000000',
-        blur: 4,
+        blur: 6,
         fill: true,
       },
-    }).setOrigin(0, 0.5);
+    }).setOrigin(0.5, 0.5);
     this.container.add(speakerText);
 
     // ── Dialogue text (typewriter reveal) ──
-    const textY = boxCenterY - BOX_H / 2 + 28;
-    const textMaxH = BOX_H - 60; // leave room for padding top/bottom
+    const textY = boxCenterY - BOX_H / 2 + 45;
+    const textMaxH = BOX_H - 90; // leave room for padding top/bottom
     this.dialogueTextObj = this.scene.add.text(textAreaLeft, textY, '', {
       fontFamily: FONT,
       fontSize: TEXT_SIZE,
@@ -379,12 +386,12 @@ export class DialogueSystem {
     this.startTypewriter();
 
     // ── Continue indicator (bottom-right of box) ──
-    const continueY = boxCenterY + BOX_H / 2 - 20;
-    const continueX = boxLeft + boxW - 24;
+    const continueY = boxCenterY + BOX_H / 2 - 30;
+    const continueX = boxLeft + boxW - 36;
 
     if (this.scene.textures.exists('dlg_continue_arrow')) {
       const arrow = this.scene.add.image(continueX, continueY, 'dlg_continue_arrow');
-      arrow.setDisplaySize(24, 24);
+      arrow.setDisplaySize(36, 36);
       this.scene.tweens.add({
         targets: arrow,
         alpha: { from: 1, to: 0.3 },
@@ -397,7 +404,7 @@ export class DialogueSystem {
     } else {
       const arrow = this.scene.add.text(continueX, continueY, '▶', {
         fontFamily: FONT,
-        fontSize: '16px',
+        fontSize: '24px',
         color: TextColors.goldDim,
       }).setOrigin(0.5);
       this.scene.tweens.add({
@@ -412,11 +419,11 @@ export class DialogueSystem {
     }
 
     // ── Skip button (top-right of box) ──
-    const skipX = boxLeft + boxW - 16;
-    const skipY = boxCenterY - BOX_H / 2 + 16;
+    const skipX = boxLeft + boxW - 24;
+    const skipY = boxCenterY - BOX_H / 2 + 24;
     const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
       fontFamily: FONT,
-      fontSize: '11px',
+      fontSize: '17px',
       color: TextColors.muted,
       letterSpacing: 1,
     }).setOrigin(1, 0.5);
@@ -502,7 +509,7 @@ export class DialogueSystem {
     });
 
     // Layout — centered on screen
-    const choiceW = Math.min(680, width * 0.8);
+    const choiceW = Math.min(1020, width * 0.8);
 
     // Sort: unasked questions first, already-asked (dimmed) at the bottom
     const sortedChoices = [...visibleChoices].sort((a, b) => {
@@ -512,14 +519,14 @@ export class DialogueSystem {
       return aAsked ? 1 : -1;
     });
 
-    const totalH = sortedChoices.length * (CHOICE_H + 10) - 10;
+    const totalH = sortedChoices.length * (CHOICE_H + 15) - 15;
     const startY = height * 0.5 - totalH / 2;
 
     // Header text — must be in the container so it's cleaned up on next render
-    const headerY = startY - 40;
+    const headerY = startY - 60;
     const header = this.scene.add.text(width / 2, headerY, 'What would you like to say?', {
       fontFamily: FONT,
-      fontSize: '16px',
+      fontSize: '24px',
       color: TextColors.goldDim,
       fontStyle: 'italic',
     }).setOrigin(0.5);
@@ -530,7 +537,7 @@ export class DialogueSystem {
       const alreadyAsked = choice.triggerEvent
         ? (this.triggeredEvents.has(choice.triggerEvent) || save.getFlag(choice.triggerEvent))
         : false;
-      const y = startY + i * (CHOICE_H + 10) + CHOICE_H / 2;
+      const y = startY + i * (CHOICE_H + 15) + CHOICE_H / 2;
 
       // Choice button
       let btn: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;

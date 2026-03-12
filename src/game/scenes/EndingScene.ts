@@ -72,7 +72,7 @@ export class EndingScene extends Phaser.Scene {
     // Title — fades in first
     const title = this.add.text(width / 2, 80, content.title, {
       fontFamily: FONT,
-      fontSize: '42px',
+      fontSize: '63px',
       color: TextColors.gold,
       align: 'center',
     });
@@ -89,7 +89,7 @@ export class EndingScene extends Phaser.Scene {
     currentDelay = 1500;
     const subtitle = this.add.text(width / 2, 130, content.subtitle, {
       fontFamily: FONT,
-      fontSize: '18px',
+      fontSize: '27px',
       fontStyle: 'italic',
       color: TextColors.goldDim,
       align: 'center',
@@ -114,7 +114,7 @@ export class EndingScene extends Phaser.Scene {
     for (let i = 0; i < content.paragraphs.length; i++) {
       const para = this.add.text(width / 2, nextY, content.paragraphs[i], {
         fontFamily: FONT,
-        fontSize: '15px',
+        fontSize: '23px',
         color: TextColors.light,
         align: 'center',
         wordWrap: { width: 600 },
@@ -138,7 +138,7 @@ export class EndingScene extends Phaser.Scene {
     // "— The End —" after all paragraphs
     const theEnd = this.add.text(width / 2, nextY + 30, '\u2014 The End \u2014', {
       fontFamily: FONT,
-      fontSize: '22px',
+      fontSize: '33px',
       fontStyle: 'italic',
       color: TextColors.gold,
       align: 'center',
@@ -156,7 +156,7 @@ export class EndingScene extends Phaser.Scene {
     currentDelay += 2000;
     const returnButton = this.add.text(width / 2, nextY + 80, 'Return to Title', {
       fontFamily: FONT,
-      fontSize: '18px',
+      fontSize: '27px',
       color: TextColors.gold,
       align: 'center',
     });
@@ -190,7 +190,7 @@ export class EndingScene extends Phaser.Scene {
 
     const creditTitle = this.add.text(width / 2, creditsY, 'Nancy Drew: The Last Curtain Call', {
       fontFamily: FONT,
-      fontSize: '13px',
+      fontSize: '20px',
       fontStyle: 'italic',
       color: TextColors.muted,
       align: 'center',
@@ -200,7 +200,7 @@ export class EndingScene extends Phaser.Scene {
 
     const creditAuthor = this.add.text(width / 2, creditsY + 24, 'Created by Carley Beck', {
       fontFamily: FONT,
-      fontSize: '13px',
+      fontSize: '20px',
       fontStyle: 'italic',
       color: TextColors.muted,
       align: 'center',

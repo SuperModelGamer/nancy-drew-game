@@ -66,7 +66,7 @@ export class ChapterTransitionScene extends Phaser.Scene {
     // --- Time stamp (fades in first) ---
     const timeText = this.add.text(width / 2, height * 0.18, transition.time, {
       fontFamily: FONT,
-      fontSize: '14px',
+      fontSize: '21px',
       color: TextColors.goldDim,
       fontStyle: 'italic',
     });
@@ -83,7 +83,7 @@ export class ChapterTransitionScene extends Phaser.Scene {
     // --- Title (after 1s) ---
     const titleText = this.add.text(width / 2, height * 0.32, transition.title, {
       fontFamily: FONT,
-      fontSize: '36px',
+      fontSize: '54px',
       color: TextColors.gold,
       fontStyle: 'bold',
     });
@@ -104,7 +104,7 @@ export class ChapterTransitionScene extends Phaser.Scene {
     // --- Subtitle (after 2s) ---
     const subtitleText = this.add.text(width / 2, height * 0.42, transition.subtitle, {
       fontFamily: FONT,
-      fontSize: '20px',
+      fontSize: '30px',
       color: TextColors.light,
       fontStyle: 'italic',
     });
@@ -131,7 +131,7 @@ export class ChapterTransitionScene extends Phaser.Scene {
     descriptionLines.forEach((line, index) => {
       const lineText = this.add.text(width / 2, lineStartY + index * lineSpacing, line, {
         fontFamily: FONT,
-        fontSize: '15px',
+        fontSize: '23px',
         color: TextColors.goldDim,
         align: 'center',
       });
@@ -154,7 +154,7 @@ export class ChapterTransitionScene extends Phaser.Scene {
     // --- "Click to continue" hint (after 4s) ---
     const hintText = this.add.text(width / 2, height * 0.92, 'Click to continue', {
       fontFamily: FONT,
-      fontSize: '12px',
+      fontSize: '18px',
       color: TextColors.goldDim,
       fontStyle: 'italic',
     });

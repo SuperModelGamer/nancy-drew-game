@@ -277,7 +277,7 @@ export function createDecoPanel(
   if (title) {
     const titleText = scene.add.text(panelCx, headerY, title, {
       fontFamily: 'Georgia, serif',
-      fontSize: '16px',
+      fontSize: '24px',
       color: DecoTextColors.gold,
       fontStyle: 'bold',
       letterSpacing: 4,
