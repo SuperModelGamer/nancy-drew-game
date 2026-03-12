@@ -503,7 +503,16 @@ export class DialogueSystem {
 
     // Layout — centered on screen
     const choiceW = Math.min(680, width * 0.8);
-    const totalH = visibleChoices.length * (CHOICE_H + 10) - 10;
+
+    // Sort: unasked questions first, already-asked (dimmed) at the bottom
+    const sortedChoices = [...visibleChoices].sort((a, b) => {
+      const aAsked = a.triggerEvent ? (this.triggeredEvents.has(a.triggerEvent) || save.getFlag(a.triggerEvent)) : false;
+      const bAsked = b.triggerEvent ? (this.triggeredEvents.has(b.triggerEvent) || save.getFlag(b.triggerEvent)) : false;
+      if (aAsked === bAsked) return 0;
+      return aAsked ? 1 : -1;
+    });
+
+    const totalH = sortedChoices.length * (CHOICE_H + 10) - 10;
     const startY = height * 0.5 - totalH / 2;
 
     // Header text — must be in the container so it's cleaned up on next render
@@ -516,8 +525,11 @@ export class DialogueSystem {
     }).setOrigin(0.5);
     this.container.add(header);
 
-    visibleChoices.forEach((choice, i) => {
+    sortedChoices.forEach((choice, i) => {
       const itemAvailable = !choice.requiredItem || inventory.hasItem(choice.requiredItem);
+      const alreadyAsked = choice.triggerEvent
+        ? (this.triggeredEvents.has(choice.triggerEvent) || save.getFlag(choice.triggerEvent))
+        : false;
       const y = startY + i * (CHOICE_H + 10) + CHOICE_H / 2;
 
       // Choice button
@@ -542,15 +554,26 @@ export class DialogueSystem {
       let displayText = choice.text;
       if (choice.requiredItem && !itemAvailable) {
         displayText += ' (requires evidence)';
+      } else if (alreadyAsked) {
+        displayText = '✓  ' + displayText;
       }
+
+      // Dim already-asked choices
+      const textColor = !itemAvailable ? '#555555' : alreadyAsked ? '#8a7a5a' : TextColors.gold;
 
       const text = this.scene!.add.text(width / 2, y, displayText, {
         fontFamily: FONT,
         fontSize: CHOICE_FONT,
-        color: itemAvailable ? TextColors.gold : '#555555',
+        color: textColor,
         wordWrap: { width: choiceW - 40 },
         align: 'center',
       }).setOrigin(0.5);
+
+      // Dim the button for already-asked choices
+      if (alreadyAsked) {
+        btn.setAlpha(0.5);
+        text.setAlpha(0.7);
+      }
 
       if (itemAvailable) {
         btn.setInteractive({ cursor: POINTER_CURSOR });
