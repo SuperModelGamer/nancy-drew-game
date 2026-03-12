@@ -791,6 +791,19 @@
           "description": "The original script of 'The Crimson Veil' — the annotations in the margins are in old red ink. Someone circled specific letters throughout the stage directions. That's deliberate. If I read them in order, they might spell something. I should take this with me."
         },
         {
+          "id": "pb_script_cipher",
+          "x": 960,
+          "y": 460,
+          "width": 80,
+          "height": 50,
+          "label": "Circled Letters",
+          "type": "locked",
+          "requiredItem": "annotated_script",
+          "puzzleId": "script_cipher",
+          "description": "Now that I have the script, I can study the circled letters more carefully. Red ink circles specific letters in the Act III stage directions. If I read them in order, they spell something. Let me work through this.",
+          "showWhen": "chapter_2"
+        },
+        {
           "id": "pb_film_canisters",
           "x": 1060,
           "y": 220,
@@ -991,6 +1004,18 @@
           "label": "Pinned Notes",
           "type": "inspect",
           "description": "A printed demolition timeline pinned to the wall. Day 1 — Final inspection. Day 2 — Utilities disconnected. Day 3 — Demolition begins, east wing. Today is circled: Day 1. Two days. That's all this theater has left. Two days to solve a century-old murder and a brand-new poisoning. No pressure, Drew."
+        },
+        {
+          "id": "mo_teacup",
+          "x": 780,
+          "y": 420,
+          "width": 50,
+          "height": 45,
+          "label": "Poisoned Teacup",
+          "type": "locked",
+          "puzzleId": "tea_analysis",
+          "description": "The teacup from Ashworth's poisoning — still sitting on his desk with crystalline residue at the bottom. The police left it here as 'not evidence enough.' But I have Margaux's alchemy book from the dressing room. If I compare the residue to the compounds described in her annotations, I can identify exactly what was used.",
+          "showWhen": "chapter_3"
         },
         {
           "id": "mo_back",
@@ -1212,6 +1237,18 @@
           "label": "Work Lamp",
           "type": "inspect",
           "description": "A modern work lamp — the only real light down here. It's plugged into an extension cord that someone ran along the ceiling and back toward the stairs. A long-term setup. Whoever works down here planned to stay a while."
+        },
+        {
+          "id": "bm_passage_entrance",
+          "x": 380,
+          "y": 180,
+          "width": 100,
+          "height": 90,
+          "label": "Hidden Passage",
+          "type": "locked",
+          "puzzleId": "passage_navigation",
+          "description": "A narrow opening in the basement wall — the bricks here are older, part of the original construction. It leads into a dark network of passages behind the theater's walls. I found Edwin's blueprints earlier. If I trace the route correctly, I can figure out where this passage connects to above.",
+          "showWhen": "chapter_4"
         },
         {
           "id": "bm_edwin",
