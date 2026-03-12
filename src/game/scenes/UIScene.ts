@@ -9,8 +9,8 @@ import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
 import { drawArtDecoFrame, drawDecoDivider, drawChevronTab, drawCornerOrnament, DecoColors, DecoTextColors } from '../utils/art-deco';
 
-// Height of the bottom toolbar strip
-const TOOLBAR_H = 52;
+// Height of the bottom toolbar strip (buttons + chapter label)
+const TOOLBAR_H = 64;
 
 // Pre-index items for O(1) lookup
 const itemMap = new Map(itemsData.items.map(i => [i.id, i]));
@@ -43,35 +43,56 @@ export class UIScene extends Phaser.Scene {
     initSceneCursor(this);
     const barY = height - TOOLBAR_H / 2;
 
-    // ─── Bottom toolbar background strip (art deco) ───
+    // ─── Bottom toolbar — solid border with integrated chapter label ───
+    const toolbarTop = height - TOOLBAR_H;
     const barBg = this.add.graphics();
-    // Gradient fade from transparent to dark
-    for (let i = 0; i < 24; i++) {
-      const alpha = (i / 24) * 0.9;
-      barBg.fillStyle(DecoColors.navy, alpha);
-      barBg.fillRect(0, height - TOOLBAR_H - 24 + i, width, 1);
+
+    // Solid dark background (feels like a proper frame border, not floating)
+    barBg.fillStyle(DecoColors.navy, 0.97);
+    barBg.fillRect(0, toolbarTop, width, TOOLBAR_H);
+
+    // Subtle gradient fade just above the bar (8px, very short)
+    for (let i = 0; i < 8; i++) {
+      barBg.fillStyle(DecoColors.navy, (i / 8) * 0.6);
+      barBg.fillRect(0, toolbarTop - 8 + i, width, 1);
     }
-    barBg.fillStyle(DecoColors.navy, 0.92);
-    barBg.fillRect(0, height - TOOLBAR_H, width, TOOLBAR_H);
-    // Gold top border with accent dots
-    barBg.lineStyle(1.5, DecoColors.gold, 0.35);
-    barBg.lineBetween(0, height - TOOLBAR_H, width, height - TOOLBAR_H);
-    barBg.lineStyle(0.5, DecoColors.gold, 0.15);
-    barBg.lineBetween(0, height - TOOLBAR_H + 3, width, height - TOOLBAR_H + 3);
-    // Small diamond accents at edges
-    barBg.fillStyle(DecoColors.gold, 0.3);
-    const dY = height - TOOLBAR_H;
-    for (const dx of [width * 0.25, width * 0.5, width * 0.75]) {
-      barBg.fillPoints([
-        new Phaser.Geom.Point(dx, dY - 4),
-        new Phaser.Geom.Point(dx + 4, dY),
-        new Phaser.Geom.Point(dx, dY + 4),
-        new Phaser.Geom.Point(dx - 4, dY),
-      ], true);
-    }
+
+    // Gold top border — double line for art deco feel
+    barBg.lineStyle(2, DecoColors.gold, 0.5);
+    barBg.lineBetween(0, toolbarTop, width, toolbarTop);
+    barBg.lineStyle(0.5, DecoColors.gold, 0.2);
+    barBg.lineBetween(0, toolbarTop + 4, width, toolbarTop + 4);
+
+    // Center diamond accent on the top border
+    barBg.fillStyle(DecoColors.gold, 0.5);
+    barBg.fillPoints([
+      new Phaser.Geom.Point(width / 2, toolbarTop - 5),
+      new Phaser.Geom.Point(width / 2 + 5, toolbarTop),
+      new Phaser.Geom.Point(width / 2, toolbarTop + 5),
+      new Phaser.Geom.Point(width / 2 - 5, toolbarTop),
+    ], true);
+
     barBg.setDepth(Depths.tooltip - 1);
 
-    // ─── Toolbar buttons (art deco chevron style) ───
+    // ─── Chapter indicator — integrated into toolbar, centered above buttons ───
+    const chapterY = toolbarTop + 10;
+    const chapterLabel = this.add.text(width / 2, chapterY, '', {
+      fontFamily: FONT,
+      fontSize: '11px',
+      color: DecoTextColors.cream,
+      fontStyle: 'italic',
+      letterSpacing: 2,
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    const updateChapter = () => {
+      const ch = SaveSystem.getInstance().getChapter();
+      chapterLabel.setText(ChapterSystem.getInstance().getChapterTitle(ch));
+    };
+    updateChapter();
+    this.events.on('wake', updateChapter);
+
+    // ─── Toolbar buttons — positioned below chapter label ───
+    const buttonY = toolbarTop + 40;
+
     const buttons = [
       { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: width * 0.12, action: () => this.toggleInventory() },
       { label: 'SUSPECTS', icon: '◉', color: 0xb4a0d4, x: width * 0.38, action: () => this.scene.launch('SuspectScene') },
@@ -80,41 +101,41 @@ export class UIScene extends Phaser.Scene {
     ];
 
     buttons.forEach(btn => {
-      const container = this.add.container(btn.x, barY);
+      const container = this.add.container(btn.x, buttonY);
       container.setDepth(Depths.tooltip);
 
       // Chevron-shaped button background
       const btnGfx = this.add.graphics();
-      drawChevronTab(btnGfx, 0, 0, 130, 38, {
+      drawChevronTab(btnGfx, 0, 0, 130, 34, {
         fillColor: DecoColors.navy,
         fillAlpha: 0.6,
         strokeColor: btn.color,
         strokeAlpha: 0.4,
-        chevronDepth: 6,
+        chevronDepth: 5,
       });
       container.add(btnGfx);
 
-      // Hit area (invisible rectangle for interaction)
-      const hitArea = this.add.rectangle(0, 0, 130, 38, 0x000000, 0);
+      // Hit area
+      const hitArea = this.add.rectangle(0, 0, 130, 34, 0x000000, 0);
       hitArea.setInteractive({ cursor: POINTER_CURSOR });
       hitArea.on('pointerover', () => {
         btnGfx.clear();
-        drawChevronTab(btnGfx, 0, 0, 130, 38, {
+        drawChevronTab(btnGfx, 0, 0, 130, 34, {
           fillColor: DecoColors.navyLight,
           fillAlpha: 0.8,
           strokeColor: btn.color,
           strokeAlpha: 0.8,
-          chevronDepth: 6,
+          chevronDepth: 5,
         });
       });
       hitArea.on('pointerout', () => {
         btnGfx.clear();
-        drawChevronTab(btnGfx, 0, 0, 130, 38, {
+        drawChevronTab(btnGfx, 0, 0, 130, 34, {
           fillColor: DecoColors.navy,
           fillAlpha: 0.6,
           strokeColor: btn.color,
           strokeAlpha: 0.4,
-          chevronDepth: 6,
+          chevronDepth: 5,
         });
       });
       hitArea.on('pointerdown', btn.action);
@@ -130,20 +151,6 @@ export class UIScene extends Phaser.Scene {
       }).setOrigin(0.5);
       container.add(text);
     });
-
-    // ─── Chapter indicator (top-center) ───
-    const chapterLabel = this.add.text(width / 2, 12, '', {
-      fontFamily: FONT,
-      fontSize: '14px',
-      color: TextColors.muted,
-      fontStyle: 'italic',
-    }).setOrigin(0.5, 0).setDepth(50);
-    const updateChapter = () => {
-      const ch = SaveSystem.getInstance().getChapter();
-      chapterLabel.setText(ChapterSystem.getInstance().getChapterTitle(ch));
-    };
-    updateChapter();
-    this.events.on('wake', updateChapter);
 
     // ─── Panels (hidden by default) ───
     this.inventoryContainer = this.createInventoryPanel();
