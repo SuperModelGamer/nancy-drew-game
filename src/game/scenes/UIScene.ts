@@ -7,6 +7,7 @@ import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
+import { drawArtDecoFrame, drawDecoDivider, drawChevronTab, drawCornerOrnament, DecoColors, DecoTextColors } from '../utils/art-deco';
 
 // Height of the bottom toolbar strip
 const TOOLBAR_H = 52;
@@ -42,77 +43,98 @@ export class UIScene extends Phaser.Scene {
     initSceneCursor(this);
     const barY = height - TOOLBAR_H / 2;
 
-    // ─── Bottom toolbar background strip ───
-    if (this.textures.exists('ui_toolbar_bg')) {
-      const toolbarImg = this.add.image(width / 2, height - TOOLBAR_H / 2, 'ui_toolbar_bg');
-      toolbarImg.setDisplaySize(width, TOOLBAR_H + 20);
-      toolbarImg.setDepth(Depths.tooltip - 1);
-    } else {
-      const barBg = this.add.graphics();
-      for (let i = 0; i < 20; i++) {
-        const alpha = (i / 20) * 0.85;
-        barBg.fillStyle(0x0a0a12, alpha);
-        barBg.fillRect(0, height - TOOLBAR_H - 20 + i, width, 1);
-      }
-      barBg.fillStyle(0x0a0a12, 0.85);
-      barBg.fillRect(0, height - TOOLBAR_H, width, TOOLBAR_H);
-      barBg.lineStyle(1, Colors.gold, 0.25);
-      barBg.lineBetween(0, height - TOOLBAR_H, width, height - TOOLBAR_H);
-      barBg.setDepth(Depths.tooltip - 1);
+    // ─── Bottom toolbar background strip (art deco) ───
+    const barBg = this.add.graphics();
+    // Gradient fade from transparent to dark
+    for (let i = 0; i < 24; i++) {
+      const alpha = (i / 24) * 0.9;
+      barBg.fillStyle(DecoColors.navy, alpha);
+      barBg.fillRect(0, height - TOOLBAR_H - 24 + i, width, 1);
     }
+    barBg.fillStyle(DecoColors.navy, 0.92);
+    barBg.fillRect(0, height - TOOLBAR_H, width, TOOLBAR_H);
+    // Gold top border with accent dots
+    barBg.lineStyle(1.5, DecoColors.gold, 0.35);
+    barBg.lineBetween(0, height - TOOLBAR_H, width, height - TOOLBAR_H);
+    barBg.lineStyle(0.5, DecoColors.gold, 0.15);
+    barBg.lineBetween(0, height - TOOLBAR_H + 3, width, height - TOOLBAR_H + 3);
+    // Small diamond accents at edges
+    barBg.fillStyle(DecoColors.gold, 0.3);
+    const dY = height - TOOLBAR_H;
+    for (const dx of [width * 0.25, width * 0.5, width * 0.75]) {
+      barBg.fillPoints([
+        new Phaser.Geom.Point(dx, dY - 4),
+        new Phaser.Geom.Point(dx + 4, dY),
+        new Phaser.Geom.Point(dx, dY + 4),
+        new Phaser.Geom.Point(dx - 4, dY),
+      ], true);
+    }
+    barBg.setDepth(Depths.tooltip - 1);
 
-    // ─── Toolbar buttons ───
-    const btnStyle = { fontFamily: FONT, fontSize: '14px' };
+    // ─── Toolbar buttons (art deco chevron style) ───
     const buttons = [
-      { label: 'Items', color: TextColors.gold, borderColor: Colors.gold, x: width * 0.12, action: () => this.toggleInventory() },
-      { label: 'Suspects', color: '#b4a0d4', borderColor: 0xb4a0d4, x: width * 0.38, action: () => this.scene.launch('SuspectScene') },
-      { label: 'Map', color: TextColors.edwin, borderColor: Colors.mapBlue, x: width * 0.62, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
-      { label: 'Journal', color: TextColors.gold, borderColor: Colors.gold, x: width * 0.88, action: () => this.toggleJournal() },
+      { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: width * 0.12, action: () => this.toggleInventory() },
+      { label: 'SUSPECTS', icon: '◉', color: 0xb4a0d4, x: width * 0.38, action: () => this.scene.launch('SuspectScene') },
+      { label: 'MAP', icon: '◇', color: Colors.mapBlue, x: width * 0.62, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
+      { label: 'JOURNAL', icon: '◆', color: DecoColors.gold, x: width * 0.88, action: () => this.toggleJournal() },
     ];
 
-    const hasToolbarBtn = this.textures.exists('ui_toolbar_btn');
     buttons.forEach(btn => {
       const container = this.add.container(btn.x, barY);
       container.setDepth(Depths.tooltip);
 
-      let bgObj: Phaser.GameObjects.GameObject;
-      if (hasToolbarBtn) {
-        const btnImg = this.add.image(0, 0, 'ui_toolbar_btn');
-        btnImg.setDisplaySize(110, 38);
-        btnImg.setInteractive({ cursor: HAND_CURSOR });
-        btnImg.on('pointerover', () => btnImg.setAlpha(1));
-        btnImg.on('pointerout', () => btnImg.setAlpha(0.85));
-        btnImg.setAlpha(0.85);
-        bgObj = btnImg;
-        btnImg.on('pointerdown', btn.action);
-      } else {
-        const bg = this.add.rectangle(0, 0, 100, 36, 0x0a0a12, 0);
-        bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
-        bg.setInteractive({ cursor: HAND_CURSOR });
-        bg.on('pointerover', () => {
-          bg.setFillStyle(Colors.hoverBg, 0.6);
-          bg.setStrokeStyle(1, btn.borderColor as number, 0.8);
-        });
-        bg.on('pointerout', () => {
-          bg.setFillStyle(0x0a0a12, 0);
-          bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
-        });
-        bg.on('pointerdown', btn.action);
-        bgObj = bg;
-      }
+      // Chevron-shaped button background
+      const btnGfx = this.add.graphics();
+      drawChevronTab(btnGfx, 0, 0, 130, 38, {
+        fillColor: DecoColors.navy,
+        fillAlpha: 0.6,
+        strokeColor: btn.color,
+        strokeAlpha: 0.4,
+        chevronDepth: 6,
+      });
+      container.add(btnGfx);
 
+      // Hit area (invisible rectangle for interaction)
+      const hitArea = this.add.rectangle(0, 0, 130, 38, 0x000000, 0);
+      hitArea.setInteractive({ cursor: HAND_CURSOR });
+      hitArea.on('pointerover', () => {
+        btnGfx.clear();
+        drawChevronTab(btnGfx, 0, 0, 130, 38, {
+          fillColor: DecoColors.navyLight,
+          fillAlpha: 0.8,
+          strokeColor: btn.color,
+          strokeAlpha: 0.8,
+          chevronDepth: 6,
+        });
+      });
+      hitArea.on('pointerout', () => {
+        btnGfx.clear();
+        drawChevronTab(btnGfx, 0, 0, 130, 38, {
+          fillColor: DecoColors.navy,
+          fillAlpha: 0.6,
+          strokeColor: btn.color,
+          strokeAlpha: 0.4,
+          chevronDepth: 6,
+        });
+      });
+      hitArea.on('pointerdown', btn.action);
+      container.add(hitArea);
+
+      const colorHex = `#${btn.color.toString(16).padStart(6, '0')}`;
       const text = this.add.text(0, 0, btn.label, {
-        ...btnStyle,
-        color: btn.color,
+        fontFamily: FONT,
+        fontSize: '13px',
+        color: colorHex,
+        fontStyle: 'bold',
+        letterSpacing: 2,
       }).setOrigin(0.5);
-
-      container.add([bgObj, text]);
+      container.add(text);
     });
 
     // ─── Chapter indicator (top-center) ───
     const chapterLabel = this.add.text(width / 2, 12, '', {
       fontFamily: FONT,
-      fontSize: '12px',
+      fontSize: '14px',
       color: TextColors.muted,
       fontStyle: 'italic',
     }).setOrigin(0.5, 0).setDepth(50);
@@ -204,53 +226,45 @@ export class UIScene extends Phaser.Scene {
     const panelX = width / 2;
     const panelY = panelH / 2 + 10;
 
-    // Panel background
-    if (this.textures.exists('ui_dossier_bg')) {
-      const dossierBg = this.add.image(panelX, panelY, 'ui_dossier_bg');
-      dossierBg.setDisplaySize(panelW, panelH);
-      container.add(dossierBg);
-    } else {
-      const panelBg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x12111a, 0.97);
-      panelBg.setStrokeStyle(1.5, Colors.gold, 0.35);
-      container.add(panelBg);
-    }
+    // Panel background with art deco frame
+    const panelLeft = panelX - panelW / 2;
+    const panelTop = panelY - panelH / 2;
+    const decoFrame = drawArtDecoFrame(this, panelLeft, panelTop, panelW, panelH, {
+      color: DecoColors.gold,
+      alpha: 0.4,
+      cornerSize: 32,
+      doubleBorder: true,
+      fillColor: DecoColors.navyMid,
+      fillAlpha: 0.97,
+    });
+    container.add(decoFrame);
 
     // ─── Header ───
-    const headerH = 44;
+    const headerH = 48;
     const headerY = panelY - panelH / 2 + headerH / 2;
 
-    if (this.textures.exists('ui_dossier_header')) {
-      const headerImg = this.add.image(panelX, headerY, 'ui_dossier_header');
-      headerImg.setDisplaySize(panelW - 2, headerH);
-      container.add(headerImg);
-    } else {
-      const headerBg = this.add.rectangle(panelX, headerY, panelW - 2, headerH, 0x0e0d16, 1);
-      container.add(headerBg);
-    }
+    const headerBg = this.add.rectangle(panelX, headerY, panelW - 8, headerH, DecoColors.navy, 1);
+    container.add(headerBg);
+
+    // Header bottom border
+    const headerLineGfx = this.add.graphics();
+    headerLineGfx.lineStyle(1, DecoColors.gold, 0.3);
+    headerLineGfx.lineBetween(panelLeft + 4, panelTop + headerH, panelLeft + panelW - 4, panelTop + headerH);
+    container.add(headerLineGfx);
 
     const title = this.add.text(panelX, headerY, 'CASE FILE — EVIDENCE', {
       fontFamily: FONT,
-      fontSize: '15px',
-      color: TextColors.gold,
+      fontSize: '16px',
+      color: DecoTextColors.goldBright,
       fontStyle: 'bold',
-      letterSpacing: 4,
+      letterSpacing: 5,
     }).setOrigin(0.5);
     container.add(title);
 
-    // Decorative header lines
-    if (this.textures.exists('ui_divider_gold')) {
-      const divL = this.add.image(panelX - panelW / 4 - 40, headerY, 'ui_divider_gold');
-      divL.setDisplaySize(panelW / 4, 8);
-      const divR = this.add.image(panelX + panelW / 4 + 40, headerY, 'ui_divider_gold');
-      divR.setDisplaySize(panelW / 4, 8);
-      container.add([divL, divR]);
-    } else {
-      const lineGfx = this.add.graphics();
-      lineGfx.lineStyle(1, Colors.gold, 0.25);
-      lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - 160, headerY);
-      lineGfx.lineBetween(panelX + 160, headerY, panelX + panelW / 2 - 20, headerY);
-      container.add(lineGfx);
-    }
+    // Decorative divider flanking title
+    const divGfx = this.add.graphics();
+    drawDecoDivider(divGfx, panelX, headerY, panelW * 0.65, DecoColors.gold, 0.25);
+    container.add(divGfx);
 
     // Close button
     if (this.textures.exists('ui_close_btn')) {
@@ -550,31 +564,24 @@ export class UIScene extends Phaser.Scene {
     const panel = this.add.container(width / 2, panelY);
 
     // Aged paper background
-    if (this.textures.exists('ui_info_card_bg')) {
-      const paperImg = this.add.image(0, 0, 'ui_info_card_bg');
-      paperImg.setDisplaySize(panelW, panelH);
-      paperImg.setInteractive();
-      panel.add(paperImg);
-    } else {
-      const paper = this.add.rectangle(0, 0, panelW, panelH, Colors.paper, 0.95);
-      paper.setStrokeStyle(2, Colors.paperBorder, 0.8);
-      paper.setInteractive();
-      panel.add(paper);
+    const paper = this.add.rectangle(0, 0, panelW, panelH, Colors.paper, 0.95);
+    paper.setStrokeStyle(2, Colors.paperBorder, 0.8);
+    paper.setInteractive();
+    panel.add(paper);
 
-      // Paper texture — subtle stain patches
-      const stains = this.add.graphics();
-      stains.fillStyle(Colors.paperBorder, 0.08);
-      stains.fillCircle(-panelW / 4, -panelH / 4, 40);
-      stains.fillCircle(panelW / 3, panelH / 5, 30);
-      stains.fillEllipse(-panelW / 6, panelH / 3, 60, 25);
-      stains.lineStyle(1, Colors.paperBorder, 0.15);
-      for (let ly = -panelH / 2 + 65; ly < panelH / 2 - 20; ly += 22) {
-        stains.lineBetween(-panelW / 2 + 25, ly, panelW / 2 - 25, ly);
-      }
-      stains.lineStyle(1, 0xcc6666, 0.2);
-      stains.lineBetween(-panelW / 2 + 55, -panelH / 2 + 10, -panelW / 2 + 55, panelH / 2 - 10);
-      panel.add(stains);
+    // Paper texture — subtle stain patches
+    const stains = this.add.graphics();
+    stains.fillStyle(Colors.paperBorder, 0.08);
+    stains.fillCircle(-panelW / 4, -panelH / 4, 40);
+    stains.fillCircle(panelW / 3, panelH / 5, 30);
+    stains.fillEllipse(-panelW / 6, panelH / 3, 60, 25);
+    stains.lineStyle(1, Colors.paperBorder, 0.15);
+    for (let ly = -panelH / 2 + 65; ly < panelH / 2 - 20; ly += 22) {
+      stains.lineBetween(-panelW / 2 + 25, ly, panelW / 2 - 25, ly);
     }
+    stains.lineStyle(1, 0xcc6666, 0.2);
+    stains.lineBetween(-panelW / 2 + 55, -panelH / 2 + 10, -panelW / 2 + 55, panelH / 2 - 10);
+    panel.add(stains);
 
     const titleText = this.add.text(0, -panelH / 2 + 25, 'Nancy\'s Journal', {
       fontFamily: '\'Palatino Linotype\', \'Book Antiqua\', Palatino, Georgia, serif',
@@ -643,13 +650,13 @@ export class UIScene extends Phaser.Scene {
 
       const bullet = this.add.text(-panelW / 2 + 62 + xJitter, y, `${i + 1}.`, {
         fontFamily: journalFont,
-        fontSize: '13px',
+        fontSize: '15px',
         color: '#5a3a2a',
         fontStyle: 'italic',
       });
       const text = this.add.text(-panelW / 2 + 82 + xJitter, y, entry, {
         fontFamily: journalFont,
-        fontSize: '13px',
+        fontSize: '15px',
         color: '#2a1a0a',
         wordWrap: { width: panelW - 130 },
         lineSpacing: 3,

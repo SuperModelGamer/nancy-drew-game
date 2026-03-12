@@ -4,6 +4,7 @@ import { DialogueSystem } from '../systems/DialogueSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
+import { drawArtDecoFrame, drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 
 interface SuspectProfile {
   id: string;
@@ -133,53 +134,45 @@ export class SuspectScene extends Phaser.Scene {
     const panelX = width / 2;
     const panelY = panelH / 2 + 8;
 
-    // Background — aged dark leather dossier
-    if (this.textures.exists('ui_dossier_bg')) {
-      const dossierBg = this.add.image(panelX, panelY, 'ui_dossier_bg');
-      dossierBg.setDisplaySize(panelW, panelH);
-      this.container.add(dossierBg);
-    } else {
-      const bg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x12111a, 0.97);
-      bg.setStrokeStyle(1.5, Colors.gold, 0.35);
-      this.container.add(bg);
-    }
+    // Background — art deco framed dossier
+    const panelLeft = panelX - panelW / 2;
+    const panelTop = panelY - panelH / 2;
+    const decoFrame = drawArtDecoFrame(this, panelLeft, panelTop, panelW, panelH, {
+      color: DecoColors.gold,
+      alpha: 0.4,
+      cornerSize: 32,
+      doubleBorder: true,
+      fillColor: DecoColors.navyMid,
+      fillAlpha: 0.97,
+    });
+    this.container.add(decoFrame);
 
     // ─── Header bar ───
-    const headerH = 44;
+    const headerH = 48;
     const headerY = panelY - panelH / 2 + headerH / 2;
 
-    if (this.textures.exists('ui_dossier_header')) {
-      const headerImg = this.add.image(panelX, headerY, 'ui_dossier_header');
-      headerImg.setDisplaySize(panelW - 2, headerH);
-      this.container.add(headerImg);
-    } else {
-      const headerBg = this.add.rectangle(panelX, headerY, panelW - 2, headerH, 0x0e0d16, 1);
-      this.container.add(headerBg);
-    }
+    const headerBg = this.add.rectangle(panelX, headerY, panelW - 8, headerH, DecoColors.navy, 1);
+    this.container.add(headerBg);
+
+    // Header bottom border
+    const headerLine = this.add.graphics();
+    headerLine.lineStyle(1, DecoColors.gold, 0.3);
+    headerLine.lineBetween(panelLeft + 4, panelTop + headerH, panelLeft + panelW - 4, panelTop + headerH);
+    this.container.add(headerLine);
 
     const title = this.add.text(panelX, headerY, 'CASE FILE — SUSPECT DOSSIERS', {
       fontFamily: FONT,
-      fontSize: '15px',
-      color: TextColors.gold,
+      fontSize: '16px',
+      color: DecoTextColors.goldBright,
       fontStyle: 'bold',
-      letterSpacing: 4,
+      letterSpacing: 5,
     }).setOrigin(0.5);
     this.container.add(title);
 
-    // Decorative lines
-    if (this.textures.exists('ui_divider_gold')) {
-      const divL = this.add.image(panelX - panelW / 4 - 50, headerY, 'ui_divider_gold');
-      divL.setDisplaySize(panelW / 4, 8);
-      const divR = this.add.image(panelX + panelW / 4 + 50, headerY, 'ui_divider_gold');
-      divR.setDisplaySize(panelW / 4, 8);
-      this.container.add([divL, divR]);
-    } else {
-      const lineGfx = this.add.graphics();
-      lineGfx.lineStyle(1, Colors.gold, 0.25);
-      lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - 200, headerY);
-      lineGfx.lineBetween(panelX + 200, headerY, panelX + panelW / 2 - 20, headerY);
-      this.container.add(lineGfx);
-    }
+    // Decorative divider flanking title
+    const divGfxHeader = this.add.graphics();
+    drawDecoDivider(divGfxHeader, panelX, headerY, panelW * 0.6, DecoColors.gold, 0.25);
+    this.container.add(divGfxHeader);
 
     // Close button
     if (this.textures.exists('ui_close_btn')) {
@@ -298,16 +291,9 @@ export class SuspectScene extends Phaser.Scene {
     // Portrait card background
     const cardH = Math.min(dh - 10, 480);
     const cardY = cy;
-    if (this.textures.exists('ui_info_card_bg')) {
-      const cardImg = this.add.image(leftX + leftW / 2, cardY, 'ui_info_card_bg');
-      cardImg.setDisplaySize(leftW, cardH);
-      cardImg.setAlpha(0.85);
-      this.container.add(cardImg);
-    } else {
-      const cardBg = this.add.rectangle(leftX + leftW / 2, cardY, leftW, cardH, 0x0e0d16, 0.7);
-      cardBg.setStrokeStyle(1, suspect.color, 0.2);
-      this.container.add(cardBg);
-    }
+    const cardBg = this.add.rectangle(leftX + leftW / 2, cardY, leftW, cardH, 0x0e0d16, 0.7);
+    cardBg.setStrokeStyle(1, suspect.color, 0.2);
+    this.container.add(cardBg);
 
     // Large portrait
     const portraitSize = 160;
@@ -327,19 +313,13 @@ export class SuspectScene extends Phaser.Scene {
       this.container.add(portrait);
 
       // Portrait frame
-      if (this.textures.exists('ui_portrait_frame')) {
-        const frameImg = this.add.image(portraitX, portraitY, 'ui_portrait_frame');
-        frameImg.setDisplaySize(portraitSize + 16, portraitSize + 16);
-        this.container.add(frameImg);
-      } else {
-        const frame = this.add.graphics();
-        frame.lineStyle(2, suspect.color, 0.5);
-        frame.strokeRoundedRect(
-          portraitX - portraitSize / 2, portraitY - portraitSize / 2,
-          portraitSize, portraitSize, 10
-        );
-        this.container.add(frame);
-      }
+      const frame = this.add.graphics();
+      frame.lineStyle(2, suspect.color, 0.5);
+      frame.strokeRoundedRect(
+        portraitX - portraitSize / 2, portraitY - portraitSize / 2,
+        portraitSize, portraitSize, 10
+      );
+      this.container.add(frame);
     } else {
       // Fallback icon
       const iconBg = this.add.rectangle(portraitX, portraitY, portraitSize, portraitSize, suspect.color, 0.1);
@@ -374,20 +354,13 @@ export class SuspectScene extends Phaser.Scene {
       { label: `Age: ${suspect.age}`, icon: '◈' },
       { label: suspect.location, icon: '◉' },
     ];
-    const hasChipBg = this.textures.exists('ui_chip_bg');
     chips.forEach((chip, i) => {
       const chipY = chipStartY + i * 30;
-      if (hasChipBg) {
-        const chipImg = this.add.image(portraitX, chipY, 'ui_chip_bg');
-        chipImg.setDisplaySize(200, 26);
-        this.container.add(chipImg);
-      } else {
-        const chipBg = this.add.rectangle(portraitX, chipY, 200, 24, suspect.color, 0.08);
-        chipBg.setStrokeStyle(1, suspect.color, 0.2);
-        this.container.add(chipBg);
-      }
+      const chipBg = this.add.rectangle(portraitX, chipY, 200, 24, suspect.color, 0.08);
+      chipBg.setStrokeStyle(1, suspect.color, 0.2);
+      this.container.add(chipBg);
       const chipLabel = this.add.text(portraitX, chipY, `${chip.icon}  ${chip.label}`, {
-        fontFamily: FONT, fontSize: '12px', color: TextColors.goldDim,
+        fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim,
       }).setOrigin(0.5);
       this.container.add(chipLabel);
     });
@@ -402,35 +375,20 @@ export class SuspectScene extends Phaser.Scene {
     const progressW = 200;
     const progressH = 5;
 
-    if (this.textures.exists('ui_progress_track')) {
-      const trackImg = this.add.image(portraitX, progressY, 'ui_progress_track');
-      trackImg.setDisplaySize(progressW, 12);
-      this.container.add(trackImg);
-    } else {
-      const trackBg = this.add.rectangle(portraitX, progressY, progressW, progressH, 0x1a1a2e, 1);
-      this.container.add(trackBg);
-    }
+    const trackBg = this.add.rectangle(portraitX, progressY, progressW, progressH, 0x1a1a2e, 1);
+    this.container.add(trackBg);
 
     const pct = discovered / total;
     if (pct > 0) {
-      if (this.textures.exists('ui_progress_fill')) {
-        const fillImg = this.add.image(
-          portraitX - progressW / 2 + (progressW * pct) / 2, progressY,
-          'ui_progress_fill'
-        );
-        fillImg.setDisplaySize(progressW * pct, 12);
-        this.container.add(fillImg);
-      } else {
-        const fill = this.add.rectangle(
-          portraitX - progressW / 2 + (progressW * pct) / 2, progressY,
-          progressW * pct, progressH, suspect.color, 0.7
-        );
-        this.container.add(fill);
-      }
+      const fill = this.add.rectangle(
+        portraitX - progressW / 2 + (progressW * pct) / 2, progressY,
+        progressW * pct, progressH, suspect.color, 0.7
+      );
+      this.container.add(fill);
     }
 
     this.container.add(this.add.text(portraitX, progressY + 14, `${discovered} / ${total} facts discovered`, {
-      fontFamily: FONT, fontSize: '11px', color: TextColors.muted, fontStyle: 'italic',
+      fontFamily: FONT, fontSize: '13px', color: TextColors.muted, fontStyle: 'italic',
     }).setOrigin(0.5));
 
     // ── Right column: Known Facts ──
@@ -440,16 +398,9 @@ export class SuspectScene extends Phaser.Scene {
 
     // Facts panel background
     const factsPanelH = cardH;
-    if (this.textures.exists('ui_facts_panel_bg')) {
-      const factsImg = this.add.image(rightCx, cy, 'ui_facts_panel_bg');
-      factsImg.setDisplaySize(rightW, factsPanelH);
-      factsImg.setAlpha(0.7);
-      this.container.add(factsImg);
-    } else {
-      const factsBg = this.add.rectangle(rightCx, cy, rightW, factsPanelH, 0x0e0d16, 0.5);
-      factsBg.setStrokeStyle(1, suspect.color, 0.12);
-      this.container.add(factsBg);
-    }
+    const factsBg = this.add.rectangle(rightCx, cy, rightW, factsPanelH, 0x0e0d16, 0.5);
+    factsBg.setStrokeStyle(1, suspect.color, 0.12);
+    this.container.add(factsBg);
 
     // Section header
     const factsHeaderY = cy - factsPanelH / 2 + 24;
@@ -461,17 +412,10 @@ export class SuspectScene extends Phaser.Scene {
       letterSpacing: 3,
     }));
 
-    // Divider under header
-    if (this.textures.exists('ui_divider_gold')) {
-      const divImg = this.add.image(rightCx, factsHeaderY + 22, 'ui_divider_gold');
-      divImg.setDisplaySize(rightW - 40, 8);
-      this.container.add(divImg);
-    } else {
-      const divGfx = this.add.graphics();
-      divGfx.lineStyle(1, Colors.gold, 0.2);
-      divGfx.lineBetween(rightX + 20, factsHeaderY + 22, rightX + rightW - 20, factsHeaderY + 22);
-      this.container.add(divGfx);
-    }
+    // Divider under header (art deco)
+    const divGfx = this.add.graphics();
+    drawDecoDivider(divGfx, rightCx, factsHeaderY + 22, rightW - 40, DecoColors.gold, 0.25);
+    this.container.add(divGfx);
 
     // Facts list
     let y = factsHeaderY + 40;
@@ -489,18 +433,11 @@ export class SuspectScene extends Phaser.Scene {
       }
 
       // Bullet
-      const bulletKey = unlocked ? 'ui_bullet_discovered' : 'ui_bullet_undiscovered';
-      if (this.textures.exists(bulletKey)) {
-        const bulletImg = this.add.image(rightX + 30, y + 8, bulletKey);
-        bulletImg.setDisplaySize(14, 14);
-        this.container.add(bulletImg);
-      } else {
-        const bullet = unlocked ? '◆' : '◇';
-        const bulletColor = unlocked ? colorHex : TextColors.hidden;
-        this.container.add(this.add.text(rightX + 24, y, bullet, {
-          fontFamily: FONT, fontSize: '14px', color: bulletColor,
-        }));
-      }
+      const bullet = unlocked ? '◆' : '◇';
+      const bulletColor = unlocked ? colorHex : TextColors.hidden;
+      this.container.add(this.add.text(rightX + 24, y, bullet, {
+        fontFamily: FONT, fontSize: '14px', color: bulletColor,
+      }));
 
       // Fact text
       const displayText = unlocked ? fact.text : '— Undiscovered —';
