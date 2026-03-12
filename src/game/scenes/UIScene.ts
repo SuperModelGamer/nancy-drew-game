@@ -4,7 +4,7 @@ import { SaveSystem } from '../systems/SaveSystem';
 import { ChapterSystem } from '../systems/ChapterSystem';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
-import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
+import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
 import { drawArtDecoFrame, drawDecoDivider, drawChevronTab, drawCornerOrnament, DecoColors, DecoTextColors } from '../utils/art-deco';
@@ -96,7 +96,7 @@ export class UIScene extends Phaser.Scene {
 
       // Hit area (invisible rectangle for interaction)
       const hitArea = this.add.rectangle(0, 0, 130, 38, 0x000000, 0);
-      hitArea.setInteractive({ cursor: HAND_CURSOR });
+      hitArea.setInteractive({ cursor: POINTER_CURSOR });
       hitArea.on('pointerover', () => {
         btnGfx.clear();
         drawChevronTab(btnGfx, 0, 0, 130, 38, {
@@ -410,7 +410,7 @@ export class UIScene extends Phaser.Scene {
       const borderColor = isSelected ? Colors.success : (isInspected ? Colors.gold : Colors.goldDim);
       const borderAlpha = isSelected ? 0.9 : (isInspected ? 0.7 : 0.2);
       cardBg.setStrokeStyle(isSelected || isInspected ? 2 : 1, borderColor, borderAlpha);
-      cardBg.setInteractive({ cursor: HAND_CURSOR });
+      cardBg.setInteractive({ cursor: POINTER_CURSOR });
 
       // Item image — larger and prominent
       const iconKey = `item_icon_${itemId}`;

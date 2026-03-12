@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
-import { Cursors, HAND_CURSOR, initSceneCursor } from '../utils/cursors';
+import { Cursors, POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 
 /**
@@ -238,7 +238,7 @@ export class MapScene extends Phaser.Scene {
           // Hit area
           const hitW = MEDALLION_SIZE * (medallion.width / medallion.height);
           const hitArea = this.add.rectangle(0, -6, hitW, MEDALLION_SIZE, 0x000000, 0);
-          hitArea.setInteractive({ cursor: isLocked ? Cursors.locked : HAND_CURSOR });
+          hitArea.setInteractive({ cursor: isLocked ? Cursors.locked : POINTER_CURSOR });
           container.add(hitArea);
 
           if (!isLocked) {
@@ -351,7 +351,7 @@ export class MapScene extends Phaser.Scene {
     }
 
     if (!isLocked && !isCurrent) {
-      cardBg.setInteractive({ cursor: HAND_CURSOR });
+      cardBg.setInteractive({ cursor: POINTER_CURSOR });
       cardBg.on('pointerover', () => cardBg.setStrokeStyle(1.5, Colors.gold, 0.8));
       cardBg.on('pointerout', () => cardBg.setStrokeStyle(1.5, Colors.gold, 0.5));
       cardBg.on('pointerdown', () => this.navigateToRoom(room.id));

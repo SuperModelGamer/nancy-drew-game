@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import roomsData from '../data/rooms.json';
 import { FONT } from '../utils/constants';
-import { HAND_CURSOR } from '../utils/cursors';
+import { POINTER_CURSOR } from '../utils/cursors';
 
 interface HotspotData {
   id: string;
@@ -79,12 +79,12 @@ export class HotspotEditorScene extends Phaser.Scene {
 
     // Left arrow click zone
     const leftArrow = this.add.rectangle(width / 2 - 180, 18, 40, 30, 0x000000, 0)
-      .setInteractive({ cursor: HAND_CURSOR }).setDepth(952);
+      .setInteractive({ cursor: POINTER_CURSOR }).setDepth(952);
     leftArrow.on('pointerdown', () => this.switchRoom(-1));
 
     // Right arrow click zone
     const rightArrow = this.add.rectangle(width / 2 + 180, 18, 40, 30, 0x000000, 0)
-      .setInteractive({ cursor: HAND_CURSOR }).setDepth(952);
+      .setInteractive({ cursor: POINTER_CURSOR }).setDepth(952);
     rightArrow.on('pointerdown', () => this.switchRoom(1));
 
     // Info text (bottom)
@@ -101,7 +101,7 @@ export class HotspotEditorScene extends Phaser.Scene {
       fontFamily: FONT,
       fontSize: '20px',
       color: '#ff6666',
-    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR }).setDepth(952);
+    }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR }).setDepth(952);
     closeBtn.on('pointerdown', () => this.closeEditor());
 
     // Draw all hotspots for current room
@@ -165,7 +165,7 @@ export class HotspotEditorScene extends Phaser.Scene {
     const rect = this.add.rectangle(hotspot.x, hotspot.y, w, h, color, 0.25);
     rect.setStrokeStyle(2, color, 0.9);
     rect.setDepth(910);
-    rect.setInteractive({ cursor: HAND_CURSOR, draggable: false });
+    rect.setInteractive({ cursor: POINTER_CURSOR, draggable: false });
 
     // Label above
     const label = this.add.text(hotspot.x, hotspot.y - h / 2 - 12, hotspot.label, {

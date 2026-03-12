@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { DialogueSystem } from '../systems/DialogueSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
-import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
+import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { drawArtDecoFrame, drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 
@@ -194,7 +194,7 @@ export class SuspectScene extends Phaser.Scene {
       const tabBg = this.add.rectangle(tx, tabStripY, tabW, 54,
         isSelected ? 0x1e1d2e : 0x15141e, isSelected ? 1 : 0.85);
       tabBg.setStrokeStyle(isSelected ? 2 : 1, suspect.color, isSelected ? 0.7 : 0.2);
-      tabBg.setInteractive({ cursor: HAND_CURSOR });
+      tabBg.setInteractive({ cursor: POINTER_CURSOR });
 
       // Bottom accent bar when selected
       if (isSelected) {
