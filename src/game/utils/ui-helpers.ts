@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { Colors, TextColors, FONT } from './constants';
-import { HAND_CURSOR, POINTER_CURSOR } from './cursors';
+import { POINTER_CURSOR } from './cursors';
 
 /**
  * Create a close button with the ui_close_btn image asset (or text fallback).
@@ -173,7 +173,7 @@ export function createToolbarButton(
   const container = scene.add.container(x, y);
   const bg = scene.add.rectangle(0, 0, btnWidth, Sizes.minTapTarget, Colors.sceneBg, 0.9);
   bg.setStrokeStyle(1, accentColor, 0.6);
-  bg.setInteractive({ cursor: HAND_CURSOR });
+  bg.setInteractive({ cursor: POINTER_CURSOR });
 
   const text = scene.add.text(0, 0, label, {
     fontFamily: FONT,

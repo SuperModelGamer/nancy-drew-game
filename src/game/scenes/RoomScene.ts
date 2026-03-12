@@ -9,7 +9,7 @@ import { ChapterSystem } from '../systems/ChapterSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { drawRoomBackground } from '../utils/room-backgrounds';
 import { showTutorialIfNeeded } from '../utils/tutorial';
-import { Cursors, CursorType, HAND_CURSOR } from '../utils/cursors';
+import { Cursors, CursorType, POINTER_CURSOR } from '../utils/cursors';
 import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 import itemsData from '../data/items.json';
@@ -668,7 +668,7 @@ export class RoomScene extends Phaser.Scene {
     };
 
     // Click anywhere to dismiss
-    overlay.setInteractive({ cursor: HAND_CURSOR });
+    overlay.setInteractive({ cursor: POINTER_CURSOR });
     overlay.on('pointerdown', dismiss);
 
     // Also allow spacebar/enter to dismiss

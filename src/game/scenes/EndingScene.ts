@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { TextColors, FONT } from '../utils/constants';
-import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
+import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
 
 interface EndingData {
   ending: string;
@@ -162,7 +162,7 @@ export class EndingScene extends Phaser.Scene {
     });
     returnButton.setOrigin(0.5);
     returnButton.setAlpha(0);
-    returnButton.setInteractive({ cursor: HAND_CURSOR });
+    returnButton.setInteractive({ cursor: POINTER_CURSOR });
 
     returnButton.on('pointerover', () => {
       returnButton.setStyle({ color: TextColors.light });

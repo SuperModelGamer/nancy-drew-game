@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { Colors, TextColors, FONT, Depths } from './constants';
-import { HAND_CURSOR } from './cursors';
+import { POINTER_CURSOR } from './cursors';
 import { SaveSystem } from '../systems/SaveSystem';
 
 const TUTORIAL_FLAG = 'tutorial_seen';
@@ -78,7 +78,7 @@ export function showTutorialIfNeeded(scene: Phaser.Scene): void {
   const btnY = height / 2 + panelH / 2 - 45;
   const btnBg = scene.add.rectangle(width / 2, btnY, 200, 44, Colors.sceneBg);
   btnBg.setStrokeStyle(2, Colors.gold, 0.6);
-  btnBg.setInteractive({ cursor: HAND_CURSOR });
+  btnBg.setInteractive({ cursor: POINTER_CURSOR });
   container.add(btnBg);
 
   const btnText = scene.add.text(width / 2, btnY, 'Begin Investigation', {

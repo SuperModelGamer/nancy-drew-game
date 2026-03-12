@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { ChapterSystem } from '../systems/ChapterSystem';
 import { Colors, TextColors, FONT } from '../utils/constants';
-import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
+import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
 
 export class TitleScene extends Phaser.Scene {
   constructor() {
@@ -204,7 +204,7 @@ export class TitleScene extends Phaser.Scene {
 
       // Invisible hit area covering the button image
       const hitArea = this.add.rectangle(0, 0, w, h, 0x000000, 0);
-      hitArea.setInteractive({ cursor: HAND_CURSOR });
+      hitArea.setInteractive({ cursor: POINTER_CURSOR });
       container.add(hitArea);
 
       // ── Hover: golden glow + scale up ──
@@ -256,7 +256,7 @@ export class TitleScene extends Phaser.Scene {
       // ── Fallback: procedural rectangle button ──
       const bg = this.add.rectangle(0, 0, w, h, 0x0e0d16, primary ? 0.9 : 0.75);
       bg.setStrokeStyle(primary ? 2 : 1, primary ? Colors.gold : 0x6a5a3a, primary ? 0.8 : 0.4);
-      bg.setInteractive({ cursor: HAND_CURSOR });
+      bg.setInteractive({ cursor: POINTER_CURSOR });
 
       const text = this.add.text(0, subtitle ? -7 : 0, label, {
         fontFamily: FONT,
@@ -360,7 +360,7 @@ export class TitleScene extends Phaser.Scene {
     // Close button
     const closeBg = this.add.rectangle(0, 140, 120, 44, Colors.sceneBg, 0.9);
     closeBg.setStrokeStyle(1, Colors.gold, 0.5);
-    closeBg.setInteractive({ cursor: HAND_CURSOR });
+    closeBg.setInteractive({ cursor: POINTER_CURSOR });
     const closeText = this.add.text(0, 140, 'Close', {
       fontFamily: FONT,
       fontSize: '16px',
@@ -426,10 +426,10 @@ export class TitleScene extends Phaser.Scene {
 
       const leftArr = this.add.text(90, rowY(0), '◀', {
         fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim,
-      }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
+      }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
       const rightArr = this.add.text(190, rowY(0), '▶', {
         fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim,
-      }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
+      }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
 
       const update = (dir: number) => {
         idx = (idx + dir + speeds.length) % speeds.length;
@@ -457,7 +457,7 @@ export class TitleScene extends Phaser.Scene {
       let on = save.getFlag('setting_highlights') !== false;
       const valText = this.add.text(140, rowY(1), on ? 'ON' : 'OFF', {
         fontFamily: FONT, fontSize: '14px', color: on ? TextColors.success : TextColors.goldDim,
-      }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
+      }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
       container.add(valText);
 
       valText.on('pointerdown', () => {
@@ -485,7 +485,7 @@ export class TitleScene extends Phaser.Scene {
       let on = save.getFlag('setting_autosave') !== false;
       const valText = this.add.text(140, rowY(2), on ? 'ON' : 'OFF', {
         fontFamily: FONT, fontSize: '14px', color: on ? TextColors.success : TextColors.goldDim,
-      }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
+      }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
       container.add(valText);
 
       valText.on('pointerdown', () => {
@@ -506,7 +506,7 @@ export class TitleScene extends Phaser.Scene {
     {
       const deleteBg = this.add.rectangle(0, rowY(3) + 10, 200, 36, 0x1a0a0a, 0.8);
       deleteBg.setStrokeStyle(1, Colors.error, 0.4);
-      deleteBg.setInteractive({ cursor: HAND_CURSOR });
+      deleteBg.setInteractive({ cursor: POINTER_CURSOR });
       const deleteText = this.add.text(0, rowY(3) + 10, 'Delete Save Data', {
         fontFamily: FONT, fontSize: '13px', color: TextColors.error,
       }).setOrigin(0.5);
@@ -526,7 +526,7 @@ export class TitleScene extends Phaser.Scene {
     // ── Close button ──
     const closeBg = this.add.rectangle(0, 140, 120, 40, Colors.sceneBg, 0.9);
     closeBg.setStrokeStyle(1, Colors.gold, 0.5);
-    closeBg.setInteractive({ cursor: HAND_CURSOR });
+    closeBg.setInteractive({ cursor: POINTER_CURSOR });
     const closeText = this.add.text(0, 140, 'Close', {
       fontFamily: FONT, fontSize: '15px', color: TextColors.gold,
     }).setOrigin(0.5);
@@ -560,7 +560,7 @@ export class TitleScene extends Phaser.Scene {
     // Confirm
     const yesBg = this.add.rectangle(-80, 40, 120, 44, Colors.danger, 0.8);
     yesBg.setStrokeStyle(1, Colors.gold, 0.5);
-    yesBg.setInteractive({ cursor: HAND_CURSOR });
+    yesBg.setInteractive({ cursor: POINTER_CURSOR });
     const yesText = this.add.text(-80, 40, 'Yes', {
       fontFamily: FONT,
       fontSize: '16px',
@@ -577,7 +577,7 @@ export class TitleScene extends Phaser.Scene {
     // Cancel
     const noBg = this.add.rectangle(80, 40, 120, 44, Colors.sceneBg, 0.8);
     noBg.setStrokeStyle(1, Colors.gold, 0.5);
-    noBg.setInteractive({ cursor: HAND_CURSOR });
+    noBg.setInteractive({ cursor: POINTER_CURSOR });
     const noText = this.add.text(80, 40, 'Cancel', {
       fontFamily: FONT,
       fontSize: '16px',
