@@ -74,24 +74,96 @@ export class UIScene extends Phaser.Scene {
 
     barBg.setDepth(Depths.tooltip - 1);
 
-    // ─── Chapter indicator — integrated into toolbar, centered above buttons ───
-    const chapterY = toolbarTop + 10;
-    const chapterLabel = this.add.text(width / 2, chapterY, '', {
+    // ─── Story progress indicator — visual act tracker in toolbar center ───
+    const TOTAL_ACTS = 5;
+    const progressY = toolbarTop + 12;
+    const progressContainer = this.add.container(width / 2, progressY);
+    progressContainer.setDepth(Depths.tooltip);
+
+    // Act pip dots with connecting lines
+    const pipSpacing = 28;
+    const totalPipW = (TOTAL_ACTS - 1) * pipSpacing;
+    const pipStartX = -totalPipW / 2;
+    const pipR = 4;
+    const pipGfx = this.add.graphics();
+    progressContainer.add(pipGfx);
+
+    // Tooltip for act title (hidden by default)
+    const actTooltip = this.add.text(0, 14, '', {
       fontFamily: FONT,
-      fontSize: '11px',
+      fontSize: '10px',
       color: DecoTextColors.cream,
       fontStyle: 'italic',
-      letterSpacing: 2,
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+      letterSpacing: 1,
+    }).setOrigin(0.5, 0).setAlpha(0);
+    progressContainer.add(actTooltip);
+
+    // Hit area for hover to show act title
+    const progressHit = this.add.rectangle(0, 0, totalPipW + 40, 20, 0x000000, 0);
+    progressHit.setInteractive({ cursor: POINTER_CURSOR });
+    progressContainer.add(progressHit);
+
+    const drawProgress = (chapter: number) => {
+      pipGfx.clear();
+
+      // Connecting line (track)
+      pipGfx.lineStyle(1, DecoColors.gold, 0.15);
+      pipGfx.lineBetween(pipStartX, 0, pipStartX + totalPipW, 0);
+
+      // Filled progress line
+      if (chapter > 1) {
+        const filledW = ((chapter - 1) / (TOTAL_ACTS - 1)) * totalPipW;
+        pipGfx.lineStyle(2, DecoColors.gold, 0.6);
+        pipGfx.lineBetween(pipStartX, 0, pipStartX + filledW, 0);
+      }
+
+      // Act pips
+      for (let i = 1; i <= TOTAL_ACTS; i++) {
+        const px = pipStartX + (i - 1) * pipSpacing;
+        const isComplete = i < chapter;
+        const isCurrent = i === chapter;
+
+        if (isCurrent) {
+          // Current act — bright gold filled diamond
+          pipGfx.fillStyle(DecoColors.gold, 0.9);
+          pipGfx.fillPoints([
+            new Phaser.Geom.Point(px, -pipR - 1),
+            new Phaser.Geom.Point(px + pipR + 1, 0),
+            new Phaser.Geom.Point(px, pipR + 1),
+            new Phaser.Geom.Point(px - pipR - 1, 0),
+          ], true);
+        } else if (isComplete) {
+          // Completed act — filled gold circle
+          pipGfx.fillStyle(DecoColors.gold, 0.6);
+          pipGfx.fillCircle(px, 0, pipR);
+        } else {
+          // Future act — empty circle outline
+          pipGfx.lineStyle(1, DecoColors.gold, 0.25);
+          pipGfx.strokeCircle(px, 0, pipR);
+        }
+      }
+
+      // Update tooltip text
+      actTooltip.setText(ChapterSystem.getInstance().getChapterTitle(chapter));
+    };
+
+    // Show/hide tooltip on hover
+    progressHit.on('pointerover', () => {
+      this.tweens.add({ targets: actTooltip, alpha: 1, duration: 150 });
+    });
+    progressHit.on('pointerout', () => {
+      this.tweens.add({ targets: actTooltip, alpha: 0, duration: 150 });
+    });
+
     const updateChapter = () => {
       const ch = SaveSystem.getInstance().getChapter();
-      chapterLabel.setText(ChapterSystem.getInstance().getChapterTitle(ch));
+      drawProgress(ch);
     };
     updateChapter();
     this.events.on('wake', updateChapter);
 
-    // ─── Toolbar buttons — positioned below chapter label ───
-    const buttonY = toolbarTop + 40;
+    // ─── Toolbar buttons — positioned below progress indicator ───
+    const buttonY = toolbarTop + 42;
 
     const buttons = [
       { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: width * 0.12, action: () => this.toggleInventory() },
