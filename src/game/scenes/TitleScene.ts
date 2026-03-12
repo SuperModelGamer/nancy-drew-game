@@ -22,89 +22,71 @@ export class TitleScene extends Phaser.Scene {
       cover.setAlpha(0.6);
     }
 
-    // ── Gradient overlays — dark at top and bottom, clear middle to show theater ──
+    // ── Gradient overlay — dark on the right side for title+menu, left shows theater ──
     const gradient = this.add.graphics();
 
-    // Top band: solid-to-transparent (title area)
-    gradient.fillGradientStyle(0x0a0a0f, 0x0a0a0f, 0x0a0a0f, 0x0a0a0f, 0.92, 0.92, 0, 0);
-    gradient.fillRect(0, 0, width, height * 0.28);
+    // Right-side vertical band: dark overlay for readability
+    gradient.fillGradientStyle(0x0a0a0f, 0x0a0a0f, 0x0a0a0f, 0x0a0a0f, 0, 0.88, 0, 0.88);
+    gradient.fillRect(width * 0.35, 0, width * 0.65, height);
 
-    // Bottom band: transparent-to-solid (menu area)
-    gradient.fillGradientStyle(0x0a0a0f, 0x0a0a0f, 0x0a0a0f, 0x0a0a0f, 0, 0, 0.95, 0.95);
-    gradient.fillRect(0, height * 0.42, width, height * 0.58);
+    // Solid dark on far right
+    gradient.fillStyle(0x0a0a0f, 0.82);
+    gradient.fillRect(width * 0.55, 0, width * 0.45, height);
 
-    // Extra solid band at very bottom for menu readability
-    gradient.fillStyle(0x0a0a0f, 0.85);
-    gradient.fillRect(0, height * 0.72, width, height * 0.28);
+    // Subtle bottom strip for credits
+    gradient.fillStyle(0x0a0a0f, 0.6);
+    gradient.fillRect(0, height - 40, width, 40);
 
-    // ── Title lockup — positioned in the top band ──
-    const titleCenterY = height * 0.10;
+    // ── Title graphic — positioned right-of-center, upper area ──
+    const contentX = width * 0.72; // right-of-center anchor for title + menu
 
-    // "A Nancy Drew Mystery" subtitle
-    const subtitle = this.add.text(width / 2, titleCenterY, 'A  N A N C Y  D R E W  M Y S T E R Y', {
-      fontFamily: FONT,
-      fontSize: '11px',
-      color: '#b8a472',
-      letterSpacing: 5,
-    }).setOrigin(0.5).setAlpha(0.8);
+    if (this.textures.exists('title_graphic')) {
+      const titleImg = this.add.image(contentX, height * 0.22, 'title_graphic');
+      // Scale to fit nicely — target about 420px wide
+      const targetW = Math.min(420, width * 0.42);
+      const scale = targetW / titleImg.width;
+      titleImg.setScale(scale);
 
-    // Decorative line
-    const lineAbove = this.add.graphics();
-    lineAbove.lineStyle(1, Colors.gold, 0.4);
-    const lineW = subtitle.width + 40;
-    lineAbove.lineBetween(width / 2 - lineW / 2, titleCenterY + 14, width / 2 + lineW / 2, titleCenterY + 14);
+      // Subtle glow pulse
+      this.tweens.add({
+        targets: titleImg,
+        alpha: { from: 1, to: 0.88 },
+        duration: 2500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    } else {
+      // Fallback: procedural text title if image missing
+      this.add.text(contentX, height * 0.12, 'A  N A N C Y  D R E W  M Y S T E R Y', {
+        fontFamily: FONT,
+        fontSize: '11px',
+        color: '#b8a472',
+        letterSpacing: 5,
+      }).setOrigin(0.5).setAlpha(0.8);
 
-    // Small diamond accents at line ends
-    this.drawDiamond(lineAbove, width / 2 - lineW / 2 - 4, titleCenterY + 14, 3, Colors.gold, 0.4);
-    this.drawDiamond(lineAbove, width / 2 + lineW / 2 + 4, titleCenterY + 14, 3, Colors.gold, 0.4);
+      this.add.text(contentX, height * 0.22, 'THE LAST\nCURTAIN CALL', {
+        fontFamily: FONT,
+        fontSize: '42px',
+        color: '#e8c55a',
+        fontStyle: 'bold',
+        align: 'center',
+        lineSpacing: 6,
+        shadow: { offsetX: 0, offsetY: 0, color: '#c9a84c', blur: 12, fill: true },
+      }).setOrigin(0.5);
+    }
 
-    // Main title — larger, with warm glow effect
-    // Shadow layer (warm amber glow behind text)
-    const titleShadow = this.add.text(width / 2, titleCenterY + 48, 'THE LAST\nCURTAIN CALL', {
-      fontFamily: FONT,
-      fontSize: '48px',
-      color: '#4a3a1a',
-      fontStyle: 'bold',
-      align: 'center',
-      lineSpacing: 6,
-    }).setOrigin(0.5).setAlpha(0.6);
+    // ── Decorative line under title ──
+    const decoLine = this.add.graphics();
+    decoLine.lineStyle(1, Colors.gold, 0.35);
+    const decoW = 280;
+    const decoY = height * 0.35;
+    decoLine.lineBetween(contentX - decoW / 2, decoY, contentX + decoW / 2, decoY);
+    this.drawDiamond(decoLine, contentX - decoW / 2 - 4, decoY, 3, Colors.gold, 0.35);
+    this.drawDiamond(decoLine, contentX + decoW / 2 + 4, decoY, 3, Colors.gold, 0.35);
 
-    // Main title text
-    const title = this.add.text(width / 2, titleCenterY + 48, 'THE LAST\nCURTAIN CALL', {
-      fontFamily: FONT,
-      fontSize: '48px',
-      color: '#e8c55a',
-      fontStyle: 'bold',
-      align: 'center',
-      lineSpacing: 6,
-      shadow: {
-        offsetX: 0,
-        offsetY: 0,
-        color: '#c9a84c',
-        blur: 12,
-        fill: true,
-      },
-    }).setOrigin(0.5);
-
-    // Subtle glow pulse
-    this.tweens.add({
-      targets: [title, titleShadow],
-      alpha: { from: 1, to: 0.85 },
-      duration: 2500,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
-    });
-
-    // Line below title
-    const lineBelow = this.add.graphics();
-    lineBelow.lineStyle(1, Colors.gold, 0.35);
-    lineBelow.lineBetween(width / 2 - lineW / 2, titleCenterY + 96, width / 2 + lineW / 2, titleCenterY + 96);
-    this.drawDiamond(lineBelow, width / 2 - lineW / 2 - 4, titleCenterY + 96, 3, Colors.gold, 0.35);
-    this.drawDiamond(lineBelow, width / 2 + lineW / 2 + 4, titleCenterY + 96, 3, Colors.gold, 0.35);
-
-    // ── Menu buttons — positioned in the bottom band ──
-    const menuX = width / 2;
+    // ── Menu buttons — right-of-center, below title ──
+    const menuX = contentX;
     const btnWidth = 260;
     const btnHeight = 46;
     const btnGap = 10;
@@ -155,10 +137,10 @@ export class TitleScene extends Phaser.Scene {
       action: () => this.showSettings(width, height),
     });
 
-    // Calculate menu position — anchor from bottom of screen, push up
+    // Calculate menu position — start below the decorative line with comfortable gap
     const totalMenuH = menuItems.length * (btnHeight + btnGap) - btnGap;
-    const menuBottomMargin = 60; // space above credits line
-    const menuStartY = height - menuBottomMargin - totalMenuH + btnHeight / 2;
+    const menuTopY = decoY + 30; // 30px below the decorative line
+    const menuStartY = menuTopY + btnHeight / 2;
 
     // Render menu buttons
     menuItems.forEach((item, i) => {
@@ -167,10 +149,10 @@ export class TitleScene extends Phaser.Scene {
     });
 
     // ── Credits ──
-    this.add.text(width / 2, height - 20, 'Created by Carley Beck', {
+    this.add.text(contentX, height - 20, 'Created by Carley Beck', {
       fontFamily: FONT,
       fontSize: '10px',
-      color: '#444455',
+      color: '#555566',
     }).setOrigin(0.5);
 
     // Set custom cursor
