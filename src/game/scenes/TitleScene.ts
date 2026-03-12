@@ -87,18 +87,19 @@ export class TitleScene extends Phaser.Scene {
 
     // ── Menu buttons — right-of-center, below title ──
     const menuX = contentX;
-    const btnWidth = 260;
-    const btnHeight = 46;
-    const btnGap = 10;
+    const btnDisplayW = 340;
+    const btnDisplayH = 70;
+    const btnGap = 14;
 
-    // Build menu items
-    const menuItems: { label: string; action: () => void; primary?: boolean; subtitle?: string }[] = [];
+    // Build menu items with texture keys
+    const menuItems: { label: string; textureKey: string; action: () => void; primary?: boolean; subtitle?: string }[] = [];
 
     if (hasSave) {
       save.load();
       const chapterTitle = ChapterSystem.getInstance().getChapterTitle(save.getChapter());
       menuItems.push({
         label: 'Continue',
+        textureKey: 'btn_continue',
         subtitle: chapterTitle,
         primary: true,
         action: () => {
@@ -114,6 +115,7 @@ export class TitleScene extends Phaser.Scene {
 
     menuItems.push({
       label: hasSave ? 'New Investigation' : 'Begin Investigation',
+      textureKey: 'btn_new_case',
       primary: !hasSave,
       action: () => {
         if (hasSave) {
@@ -129,23 +131,24 @@ export class TitleScene extends Phaser.Scene {
 
     menuItems.push({
       label: 'How to Play',
+      textureKey: 'btn_howto',
       action: () => this.showHowToPlay(width, height),
     });
 
     menuItems.push({
       label: 'Settings',
+      textureKey: 'btn_settings',
       action: () => this.showSettings(width, height),
     });
 
     // Calculate menu position — start below the decorative line with comfortable gap
-    const totalMenuH = menuItems.length * (btnHeight + btnGap) - btnGap;
-    const menuTopY = decoY + 30; // 30px below the decorative line
-    const menuStartY = menuTopY + btnHeight / 2;
+    const menuTopY = decoY + 30;
+    const menuStartY = menuTopY + btnDisplayH / 2;
 
-    // Render menu buttons
+    // Render menu buttons with staggered fade-in
     menuItems.forEach((item, i) => {
-      const y = menuStartY + i * (btnHeight + btnGap);
-      this.createMenuButton(menuX, y, btnWidth, btnHeight, item.label, item.action, item.primary, item.subtitle);
+      const y = menuStartY + i * (btnDisplayH + btnGap);
+      this.createMenuButton(menuX, y, btnDisplayW, btnDisplayH, item.label, item.textureKey, item.action, item.primary, item.subtitle, i);
     });
 
     // ── Credits ──
@@ -174,50 +177,135 @@ export class TitleScene extends Phaser.Scene {
 
   private createMenuButton(
     x: number, y: number, w: number, h: number,
-    label: string, onClick: () => void,
-    primary?: boolean, subtitle?: string,
+    label: string, textureKey: string, onClick: () => void,
+    primary?: boolean, subtitle?: string, index?: number,
   ): Phaser.GameObjects.Container {
     const container = this.add.container(x, y);
+    container.setAlpha(0); // start invisible for staggered fade-in
 
-    // Button background
-    const bg = this.add.rectangle(0, 0, w, h, 0x0e0d16, primary ? 0.9 : 0.75);
-    bg.setStrokeStyle(primary ? 2 : 1, primary ? Colors.gold : 0x6a5a3a, primary ? 0.8 : 0.4);
-    bg.setInteractive({ cursor: HAND_CURSOR });
+    const hasTexture = this.textures.exists(textureKey);
 
-    // Button label
-    const text = this.add.text(0, subtitle ? -7 : 0, label, {
-      fontFamily: FONT,
-      fontSize: primary ? '19px' : '16px',
-      color: primary ? '#e8c55a' : TextColors.light,
-    }).setOrigin(0.5);
+    if (hasTexture) {
+      // ── Image-based button ──
+      const btnImg = this.add.image(0, 0, textureKey);
+      btnImg.setDisplaySize(w, h);
+      container.add(btnImg);
 
-    container.add([bg, text]);
+      // Subtitle overlay (e.g., chapter name under Continue)
+      if (subtitle) {
+        const sub = this.add.text(0, h / 2 + 10, subtitle, {
+          fontFamily: FONT,
+          fontSize: '11px',
+          color: TextColors.goldDim,
+          fontStyle: 'italic',
+        }).setOrigin(0.5);
+        container.add(sub);
+      }
 
-    // Subtitle (e.g., chapter name under Continue)
-    if (subtitle) {
-      const sub = this.add.text(0, 12, subtitle, {
+      // Invisible hit area covering the button image
+      const hitArea = this.add.rectangle(0, 0, w, h, 0x000000, 0);
+      hitArea.setInteractive({ cursor: HAND_CURSOR });
+      container.add(hitArea);
+
+      // ── Hover: golden glow + scale up ──
+      hitArea.on('pointerover', () => {
+        this.tweens.killTweensOf(container);
+        this.tweens.add({
+          targets: container,
+          scaleX: 1.06,
+          scaleY: 1.06,
+          duration: 180,
+          ease: 'Back.easeOut',
+        });
+        btnImg.setTint(0xffeecc); // warm golden tint
+      });
+
+      // ── Hover out: spring back to normal ──
+      hitArea.on('pointerout', () => {
+        this.tweens.killTweensOf(container);
+        this.tweens.add({
+          targets: container,
+          scaleX: 1,
+          scaleY: 1,
+          duration: 250,
+          ease: 'Back.easeOut',
+        });
+        btnImg.clearTint();
+      });
+
+      // ── Press: quick scale-down "push" + brightness flash ──
+      hitArea.on('pointerdown', () => {
+        this.tweens.killTweensOf(container);
+        this.tweens.add({
+          targets: container,
+          scaleX: 0.95,
+          scaleY: 0.95,
+          duration: 80,
+          ease: 'Power2',
+          yoyo: true,
+          onYoyo: () => {
+            btnImg.setTint(0xffffff); // bright flash
+          },
+          onComplete: () => {
+            btnImg.clearTint();
+            onClick();
+          },
+        });
+      });
+    } else {
+      // ── Fallback: procedural rectangle button ──
+      const bg = this.add.rectangle(0, 0, w, h, 0x0e0d16, primary ? 0.9 : 0.75);
+      bg.setStrokeStyle(primary ? 2 : 1, primary ? Colors.gold : 0x6a5a3a, primary ? 0.8 : 0.4);
+      bg.setInteractive({ cursor: HAND_CURSOR });
+
+      const text = this.add.text(0, subtitle ? -7 : 0, label, {
         fontFamily: FONT,
-        fontSize: '10px',
-        color: TextColors.goldDim,
-        fontStyle: 'italic',
+        fontSize: primary ? '19px' : '16px',
+        color: primary ? '#e8c55a' : TextColors.light,
       }).setOrigin(0.5);
-      container.add(sub);
+      container.add([bg, text]);
+
+      if (subtitle) {
+        const sub = this.add.text(0, 12, subtitle, {
+          fontFamily: FONT, fontSize: '10px', color: TextColors.goldDim, fontStyle: 'italic',
+        }).setOrigin(0.5);
+        container.add(sub);
+      }
+
+      bg.on('pointerover', () => {
+        this.tweens.killTweensOf(container);
+        this.tweens.add({ targets: container, scaleX: 1.04, scaleY: 1.04, duration: 150, ease: 'Back.easeOut' });
+        bg.setFillStyle(0x1a1a3e, 0.9);
+        bg.setStrokeStyle(2, Colors.gold, 0.9);
+        text.setColor('#e8c55a');
+      });
+
+      bg.on('pointerout', () => {
+        this.tweens.killTweensOf(container);
+        this.tweens.add({ targets: container, scaleX: 1, scaleY: 1, duration: 200, ease: 'Back.easeOut' });
+        bg.setFillStyle(0x0e0d16, primary ? 0.9 : 0.75);
+        bg.setStrokeStyle(primary ? 2 : 1, primary ? Colors.gold : 0x6a5a3a, primary ? 0.8 : 0.4);
+        text.setColor(primary ? '#e8c55a' : TextColors.light);
+      });
+
+      bg.on('pointerdown', () => {
+        this.tweens.add({
+          targets: container, scaleX: 0.95, scaleY: 0.95, duration: 80,
+          ease: 'Power2', yoyo: true, onComplete: () => onClick(),
+        });
+      });
     }
 
-    // Hover effects
-    bg.on('pointerover', () => {
-      bg.setFillStyle(0x1a1a3e, 0.9);
-      bg.setStrokeStyle(2, Colors.gold, 0.9);
-      text.setColor('#e8c55a');
+    // ── Staggered entrance animation ──
+    const delay = (index ?? 0) * 120;
+    this.tweens.add({
+      targets: container,
+      alpha: { from: 0, to: 1 },
+      y: { from: y + 20, to: y },
+      duration: 400,
+      delay: delay + 300, // 300ms initial delay after scene loads
+      ease: 'Power2',
     });
-
-    bg.on('pointerout', () => {
-      bg.setFillStyle(0x0e0d16, primary ? 0.9 : 0.75);
-      bg.setStrokeStyle(primary ? 2 : 1, primary ? Colors.gold : 0x6a5a3a, primary ? 0.8 : 0.4);
-      text.setColor(primary ? '#e8c55a' : TextColors.light);
-    });
-
-    bg.on('pointerdown', onClick);
 
     return container;
   }
