@@ -3,7 +3,7 @@ import { SaveSystem } from '../systems/SaveSystem';
 import { DialogueSystem } from '../systems/DialogueSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
-import { createCloseButton, createOverlay } from '../utils/ui-helpers';
+import { createOverlay } from '../utils/ui-helpers';
 
 interface SuspectProfile {
   id: string;
@@ -103,10 +103,7 @@ const SUSPECTS: SuspectProfile[] = [
   },
 ];
 
-// Canvas is 1280×720. Toolbar is 52px at bottom.
 const TOOLBAR_H = 52;
-const W = 1280;
-const H = 720;
 
 export class SuspectScene extends Phaser.Scene {
   private container!: Phaser.GameObjects.Container;
@@ -119,7 +116,6 @@ export class SuspectScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
-    // Full-screen dark overlay
     createOverlay(this, 0.88, Depths.suspectOverlay);
     initSceneCursor(this);
 
@@ -127,23 +123,37 @@ export class SuspectScene extends Phaser.Scene {
     this.container.setDepth(Depths.suspectContent);
 
     // ─── Main panel ───
-    // Leave 52px for toolbar + 8px padding at bottom, 8px at top
     const panelW = 1100;
     const panelH = height - TOOLBAR_H - 16;
     const panelX = width / 2;
     const panelY = panelH / 2 + 8;
 
-    // Background — aged dark paper
-    const bg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x12111a, 0.97);
-    bg.setStrokeStyle(1.5, Colors.gold, 0.35);
-    this.container.add(bg);
+    // Background — use dossier-bg image
+    if (this.textures.exists('ui_dossier_bg')) {
+      const bg = this.add.image(panelX, panelY, 'ui_dossier_bg');
+      bg.setDisplaySize(panelW, panelH);
+      this.container.add(bg);
+    } else {
+      const bg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x12111a, 0.97);
+      bg.setStrokeStyle(1.5, Colors.gold, 0.35);
+      this.container.add(bg);
+    }
 
     // ─── Header bar ───
     const headerH = 44;
     const headerY = panelY - panelH / 2 + headerH / 2;
 
-    const headerBg = this.add.rectangle(panelX, headerY, panelW - 2, headerH, 0x0e0d16, 1);
-    this.container.add(headerBg);
+    if (this.textures.exists('ui_dossier_header')) {
+      const header = this.add.image(panelX, headerY, 'ui_dossier_header');
+      header.setDisplaySize(panelW - 2, headerH);
+      // Crop to just the top header bar portion of the image
+      header.setCrop(0, 0, header.texture.getSourceImage().width, header.texture.getSourceImage().height * 0.4);
+      header.setDisplaySize(panelW - 2, headerH);
+      this.container.add(header);
+    } else {
+      const headerBg = this.add.rectangle(panelX, headerY, panelW - 2, headerH, 0x0e0d16, 1);
+      this.container.add(headerBg);
+    }
 
     const title = this.add.text(panelX, headerY, 'CASE FILE — SUSPECT DOSSIERS', {
       fontFamily: FONT,
@@ -154,18 +164,44 @@ export class SuspectScene extends Phaser.Scene {
     }).setOrigin(0.5);
     this.container.add(title);
 
-    // Decorative lines
-    const lineGfx = this.add.graphics();
-    lineGfx.lineStyle(1, Colors.gold, 0.25);
-    lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - 200, headerY);
-    lineGfx.lineBetween(panelX + 200, headerY, panelX + panelW / 2 - 20, headerY);
-    this.container.add(lineGfx);
+    // Decorative divider lines flanking title
+    if (this.textures.exists('ui_divider_gold')) {
+      const divLeft = this.add.image(panelX - 260, headerY, 'ui_divider_gold');
+      divLeft.setDisplaySize(200, 8);
+      divLeft.setAlpha(0.5);
+      const divRight = this.add.image(panelX + 260, headerY, 'ui_divider_gold');
+      divRight.setDisplaySize(200, 8);
+      divRight.setAlpha(0.5);
+      this.container.add([divLeft, divRight]);
+    } else {
+      const lineGfx = this.add.graphics();
+      lineGfx.lineStyle(1, Colors.gold, 0.25);
+      lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - 200, headerY);
+      lineGfx.lineBetween(panelX + 200, headerY, panelX + panelW / 2 - 20, headerY);
+      this.container.add(lineGfx);
+    }
 
-    // Close button
-    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.scene.stop(), '20px');
-    closeBtn.setDepth(Depths.suspectContent);
+    // Close button — use image asset
+    if (this.textures.exists('ui_close_btn')) {
+      const closeImg = this.add.image(panelX + panelW / 2 - 22, headerY, 'ui_close_btn');
+      closeImg.setDisplaySize(32, 32);
+      closeImg.setInteractive({ cursor: HAND_CURSOR });
+      closeImg.on('pointerover', () => closeImg.setAlpha(1));
+      closeImg.on('pointerout', () => closeImg.setAlpha(0.8));
+      closeImg.on('pointerdown', () => this.scene.stop());
+      closeImg.setAlpha(0.8);
+      closeImg.setDepth(Depths.suspectContent);
+    } else {
+      const closeBtn = this.add.text(panelX + panelW / 2 - 22, headerY, '✕', {
+        fontFamily: FONT, fontSize: '20px', color: TextColors.goldDim,
+      }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
+      closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
+      closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
+      closeBtn.on('pointerdown', () => this.scene.stop());
+      closeBtn.setDepth(Depths.suspectContent);
+    }
 
-    // ─── Suspect tabs (horizontal strip below header) ───
+    // ─── Suspect tabs ───
     const tabStripY = headerY + headerH / 2 + 40;
     const tabW = 190;
     const tabGap = 12;
@@ -177,11 +213,26 @@ export class SuspectScene extends Phaser.Scene {
       const isSelected = i === this.selectedIndex;
       const colorHex = `#${suspect.color.toString(16).padStart(6, '0')}`;
 
-      // Tab card
-      const tabBg = this.add.rectangle(tx, tabStripY, tabW, 54,
-        isSelected ? 0x1e1d2e : 0x15141e, isSelected ? 1 : 0.85);
-      tabBg.setStrokeStyle(isSelected ? 2 : 1, suspect.color, isSelected ? 0.7 : 0.2);
-      tabBg.setInteractive({ cursor: HAND_CURSOR });
+      // Tab background — use tabs image or fallback
+      if (this.textures.exists('ui_tabs')) {
+        const tabImg = this.add.image(tx, tabStripY, 'ui_tabs');
+        // The image has two tab variants stacked; use displaySize to fit one tab
+        tabImg.setDisplaySize(tabW, 54);
+        tabImg.setAlpha(isSelected ? 1 : 0.6);
+        tabImg.setCrop(
+          0,
+          isSelected ? 0 : tabImg.texture.getSourceImage().height * 0.55,
+          tabImg.texture.getSourceImage().width,
+          tabImg.texture.getSourceImage().height * 0.45,
+        );
+        tabImg.setDisplaySize(tabW, 54);
+        this.container.add(tabImg);
+      } else {
+        const tabBg = this.add.rectangle(tx, tabStripY, tabW, 54,
+          isSelected ? 0x1e1d2e : 0x15141e, isSelected ? 1 : 0.85);
+        tabBg.setStrokeStyle(isSelected ? 2 : 1, suspect.color, isSelected ? 0.7 : 0.2);
+        this.container.add(tabBg);
+      }
 
       // Bottom accent bar when selected
       if (isSelected) {
@@ -189,7 +240,7 @@ export class SuspectScene extends Phaser.Scene {
         this.container.add(accent);
       }
 
-      // Small portrait
+      // Small portrait in tab
       const portraitX = tx - tabW / 2 + 24;
       const portraitKey = `portrait_${suspect.id}`;
       if (this.textures.exists(portraitKey)) {
@@ -224,21 +275,19 @@ export class SuspectScene extends Phaser.Scene {
         fontStyle: 'italic',
       }).setOrigin(0.5, 0.5);
 
-      this.container.add([tabBg, nameText, roleText]);
+      this.container.add([nameText, roleText]);
 
-      tabBg.on('pointerdown', () => {
+      // Hit area for tab (on top of everything)
+      const tabHit = this.add.rectangle(tx, tabStripY, tabW, 54, 0x000000, 0);
+      tabHit.setInteractive({ cursor: HAND_CURSOR });
+      tabHit.on('pointerdown', () => {
         this.selectedIndex = i;
         this.scene.restart();
       });
-      tabBg.on('pointerover', () => {
-        if (i !== this.selectedIndex) tabBg.setFillStyle(0x1e1d2e, 0.9);
-      });
-      tabBg.on('pointerout', () => {
-        if (i !== this.selectedIndex) tabBg.setFillStyle(0x15141e, 0.85);
-      });
+      this.container.add(tabHit);
     });
 
-    // ─── Detail area (below tabs) ───
+    // ─── Detail area ───
     const detailTop = tabStripY + 42;
     const detailBottom = panelY + panelH / 2 - 14;
     const detailH = detailBottom - detailTop;
@@ -265,12 +314,20 @@ export class SuspectScene extends Phaser.Scene {
     const leftW = 280;
     const leftX = cx - dw / 2;
 
-    // Portrait card background
+    // Portrait info card background
     const cardH = Math.min(dh - 10, 480);
     const cardY = cy;
-    const cardBg = this.add.rectangle(leftX + leftW / 2, cardY, leftW, cardH, 0x0e0d16, 0.7);
-    cardBg.setStrokeStyle(1, suspect.color, 0.2);
-    this.container.add(cardBg);
+
+    if (this.textures.exists('ui_info_card_bg')) {
+      const cardImg = this.add.image(leftX + leftW / 2, cardY, 'ui_info_card_bg');
+      cardImg.setDisplaySize(leftW, cardH);
+      cardImg.setAlpha(0.85);
+      this.container.add(cardImg);
+    } else {
+      const cardBg = this.add.rectangle(leftX + leftW / 2, cardY, leftW, cardH, 0x0e0d16, 0.7);
+      cardBg.setStrokeStyle(1, suspect.color, 0.2);
+      this.container.add(cardBg);
+    }
 
     // Large portrait
     const portraitSize = 160;
@@ -289,16 +346,25 @@ export class SuspectScene extends Phaser.Scene {
       portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
       this.container.add(portrait);
 
-      // Portrait frame
-      const frame = this.add.graphics();
-      frame.lineStyle(2, suspect.color, 0.5);
-      frame.strokeRoundedRect(
-        portraitX - portraitSize / 2, portraitY - portraitSize / 2,
-        portraitSize, portraitSize, 10
-      );
-      this.container.add(frame);
+      // Portrait frame — use image asset
+      if (this.textures.exists('ui_portrait_frame')) {
+        const frame = this.add.image(portraitX, portraitY, 'ui_portrait_frame');
+        // The image has two frames side by side; crop to the left one
+        const srcW = frame.texture.getSourceImage().width;
+        const srcH = frame.texture.getSourceImage().height;
+        frame.setCrop(0, 0, srcW * 0.48, srcH);
+        frame.setDisplaySize(portraitSize + 12, portraitSize + 12);
+        this.container.add(frame);
+      } else {
+        const frame = this.add.graphics();
+        frame.lineStyle(2, suspect.color, 0.5);
+        frame.strokeRoundedRect(
+          portraitX - portraitSize / 2, portraitY - portraitSize / 2,
+          portraitSize, portraitSize, 10
+        );
+        this.container.add(frame);
+      }
     } else {
-      // Fallback icon
       const iconBg = this.add.rectangle(portraitX, portraitY, portraitSize, portraitSize, suspect.color, 0.1);
       iconBg.setStrokeStyle(2, suspect.color, 0.3);
       const iconText = this.add.text(portraitX, portraitY, suspect.icon, {
@@ -307,7 +373,7 @@ export class SuspectScene extends Phaser.Scene {
       this.container.add([iconBg, iconText]);
     }
 
-    // Name (below portrait)
+    // Name
     const nameY = portraitY + portraitSize / 2 + 20;
     this.container.add(this.add.text(portraitX, nameY, suspect.name, {
       fontFamily: FONT,
@@ -325,7 +391,7 @@ export class SuspectScene extends Phaser.Scene {
       fontStyle: 'italic',
     }).setOrigin(0.5));
 
-    // Info chips
+    // Info chips — use chip-bg image
     const chipStartY = nameY + 56;
     const chips = [
       { label: `Age: ${suspect.age}`, icon: '◈' },
@@ -333,15 +399,23 @@ export class SuspectScene extends Phaser.Scene {
     ];
     chips.forEach((chip, i) => {
       const chipY = chipStartY + i * 30;
-      const chipBg = this.add.rectangle(portraitX, chipY, 200, 24, suspect.color, 0.08);
-      chipBg.setStrokeStyle(1, suspect.color, 0.2);
+      if (this.textures.exists('ui_chip_bg')) {
+        const chipImg = this.add.image(portraitX, chipY, 'ui_chip_bg');
+        chipImg.setDisplaySize(200, 26);
+        chipImg.setAlpha(0.7);
+        this.container.add(chipImg);
+      } else {
+        const chipBg = this.add.rectangle(portraitX, chipY, 200, 24, suspect.color, 0.08);
+        chipBg.setStrokeStyle(1, suspect.color, 0.2);
+        this.container.add(chipBg);
+      }
       const chipLabel = this.add.text(portraitX, chipY, `${chip.icon}  ${chip.label}`, {
         fontFamily: FONT, fontSize: '12px', color: TextColors.goldDim,
       }).setOrigin(0.5);
-      this.container.add([chipBg, chipLabel]);
+      this.container.add(chipLabel);
     });
 
-    // Discovery count
+    // Discovery count + progress bar
     const discovered = suspect.facts.filter(f =>
       !f.requiresFlag || save.getFlag(f.requiresFlag) || dialogue.hasTriggeredEvent(f.requiresFlag)
     ).length;
@@ -349,21 +423,38 @@ export class SuspectScene extends Phaser.Scene {
 
     const progressY = chipStartY + 80;
     const progressW = 200;
-    const progressH = 5;
+    const progressH = 16;
 
-    const trackBg = this.add.rectangle(portraitX, progressY, progressW, progressH, 0x1a1a2e, 1);
-    this.container.add(trackBg);
-
-    const pct = discovered / total;
-    if (pct > 0) {
-      const fill = this.add.rectangle(
-        portraitX - progressW / 2 + (progressW * pct) / 2, progressY,
-        progressW * pct, progressH, suspect.color, 0.7
-      );
-      this.container.add(fill);
+    // Progress track
+    if (this.textures.exists('ui_progress_track')) {
+      const track = this.add.image(portraitX, progressY, 'ui_progress_track');
+      track.setDisplaySize(progressW, progressH);
+      this.container.add(track);
+    } else {
+      const trackBg = this.add.rectangle(portraitX, progressY, progressW, 5, 0x1a1a2e, 1);
+      this.container.add(trackBg);
     }
 
-    this.container.add(this.add.text(portraitX, progressY + 14, `${discovered} / ${total} facts discovered`, {
+    // Progress fill
+    const pct = discovered / total;
+    if (pct > 0) {
+      if (this.textures.exists('ui_progress_fill')) {
+        const fill = this.add.image(
+          portraitX - progressW / 2 + (progressW * pct) / 2, progressY,
+          'ui_progress_fill'
+        );
+        fill.setDisplaySize(progressW * pct, progressH);
+        this.container.add(fill);
+      } else {
+        const fill = this.add.rectangle(
+          portraitX - progressW / 2 + (progressW * pct) / 2, progressY,
+          progressW * pct, 5, suspect.color, 0.7
+        );
+        this.container.add(fill);
+      }
+    }
+
+    this.container.add(this.add.text(portraitX, progressY + 16, `${discovered} / ${total} facts discovered`, {
       fontFamily: FONT, fontSize: '11px', color: TextColors.muted, fontStyle: 'italic',
     }).setOrigin(0.5));
 
@@ -374,9 +465,16 @@ export class SuspectScene extends Phaser.Scene {
 
     // Facts panel background
     const factsPanelH = cardH;
-    const factsBg = this.add.rectangle(rightCx, cy, rightW, factsPanelH, 0x0e0d16, 0.5);
-    factsBg.setStrokeStyle(1, suspect.color, 0.12);
-    this.container.add(factsBg);
+    if (this.textures.exists('ui_facts_panel_bg')) {
+      const factsImg = this.add.image(rightCx, cy, 'ui_facts_panel_bg');
+      factsImg.setDisplaySize(rightW, factsPanelH);
+      factsImg.setAlpha(0.35);
+      this.container.add(factsImg);
+    } else {
+      const factsBg = this.add.rectangle(rightCx, cy, rightW, factsPanelH, 0x0e0d16, 0.5);
+      factsBg.setStrokeStyle(1, suspect.color, 0.12);
+      this.container.add(factsBg);
+    }
 
     // Section header
     const factsHeaderY = cy - factsPanelH / 2 + 24;
@@ -388,15 +486,23 @@ export class SuspectScene extends Phaser.Scene {
       letterSpacing: 3,
     }));
 
-    // Divider under header
-    const divGfx = this.add.graphics();
-    divGfx.lineStyle(1, Colors.gold, 0.2);
-    divGfx.lineBetween(rightX + 20, factsHeaderY + 22, rightX + rightW - 20, factsHeaderY + 22);
-    this.container.add(divGfx);
+    // Divider under header — use divider-gold image
+    if (this.textures.exists('ui_divider_gold')) {
+      const div = this.add.image(rightCx, factsHeaderY + 22, 'ui_divider_gold');
+      div.setDisplaySize(rightW - 40, 6);
+      div.setAlpha(0.4);
+      this.container.add(div);
+    } else {
+      const divGfx = this.add.graphics();
+      divGfx.lineStyle(1, Colors.gold, 0.2);
+      divGfx.lineBetween(rightX + 20, factsHeaderY + 22, rightX + rightW - 20, factsHeaderY + 22);
+      this.container.add(divGfx);
+    }
 
     // Facts list
     let y = factsHeaderY + 40;
     const factMaxW = rightW - 60;
+    const hasBulletImages = this.textures.exists('ui_bullet_discovered') && this.textures.exists('ui_bullet_undiscovered');
 
     suspect.facts.forEach((fact, idx) => {
       const unlocked = !fact.requiresFlag ||
@@ -409,12 +515,19 @@ export class SuspectScene extends Phaser.Scene {
         this.container.add(rowBg);
       }
 
-      // Bullet
-      const bullet = unlocked ? '◆' : '◇';
-      const bulletColor = unlocked ? colorHex : TextColors.hidden;
-      this.container.add(this.add.text(rightX + 24, y, bullet, {
-        fontFamily: FONT, fontSize: '14px', color: bulletColor,
-      }));
+      // Bullet — use image assets
+      if (hasBulletImages) {
+        const bulletKey = unlocked ? 'ui_bullet_discovered' : 'ui_bullet_undiscovered';
+        const bulletImg = this.add.image(rightX + 30, y + 8, bulletKey);
+        bulletImg.setDisplaySize(16, 16);
+        this.container.add(bulletImg);
+      } else {
+        const bullet = unlocked ? '◆' : '◇';
+        const bulletColor = unlocked ? colorHex : TextColors.hidden;
+        this.container.add(this.add.text(rightX + 24, y, bullet, {
+          fontFamily: FONT, fontSize: '14px', color: bulletColor,
+        }));
+      }
 
       // Fact text
       const displayText = unlocked ? fact.text : '— Undiscovered —';

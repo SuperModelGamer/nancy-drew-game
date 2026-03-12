@@ -53,6 +53,30 @@ export class BootScene extends Phaser.Scene {
       this.load.image(`map_${room}`, `assets/ui/map/${room}.png`);
     }
 
+    // Load UI component images
+    const uiAssets: Record<string, string> = {
+      'ui_toolbar_bg': 'toolbar-bg',
+      'ui_toolbar_btn': 'toolbar-btn',
+      'ui_close_btn': 'close-btn',
+      'ui_dossier_bg': 'dossier-bg',
+      'ui_dossier_header': 'dossier-header',
+      'ui_tabs': 'tabs',
+      'ui_portrait_frame': 'portrait-frame',
+      'ui_info_card_bg': 'info-card-bg',
+      'ui_facts_panel_bg': 'facts-panel-bg',
+      'ui_facts_panel_bg_alt': 'facts-panel-bg-alt',
+      'ui_progress_fill': 'progress-fill',
+      'ui_progress_track': 'progress-track',
+      'ui_knob': 'knob',
+      'ui_chip_bg': 'chip-bg',
+      'ui_bullet_discovered': 'bullet-discovered',
+      'ui_bullet_undiscovered': 'bullet-undiscovered',
+      'ui_divider_gold': 'divider-gold',
+    };
+    for (const [key, filename] of Object.entries(uiAssets)) {
+      this.load.image(key, `assets/ui/${filename}.png`);
+    }
+
     // Load real item icons (texture key matches item_icon_{id} so procedural fallback is skipped)
     // Primary: new high-quality assets from assets/items/
     const itemIconsHQ: Record<string, string> = {

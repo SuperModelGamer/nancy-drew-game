@@ -43,17 +43,23 @@ export class UIScene extends Phaser.Scene {
     const barY = height - TOOLBAR_H / 2;
 
     // ─── Bottom toolbar background strip ───
-    const barBg = this.add.graphics();
-    for (let i = 0; i < 20; i++) {
-      const alpha = (i / 20) * 0.85;
-      barBg.fillStyle(0x0a0a12, alpha);
-      barBg.fillRect(0, height - TOOLBAR_H - 20 + i, width, 1);
+    if (this.textures.exists('ui_toolbar_bg')) {
+      const toolbarImg = this.add.image(width / 2, height - TOOLBAR_H / 2, 'ui_toolbar_bg');
+      toolbarImg.setDisplaySize(width, TOOLBAR_H + 20);
+      toolbarImg.setDepth(Depths.tooltip - 1);
+    } else {
+      const barBg = this.add.graphics();
+      for (let i = 0; i < 20; i++) {
+        const alpha = (i / 20) * 0.85;
+        barBg.fillStyle(0x0a0a12, alpha);
+        barBg.fillRect(0, height - TOOLBAR_H - 20 + i, width, 1);
+      }
+      barBg.fillStyle(0x0a0a12, 0.85);
+      barBg.fillRect(0, height - TOOLBAR_H, width, TOOLBAR_H);
+      barBg.lineStyle(1, Colors.gold, 0.25);
+      barBg.lineBetween(0, height - TOOLBAR_H, width, height - TOOLBAR_H);
+      barBg.setDepth(Depths.tooltip - 1);
     }
-    barBg.fillStyle(0x0a0a12, 0.85);
-    barBg.fillRect(0, height - TOOLBAR_H, width, TOOLBAR_H);
-    barBg.lineStyle(1, Colors.gold, 0.25);
-    barBg.lineBetween(0, height - TOOLBAR_H, width, height - TOOLBAR_H);
-    barBg.setDepth(Depths.tooltip - 1);
 
     // ─── Toolbar buttons ───
     const btnStyle = { fontFamily: FONT, fontSize: '14px' };
@@ -64,30 +70,49 @@ export class UIScene extends Phaser.Scene {
       { label: 'Journal', color: TextColors.gold, borderColor: Colors.gold, x: width * 0.88, action: () => this.toggleJournal() },
     ];
 
+    const hasToolbarBtn = this.textures.exists('ui_toolbar_btn');
+
     buttons.forEach(btn => {
       const container = this.add.container(btn.x, barY);
       container.setDepth(Depths.tooltip);
 
-      const bg = this.add.rectangle(0, 0, 100, 36, 0x0a0a12, 0);
-      bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
-      bg.setInteractive({ cursor: HAND_CURSOR });
+      let hitTarget: Phaser.GameObjects.GameObject;
+
+      if (hasToolbarBtn) {
+        const btnImg = this.add.image(0, 0, 'ui_toolbar_btn');
+        btnImg.setDisplaySize(120, 40);
+        btnImg.setAlpha(0.85);
+        btnImg.setInteractive({ cursor: HAND_CURSOR });
+        container.add(btnImg);
+        hitTarget = btnImg;
+
+        btnImg.on('pointerover', () => btnImg.setAlpha(1));
+        btnImg.on('pointerout', () => btnImg.setAlpha(0.85));
+      } else {
+        const bg = this.add.rectangle(0, 0, 100, 36, 0x0a0a12, 0);
+        bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
+        bg.setInteractive({ cursor: HAND_CURSOR });
+        container.add(bg);
+        hitTarget = bg;
+
+        bg.on('pointerover', () => {
+          bg.setFillStyle(Colors.hoverBg, 0.6);
+          bg.setStrokeStyle(1, btn.borderColor as number, 0.8);
+        });
+        bg.on('pointerout', () => {
+          bg.setFillStyle(0x0a0a12, 0);
+          bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
+        });
+      }
 
       const text = this.add.text(0, 0, btn.label, {
         ...btnStyle,
         color: btn.color,
       }).setOrigin(0.5);
 
-      container.add([bg, text]);
+      container.add(text);
 
-      bg.on('pointerover', () => {
-        bg.setFillStyle(Colors.hoverBg, 0.6);
-        bg.setStrokeStyle(1, btn.borderColor as number, 0.8);
-      });
-      bg.on('pointerout', () => {
-        bg.setFillStyle(0x0a0a12, 0);
-        bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
-      });
-      bg.on('pointerdown', btn.action);
+      (hitTarget as Phaser.GameObjects.Rectangle).on('pointerdown', btn.action);
     });
 
     // ─── Chapter indicator (top-center) ───
@@ -185,17 +210,31 @@ export class UIScene extends Phaser.Scene {
     const panelX = width / 2;
     const panelY = panelH / 2 + 10;
 
-    // Panel background
-    const panelBg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x12111a, 0.97);
-    panelBg.setStrokeStyle(1.5, Colors.gold, 0.35);
-    container.add(panelBg);
+    // Panel background — use dossier-bg image
+    if (this.textures.exists('ui_dossier_bg')) {
+      const panelImg = this.add.image(panelX, panelY, 'ui_dossier_bg');
+      panelImg.setDisplaySize(panelW, panelH);
+      container.add(panelImg);
+    } else {
+      const panelBg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x12111a, 0.97);
+      panelBg.setStrokeStyle(1.5, Colors.gold, 0.35);
+      container.add(panelBg);
+    }
 
     // ─── Header ───
     const headerH = 44;
     const headerY = panelY - panelH / 2 + headerH / 2;
 
-    const headerBg = this.add.rectangle(panelX, headerY, panelW - 2, headerH, 0x0e0d16, 1);
-    container.add(headerBg);
+    if (this.textures.exists('ui_dossier_header')) {
+      const headerImg = this.add.image(panelX, headerY, 'ui_dossier_header');
+      headerImg.setDisplaySize(panelW - 2, headerH);
+      headerImg.setCrop(0, 0, headerImg.texture.getSourceImage().width, headerImg.texture.getSourceImage().height * 0.4);
+      headerImg.setDisplaySize(panelW - 2, headerH);
+      container.add(headerImg);
+    } else {
+      const headerBg = this.add.rectangle(panelX, headerY, panelW - 2, headerH, 0x0e0d16, 1);
+      container.add(headerBg);
+    }
 
     const title = this.add.text(panelX, headerY, 'CASE FILE — EVIDENCE', {
       fontFamily: FONT,
@@ -207,15 +246,36 @@ export class UIScene extends Phaser.Scene {
     container.add(title);
 
     // Decorative header lines
-    const lineGfx = this.add.graphics();
-    lineGfx.lineStyle(1, Colors.gold, 0.25);
-    lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - 160, headerY);
-    lineGfx.lineBetween(panelX + 160, headerY, panelX + panelW / 2 - 20, headerY);
-    container.add(lineGfx);
+    if (this.textures.exists('ui_divider_gold')) {
+      const divL = this.add.image(panelX - 260, headerY, 'ui_divider_gold');
+      divL.setDisplaySize(200, 8);
+      divL.setAlpha(0.5);
+      const divR = this.add.image(panelX + 260, headerY, 'ui_divider_gold');
+      divR.setDisplaySize(200, 8);
+      divR.setAlpha(0.5);
+      container.add([divL, divR]);
+    } else {
+      const lineGfx = this.add.graphics();
+      lineGfx.lineStyle(1, Colors.gold, 0.25);
+      lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - 160, headerY);
+      lineGfx.lineBetween(panelX + 160, headerY, panelX + panelW / 2 - 20, headerY);
+      container.add(lineGfx);
+    }
 
-    // Close button
-    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.toggleInventory(), '20px');
-    container.add(closeBtn);
+    // Close button — use image if available
+    if (this.textures.exists('ui_close_btn')) {
+      const closeImg = this.add.image(panelX + panelW / 2 - 22, headerY, 'ui_close_btn');
+      closeImg.setDisplaySize(32, 32);
+      closeImg.setAlpha(0.8);
+      closeImg.setInteractive({ cursor: HAND_CURSOR });
+      closeImg.on('pointerover', () => closeImg.setAlpha(1));
+      closeImg.on('pointerout', () => closeImg.setAlpha(0.8));
+      closeImg.on('pointerdown', () => this.toggleInventory());
+      container.add(closeImg);
+    } else {
+      const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.toggleInventory(), '20px');
+      container.add(closeBtn);
+    }
 
     // ─── Layout: left item grid + right detail panel ───
     const contentTop = headerY + headerH / 2 + 12;
@@ -500,25 +560,32 @@ export class UIScene extends Phaser.Scene {
     const panelY = Math.min(height / 2, height - TOOLBAR_H - panelH / 2 - 15);
     const panel = this.add.container(width / 2, panelY);
 
-    // Aged paper background
-    const paper = this.add.rectangle(0, 0, panelW, panelH, Colors.paper, 0.95);
-    paper.setStrokeStyle(2, Colors.paperBorder, 0.8);
-    paper.setInteractive();
-    panel.add(paper);
+    // Aged paper background — use info-card-bg image or procedural fallback
+    if (this.textures.exists('ui_info_card_bg')) {
+      const paperImg = this.add.image(0, 0, 'ui_info_card_bg');
+      paperImg.setDisplaySize(panelW, panelH);
+      paperImg.setInteractive();
+      panel.add(paperImg);
+    } else {
+      const paper = this.add.rectangle(0, 0, panelW, panelH, Colors.paper, 0.95);
+      paper.setStrokeStyle(2, Colors.paperBorder, 0.8);
+      paper.setInteractive();
+      panel.add(paper);
 
-    // Paper texture — subtle stain patches
-    const stains = this.add.graphics();
-    stains.fillStyle(Colors.paperBorder, 0.08);
-    stains.fillCircle(-panelW / 4, -panelH / 4, 40);
-    stains.fillCircle(panelW / 3, panelH / 5, 30);
-    stains.fillEllipse(-panelW / 6, panelH / 3, 60, 25);
-    stains.lineStyle(1, Colors.paperBorder, 0.15);
-    for (let ly = -panelH / 2 + 65; ly < panelH / 2 - 20; ly += 22) {
-      stains.lineBetween(-panelW / 2 + 25, ly, panelW / 2 - 25, ly);
+      // Paper texture — subtle stain patches
+      const stains = this.add.graphics();
+      stains.fillStyle(Colors.paperBorder, 0.08);
+      stains.fillCircle(-panelW / 4, -panelH / 4, 40);
+      stains.fillCircle(panelW / 3, panelH / 5, 30);
+      stains.fillEllipse(-panelW / 6, panelH / 3, 60, 25);
+      stains.lineStyle(1, Colors.paperBorder, 0.15);
+      for (let ly = -panelH / 2 + 65; ly < panelH / 2 - 20; ly += 22) {
+        stains.lineBetween(-panelW / 2 + 25, ly, panelW / 2 - 25, ly);
+      }
+      stains.lineStyle(1, 0xcc6666, 0.2);
+      stains.lineBetween(-panelW / 2 + 55, -panelH / 2 + 10, -panelW / 2 + 55, panelH / 2 - 10);
+      panel.add(stains);
     }
-    stains.lineStyle(1, 0xcc6666, 0.2);
-    stains.lineBetween(-panelW / 2 + 55, -panelH / 2 + 10, -panelW / 2 + 55, panelH / 2 - 10);
-    panel.add(stains);
 
     const titleText = this.add.text(0, -panelH / 2 + 25, 'Nancy\'s Journal', {
       fontFamily: '\'Palatino Linotype\', \'Book Antiqua\', Palatino, Georgia, serif',
@@ -533,15 +600,26 @@ export class UIScene extends Phaser.Scene {
     underline.lineBetween(-60, -panelH / 2 + 40, 60, -panelH / 2 + 40);
     panel.add(underline);
 
-    const closeBtn = this.add.text(panelW / 2 - 20, -panelH / 2 + 15, '✕', {
-      fontFamily: FONT,
-      fontSize: '20px',
-      color: '#6a5a4a',
-    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
-    closeBtn.on('pointerdown', () => this.toggleJournal());
-    closeBtn.on('pointerover', () => closeBtn.setColor('#3a2a1a'));
-    closeBtn.on('pointerout', () => closeBtn.setColor('#6a5a4a'));
-    panel.add(closeBtn);
+    if (this.textures.exists('ui_close_btn')) {
+      const closeImg = this.add.image(panelW / 2 - 20, -panelH / 2 + 15, 'ui_close_btn');
+      closeImg.setDisplaySize(28, 28);
+      closeImg.setAlpha(0.7);
+      closeImg.setInteractive({ cursor: HAND_CURSOR });
+      closeImg.on('pointerdown', () => this.toggleJournal());
+      closeImg.on('pointerover', () => closeImg.setAlpha(1));
+      closeImg.on('pointerout', () => closeImg.setAlpha(0.7));
+      panel.add(closeImg);
+    } else {
+      const closeBtn = this.add.text(panelW / 2 - 20, -panelH / 2 + 15, '✕', {
+        fontFamily: FONT,
+        fontSize: '20px',
+        color: '#6a5a4a',
+      }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
+      closeBtn.on('pointerdown', () => this.toggleJournal());
+      closeBtn.on('pointerover', () => closeBtn.setColor('#3a2a1a'));
+      closeBtn.on('pointerout', () => closeBtn.setColor('#6a5a4a'));
+      panel.add(closeBtn);
+    }
 
     panel.setDepth(Depths.journalPanel);
     return panel;

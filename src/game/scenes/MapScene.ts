@@ -99,17 +99,29 @@ export class MapScene extends Phaser.Scene {
     // --- Close button ---
     const closeBtnX = panelX + panelW / 2 - 28;
     const closeBtnY = panelY - panelH / 2 + 28;
-    const closeBtn = this.add.text(closeBtnX, closeBtnY, '✕', {
-      fontFamily: FONT,
-      fontSize: '22px',
-      color: TextColors.goldDim,
-    });
-    closeBtn.setOrigin(0.5);
-    closeBtn.setDepth(contentDepth + 2);
-    closeBtn.setInteractive({ cursor: HAND_CURSOR });
-    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
-    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
-    closeBtn.on('pointerdown', () => this.scene.stop());
+
+    if (this.textures.exists('ui_close_btn')) {
+      const closeImg = this.add.image(closeBtnX, closeBtnY, 'ui_close_btn');
+      closeImg.setDisplaySize(32, 32);
+      closeImg.setAlpha(0.8);
+      closeImg.setDepth(contentDepth + 2);
+      closeImg.setInteractive({ cursor: HAND_CURSOR });
+      closeImg.on('pointerover', () => closeImg.setAlpha(1));
+      closeImg.on('pointerout', () => closeImg.setAlpha(0.8));
+      closeImg.on('pointerdown', () => this.scene.stop());
+    } else {
+      const closeBtn = this.add.text(closeBtnX, closeBtnY, '✕', {
+        fontFamily: FONT,
+        fontSize: '22px',
+        color: TextColors.goldDim,
+      });
+      closeBtn.setOrigin(0.5);
+      closeBtn.setDepth(contentDepth + 2);
+      closeBtn.setInteractive({ cursor: HAND_CURSOR });
+      closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
+      closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
+      closeBtn.on('pointerdown', () => this.scene.stop());
+    }
 
     // --- Room grid layout ---
     const chapter = SaveSystem.getInstance().getChapter();
