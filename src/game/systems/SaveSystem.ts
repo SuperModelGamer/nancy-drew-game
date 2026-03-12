@@ -109,6 +109,29 @@ export class SaveSystem {
     }
   }
 
+  /** Mark a room as discovered on the map. */
+  discoverRoom(roomId: string): void {
+    this.flags[`discovered_${roomId}`] = true;
+  }
+
+  /** Check whether a room has been discovered. Lobby is always discovered. */
+  isRoomDiscovered(roomId: string): boolean {
+    if (roomId === 'lobby') return true;
+    return !!this.flags[`discovered_${roomId}`];
+  }
+
+  /** Return the set of all discovered room IDs. */
+  getDiscoveredRooms(): string[] {
+    const discovered = ['lobby'];
+    const prefix = 'discovered_';
+    for (const key of Object.keys(this.flags)) {
+      if (key.startsWith(prefix) && this.flags[key]) {
+        discovered.push(key.slice(prefix.length));
+      }
+    }
+    return discovered;
+  }
+
   hasSave(): boolean {
     return localStorage.getItem(SAVE_KEY) !== null;
   }

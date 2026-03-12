@@ -57,6 +57,44 @@ export class RoomScene extends Phaser.Scene {
     const rooms = roomsData.rooms as RoomData[];
     this.currentRoom = rooms.find(r => r.id === roomId) || rooms[0];
     SaveSystem.getInstance().setCurrentRoom(roomId);
+    this.discoverRoomsOnEntry(roomId);
+  }
+
+  /**
+   * Mark the current room as discovered and reveal adjacent rooms
+   * based on story progression rules.
+   */
+  private discoverRoomsOnEntry(roomId: string): void {
+    const save = SaveSystem.getInstance();
+    const chapter = save.getChapter();
+
+    // Always discover the room you're standing in
+    save.discoverRoom(roomId);
+
+    // Chapter 1: Lobby reveals Auditorium once you've talked to Vivian
+    if (roomId === 'lobby' && save.getFlag('learned_about_margaux')) {
+      save.discoverRoom('auditorium');
+    }
+    // Visiting the auditorium reveals Backstage
+    if (roomId === 'auditorium') {
+      save.discoverRoom('backstage');
+    }
+    // Chapter 2+: several rooms open up
+    if (chapter >= 2) {
+      save.discoverRoom('auditorium');
+      save.discoverRoom('backstage');
+      save.discoverRoom('dressing_room');
+      save.discoverRoom('projection_booth');
+      save.discoverRoom('managers_office');
+    }
+    // Chapter 3+: catwalk becomes known
+    if (chapter >= 3 || save.getFlag('catwalk_access')) {
+      save.discoverRoom('catwalk');
+    }
+    // Chapter 4+: basement becomes known
+    if (chapter >= 4) {
+      save.discoverRoom('basement');
+    }
   }
 
   create(): void {
