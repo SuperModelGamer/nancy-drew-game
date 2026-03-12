@@ -76,7 +76,10 @@ export class RoomScene extends Phaser.Scene {
     addAmbientParticles(this, this.currentRoom.id);
 
     // ─── Room Entry Announcement (centered, click-to-continue) ───
-    this.showRoomAnnouncement(width, height);
+    // Tutorial will be shown AFTER the announcement is dismissed (via callback)
+    this.showRoomAnnouncement(width, height, () => {
+      showTutorialIfNeeded(this);
+    });
 
     // Create hotspots (filtered by showWhen)
     this.createHotspots();
@@ -124,7 +127,6 @@ export class RoomScene extends Phaser.Scene {
     // Curtain open reveal
     this.playCurtainOpen(() => {
       this.checkScriptedEvents();
-      showTutorialIfNeeded(this);
     });
 
     // Hotspot editor toggle (backtick key)
@@ -572,7 +574,7 @@ export class RoomScene extends Phaser.Scene {
     });
   }
 
-  private showRoomAnnouncement(width: number, height: number): void {
+  private showRoomAnnouncement(width: number, height: number, onDismiss?: () => void): void {
     const container = this.add.container(0, 0);
     container.setDepth(Depths.scriptedEvent - 1); // High z-order, just below scripted events
 
@@ -648,27 +650,31 @@ export class RoomScene extends Phaser.Scene {
       ease: 'Power2',
     });
 
-    // Click anywhere to dismiss
-    overlay.setInteractive({ cursor: HAND_CURSOR });
-    overlay.on('pointerdown', () => {
+    // Shared dismiss logic — fade out, destroy, then trigger callback
+    let dismissed = false;
+    const dismiss = () => {
+      if (dismissed) return;
+      dismissed = true;
+      this.input.keyboard!.off('keydown', dismissKey);
       this.tweens.add({
         targets: container,
         alpha: 0,
         duration: 300,
-        onComplete: () => container.destroy(),
+        onComplete: () => {
+          container.destroy();
+          if (onDismiss) onDismiss();
+        },
       });
-    });
+    };
+
+    // Click anywhere to dismiss
+    overlay.setInteractive({ cursor: HAND_CURSOR });
+    overlay.on('pointerdown', dismiss);
 
     // Also allow spacebar/enter to dismiss
     const dismissKey = (event: KeyboardEvent) => {
       if (event.code === 'Space' || event.code === 'Enter') {
-        this.tweens.add({
-          targets: container,
-          alpha: 0,
-          duration: 300,
-          onComplete: () => container.destroy(),
-        });
-        this.input.keyboard!.off('keydown', dismissKey);
+        dismiss();
       }
     };
     this.input.keyboard!.on('keydown', dismissKey);
