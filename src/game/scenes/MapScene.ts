@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
-import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
+import { Cursors, HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createOverlay } from '../utils/ui-helpers';
 
 /**
@@ -251,7 +251,7 @@ export class MapScene extends Phaser.Scene {
           // Hit area
           const hitW = MEDALLION_SIZE * (medallion.width / medallion.height);
           const hitArea = this.add.rectangle(0, -6, hitW, MEDALLION_SIZE, 0x000000, 0);
-          hitArea.setInteractive({ cursor: isLocked ? 'default' : HAND_CURSOR });
+          hitArea.setInteractive({ cursor: isLocked ? Cursors.locked : HAND_CURSOR });
           container.add(hitArea);
 
           if (!isLocked) {

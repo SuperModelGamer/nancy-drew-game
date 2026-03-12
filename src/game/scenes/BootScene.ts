@@ -77,6 +77,30 @@ export class BootScene extends Phaser.Scene {
       this.load.image(`item_icon_${itemId}`, `assets/items/${filename}.png`);
     }
 
+    // Load UI component images (toolbar, dossier, panels, buttons, etc.)
+    const uiAssets: Record<string, string> = {
+      ui_toolbar_bg: 'toolbar-bg',
+      ui_toolbar_btn: 'toolbar-btn',
+      ui_close_btn: 'close-btn',
+      ui_dossier_bg: 'dossier-bg',
+      ui_dossier_header: 'dossier-header',
+      ui_tabs: 'tabs',
+      ui_portrait_frame: 'portrait-frame',
+      ui_info_card_bg: 'info-card-bg',
+      ui_facts_panel_bg: 'facts-panel-bg',
+      ui_facts_panel_bg_alt: 'facts-panel-bg-alt',
+      ui_progress_fill: 'progress-fill',
+      ui_progress_track: 'progress-track',
+      ui_knob: 'knob',
+      ui_chip_bg: 'chip-bg',
+      ui_bullet_discovered: 'bullet-discovered',
+      ui_bullet_undiscovered: 'bullet-undiscovered',
+      ui_divider_gold: 'divider-gold',
+    };
+    for (const [key, filename] of Object.entries(uiAssets)) {
+      this.load.image(key, `assets/ui/${filename}.png`);
+    }
+
     // Load intro cinematic background images (gracefully skipped if files don't exist)
     const introImages = [
       'intro_stage_1928', 'intro_goblet', 'intro_stage_empty',
@@ -100,7 +124,8 @@ export class BootScene extends Phaser.Scene {
     // Suppress load errors for optional intro assets (images + audio)
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       if (file.key.startsWith('intro_') || file.key.startsWith('sfx_') ||
-          file.key.startsWith('ambient_') || file.key.startsWith('music_')) {
+          file.key.startsWith('ambient_') || file.key.startsWith('music_') ||
+          file.key.startsWith('ui_')) {
         // Silently ignore — intro works without these assets
         return;
       }
