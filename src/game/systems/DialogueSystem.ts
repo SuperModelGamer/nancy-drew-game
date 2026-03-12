@@ -3,7 +3,7 @@ import dialogueData from '../data/dialogue.json';
 import { InventorySystem } from './InventorySystem';
 import { SaveSystem } from './SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
-import { HAND_CURSOR } from '../utils/cursors';
+import { HAND_CURSOR, POINTER_CURSOR } from '../utils/cursors';
 
 interface DialogueLine {
   speaker: string;
@@ -360,6 +360,7 @@ export class DialogueSystem {
 
     // ── Dialogue text (typewriter reveal) ──
     const textY = boxCenterY - BOX_H / 2 + 28;
+    const textMaxH = BOX_H - 60; // leave room for padding top/bottom
     this.dialogueTextObj = this.scene.add.text(textAreaLeft, textY, '', {
       fontFamily: FONT,
       fontSize: TEXT_SIZE,
@@ -367,6 +368,10 @@ export class DialogueSystem {
       wordWrap: { width: textAreaW },
       lineSpacing: 6,
     });
+    // Clip text that overflows the dialogue box
+    const textMask = this.scene.make.graphics({});
+    textMask.fillRect(textAreaLeft - 4, textY - 2, textAreaW + 8, textMaxH);
+    this.dialogueTextObj.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, textMask));
     this.container.add(this.dialogueTextObj);
 
     // Start typewriter
@@ -415,7 +420,7 @@ export class DialogueSystem {
       color: TextColors.muted,
       letterSpacing: 1,
     }).setOrigin(1, 0.5);
-    skipBtn.setInteractive({ cursor: HAND_CURSOR });
+    skipBtn.setInteractive({ cursor: POINTER_CURSOR });
     skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.goldDim));
     skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.muted));
     skipBtn.on('pointerdown', () => this.skipToEnd());
@@ -425,7 +430,7 @@ export class DialogueSystem {
     const hitArea = this.scene.add.rectangle(
       width / 2, boxCenterY, boxW, BOX_H, 0x000000, 0
     );
-    hitArea.setInteractive({ cursor: HAND_CURSOR });
+    hitArea.setInteractive({ cursor: POINTER_CURSOR });
     hitArea.on('pointerdown', () => this.advance());
     this.container.add(hitArea);
 
@@ -548,7 +553,7 @@ export class DialogueSystem {
       }).setOrigin(0.5);
 
       if (itemAvailable) {
-        btn.setInteractive({ cursor: HAND_CURSOR });
+        btn.setInteractive({ cursor: POINTER_CURSOR });
 
         // Store the base scales set by setDisplaySize so hover tweens are relative
         const baseBtnSX = btn.scaleX;

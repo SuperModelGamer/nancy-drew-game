@@ -56,18 +56,8 @@
             { "speaker": "Nancy", "text": "Does he have enemies here?" },
             { "speaker": "Vivian", "text": "Everyone in this theater has a reason to want the demolition stopped. Myself included. I won't insult your intelligence by pretending otherwise." }
           ],
-          "choices": [
-            {
-              "text": "Tell me about Margaux Fontaine.",
-              "nextNode": "about_margaux",
-              "triggerEvent": "learned_about_ashworth"
-            },
-            {
-              "text": "I'll start looking around.",
-              "nextNode": "end",
-              "triggerEvent": "learned_about_ashworth"
-            }
-          ]
+          "nextNode": "end",
+          "triggerEvent": "learned_about_ashworth"
         },
         {
           "id": "about_others",
