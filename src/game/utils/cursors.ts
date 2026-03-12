@@ -5,8 +5,8 @@ const pngCursor = (filename: string, hotX: number, hotY: number): string =>
   `url("assets/ui/cursors/${filename}.png") ${hotX} ${hotY}, auto`;
 
 export const Cursors = {
-  /** Default scene cursor — gold spyglass (general exploration) */
-  default: pngCursor('spyglass', 20, 16),
+  /** Default scene cursor — gold art deco pointer arrow */
+  default: pngCursor('pointer', 4, 2),
 
   /** Inspecting clues and objects — gold spyglass */
   inspect: pngCursor('spyglass', 20, 16),
@@ -34,7 +34,7 @@ export function setGameCursor(scene: Phaser.Scene, type: CursorType): void {
   scene.input.setDefaultCursor(Cursors[type]);
 }
 
-/** Set the default cursor for any scene to the gold spyglass */
+/** Set the default cursor for any scene to the gold pointer */
 export function initSceneCursor(scene: Phaser.Scene): void {
   scene.input.setDefaultCursor(Cursors.default);
 }
