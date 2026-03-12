@@ -43,23 +43,17 @@ export class UIScene extends Phaser.Scene {
     const barY = height - TOOLBAR_H / 2;
 
     // ─── Bottom toolbar background strip ───
-    if (this.textures.exists('ui_toolbar_bg')) {
-      const toolbarImg = this.add.image(width / 2, height - TOOLBAR_H / 2, 'ui_toolbar_bg');
-      toolbarImg.setDisplaySize(width, TOOLBAR_H + 20);
-      toolbarImg.setDepth(Depths.tooltip - 1);
-    } else {
-      const barBg = this.add.graphics();
-      for (let i = 0; i < 20; i++) {
-        const alpha = (i / 20) * 0.85;
-        barBg.fillStyle(0x0a0a12, alpha);
-        barBg.fillRect(0, height - TOOLBAR_H - 20 + i, width, 1);
-      }
-      barBg.fillStyle(0x0a0a12, 0.85);
-      barBg.fillRect(0, height - TOOLBAR_H, width, TOOLBAR_H);
-      barBg.lineStyle(1, Colors.gold, 0.25);
-      barBg.lineBetween(0, height - TOOLBAR_H, width, height - TOOLBAR_H);
-      barBg.setDepth(Depths.tooltip - 1);
+    const barBg = this.add.graphics();
+    for (let i = 0; i < 20; i++) {
+      const alpha = (i / 20) * 0.85;
+      barBg.fillStyle(0x0a0a12, alpha);
+      barBg.fillRect(0, height - TOOLBAR_H - 20 + i, width, 1);
     }
+    barBg.fillStyle(0x0a0a12, 0.85);
+    barBg.fillRect(0, height - TOOLBAR_H, width, TOOLBAR_H);
+    barBg.lineStyle(1, Colors.gold, 0.25);
+    barBg.lineBetween(0, height - TOOLBAR_H, width, height - TOOLBAR_H);
+    barBg.setDepth(Depths.tooltip - 1);
 
     // ─── Toolbar buttons ───
     const btnStyle = { fontFamily: FONT, fontSize: '14px' };
@@ -70,43 +64,29 @@ export class UIScene extends Phaser.Scene {
       { label: 'Journal', color: TextColors.gold, borderColor: Colors.gold, x: width * 0.88, action: () => this.toggleJournal() },
     ];
 
-    const hasToolbarBtn = this.textures.exists('ui_toolbar_btn');
     buttons.forEach(btn => {
       const container = this.add.container(btn.x, barY);
       container.setDepth(Depths.tooltip);
 
-      let bgObj: Phaser.GameObjects.GameObject;
-      if (hasToolbarBtn) {
-        const btnImg = this.add.image(0, 0, 'ui_toolbar_btn');
-        btnImg.setDisplaySize(110, 38);
-        btnImg.setInteractive({ cursor: HAND_CURSOR });
-        btnImg.on('pointerover', () => btnImg.setAlpha(1));
-        btnImg.on('pointerout', () => btnImg.setAlpha(0.85));
-        btnImg.setAlpha(0.85);
-        bgObj = btnImg;
-        btnImg.on('pointerdown', btn.action);
-      } else {
-        const bg = this.add.rectangle(0, 0, 100, 36, 0x0a0a12, 0);
+      const bg = this.add.rectangle(0, 0, 100, 36, 0x0a0a12, 0);
+      bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
+      bg.setInteractive({ cursor: HAND_CURSOR });
+      bg.on('pointerover', () => {
+        bg.setFillStyle(Colors.hoverBg, 0.6);
+        bg.setStrokeStyle(1, btn.borderColor as number, 0.8);
+      });
+      bg.on('pointerout', () => {
+        bg.setFillStyle(0x0a0a12, 0);
         bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
-        bg.setInteractive({ cursor: HAND_CURSOR });
-        bg.on('pointerover', () => {
-          bg.setFillStyle(Colors.hoverBg, 0.6);
-          bg.setStrokeStyle(1, btn.borderColor as number, 0.8);
-        });
-        bg.on('pointerout', () => {
-          bg.setFillStyle(0x0a0a12, 0);
-          bg.setStrokeStyle(1, btn.borderColor as number, 0.4);
-        });
-        bg.on('pointerdown', btn.action);
-        bgObj = bg;
-      }
+      });
+      bg.on('pointerdown', btn.action);
 
       const text = this.add.text(0, 0, btn.label, {
         ...btnStyle,
         color: btn.color,
       }).setOrigin(0.5);
 
-      container.add([bgObj, text]);
+      container.add([bg, text]);
     });
 
     // ─── Chapter indicator (top-center) ───
@@ -205,28 +185,16 @@ export class UIScene extends Phaser.Scene {
     const panelY = panelH / 2 + 10;
 
     // Panel background
-    if (this.textures.exists('ui_dossier_bg')) {
-      const dossierBg = this.add.image(panelX, panelY, 'ui_dossier_bg');
-      dossierBg.setDisplaySize(panelW, panelH);
-      container.add(dossierBg);
-    } else {
-      const panelBg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x12111a, 0.97);
-      panelBg.setStrokeStyle(1.5, Colors.gold, 0.35);
-      container.add(panelBg);
-    }
+    const panelBg = this.add.rectangle(panelX, panelY, panelW, panelH, 0x12111a, 0.97);
+    panelBg.setStrokeStyle(1.5, Colors.gold, 0.35);
+    container.add(panelBg);
 
     // ─── Header ───
     const headerH = 44;
     const headerY = panelY - panelH / 2 + headerH / 2;
 
-    if (this.textures.exists('ui_dossier_header')) {
-      const headerImg = this.add.image(panelX, headerY, 'ui_dossier_header');
-      headerImg.setDisplaySize(panelW - 2, headerH);
-      container.add(headerImg);
-    } else {
-      const headerBg = this.add.rectangle(panelX, headerY, panelW - 2, headerH, 0x0e0d16, 1);
-      container.add(headerBg);
-    }
+    const headerBg = this.add.rectangle(panelX, headerY, panelW - 2, headerH, 0x0e0d16, 1);
+    container.add(headerBg);
 
     const title = this.add.text(panelX, headerY, 'CASE FILE — EVIDENCE', {
       fontFamily: FONT,
@@ -238,19 +206,11 @@ export class UIScene extends Phaser.Scene {
     container.add(title);
 
     // Decorative header lines
-    if (this.textures.exists('ui_divider_gold')) {
-      const divL = this.add.image(panelX - panelW / 4 - 40, headerY, 'ui_divider_gold');
-      divL.setDisplaySize(panelW / 4, 8);
-      const divR = this.add.image(panelX + panelW / 4 + 40, headerY, 'ui_divider_gold');
-      divR.setDisplaySize(panelW / 4, 8);
-      container.add([divL, divR]);
-    } else {
-      const lineGfx = this.add.graphics();
-      lineGfx.lineStyle(1, Colors.gold, 0.25);
-      lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - 160, headerY);
-      lineGfx.lineBetween(panelX + 160, headerY, panelX + panelW / 2 - 20, headerY);
-      container.add(lineGfx);
-    }
+    const lineGfx = this.add.graphics();
+    lineGfx.lineStyle(1, Colors.gold, 0.25);
+    lineGfx.lineBetween(panelX - panelW / 2 + 20, headerY, panelX - 160, headerY);
+    lineGfx.lineBetween(panelX + 160, headerY, panelX + panelW / 2 - 20, headerY);
+    container.add(lineGfx);
 
     // Close button
     if (this.textures.exists('ui_close_btn')) {
@@ -550,31 +510,24 @@ export class UIScene extends Phaser.Scene {
     const panel = this.add.container(width / 2, panelY);
 
     // Aged paper background
-    if (this.textures.exists('ui_info_card_bg')) {
-      const paperImg = this.add.image(0, 0, 'ui_info_card_bg');
-      paperImg.setDisplaySize(panelW, panelH);
-      paperImg.setInteractive();
-      panel.add(paperImg);
-    } else {
-      const paper = this.add.rectangle(0, 0, panelW, panelH, Colors.paper, 0.95);
-      paper.setStrokeStyle(2, Colors.paperBorder, 0.8);
-      paper.setInteractive();
-      panel.add(paper);
+    const paper = this.add.rectangle(0, 0, panelW, panelH, Colors.paper, 0.95);
+    paper.setStrokeStyle(2, Colors.paperBorder, 0.8);
+    paper.setInteractive();
+    panel.add(paper);
 
-      // Paper texture — subtle stain patches
-      const stains = this.add.graphics();
-      stains.fillStyle(Colors.paperBorder, 0.08);
-      stains.fillCircle(-panelW / 4, -panelH / 4, 40);
-      stains.fillCircle(panelW / 3, panelH / 5, 30);
-      stains.fillEllipse(-panelW / 6, panelH / 3, 60, 25);
-      stains.lineStyle(1, Colors.paperBorder, 0.15);
-      for (let ly = -panelH / 2 + 65; ly < panelH / 2 - 20; ly += 22) {
-        stains.lineBetween(-panelW / 2 + 25, ly, panelW / 2 - 25, ly);
-      }
-      stains.lineStyle(1, 0xcc6666, 0.2);
-      stains.lineBetween(-panelW / 2 + 55, -panelH / 2 + 10, -panelW / 2 + 55, panelH / 2 - 10);
-      panel.add(stains);
+    // Paper texture — subtle stain patches
+    const stains = this.add.graphics();
+    stains.fillStyle(Colors.paperBorder, 0.08);
+    stains.fillCircle(-panelW / 4, -panelH / 4, 40);
+    stains.fillCircle(panelW / 3, panelH / 5, 30);
+    stains.fillEllipse(-panelW / 6, panelH / 3, 60, 25);
+    stains.lineStyle(1, Colors.paperBorder, 0.15);
+    for (let ly = -panelH / 2 + 65; ly < panelH / 2 - 20; ly += 22) {
+      stains.lineBetween(-panelW / 2 + 25, ly, panelW / 2 - 25, ly);
     }
+    stains.lineStyle(1, 0xcc6666, 0.2);
+    stains.lineBetween(-panelW / 2 + 55, -panelH / 2 + 10, -panelW / 2 + 55, panelH / 2 - 10);
+    panel.add(stains);
 
     const titleText = this.add.text(0, -panelH / 2 + 25, 'Nancy\'s Journal', {
       fontFamily: '\'Palatino Linotype\', \'Book Antiqua\', Palatino, Georgia, serif',
