@@ -5,10 +5,14 @@ import { ChapterSystem } from '../systems/ChapterSystem';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
+import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
 
 // Height of the bottom toolbar strip
 const TOOLBAR_H = 52;
+
+// Pre-index items for O(1) lookup
+const itemMap = new Map(itemsData.items.map(i => [i.id, i]));
 
 export class UIScene extends Phaser.Scene {
   private inventoryBar!: Phaser.GameObjects.Container;
@@ -26,6 +30,8 @@ export class UIScene extends Phaser.Scene {
   private selectedItemId: string | null = null;
   // Track items container for refresh
   private itemsGrid!: Phaser.GameObjects.Container;
+  // Cached layout dimensions from createInventoryPanel
+  private layout = { leftX: 0, contentTop: 0, contentH: 0, leftW: 0, rightW: 0, rightX: 0 };
 
   constructor() {
     super({ key: 'UIScene' });
@@ -105,9 +111,13 @@ export class UIScene extends Phaser.Scene {
     this.journalPanel = this.createJournalPanel();
     this.journalPanel.setVisible(false);
 
-    // Listen for inventory changes
-    InventorySystem.getInstance().onChange(() => {
+    // Listen for inventory changes (clean up on shutdown to prevent leaks)
+    const onInventoryChange = () => {
       if (this.inventoryOpen) this.refreshInventoryGrid();
+    };
+    InventorySystem.getInstance().onChange(onInventoryChange);
+    this.events.on('shutdown', () => {
+      InventorySystem.getInstance().offChange(onInventoryChange);
     });
   }
 
@@ -120,6 +130,7 @@ export class UIScene extends Phaser.Scene {
     this.inventoryOpen = !this.inventoryOpen;
     if (this.inventoryOpen) {
       UISounds.panelOpen();
+      this.resetDetailPanel();
       this.refreshInventoryGrid();
       this.inventoryContainer.setVisible(true);
       this.inventoryContainer.setAlpha(0);
@@ -165,8 +176,7 @@ export class UIScene extends Phaser.Scene {
     container.setDepth(Depths.inventoryPanel);
 
     // Full-screen dark overlay
-    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.88);
-    overlay.setInteractive(); // block clicks through
+    const overlay = createOverlay(this, 0.88);
     container.add(overlay);
 
     // Main panel dimensions — fill most of the screen, leave room for toolbar
@@ -204,14 +214,7 @@ export class UIScene extends Phaser.Scene {
     container.add(lineGfx);
 
     // Close button
-    const closeBtn = this.add.text(panelX + panelW / 2 - 22, headerY, '✕', {
-      fontFamily: FONT,
-      fontSize: '20px',
-      color: TextColors.goldDim,
-    }).setOrigin(0.5).setInteractive({ cursor: HAND_CURSOR });
-    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
-    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
-    closeBtn.on('pointerdown', () => this.toggleInventory());
+    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 22, headerY, () => this.toggleInventory(), '20px');
     container.add(closeBtn);
 
     // ─── Layout: left item grid + right detail panel ───
@@ -297,12 +300,7 @@ export class UIScene extends Phaser.Scene {
     container.add(hint);
 
     // Store layout info for refresh
-    container.setData('leftX', leftX);
-    container.setData('contentTop', contentTop);
-    container.setData('contentH', contentH);
-    container.setData('leftW', leftW);
-    container.setData('rightW', rightW);
-    container.setData('rightX', rightX);
+    this.layout = { leftX, contentTop, contentH, leftW, rightW, rightX };
 
     return container;
   }
@@ -313,13 +311,9 @@ export class UIScene extends Phaser.Scene {
 
     const inventory = InventorySystem.getInstance();
     const items = inventory.getItems();
-    const allItems = itemsData.items;
     const selectedItem = inventory.getSelectedItem();
 
-    const leftX = this.inventoryContainer.getData('leftX') as number;
-    const contentTop = this.inventoryContainer.getData('contentTop') as number;
-    const contentH = this.inventoryContainer.getData('contentH') as number;
-    const leftW = this.inventoryContainer.getData('leftW') as number;
+    const { leftX, contentTop, contentH, leftW } = this.layout;
 
     // Grid layout: 3 columns
     const cols = 3;
@@ -347,7 +341,7 @@ export class UIScene extends Phaser.Scene {
     }
 
     items.forEach((itemId, index) => {
-      const itemData = allItems.find((i: { id: string }) => i.id === itemId);
+      const itemData = itemMap.get(itemId);
       if (!itemData) return;
 
       const col = index % cols;
@@ -371,10 +365,7 @@ export class UIScene extends Phaser.Scene {
       let icon: Phaser.GameObjects.GameObject;
       if (this.textures.exists(iconKey)) {
         const img = this.add.image(x, y, iconKey);
-        // Scale to fit while maintaining aspect ratio
-        const tex = this.textures.get(iconKey).getSourceImage();
-        const scale = Math.min(imgSize / tex.width, imgSize / tex.height);
-        img.setScale(scale);
+        this.scaleImageToFit(img, imgSize);
         icon = img;
       } else {
         icon = this.add.text(x, y, itemData.icon || '?', {
@@ -431,16 +422,29 @@ export class UIScene extends Phaser.Scene {
     });
   }
 
+  private resetDetailPanel(): void {
+    this.selectedItemId = null;
+    this.detailPlaceholder.setVisible(true);
+    this.detailName.setVisible(false);
+    this.detailKeyBadge.setVisible(false);
+    this.detailDesc.setVisible(false);
+    if (this.detailImage) this.detailImage.setVisible(false);
+  }
+
+  private scaleImageToFit(img: Phaser.GameObjects.Image, maxSize: number): void {
+    const tex = img.texture.getSourceImage();
+    const scale = Math.min(maxSize / tex.width, maxSize / tex.height);
+    img.setScale(scale);
+  }
+
   private showItemDetail(itemId: string): void {
+    if (this.selectedItemId === itemId) return;
     this.selectedItemId = itemId;
 
-    const allItems = itemsData.items;
-    const itemData = allItems.find((i: { id: string }) => i.id === itemId);
+    const itemData = itemMap.get(itemId);
     if (!itemData) return;
 
-    const rightX = this.inventoryContainer.getData('rightX') as number;
-    const rightW = this.inventoryContainer.getData('rightW') as number;
-    const contentTop = this.inventoryContainer.getData('contentTop') as number;
+    const { rightX, rightW, contentTop } = this.layout;
     const detailCenterX = rightX + rightW / 2;
 
     // Hide placeholder
@@ -457,27 +461,29 @@ export class UIScene extends Phaser.Scene {
     // Update description — position below badge or name
     const descY = isKey ? contentTop + 68 : contentTop + 48;
 
-    // Update or create detail image
+    // Update or create detail image — reuse existing object when possible
     const iconKey = `item_icon_${itemId}`;
-    if (this.detailImage) {
-      this.detailImage.destroy();
-      this.detailImage = null;
-    }
 
     if (this.textures.exists(iconKey)) {
       const imgMaxSize = Math.min(rightW - 60, 220);
-      const img = this.add.image(detailCenterX, descY + 20, iconKey);
-      const tex = this.textures.get(iconKey).getSourceImage();
-      const scale = Math.min(imgMaxSize / tex.width, imgMaxSize / tex.height);
-      img.setScale(scale);
-      img.setOrigin(0.5, 0);
-      this.detailImage = img;
-      this.inventoryContainer.add(img);
+      if (this.detailImage) {
+        this.detailImage.setTexture(iconKey);
+        this.detailImage.setPosition(detailCenterX, descY + 20);
+      } else {
+        const img = this.add.image(detailCenterX, descY + 20, iconKey);
+        img.setOrigin(0.5, 0);
+        this.detailImage = img;
+        this.inventoryContainer.add(img);
+      }
+      this.scaleImageToFit(this.detailImage, imgMaxSize);
+      this.detailImage.setVisible(true);
 
       // Position description below image
-      const imgBottom = descY + 20 + tex.height * scale + 16;
+      const tex = this.detailImage.texture.getSourceImage();
+      const imgBottom = descY + 20 + tex.height * this.detailImage.scaleY + 16;
       this.detailDesc.setPosition(detailCenterX, imgBottom);
     } else {
+      if (this.detailImage) this.detailImage.setVisible(false);
       this.detailDesc.setPosition(detailCenterX, descY + 20);
     }
 

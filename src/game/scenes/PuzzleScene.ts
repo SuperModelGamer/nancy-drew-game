@@ -58,6 +58,7 @@ export class PuzzleScene extends Phaser.Scene {
     }
 
     const { width, height } = this.cameras.main;
+    initSceneCursor(this);
 
     // Dark overlay
     this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
@@ -454,6 +455,13 @@ export class PuzzleScene extends Phaser.Scene {
           InventorySystem.getInstance().addItem(item.id);
           this.feedbackText.setText(`Correct! Found: ${item.name}`);
         }
+      }
+
+      // Journal entry for solving the puzzle
+      if (puzzle) {
+        SaveSystem.getInstance().addJournalEntry(
+          `Solved "${puzzle.name}" — ${puzzle.unlocks === 'case_closed' ? 'the full timeline is clear now.' : 'this reveals new evidence.'}`
+        );
       }
 
       // Close after a moment

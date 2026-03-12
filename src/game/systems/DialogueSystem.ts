@@ -31,6 +31,33 @@ interface Dialogue {
   nodes: DialogueNode[];
 }
 
+// Journal entries triggered by dialogue events
+const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
+  learned_about_margaux: 'Vivian told me about Margaux Fontaine — a legendary actress who died on stage in 1928 from poison in a prop goblet. Vivian was her goddaughter.',
+  learned_about_ashworth: 'Roland Ashworth collapsed last night — poisoned. He owns the Monarch and plans to demolish it for the insurance payout.',
+  learned_about_cecilia: 'Cecilia Drake was Margaux\'s understudy in 1928. She had the most to gain from Margaux\'s death and took the lead role after.',
+  learned_about_hale_family: 'The Hale family has deep roots in the Monarch. Edwin Hale is the theater historian — he knows more about 1928 than anyone alive.',
+  vivian_full_trust: 'Vivian trusts me fully now. She gave me access to the private archives and Margaux\'s personal effects.',
+  learned_about_crimson_veil: 'Edwin told me about "The Crimson Veil" — Margaux\'s final play. The Act III poisoning scene mirrors how she actually died. The script may contain hidden clues.',
+  showed_edwin_diary: 'I showed Edwin Margaux\'s diary. He was visibly shaken — he knows more about her death than he\'s letting on.',
+  edwin_personal_revealed: 'Edwin confessed he\'s been investigating Margaux\'s murder for fifteen years. He built the "Ghost Project" to scare Ashworth away from demolishing the theater.',
+  learned_about_missing_props: 'Stella admitted that original props from 1928 have been going missing. She\'s been selling them to pay her mother\'s medical bills.',
+  stella_confession: 'Stella broke down and confessed — she\'s been selling the theater\'s props. She\'s desperate, not malicious. She gave me the basement key location.',
+  basement_key_location: 'Stella told me the basement key is hidden behind the backstage lighting panel.',
+  effects_manual_location: 'I learned the Special Effects Manual is somewhere backstage — it explains the theater\'s hidden mechanisms.',
+  catwalk_access: 'Diego gave me access to the catwalk. He said Edwin spends a lot of time up there alone.',
+  annotated_script_found: 'Found the original annotated script of "The Crimson Veil." Red-circled letters in the margins may spell a hidden message.',
+  cipher_discussed: 'Diego helped me understand the script cipher — the circled letters follow the stage directions in Act III, not the dialogue.',
+  heard_basement_noises: 'Diego mentioned hearing strange noises from the basement at night — mechanical sounds, like machinery running on its own.',
+  saw_figure_before_collapse: 'Ashworth saw a ghostly figure moments before he collapsed. The "ghost" may have been a distraction during the poisoning.',
+  ashworth_motive_revealed: 'Ashworth admitted the demolition insurance is worth $2.3 million. He rejected an $800K offer from the Historical Society. He chose greed.',
+  learned_about_basement_intruder: 'Someone has been accessing the basement at night. There are fresh footprints and the fog machines have been recently serviced.',
+  called_friends: 'Called Bess and George — Bess is researching antimony poisoning, George is looking into the Hale family history.',
+  called_dad: 'Called Dad. He said antimony poisoning cases from the 1920s were often ruled accidental. The police may not have investigated Margaux\'s death properly.',
+  called_historical_society: 'The Historical Society confirmed the Monarch is eligible for landmark status — which would block Ashworth\'s demolition. Someone doesn\'t want that to happen.',
+  called_ned: 'Called Ned. He told me to be careful — old buildings fall apart at the worst moments. He\'s right, but I can\'t stop now.',
+};
+
 export class DialogueSystem {
   private static instance: DialogueSystem;
   private active = false;
@@ -282,6 +309,7 @@ export class DialogueSystem {
       'Bess': '#d4a0b4',
       'George': '#a0c9a0',
       'Carson Drew': '#c9b87b',
+      'Ned': '#7bb5c9',
       'Receptionist': '#8a8a8a',
     };
     return colors[speaker] || TextColors.gold;
@@ -331,7 +359,13 @@ export class DialogueSystem {
   private triggerEvent(eventId: string): void {
     this.triggeredEvents.add(eventId);
     // Also set as a SaveSystem flag for persistence and cross-system access
-    SaveSystem.getInstance().setFlag(eventId, true);
+    const save = SaveSystem.getInstance();
+    save.setFlag(eventId, true);
+    // Write journal entry if one is defined for this event
+    const journalEntry = EVENT_JOURNAL_ENTRIES[eventId];
+    if (journalEntry) {
+      save.addJournalEntry(journalEntry);
+    }
   }
 
   private endDialogue(): void {

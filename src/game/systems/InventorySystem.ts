@@ -52,6 +52,11 @@ export class InventorySystem {
     this.listeners.push(listener);
   }
 
+  offChange(listener: () => void): void {
+    const idx = this.listeners.indexOf(listener);
+    if (idx !== -1) this.listeners.splice(idx, 1);
+  }
+
   private notify(): void {
     this.listeners.forEach(fn => fn());
   }
