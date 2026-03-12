@@ -16,14 +16,44 @@ const BOTTOM_MARGIN = 12; // negative space below toolbar to prevent misclicks
 // Pre-index items for O(1) lookup
 const itemMap = new Map(itemsData.items.map(i => [i.id, i]));
 
+// Journal pagination
+const JOURNAL_ENTRIES_PER_PAGE = 5;
+
+// Case Book tab identifiers
+type CaseBookTab = 'journal' | 'evidence';
+
+// Case Book visual constants
+const BOOK_LEATHER = 0x3a2a1a;
+const BOOK_PAPER = 0xF5E6C8;
+const BOOK_INK = '#2a1a0a';
+const BOOK_BULLET = '#5a3a2a';
+const BOOK_SPINE = 0x2a1a0a;
+const BOOK_MARGIN_RED = 0xcc6666;
+const BOOK_STAIN = 0x8B7355;
+const JOURNAL_FONT = "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
+const TAB_GOLD = 0xc9a84c;
+const TAB_GOLD_STR = '#c9a84c';
+
 export class UIScene extends Phaser.Scene {
   private inventoryBar!: Phaser.GameObjects.Container;
   private journalButton!: Phaser.GameObjects.Container;
-  private inventoryOpen = false;
-  private journalOpen = false;
-  private inventoryContainer!: Phaser.GameObjects.Container;
-  private journalPanel!: Phaser.GameObjects.Container;
-  // Detail panel elements (right side of inventory)
+  private caseBookOpen = false;
+  private caseBookContainer!: Phaser.GameObjects.Container;
+  private currentTab: CaseBookTab = 'evidence';
+  private journalPage = 0;
+
+  // Evidence tab content container (swapped in/out)
+  private evidenceContent!: Phaser.GameObjects.Container;
+  // Journal tab content container (swapped in/out)
+  private journalContent!: Phaser.GameObjects.Container;
+
+  // Tab button references for visual updates
+  private tabJournalBg!: Phaser.GameObjects.Graphics;
+  private tabJournalText!: Phaser.GameObjects.Text;
+  private tabEvidenceBg!: Phaser.GameObjects.Graphics;
+  private tabEvidenceText!: Phaser.GameObjects.Text;
+
+  // Detail panel elements (right side of evidence tab)
   private detailImage!: Phaser.GameObjects.Image | null;
   private detailName!: Phaser.GameObjects.Text;
   private detailDesc!: Phaser.GameObjects.Text;
@@ -32,8 +62,10 @@ export class UIScene extends Phaser.Scene {
   private selectedItemId: string | null = null;
   // Track items container for refresh
   private itemsGrid!: Phaser.GameObjects.Container;
-  // Cached layout dimensions from createInventoryPanel
+  // Cached layout dimensions from createCaseBookPanel
   private layout = { leftX: 0, contentTop: 0, contentH: 0, leftW: 0, rightW: 0, rightX: 0 };
+  // Case Book panel dimensions (cached for journal use)
+  private bookLayout = { panelW: 0, panelH: 0, panelX: 0, panelY: 0, contentTop: 0, contentBottom: 0 };
 
   constructor() {
     super({ key: 'UIScene' });
@@ -229,16 +261,13 @@ export class UIScene extends Phaser.Scene {
       container.add(text);
     });
 
-    // ─── Panels (hidden by default) ───
-    this.inventoryContainer = this.createInventoryPanel();
-    this.inventoryContainer.setVisible(false);
-
-    this.journalPanel = this.createJournalPanel();
-    this.journalPanel.setVisible(false);
+    // ─── Case Book panel (hidden by default) ───
+    this.caseBookContainer = this.createCaseBookPanel();
+    this.caseBookContainer.setVisible(false);
 
     // Listen for inventory changes (clean up on shutdown to prevent leaks)
     const onInventoryChange = () => {
-      if (this.inventoryOpen) this.refreshInventoryGrid();
+      if (this.caseBookOpen && this.currentTab === 'evidence') this.refreshInventoryGrid();
     };
     InventorySystem.getInstance().onChange(onInventoryChange);
     this.events.on('shutdown', () => {
@@ -247,55 +276,116 @@ export class UIScene extends Phaser.Scene {
   }
 
   private toggleInventory(): void {
-    if (this.journalOpen) {
-      this.journalOpen = false;
-      this.journalPanel.setVisible(false);
-    }
-
-    this.inventoryOpen = !this.inventoryOpen;
-    if (this.inventoryOpen) {
-      UISounds.panelOpen();
-      this.resetDetailPanel();
-      this.refreshInventoryGrid();
-      this.inventoryContainer.setVisible(true);
-      this.inventoryContainer.setAlpha(0);
-      this.tweens.add({ targets: this.inventoryContainer, alpha: 1, duration: 200 });
+    if (this.caseBookOpen && this.currentTab === 'evidence') {
+      // Already open on evidence tab — close it
+      this.closeCaseBook();
+    } else if (this.caseBookOpen && this.currentTab === 'journal') {
+      // Open on journal tab — switch to evidence
+      this.switchTab('evidence');
     } else {
-      this.tweens.add({
-        targets: this.inventoryContainer,
-        alpha: 0,
-        duration: 200,
-        onComplete: () => this.inventoryContainer.setVisible(false),
-      });
+      // Closed — open to evidence tab
+      this.openCaseBook('evidence');
     }
   }
 
   private toggleJournal(): void {
-    if (this.inventoryOpen) {
-      this.inventoryOpen = false;
-      this.inventoryContainer.setVisible(false);
-    }
-
-    this.journalOpen = !this.journalOpen;
-    if (this.journalOpen) {
-      UISounds.panelOpen();
-      this.refreshJournalPanel();
-      this.journalPanel.setVisible(true);
-      this.journalPanel.setAlpha(0);
-      this.tweens.add({ targets: this.journalPanel, alpha: 1, duration: 200 });
+    if (this.caseBookOpen && this.currentTab === 'journal') {
+      // Already open on journal tab — close it
+      this.closeCaseBook();
+    } else if (this.caseBookOpen && this.currentTab === 'evidence') {
+      // Open on evidence tab — switch to journal
+      this.switchTab('journal');
     } else {
-      this.tweens.add({
-        targets: this.journalPanel,
-        alpha: 0,
-        duration: 200,
-        onComplete: () => this.journalPanel.setVisible(false),
-      });
+      // Closed — open to journal tab
+      this.openCaseBook('journal');
     }
   }
 
-  // ─── Full-screen Evidence Panel ───────────────────────────────────────────
+  private openCaseBook(tab: CaseBookTab): void {
+    this.caseBookOpen = true;
+    this.currentTab = tab;
+    UISounds.panelOpen();
 
-  private createInventoryPanel(): Phaser.GameObjects.Container {
+    if (tab === 'evidence') {
+      this.resetDetailPanel();
+      this.refreshInventoryGrid();
+    } else {
+      this.journalPage = 0;
+      this.refreshJournalContent();
+    }
+
+    this.updateTabVisuals();
+    this.evidenceContent.setVisible(tab === 'evidence');
+    this.journalContent.setVisible(tab === 'journal');
+
+    this.caseBookContainer.setVisible(true);
+    this.caseBookContainer.setAlpha(0);
+    this.tweens.add({ targets: this.caseBookContainer, alpha: 1, duration: 200 });
+  }
+
+  private closeCaseBook(): void {
+    this.caseBookOpen = false;
+    this.tweens.add({
+      targets: this.caseBookContainer,
+      alpha: 0,
+      duration: 200,
+      onComplete: () => this.caseBookContainer.setVisible(false),
+    });
+  }
+
+  private switchTab(tab: CaseBookTab): void {
+    this.currentTab = tab;
+    this.updateTabVisuals();
+
+    if (tab === 'evidence') {
+      this.resetDetailPanel();
+      this.refreshInventoryGrid();
+      this.evidenceContent.setVisible(true);
+      this.journalContent.setVisible(false);
+    } else {
+      this.journalPage = 0;
+      this.refreshJournalContent();
+      this.evidenceContent.setVisible(false);
+      this.journalContent.setVisible(true);
+    }
+  }
+
+  private updateTabVisuals(): void {
+    const isJournal = this.currentTab === 'journal';
+    const isEvidence = this.currentTab === 'evidence';
+
+    // Journal tab
+    this.tabJournalBg.clear();
+    if (isJournal) {
+      this.tabJournalBg.fillStyle(TAB_GOLD, 1);
+      this.tabJournalBg.fillRoundedRect(-75, -18, 150, 36, 6);
+      this.tabJournalText.setColor('#1a1008');
+      this.tabJournalText.setFontStyle('bold');
+    } else {
+      this.tabJournalBg.lineStyle(1.5, TAB_GOLD, 0.6);
+      this.tabJournalBg.strokeRoundedRect(-75, -18, 150, 36, 6);
+      this.tabJournalText.setColor(TAB_GOLD_STR);
+      this.tabJournalText.setFontStyle('bold');
+    }
+
+    // Evidence tab
+    this.tabEvidenceBg.clear();
+    if (isEvidence) {
+      this.tabEvidenceBg.fillStyle(TAB_GOLD, 1);
+      this.tabEvidenceBg.fillRoundedRect(-75, -18, 150, 36, 6);
+      this.tabEvidenceText.setColor('#1a1008');
+      this.tabEvidenceText.setFontStyle('bold');
+    } else {
+      this.tabEvidenceBg.lineStyle(1.5, TAB_GOLD, 0.6);
+      this.tabEvidenceBg.strokeRoundedRect(-75, -18, 150, 36, 6);
+      this.tabEvidenceText.setColor(TAB_GOLD_STR);
+      this.tabEvidenceText.setFontStyle('bold');
+    }
+  }
+
+  // ─── Unified Case Book Panel ───────────────────────────────────────────────
+
+  private createCaseBookPanel(): Phaser.GameObjects.Container {
     const { width, height } = this.cameras.main;
     const container = this.add.container(0, 0);
     container.setDepth(Depths.inventoryPanel);
@@ -304,142 +394,252 @@ export class UIScene extends Phaser.Scene {
     const overlay = createOverlay(this, 0.88);
     container.add(overlay);
 
-    // Main panel dimensions — fill most of the screen, leave room for toolbar
+    // Main panel dimensions — same as old inventory panel
     const panelW = Math.min(width - 60, 1650);
     const panelH = height - TOOLBAR_H - BOTTOM_MARGIN - 45;
     const panelX = width / 2;
     const panelY = panelH / 2 + 15;
 
-    // Panel background with art deco frame
     const panelLeft = panelX - panelW / 2;
     const panelTop = panelY - panelH / 2;
-    const decoFrame = drawArtDecoFrame(this, panelLeft, panelTop, panelW, panelH, {
-      color: DecoColors.gold,
-      alpha: 0.4,
-      cornerSize: 32,
-      doubleBorder: true,
-      fillColor: DecoColors.navyMid,
-      fillAlpha: 0.97,
-    });
-    container.add(decoFrame);
+    const panelRight = panelLeft + panelW;
+    const panelBottom = panelTop + panelH;
+
+    // ─── Leather-bound book background ───
+    const bookGfx = this.add.graphics();
+
+    // Outer leather border
+    bookGfx.fillStyle(BOOK_LEATHER, 1);
+    bookGfx.fillRoundedRect(panelLeft, panelTop, panelW, panelH, 8);
+
+    // Inner aged paper fill (inset by leather border width)
+    const leatherBorder = 14;
+    const paperLeft = panelLeft + leatherBorder;
+    const paperTop = panelTop + leatherBorder;
+    const paperW = panelW - leatherBorder * 2;
+    const paperH = panelH - leatherBorder * 2;
+    bookGfx.fillStyle(BOOK_PAPER, 1);
+    bookGfx.fillRoundedRect(paperLeft, paperTop, paperW, paperH, 4);
+
+    // Spine binding line (vertical line down the center-left area, like a real book spine)
+    const spineX = panelLeft + leatherBorder + 6;
+    bookGfx.lineStyle(3, BOOK_SPINE, 0.5);
+    bookGfx.lineBetween(spineX, paperTop + 8, spineX, paperTop + paperH - 8);
+    bookGfx.lineStyle(1, BOOK_SPINE, 0.25);
+    bookGfx.lineBetween(spineX + 4, paperTop + 8, spineX + 4, paperTop + paperH - 8);
+
+    // Leather edge highlight (subtle bevel)
+    bookGfx.lineStyle(1, 0x5a4a3a, 0.4);
+    bookGfx.strokeRoundedRect(panelLeft + 1, panelTop + 1, panelW - 2, panelH - 2, 8);
+    bookGfx.lineStyle(1, 0x1a0e08, 0.6);
+    bookGfx.strokeRoundedRect(panelLeft, panelTop, panelW, panelH, 8);
+
+    container.add(bookGfx);
+
+    // ─── Subtle stain patches on the paper ───
+    const stainGfx = this.add.graphics();
+    stainGfx.fillStyle(BOOK_STAIN, 0.06);
+    stainGfx.fillCircle(panelX - panelW / 4, panelY - panelH / 5, 55);
+    stainGfx.fillCircle(panelX + panelW / 3, panelY + panelH / 6, 40);
+    stainGfx.fillEllipse(panelX - panelW / 6, panelY + panelH / 4, 80, 34);
+    stainGfx.fillStyle(BOOK_STAIN, 0.04);
+    stainGfx.fillCircle(panelX + panelW / 5, panelY - panelH / 3, 35);
+    container.add(stainGfx);
 
     // ─── Header ───
     const headerH = 72;
-    const headerY = panelY - panelH / 2 + headerH / 2;
+    const headerY = panelTop + leatherBorder + headerH / 2;
+    const headerContentTop = paperTop;
 
-    const headerBg = this.add.rectangle(panelX, headerY, panelW - 12, headerH, DecoColors.navy, 1);
+    // Header background (darker paper strip)
+    const headerBg = this.add.rectangle(panelX, headerY, paperW, headerH, 0x3a2a1a, 0.15);
     container.add(headerBg);
 
-    // Header bottom border
+    // Header bottom divider
     const headerLineGfx = this.add.graphics();
-    headerLineGfx.lineStyle(1.5, DecoColors.gold, 0.3);
-    headerLineGfx.lineBetween(panelLeft + 6, panelTop + headerH, panelLeft + panelW - 6, panelTop + headerH);
+    headerLineGfx.lineStyle(1.5, BOOK_LEATHER, 0.3);
+    headerLineGfx.lineBetween(paperLeft + 20, headerContentTop + headerH, paperLeft + paperW - 20, headerContentTop + headerH);
     container.add(headerLineGfx);
 
-    const title = this.add.text(panelX, headerY, 'CASE FILE — EVIDENCE', {
-      fontFamily: FONT,
-      fontSize: '24px',
-      color: DecoTextColors.goldBright,
-      fontStyle: 'bold',
-      letterSpacing: 7,
+    const title = this.add.text(panelX, headerY, "NANCY'S CASE BOOK", {
+      fontFamily: JOURNAL_FONT,
+      fontSize: '28px',
+      color: '#3a2a1a',
+      fontStyle: 'bold italic',
+      letterSpacing: 5,
     }).setOrigin(0.5);
     container.add(title);
 
-    // Decorative divider flanking title
-    const divGfx = this.add.graphics();
-    drawDecoDivider(divGfx, panelX, headerY, panelW * 0.65, DecoColors.gold, 0.25);
-    container.add(divGfx);
+    // Decorative underline flourishes
+    const flourishGfx = this.add.graphics();
+    flourishGfx.lineStyle(1, 0x3a2a1a, 0.3);
+    const flourishW = 140;
+    flourishGfx.lineBetween(panelX - flourishW, headerY + 18, panelX + flourishW, headerY + 18);
+    flourishGfx.fillStyle(0x3a2a1a, 0.4);
+    // Small diamond at center of flourish
+    const fd = 4;
+    flourishGfx.fillPoints([
+      new Phaser.Geom.Point(panelX, headerY + 18 - fd),
+      new Phaser.Geom.Point(panelX + fd, headerY + 18),
+      new Phaser.Geom.Point(panelX, headerY + 18 + fd),
+      new Phaser.Geom.Point(panelX - fd, headerY + 18),
+    ], true);
+    container.add(flourishGfx);
 
     // Close button
-    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 33, headerY, () => this.toggleInventory(), 66);
+    const closeBtn = createCloseButton(this, panelLeft + panelW - leatherBorder - 30, headerY, () => this.closeCaseBook(), 56);
     container.add(closeBtn);
 
-    // ─── Layout: left item grid + right detail panel ───
-    const contentTop = headerY + headerH / 2 + 18;
-    const contentBottom = panelY + panelH / 2 - 21;
+    // ─── Tab buttons (below header) ───
+    const tabY = headerContentTop + headerH + 30;
+    const tabSpacing = 170;
+
+    // JOURNAL tab
+    const journalTabContainer = this.add.container(panelX - tabSpacing / 2, tabY);
+    this.tabJournalBg = this.add.graphics();
+    journalTabContainer.add(this.tabJournalBg);
+    this.tabJournalText = this.add.text(0, 0, 'JOURNAL', {
+      fontFamily: FONT,
+      fontSize: '18px',
+      color: TAB_GOLD_STR,
+      fontStyle: 'bold',
+      letterSpacing: 2,
+    }).setOrigin(0.5);
+    journalTabContainer.add(this.tabJournalText);
+    const journalTabHit = this.add.rectangle(0, 0, 150, 36, 0x000000, 0);
+    journalTabHit.setInteractive({ cursor: POINTER_CURSOR });
+    journalTabHit.on('pointerdown', () => {
+      if (this.currentTab !== 'journal') this.switchTab('journal');
+    });
+    journalTabContainer.add(journalTabHit);
+    container.add(journalTabContainer);
+
+    // EVIDENCE tab
+    const evidenceTabContainer = this.add.container(panelX + tabSpacing / 2, tabY);
+    this.tabEvidenceBg = this.add.graphics();
+    evidenceTabContainer.add(this.tabEvidenceBg);
+    this.tabEvidenceText = this.add.text(0, 0, 'EVIDENCE', {
+      fontFamily: FONT,
+      fontSize: '18px',
+      color: TAB_GOLD_STR,
+      fontStyle: 'bold',
+      letterSpacing: 2,
+    }).setOrigin(0.5);
+    evidenceTabContainer.add(this.tabEvidenceText);
+    const evidenceTabHit = this.add.rectangle(0, 0, 150, 36, 0x000000, 0);
+    evidenceTabHit.setInteractive({ cursor: POINTER_CURSOR });
+    evidenceTabHit.on('pointerdown', () => {
+      if (this.currentTab !== 'evidence') this.switchTab('evidence');
+    });
+    evidenceTabContainer.add(evidenceTabHit);
+    container.add(evidenceTabContainer);
+
+    // ─── Content area starts below tabs ───
+    const contentTop = tabY + 30;
+    const contentBottom = panelBottom - leatherBorder - 18;
     const contentH = contentBottom - contentTop;
-    const leftW = panelW * 0.55;
-    const rightW = panelW - leftW - 45;
-    const leftX = panelX - panelW / 2 + 22;
+
+    // Store book layout for journal use
+    this.bookLayout = { panelW: paperW, panelH: paperH, panelX, panelY, contentTop, contentBottom };
+
+    // ─── Evidence content container ───
+    this.evidenceContent = this.add.container(0, 0);
+    container.add(this.evidenceContent);
+    this.createEvidenceContent(panelX, paperLeft, paperW, contentTop, contentH, contentBottom);
+
+    // ─── Journal content container ───
+    this.journalContent = this.add.container(0, 0);
+    container.add(this.journalContent);
+
+    return container;
+  }
+
+  // ─── Evidence tab content (grid + detail panel) ─────────────────────────────
+
+  private createEvidenceContent(
+    panelX: number, paperLeft: number, paperW: number,
+    contentTop: number, contentH: number, contentBottom: number,
+  ): void {
+    const leftW = paperW * 0.55;
+    const rightW = paperW - leftW - 45;
+    const leftX = paperLeft + 22;
     const rightX = leftX + leftW + 22;
 
     // ─── Items grid container (will be populated by refresh) ───
     this.itemsGrid = this.add.container(0, 0);
-    container.add(this.itemsGrid);
+    this.evidenceContent.add(this.itemsGrid);
 
     // ─── Right detail panel ───
     const detailCenterX = rightX + rightW / 2;
     const detailCenterY = contentTop + contentH / 2;
 
-    // Detail background
-    const detailBg = this.add.rectangle(detailCenterX, detailCenterY, rightW, contentH, 0x0e0d16, 0.7);
-    detailBg.setStrokeStyle(1, Colors.gold, 0.15);
-    container.add(detailBg);
+    // Detail background — parchment style
+    const detailBg = this.add.rectangle(detailCenterX, detailCenterY, rightW, contentH, 0x3a2a1a, 0.08);
+    detailBg.setStrokeStyle(1, BOOK_LEATHER, 0.2);
+    this.evidenceContent.add(detailBg);
 
     // Placeholder text (shown when no item selected)
     this.detailPlaceholder = this.add.text(detailCenterX, detailCenterY, 'Select an item to inspect', {
-      fontFamily: FONT,
+      fontFamily: JOURNAL_FONT,
       fontSize: '21px',
-      color: TextColors.muted,
+      color: '#6a5a4a',
       fontStyle: 'italic',
       align: 'center',
     }).setOrigin(0.5);
-    container.add(this.detailPlaceholder);
+    this.evidenceContent.add(this.detailPlaceholder);
 
     // Detail image (created on demand)
     this.detailImage = null;
 
     // Detail name
     this.detailName = this.add.text(detailCenterX, contentTop + 30, '', {
-      fontFamily: FONT,
-      fontSize: '30px',
-      color: TextColors.gold,
+      fontFamily: JOURNAL_FONT,
+      fontSize: '28px',
+      color: '#3a2a1a',
       fontStyle: 'bold',
       align: 'center',
     }).setOrigin(0.5, 0);
-    container.add(this.detailName);
+    this.evidenceContent.add(this.detailName);
 
     // Key item badge
     this.detailKeyBadge = this.add.container(detailCenterX, contentTop + 72);
-    const badgeBg = this.add.rectangle(0, 0, 150, 33, Colors.gold, 0.12);
-    badgeBg.setStrokeStyle(1.5, Colors.gold, 0.3);
+    const badgeBg = this.add.rectangle(0, 0, 150, 33, TAB_GOLD, 0.15);
+    badgeBg.setStrokeStyle(1.5, TAB_GOLD, 0.4);
     const badgeText = this.add.text(0, 0, '★  KEY EVIDENCE', {
       fontFamily: FONT,
       fontSize: '15px',
-      color: TextColors.gold,
+      color: TAB_GOLD_STR,
       letterSpacing: 1,
     }).setOrigin(0.5);
     this.detailKeyBadge.add([badgeBg, badgeText]);
     this.detailKeyBadge.setVisible(false);
-    container.add(this.detailKeyBadge);
+    this.evidenceContent.add(this.detailKeyBadge);
 
     // Detail description
     this.detailDesc = this.add.text(detailCenterX, contentTop + 120, '', {
-      fontFamily: FONT,
+      fontFamily: JOURNAL_FONT,
       fontSize: '21px',
-      color: TextColors.light,
+      color: BOOK_INK,
       wordWrap: { width: rightW - 60 },
       lineSpacing: 5,
       align: 'center',
     }).setOrigin(0.5, 0);
-    container.add(this.detailDesc);
+    this.evidenceContent.add(this.detailDesc);
 
     // Hint at bottom of detail panel
     const hintY = contentBottom - 30;
     const hint = this.add.text(detailCenterX, hintY, 'Click an item to select it for use.\nClick again to deselect.', {
-      fontFamily: FONT,
+      fontFamily: JOURNAL_FONT,
       fontSize: '17px',
-      color: TextColors.muted,
+      color: '#6a5a4a',
       fontStyle: 'italic',
       align: 'center',
       lineSpacing: 2,
     }).setOrigin(0.5, 1);
-    container.add(hint);
+    this.evidenceContent.add(hint);
 
     // Store layout info for refresh
     this.layout = { leftX, contentTop, contentH, leftW, rightW, rightX };
-
-    return container;
   }
 
   private refreshInventoryGrid(): void {
@@ -465,9 +665,9 @@ export class UIScene extends Phaser.Scene {
         leftX + leftW / 2, contentTop + contentH / 2,
         'No evidence collected yet.\n\nExplore the theater to find items.',
         {
-          fontFamily: FONT,
+          fontFamily: JOURNAL_FONT,
           fontSize: '21px',
-          color: TextColors.muted,
+          color: '#6a5a4a',
           fontStyle: 'italic',
           align: 'center',
           lineSpacing: 6,
@@ -489,9 +689,9 @@ export class UIScene extends Phaser.Scene {
       const isSelected = selectedItem === itemId;
       const isInspected = this.selectedItemId === itemId;
 
-      // Card background
-      const cardBg = this.add.rectangle(x, y + 10, cardW, cardH, 0x15141e, 0.9);
-      const borderColor = isSelected ? Colors.success : (isInspected ? Colors.gold : Colors.goldDim);
+      // Card background — parchment card style
+      const cardBg = this.add.rectangle(x, y + 10, cardW, cardH, 0x3a2a1a, 0.08);
+      const borderColor = isSelected ? Colors.success : (isInspected ? TAB_GOLD : BOOK_LEATHER);
       const borderAlpha = isSelected ? 0.9 : (isInspected ? 0.7 : 0.2);
       cardBg.setStrokeStyle(isSelected || isInspected ? 2 : 1, borderColor, borderAlpha);
       cardBg.setInteractive({ cursor: POINTER_CURSOR });
@@ -512,9 +712,9 @@ export class UIScene extends Phaser.Scene {
 
       // Item name below image
       const label = this.add.text(x, y + cardW / 2 + 6, itemData.name, {
-        fontFamily: FONT,
+        fontFamily: JOURNAL_FONT,
         fontSize: '17px',
-        color: isSelected ? TextColors.success : TextColors.gold,
+        color: isSelected ? TextColors.success : '#3a2a1a',
         align: 'center',
         wordWrap: { width: cardW - 8 },
       }).setOrigin(0.5, 0);
@@ -542,14 +742,14 @@ export class UIScene extends Phaser.Scene {
 
       // Hover effects
       cardBg.on('pointerover', () => {
-        cardBg.setFillStyle(0x1e1d2e, 1);
-        cardBg.setStrokeStyle(2, Colors.gold, 0.6);
+        cardBg.setFillStyle(0x3a2a1a, 0.15);
+        cardBg.setStrokeStyle(2, TAB_GOLD, 0.6);
         this.showItemDetail(itemId);
       });
       cardBg.on('pointerout', () => {
         if (this.selectedItemId !== itemId) {
-          cardBg.setFillStyle(0x15141e, 0.9);
-          const bc = (selectedItem === itemId) ? Colors.success : Colors.goldDim;
+          cardBg.setFillStyle(0x3a2a1a, 0.08);
+          const bc = (selectedItem === itemId) ? Colors.success : BOOK_LEATHER;
           const ba = (selectedItem === itemId) ? 0.9 : 0.2;
           cardBg.setStrokeStyle((selectedItem === itemId) ? 2 : 1, bc, ba);
         }
@@ -610,7 +810,7 @@ export class UIScene extends Phaser.Scene {
         const img = this.add.image(detailCenterX, descY + 20, iconKey);
         img.setOrigin(0.5, 0);
         this.detailImage = img;
-        this.inventoryContainer.add(img);
+        this.evidenceContent.add(img);
       }
       this.scaleImageToFit(this.detailImage, imgMaxSize);
       this.detailImage.setVisible(true);
@@ -628,98 +828,130 @@ export class UIScene extends Phaser.Scene {
     this.detailDesc.setVisible(true);
   }
 
-  // ─── Journal Panel ──────────────────────────────────────────────────────
+  // ─── Journal Tab Content ──────────────────────────────────────────────────
 
-  private createJournalPanel(): Phaser.GameObjects.Container {
-    const { width, height } = this.cameras.main;
-    const panelW = Math.min(width * 0.9, 900);
-    const panelH = 600;
-    const panelY = Math.min(height / 2, height - TOOLBAR_H - BOTTOM_MARGIN - panelH / 2 - 22);
-    const panel = this.add.container(width / 2, panelY);
+  private refreshJournalContent(): void {
+    // Clear previous journal content
+    this.journalContent.removeAll(true);
 
-    // Aged paper background
-    const paper = this.add.rectangle(0, 0, panelW, panelH, Colors.paper, 0.95);
-    paper.setStrokeStyle(2, Colors.paperBorder, 0.8);
-    paper.setInteractive();
-    panel.add(paper);
-
-    // Paper texture — subtle stain patches
-    const stains = this.add.graphics();
-    stains.fillStyle(Colors.paperBorder, 0.08);
-    stains.fillCircle(-panelW / 4, -panelH / 4, 60);
-    stains.fillCircle(panelW / 3, panelH / 5, 45);
-    stains.fillEllipse(-panelW / 6, panelH / 3, 90, 38);
-    stains.lineStyle(1, Colors.paperBorder, 0.15);
-    for (let ly = -panelH / 2 + 98; ly < panelH / 2 - 30; ly += 33) {
-      stains.lineBetween(-panelW / 2 + 38, ly, panelW / 2 - 38, ly);
-    }
-    stains.lineStyle(1, 0xcc6666, 0.2);
-    stains.lineBetween(-panelW / 2 + 83, -panelH / 2 + 15, -panelW / 2 + 83, panelH / 2 - 15);
-    panel.add(stains);
-
-    const titleText = this.add.text(0, -panelH / 2 + 38, 'Nancy\'s Journal', {
-      fontFamily: '\'Palatino Linotype\', \'Book Antiqua\', Palatino, Georgia, serif',
-      fontSize: '33px',
-      color: '#3a2a1a',
-      fontStyle: 'italic',
-    }).setOrigin(0.5);
-    panel.add(titleText);
-
-    const underline = this.add.graphics();
-    underline.lineStyle(1, 0x3a2a1a, 0.4);
-    underline.lineBetween(-90, -panelH / 2 + 60, 90, -panelH / 2 + 60);
-    panel.add(underline);
-
-    const closeBtn = createCloseButton(this, panelW / 2 - 30, -panelH / 2 + 22, () => this.toggleJournal(), 60);
-    panel.add(closeBtn);
-
-    panel.setDepth(Depths.journalPanel);
-    return panel;
-  }
-
-  private refreshJournalPanel(): void {
-    // Clear old entries (keep bg, stains, title, underline, closeBtn = 5 elements)
-    while (this.journalPanel.length > 5) {
-      this.journalPanel.removeAt(5, true);
-    }
-
+    const { panelW, panelX, contentTop, contentBottom } = this.bookLayout;
     const save = SaveSystem.getInstance();
     const journal = save.getJournal();
-    const panelW = Math.min(this.cameras.main.width * 0.9, 900);
-    const journalFont = '\'Palatino Linotype\', \'Book Antiqua\', Palatino, Georgia, serif';
+
+    const contentLeft = panelX - panelW / 2 + 30;
+    const contentRight = panelX + panelW / 2 - 30;
+    const usableW = contentRight - contentLeft;
+
+    // ─── Ruled lines on the journal page ───
+    const ruledGfx = this.add.graphics();
+    const lineSpacing = 33;
+    const ruledStart = contentTop + 10;
+    const ruledEnd = contentBottom - 50;
+    ruledGfx.lineStyle(1, BOOK_STAIN, 0.12);
+    for (let ly = ruledStart; ly < ruledEnd; ly += lineSpacing) {
+      ruledGfx.lineBetween(contentLeft, ly, contentRight, ly);
+    }
+    // Red margin line
+    const marginX = contentLeft + 55;
+    ruledGfx.lineStyle(1, BOOK_MARGIN_RED, 0.2);
+    ruledGfx.lineBetween(marginX, contentTop, marginX, contentBottom - 45);
+    this.journalContent.add(ruledGfx);
 
     if (journal.length === 0) {
-      const empty = this.add.text(0, 0, 'No entries yet.\n\nExplore the theater and talk to people\nto fill Nancy\'s journal.', {
-        fontFamily: journalFont,
+      const empty = this.add.text(panelX, (contentTop + contentBottom) / 2, "No entries yet.\n\nExplore the theater and talk to people\nto fill Nancy's journal.", {
+        fontFamily: JOURNAL_FONT,
         fontSize: '21px',
         color: '#6a5a4a',
         fontStyle: 'italic',
         align: 'center',
         lineSpacing: 6,
       }).setOrigin(0.5);
-      this.journalPanel.add(empty);
+      this.journalContent.add(empty);
       return;
     }
 
-    let y = -195;
-    journal.forEach((entry, i) => {
-      const xJitter = ((i * 7) % 5) - 3;
+    // Pagination
+    const totalPages = Math.ceil(journal.length / JOURNAL_ENTRIES_PER_PAGE);
+    if (this.journalPage >= totalPages) this.journalPage = totalPages - 1;
+    if (this.journalPage < 0) this.journalPage = 0;
 
-      const bullet = this.add.text(-panelW / 2 + 93 + xJitter, y, `${i + 1}.`, {
-        fontFamily: journalFont,
+    const startIdx = this.journalPage * JOURNAL_ENTRIES_PER_PAGE;
+    const endIdx = Math.min(startIdx + JOURNAL_ENTRIES_PER_PAGE, journal.length);
+    const pageEntries = journal.slice(startIdx, endIdx);
+
+    // Render entries
+    let y = contentTop + 20;
+    const entryLeft = marginX + 15;
+
+    pageEntries.forEach((entry, i) => {
+      const globalIdx = startIdx + i;
+      const xJitter = ((globalIdx * 7) % 5) - 3;
+
+      const bullet = this.add.text(contentLeft + 10 + xJitter, y, `${globalIdx + 1}.`, {
+        fontFamily: JOURNAL_FONT,
         fontSize: '22px',
-        color: '#5a3a2a',
+        color: BOOK_BULLET,
         fontStyle: 'italic',
       });
-      const text = this.add.text(-panelW / 2 + 123 + xJitter, y, entry, {
-        fontFamily: journalFont,
+
+      const text = this.add.text(entryLeft + xJitter, y, entry, {
+        fontFamily: JOURNAL_FONT,
         fontSize: '22px',
-        color: '#2a1a0a',
-        wordWrap: { width: panelW - 195 },
+        color: BOOK_INK,
+        wordWrap: { width: usableW - 80 },
         lineSpacing: 5,
       });
-      this.journalPanel.add([bullet, text]);
+
+      this.journalContent.add([bullet, text]);
       y += text.height + 18;
     });
+
+    // ─── Page indicator and navigation ───
+    const navY = contentBottom - 20;
+
+    // Page indicator
+    const pageText = this.add.text(panelX, navY, `Page ${this.journalPage + 1} of ${totalPages}`, {
+      fontFamily: JOURNAL_FONT,
+      fontSize: '18px',
+      color: BOOK_BULLET,
+      fontStyle: 'italic',
+    }).setOrigin(0.5);
+    this.journalContent.add(pageText);
+
+    // Previous button
+    if (this.journalPage > 0) {
+      const prevBtn = this.add.text(contentLeft + 20, navY, '← Previous', {
+        fontFamily: JOURNAL_FONT,
+        fontSize: '18px',
+        color: '#5a3a2a',
+        fontStyle: 'bold',
+      }).setOrigin(0, 0.5);
+      prevBtn.setInteractive({ cursor: POINTER_CURSOR });
+      prevBtn.on('pointerover', () => prevBtn.setColor(TAB_GOLD_STR));
+      prevBtn.on('pointerout', () => prevBtn.setColor('#5a3a2a'));
+      prevBtn.on('pointerdown', () => {
+        this.journalPage--;
+        this.refreshJournalContent();
+      });
+      this.journalContent.add(prevBtn);
+    }
+
+    // Next button
+    if (this.journalPage < totalPages - 1) {
+      const nextBtn = this.add.text(contentRight - 20, navY, 'Next →', {
+        fontFamily: JOURNAL_FONT,
+        fontSize: '18px',
+        color: '#5a3a2a',
+        fontStyle: 'bold',
+      }).setOrigin(1, 0.5);
+      nextBtn.setInteractive({ cursor: POINTER_CURSOR });
+      nextBtn.on('pointerover', () => nextBtn.setColor(TAB_GOLD_STR));
+      nextBtn.on('pointerout', () => nextBtn.setColor('#5a3a2a'));
+      nextBtn.on('pointerdown', () => {
+        this.journalPage++;
+        this.refreshJournalContent();
+      });
+      this.journalContent.add(nextBtn);
+    }
   }
 }

@@ -21,7 +21,7 @@
     {
       "id": "script_cipher",
       "name": "The Script Cipher",
-      "type": "logic",
+      "type": "cipher",
       "description": "Red-circled letters in the margins of The Crimson Veil script. Read them in order through the stage directions of Act III to reveal the hidden message. What single word do they spell?",
       "answer": "goblet",
       "clues": [
@@ -35,12 +35,17 @@
         "Focus only on the red-circled letters in the stage directions.",
         "There are six circled letters in Act III.",
         "It's the vessel that killed Lady Ashford on stage — and killed Margaux in reality."
-      ]
+      ],
+      "interactiveData": {
+        "answerLetters": ["g", "o", "b", "l", "e", "t"],
+        "decoyLetters": ["a", "r", "s", "m", "p", "n", "i", "d"],
+        "scriptTitle": "The Crimson Veil — Act III Stage Directions"
+      }
     },
     {
       "id": "lighting_sequence",
       "name": "The Lighting Sequence",
-      "type": "sequence",
+      "type": "lighting_board",
       "description": "The catwalk lighting board. Four colored switches must be pressed in the exact order of the Act III lighting cue to open the hidden compartment.",
       "answer": "red-blue-white-red",
       "clues": [
@@ -54,7 +59,12 @@
         "The effects manual translates poetic stage directions to actual light colors.",
         "Crimson = red. Moonlight = blue. Center spot = white.",
         "The sequence starts and ends with the same color."
-      ]
+      ],
+      "interactiveData": {
+        "channels": ["RED", "BLUE", "WHITE", "GREEN"],
+        "cueCard": "Act III Cue: crimson wash, moonlight blue, center spot, crimson wash",
+        "targetSequence": ["red", "blue", "white", "red"]
+      }
     },
     {
       "id": "evidence_board",
@@ -80,8 +90,8 @@
     {
       "id": "mirror_puzzle",
       "name": "The Vanity Mirror",
-      "type": "logic",
-      "description": "Using the magnifying glass, you've revealed wax writing on Margaux's mirror. She left an accusation. Who did she accuse? Enter the initials.",
+      "type": "mirror_reveal",
+      "description": "Using the magnifying glass, you've revealed wax writing on Margaux's mirror. She left an accusation. Drag the lens across the foggy mirror to reveal what's hidden beneath.",
       "answer": "cd",
       "clues": [
         "The mirror message: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.'",
@@ -93,13 +103,18 @@
         "Margaux wrote the initials of her killer on her own mirror.",
         "Think about who her understudy was — the person who took over her role.",
         "The initials stand for a first and last name."
-      ]
+      ],
+      "interactiveData": {
+        "revealText": "C.D.",
+        "subText": "brings the tea. changed the goblet. will be the death of me.",
+        "revealThreshold": 0.8
+      }
     },
     {
       "id": "film_puzzle",
       "name": "The Film Frames",
-      "type": "sequence",
-      "description": "Four frames from the 1928 rehearsal footage, visible through the magnifying glass. They've been spliced out of order. Arrange them to show what happened on stage that night.",
+      "type": "film_assembly",
+      "description": "Four frames from the 1928 rehearsal footage, visible through the magnifying glass. They've been spliced out of order. Drag the frames to the light table slots to reconstruct what happened on stage.",
       "answer": "toast-drink-collapse-understudy",
       "clues": [
         "The script's Act III stage directions describe the sequence: toast, drink, collapse.",
@@ -112,25 +127,49 @@
         "The sequence follows the plot of The Crimson Veil's final scene.",
         "What happens first in the scene? The toast.",
         "After the lead actress falls, who steps forward to take her place?"
-      ]
+      ],
+      "interactiveData": {
+        "frames": [
+          { "id": "toast", "label": "A woman raises a goblet to the audience" },
+          { "id": "drink", "label": "She drinks deeply from the goblet" },
+          { "id": "collapse", "label": "She staggers and collapses on stage" },
+          { "id": "understudy", "label": "A second woman steps from the wings" }
+        ],
+        "correctOrder": ["toast", "drink", "collapse", "understudy"]
+      }
     },
     {
       "id": "lockbox_puzzle",
       "name": "Stella's Lockbox",
-      "type": "combination",
-      "description": "A metal lockbox under Stella's work station with a four-digit combination lock. The lock has numbers 0–9 on each dial.",
-      "answer": "4200",
+      "type": "symbol_match",
+      "description": "A metal lockbox under Stella's work station with four rotating symbol dials. Each dial cycles through theatrical symbols. Find the correct combination of symbols to open it.",
+      "answer": "mask-spotlight-curtain-rose",
       "clues": [
         "The call board lists missing props with 'est. value: $4,200.'",
         "Stella mentioned she's been tracking what's been 'relocated.'",
-        "The value of the missing items is the key — it's what she's trying to hide."
+        "Stella's notebook has doodles of a mask, then a spotlight, then curtains, then a rose.",
+        "The symbols on the lockbox match standard theatrical iconography."
       ],
       "unlocks": "stella_records",
       "hints": [
-        "Look at the call board notice near Stella's station.",
-        "The combination relates to the estimated value of missing props.",
-        "The number is a dollar amount, four digits."
-      ]
+        "Look at the doodles in Stella's notebook — they appear in a specific order.",
+        "The first symbol represents the art of theater itself.",
+        "Mask, spotlight, curtain, rose — the icons of the stage."
+      ],
+      "interactiveData": {
+        "symbols": ["mask", "spotlight", "curtain", "rose", "key", "bell", "crown", "feather"],
+        "symbolEmojis": {
+          "mask": "🎭",
+          "spotlight": "🔦",
+          "curtain": "🎪",
+          "rose": "🌹",
+          "key": "🔑",
+          "bell": "🔔",
+          "crown": "👑",
+          "feather": "🪶"
+        },
+        "correctCombination": ["mask", "spotlight", "curtain", "rose"]
+      }
     },
     {
       "id": "office_safe_puzzle",
@@ -153,8 +192,8 @@
     {
       "id": "passage_navigation",
       "name": "Hidden Passage Navigation",
-      "type": "logic",
-      "description": "The hidden passages behind the theater's walls form a network. Using the blueprints, determine which room the passage from the basement connects to. Where does it emerge?",
+      "type": "maze",
+      "description": "The hidden passages behind the theater's walls form a network. Using the blueprints, trace a path from the basement entrance to the dressing room.",
       "answer": "dressing room",
       "clues": [
         "The blueprints show passages connecting the basement to several rooms.",
@@ -167,13 +206,45 @@
         "Which room has a direct connection to the basement that you've noticed?",
         "Think about where the warm air and machinery sounds are coming from.",
         "Edwin needed access to Margaux's costume — what room has it?"
-      ]
+      ],
+      "interactiveData": {
+        "nodes": [
+          { "id": "basement", "label": "Basement", "x": 0, "y": 4, "start": true },
+          { "id": "boiler", "label": "Boiler Room", "x": 1, "y": 4 },
+          { "id": "storage", "label": "Storage", "x": 2, "y": 4 },
+          { "id": "trap_room", "label": "Trap Room", "x": 0, "y": 3 },
+          { "id": "under_stage", "label": "Under Stage", "x": 1, "y": 3 },
+          { "id": "junction", "label": "Junction", "x": 2, "y": 3 },
+          { "id": "dead_end_1", "label": "Collapsed", "x": 0, "y": 2, "deadEnd": true },
+          { "id": "stairwell", "label": "Stairwell", "x": 1, "y": 2 },
+          { "id": "dead_end_2", "label": "Bricked Up", "x": 2, "y": 2, "deadEnd": true },
+          { "id": "backstage", "label": "Backstage", "x": 0, "y": 1 },
+          { "id": "narrow", "label": "Narrow Pass", "x": 1, "y": 1 },
+          { "id": "dressing_room", "label": "Dressing Room", "x": 1, "y": 0, "goal": true }
+        ],
+        "edges": [
+          ["basement", "boiler"],
+          ["basement", "trap_room"],
+          ["boiler", "under_stage"],
+          ["boiler", "storage"],
+          ["storage", "junction"],
+          ["trap_room", "dead_end_1"],
+          ["trap_room", "under_stage"],
+          ["under_stage", "stairwell"],
+          ["junction", "dead_end_2"],
+          ["junction", "stairwell"],
+          ["stairwell", "narrow"],
+          ["stairwell", "backstage"],
+          ["backstage", "narrow"],
+          ["narrow", "dressing_room"]
+        ]
+      }
     },
     {
       "id": "tea_analysis",
       "name": "Poison Identification",
-      "type": "logic",
-      "description": "Compare the poisoned teacup residue with compounds described in Margaux's alchemy book. What compound was used to poison Ashworth?",
+      "type": "chemistry",
+      "description": "Analyze the poisoned teacup residue in the lab. Follow the three-step procedure to identify the compound used against Ashworth.",
       "answer": "antimony",
       "clues": [
         "The alchemy book in the dressing room has a section on antimony compounds heavily annotated by Margaux.",
@@ -186,7 +257,38 @@
         "Margaux annotated one specific section of the alchemy book — what compound?",
         "The same poison was used in 1928 and in the modern day.",
         "It's a metallic element — Margaux wrote 'These are my symptoms exactly' next to it."
-      ]
+      ],
+      "interactiveData": {
+        "steps": [
+          {
+            "action": "Heat sample",
+            "description": "Apply heat to the residue sample",
+            "result": "White powder dissolves into clear solution with metallic sheen"
+          },
+          {
+            "action": "Add reagent",
+            "description": "Select the correct reagent to test the solution",
+            "options": ["Sodium hydroxide", "Hydrogen sulfide", "Silver nitrate"],
+            "correctOption": "Hydrogen sulfide",
+            "wrongFeedback": {
+              "Sodium hydroxide": "The solution turns cloudy but reveals nothing diagnostic. Try a different reagent.",
+              "Silver nitrate": "A white precipitate forms — inconclusive for this compound. Try again."
+            },
+            "correctResult": "Dark orange precipitate forms — characteristic of a metallic sulfide"
+          },
+          {
+            "action": "Observe result",
+            "description": "Examine the precipitate under magnification",
+            "options": ["Compare to arsenic profile", "Compare to antimony profile", "Compare to mercury profile"],
+            "correctOption": "Compare to antimony profile",
+            "wrongFeedback": {
+              "Compare to arsenic profile": "Crystal structure doesn't match arsenic sulfide. The color is wrong.",
+              "Compare to mercury profile": "Mercury sulfide is black, not orange-red. This isn't mercury."
+            },
+            "correctResult": "Orange-red precipitate matches antimony trisulfide (Sb₂S₃). Compound identified: ANTIMONY"
+          }
+        ]
+      }
     }
   ]
 }
