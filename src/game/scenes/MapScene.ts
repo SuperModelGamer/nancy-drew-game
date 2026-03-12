@@ -4,26 +4,46 @@ import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { HAND_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createOverlay } from '../utils/ui-helpers';
 
+/**
+ * Room definition with hand-placed positions reflecting the Monarch Theatre's
+ * vertical cross-section: catwalk up top, auditorium and wings in the middle,
+ * lobby at ground level, basement below.
+ *
+ * Positions are expressed as fractions (0-1) of the map content area so the
+ * layout scales to any panel size.
+ */
 interface RoomDef {
   id: string;
   name: string;
-  color: number;
+  /** Fraction of content width (0 = left edge, 1 = right edge) */
+  fx: number;
+  /** Fraction of content height (0 = top, 1 = bottom) */
+  fy: number;
+  /** Floor label for the cross-section */
+  floor: 'upper' | 'main' | 'ground' | 'below';
+  /** Minimum chapter required to ACCESS this room (can still be visible if discovered) */
   requiresChapter?: number;
-  gridX: number;
-  gridY: number;
 }
 
 const ROOMS: RoomDef[] = [
-  { id: 'catwalk',          name: 'Catwalk',           color: 0x8a8a8a, gridX: 1, gridY: 0 },
-  { id: 'projection_booth', name: 'Projection Booth',  color: 0x7bc98a, gridX: 3, gridY: 0 },
-  { id: 'backstage',        name: 'Backstage',         color: 0xc9947b, gridX: 0, gridY: 1 },
-  { id: 'auditorium',       name: 'Auditorium',        color: 0x7ba3c9, gridX: 2, gridY: 1 },
-  { id: 'managers_office',  name: "Manager's Office",  color: 0xc97b7b, gridX: 4, gridY: 1 },
-  { id: 'dressing_room',    name: 'Dressing Room',     color: 0xb4a0d4, gridX: 1, gridY: 2 },
-  { id: 'lobby',            name: 'Grand Lobby',       color: Colors.gold, gridX: 2, gridY: 2 },
-  { id: 'basement',         name: 'Basement',          color: 0x5a5a7a, requiresChapter: 4, gridX: 2, gridY: 3 },
+  // Upper level — above the stage
+  { id: 'catwalk',          name: 'Catwalk',           fx: 0.30, fy: 0.12, floor: 'upper', requiresChapter: 3 },
+  { id: 'projection_booth', name: 'Projection Booth',  fx: 0.70, fy: 0.12, floor: 'upper' },
+
+  // Main level — the stage and wings
+  { id: 'backstage',        name: 'Backstage',         fx: 0.15, fy: 0.38, floor: 'main' },
+  { id: 'auditorium',       name: 'Auditorium',        fx: 0.50, fy: 0.38, floor: 'main' },
+  { id: 'managers_office',  name: "Manager's Office",  fx: 0.85, fy: 0.38, floor: 'main' },
+
+  // Ground level — front of house
+  { id: 'dressing_room',    name: 'Dressing Room',     fx: 0.28, fy: 0.64, floor: 'ground' },
+  { id: 'lobby',            name: 'Grand Lobby',       fx: 0.68, fy: 0.64, floor: 'ground' },
+
+  // Below stage
+  { id: 'basement',         name: 'Basement',          fx: 0.50, fy: 0.90, floor: 'below', requiresChapter: 4 },
 ];
 
+/** Connections between rooms shown as hallway lines */
 const CONNECTIONS: [string, string][] = [
   ['catwalk', 'backstage'],
   ['catwalk', 'auditorium'],
@@ -37,12 +57,18 @@ const CONNECTIONS: [string, string][] = [
   ['lobby', 'basement'],
 ];
 
-// Size to display each medallion icon (height-based since icons are portrait with built-in labels)
-const MEDALLION_DISPLAY_SIZE = 130;
+/** Floor labels for the cross-section diagram */
+const FLOOR_LABELS: { label: string; fy: number }[] = [
+  { label: 'UPPER GALLERY',  fy: 0.12 },
+  { label: 'STAGE LEVEL',    fy: 0.38 },
+  { label: 'GROUND FLOOR',   fy: 0.64 },
+  { label: 'BELOW STAGE',    fy: 0.90 },
+];
+
+const MEDALLION_SIZE = 110;
 
 export class MapScene extends Phaser.Scene {
   private currentRoom = '';
-  private roomCards: Map<string, Phaser.GameObjects.Container> = new Map();
 
   constructor() {
     super({ key: 'MapScene' });
@@ -54,7 +80,8 @@ export class MapScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = this.cameras.main;
-    this.roomCards.clear();
+    const save = SaveSystem.getInstance();
+    const chapter = save.getChapter();
 
     // --- Full-screen overlay ---
     createOverlay(this, 0.8, Depths.mapOverlay);
@@ -63,260 +90,297 @@ export class MapScene extends Phaser.Scene {
     const contentDepth = Depths.mapContent;
 
     // --- Panel dimensions ---
-    const panelW = Math.min(900, width - 40);
-    const panelH = Math.min(660, height - 40);
+    const panelW = Math.min(960, width - 32);
+    const panelH = Math.min(700, height - 32);
     const panelX = width / 2;
     const panelY = height / 2 + 10;
 
-    // --- Draw dark aged parchment background ---
+    // --- Background ---
     this.drawParchmentBackground(panelX, panelY, panelW, panelH, contentDepth);
-
-    // --- Art deco border frame ---
     this.drawArtDecoBorder(panelX, panelY, panelW, panelH, contentDepth);
 
     // --- Title ---
-    const titleY = panelY - panelH / 2 + 36;
+    const titleY = panelY - panelH / 2 + 32;
     const titleText = this.add.text(panelX, titleY, 'THE MONARCH THEATRE', {
       fontFamily: FONT,
-      fontSize: '22px',
+      fontSize: '20px',
       color: TextColors.gold,
       letterSpacing: 6,
-    });
-    titleText.setOrigin(0.5);
-    titleText.setDepth(contentDepth + 1);
+    }).setOrigin(0.5).setDepth(contentDepth + 1);
 
     // Decorative lines flanking the title
-    const lineGfx = this.add.graphics();
-    lineGfx.setDepth(contentDepth + 1);
+    const lineGfx = this.add.graphics().setDepth(contentDepth + 1);
     lineGfx.lineStyle(1, Colors.gold, 0.5);
-    const titleHalfW = titleText.width / 2 + 16;
-    lineGfx.lineBetween(panelX - titleHalfW - 60, titleY, panelX - titleHalfW, titleY);
-    lineGfx.lineBetween(panelX + titleHalfW, titleY, panelX + titleHalfW + 60, titleY);
-    // Small diamond accents
-    this.drawDiamond(lineGfx, panelX - titleHalfW - 64, titleY, 4, Colors.gold, 0.5);
-    this.drawDiamond(lineGfx, panelX + titleHalfW + 64, titleY, 4, Colors.gold, 0.5);
+    const thw = titleText.width / 2 + 16;
+    lineGfx.lineBetween(panelX - thw - 60, titleY, panelX - thw, titleY);
+    lineGfx.lineBetween(panelX + thw, titleY, panelX + thw + 60, titleY);
+    this.drawDiamond(lineGfx, panelX - thw - 64, titleY, 4, Colors.gold, 0.5);
+    this.drawDiamond(lineGfx, panelX + thw + 64, titleY, 4, Colors.gold, 0.5);
 
     // --- Close button ---
     const closeBtnX = panelX + panelW / 2 - 28;
     const closeBtnY = panelY - panelH / 2 + 28;
-    const closeBtn = this.add.text(closeBtnX, closeBtnY, '✕', {
-      fontFamily: FONT,
-      fontSize: '22px',
-      color: TextColors.goldDim,
-    });
-    closeBtn.setOrigin(0.5);
-    closeBtn.setDepth(contentDepth + 2);
-    closeBtn.setInteractive({ cursor: HAND_CURSOR });
-    closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
-    closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
-    closeBtn.on('pointerdown', () => this.scene.stop());
 
-    // --- Room grid layout ---
-    const chapter = SaveSystem.getInstance().getChapter();
-    const gridOriginX = panelX;
-    const gridOriginY = panelY + 18;
-    const cellW = 170;
-    const cellH = 140;
-    const gridCols = 5;
-    const gridRows = 4;
-    const gridW = gridCols * cellW;
-    const gridH = gridRows * cellH;
-
-    const getRoomCenter = (room: RoomDef): { x: number; y: number } => ({
-      x: gridOriginX - gridW / 2 + room.gridX * cellW + cellW / 2,
-      y: gridOriginY - gridH / 2 + room.gridY * cellH + cellH / 2 + 16,
-    });
-
-    // --- Connection paths (gold hallway lines) ---
-    const pathGfx = this.add.graphics();
-    pathGfx.setDepth(contentDepth + 1);
-
-    for (const [idA, idB] of CONNECTIONS) {
-      const roomA = ROOMS.find((r) => r.id === idA);
-      const roomB = ROOMS.find((r) => r.id === idB);
-      if (!roomA || !roomB) continue;
-
-      const a = getRoomCenter(roomA);
-      const b = getRoomCenter(roomB);
-
-      // Outer glow line
-      pathGfx.lineStyle(4, Colors.gold, 0.08);
-      pathGfx.lineBetween(a.x, a.y, b.x, b.y);
-
-      // Main connection line
-      pathGfx.lineStyle(2, Colors.gold, 0.25);
-      pathGfx.lineBetween(a.x, a.y, b.x, b.y);
-
-      // Dashed center highlight
-      this.drawDashedLine(pathGfx, a.x, a.y, b.x, b.y, 6, 4, Colors.gold, 0.12);
+    if (this.textures.exists('ui_close_btn')) {
+      const closeImg = this.add.image(closeBtnX, closeBtnY, 'ui_close_btn');
+      closeImg.setDisplaySize(32, 32).setDepth(contentDepth + 3);
+      closeImg.setInteractive({ cursor: HAND_CURSOR });
+      closeImg.on('pointerover', () => closeImg.setScale(closeImg.scaleX * 1.15));
+      closeImg.on('pointerout', () => closeImg.setDisplaySize(32, 32));
+      closeImg.on('pointerdown', () => this.scene.stop());
+    } else {
+      const closeBtn = this.add.text(closeBtnX, closeBtnY, '✕', {
+        fontFamily: FONT, fontSize: '22px', color: TextColors.goldDim,
+      }).setOrigin(0.5).setDepth(contentDepth + 3).setInteractive({ cursor: HAND_CURSOR });
+      closeBtn.on('pointerover', () => closeBtn.setColor(TextColors.gold));
+      closeBtn.on('pointerout', () => closeBtn.setColor(TextColors.goldDim));
+      closeBtn.on('pointerdown', () => this.scene.stop());
     }
 
-    // --- Place medallion icons ---
+    // --- Content area (inside border, below title) ---
+    const contentLeft = panelX - panelW / 2 + 50;
+    const contentTop = titleY + 20;
+    const contentW = panelW - 100;
+    const contentH = panelH - 80;
+
+    // --- Floor level labels (left side) ---
+    for (const fl of FLOOR_LABELS) {
+      const labelY = contentTop + fl.fy * contentH;
+      this.add.text(contentLeft - 8, labelY, fl.label, {
+        fontFamily: FONT,
+        fontSize: '8px',
+        color: TextColors.goldDim,
+        letterSpacing: 2,
+      }).setOrigin(1, 0.5).setDepth(contentDepth + 1).setAlpha(0.6);
+
+      // Faint horizontal guide line
+      const guideGfx = this.add.graphics().setDepth(contentDepth);
+      guideGfx.lineStyle(1, Colors.gold, 0.06);
+      guideGfx.lineBetween(contentLeft, labelY, contentLeft + contentW, labelY);
+    }
+
+    // --- Helper to get room pixel position ---
+    const getRoomPos = (room: RoomDef) => ({
+      x: contentLeft + room.fx * contentW,
+      y: contentTop + room.fy * contentH,
+    });
+
+    // --- Connection paths ---
+    const pathGfx = this.add.graphics().setDepth(contentDepth + 1);
+
+    for (const [idA, idB] of CONNECTIONS) {
+      const roomA = ROOMS.find(r => r.id === idA);
+      const roomB = ROOMS.find(r => r.id === idB);
+      if (!roomA || !roomB) continue;
+
+      const a = getRoomPos(roomA);
+      const b = getRoomPos(roomB);
+      const aDiscovered = save.isRoomDiscovered(roomA.id);
+      const bDiscovered = save.isRoomDiscovered(roomB.id);
+      const bothKnown = aDiscovered && bDiscovered;
+
+      // Outer glow
+      pathGfx.lineStyle(4, Colors.gold, bothKnown ? 0.08 : 0.03);
+      pathGfx.lineBetween(a.x, a.y, b.x, b.y);
+
+      // Main line
+      pathGfx.lineStyle(2, Colors.gold, bothKnown ? 0.25 : 0.08);
+      pathGfx.lineBetween(a.x, a.y, b.x, b.y);
+
+      if (bothKnown) {
+        this.drawDashedLine(pathGfx, a.x, a.y, b.x, b.y, 6, 4, Colors.gold, 0.12);
+      }
+    }
+
+    // --- Place room medallions ---
     for (const room of ROOMS) {
-      const pos = getRoomCenter(room);
+      const pos = getRoomPos(room);
       const isCurrentRoom = room.id === this.currentRoom;
+      const isDiscovered = save.isRoomDiscovered(room.id);
       const isLocked = room.requiresChapter !== undefined && chapter < room.requiresChapter;
 
       const container = this.add.container(pos.x, pos.y);
       container.setDepth(contentDepth + 2);
 
-      const textureKey = `map_${room.id}`;
-      const hasTexture = this.textures.exists(textureKey);
+      if (isDiscovered) {
+        // --- DISCOVERED ROOM: Show medallion ---
+        const textureKey = `map_${room.id}`;
+        const hasTexture = this.textures.exists(textureKey);
 
-      if (hasTexture && !isLocked) {
-        // Use the medallion image (new icons are portrait with built-in nameplate)
-        const medallion = this.add.image(0, -6, textureKey);
-        // Scale to fit our display size based on height (icons are taller than wide)
-        const scale = MEDALLION_DISPLAY_SIZE / medallion.height;
-        medallion.setScale(scale);
-        container.add(medallion);
-
-        // The circular part of the medallion is roughly the top 75% of the image
-        const circleRadius = (MEDALLION_DISPLAY_SIZE * 0.36);
-        const circleOffsetY = -6 - (MEDALLION_DISPLAY_SIZE * 0.1);
-
-        // Current room: dramatic multi-layered glow (Nancy Drew style)
-        if (isCurrentRoom) {
-          const glowRing = this.add.graphics();
-
-          // Outermost soft bloom — wide, faint warm white
-          glowRing.lineStyle(20, 0xfff4d0, 0.08);
-          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 18);
-
-          // Outer glow — warm amber
-          glowRing.lineStyle(12, 0xffcc44, 0.15);
-          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 12);
-
-          // Mid glow — bright gold
-          glowRing.lineStyle(6, 0xffd866, 0.35);
-          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 6);
-
-          // Inner bright ring — crisp white-gold
-          glowRing.lineStyle(3, 0xffeebb, 0.7);
-          glowRing.strokeCircle(0, circleOffsetY, circleRadius + 2);
-
-          // Core highlight ring — near-white
-          glowRing.lineStyle(1.5, 0xfff8e0, 0.9);
-          glowRing.strokeCircle(0, circleOffsetY, circleRadius);
-
-          container.addAt(glowRing, 0);
-
-          // Pulsing animation on the glow
-          this.tweens.add({
-            targets: glowRing,
-            alpha: { from: 1, to: 0.5 },
-            duration: 1200,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut',
-          });
-        }
-
-        // Invisible hit area over the full medallion (including nameplate)
-        const hitW = MEDALLION_DISPLAY_SIZE * (medallion.width / medallion.height);
-        const hitArea = this.add.rectangle(0, -6, hitW, MEDALLION_DISPLAY_SIZE, 0x000000, 0);
-        hitArea.setInteractive({ cursor: HAND_CURSOR });
-        container.add(hitArea);
-
-        // Hover effects
-        hitArea.on('pointerover', () => {
-          if (room.id !== this.currentRoom) {
-            medallion.setScale(scale * 1.08);
-          }
-        });
-        hitArea.on('pointerout', () => {
+        if (hasTexture) {
+          const medallion = this.add.image(0, -6, textureKey);
+          const scale = MEDALLION_SIZE / medallion.height;
           medallion.setScale(scale);
-        });
-        hitArea.on('pointerdown', () => {
-          if (room.id !== this.currentRoom) {
-            this.navigateToRoom(room.id);
+
+          // Locked rooms (discovered but chapter-gated): desaturated + lock overlay
+          if (isLocked) {
+            medallion.setTint(0x666666);
+            medallion.setAlpha(0.5);
           }
-        });
 
-        // "You are here" indicator (below the nameplate)
-        if (isCurrentRoom) {
-          // Slightly enlarge the current room medallion
-          medallion.setScale(scale * 1.05);
+          container.add(medallion);
 
-          const hereText = this.add.text(0, MEDALLION_DISPLAY_SIZE / 2 + 2, '— you are here —', {
-            fontFamily: FONT,
-            fontSize: '10px',
-            color: '#fff4d0',
-          });
-          hereText.setOrigin(0.5);
-          hereText.setAlpha(0.9);
-          container.add(hereText);
+          const circleRadius = MEDALLION_SIZE * 0.36;
+          const circleOffsetY = -6 - MEDALLION_SIZE * 0.1;
+
+          // Current room glow
+          if (isCurrentRoom) {
+            const glowRing = this.add.graphics();
+            glowRing.lineStyle(20, 0xfff4d0, 0.08);
+            glowRing.strokeCircle(0, circleOffsetY, circleRadius + 18);
+            glowRing.lineStyle(12, 0xffcc44, 0.15);
+            glowRing.strokeCircle(0, circleOffsetY, circleRadius + 12);
+            glowRing.lineStyle(6, 0xffd866, 0.35);
+            glowRing.strokeCircle(0, circleOffsetY, circleRadius + 6);
+            glowRing.lineStyle(3, 0xffeebb, 0.7);
+            glowRing.strokeCircle(0, circleOffsetY, circleRadius + 2);
+            glowRing.lineStyle(1.5, 0xfff8e0, 0.9);
+            glowRing.strokeCircle(0, circleOffsetY, circleRadius);
+            container.addAt(glowRing, 0);
+
+            this.tweens.add({
+              targets: glowRing,
+              alpha: { from: 1, to: 0.5 },
+              duration: 1200,
+              yoyo: true,
+              repeat: -1,
+              ease: 'Sine.easeInOut',
+            });
+          }
+
+          // Hit area
+          const hitW = MEDALLION_SIZE * (medallion.width / medallion.height);
+          const hitArea = this.add.rectangle(0, -6, hitW, MEDALLION_SIZE, 0x000000, 0);
+          hitArea.setInteractive({ cursor: isLocked ? 'default' : HAND_CURSOR });
+          container.add(hitArea);
+
+          if (!isLocked) {
+            const baseScale = isCurrentRoom ? scale * 1.05 : scale;
+            if (isCurrentRoom) medallion.setScale(baseScale);
+
+            hitArea.on('pointerover', () => {
+              if (room.id !== this.currentRoom) medallion.setScale(scale * 1.08);
+            });
+            hitArea.on('pointerout', () => {
+              medallion.setScale(isCurrentRoom ? scale * 1.05 : scale);
+            });
+            hitArea.on('pointerdown', () => {
+              if (room.id !== this.currentRoom) this.navigateToRoom(room.id);
+            });
+          }
+
+          // Lock icon overlay for chapter-gated rooms
+          if (isLocked) {
+            const lockIcon = this.add.text(0, circleOffsetY, '🔒', {
+              fontSize: '24px',
+            }).setOrigin(0.5).setAlpha(0.7);
+            container.add(lockIcon);
+
+            const lockLabel = this.add.text(0, MEDALLION_SIZE / 2 + 2, `Chapter ${room.requiresChapter}`, {
+              fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+            }).setOrigin(0.5).setAlpha(0.6);
+            container.add(lockLabel);
+          }
+
+          // "You are here" indicator
+          if (isCurrentRoom) {
+            const hereText = this.add.text(0, MEDALLION_SIZE / 2 + 2, '— you are here —', {
+              fontFamily: FONT, fontSize: '10px', color: '#fff4d0',
+            }).setOrigin(0.5).setAlpha(0.9);
+            container.add(hereText);
+          }
+        } else {
+          // Fallback: discovered but no texture
+          this.createFallbackCard(container, room, isCurrentRoom, isLocked);
         }
       } else {
-        // Fallback: locked room or missing texture — draw a simple card
-        const cardW = 100;
-        const cardH = 80;
+        // --- UNDISCOVERED ROOM: Shadowy silhouette with ? ---
+        const silBg = this.add.graphics();
+        silBg.fillStyle(0x0a0a1a, 0.6);
+        silBg.fillCircle(0, -12, 36);
+        silBg.lineStyle(1.5, Colors.gold, 0.15);
+        silBg.strokeCircle(0, -12, 36);
+        container.add(silBg);
 
-        const cardBg = this.add.rectangle(0, 0, cardW, cardH, 0x0a0a1a, 0.7);
-        cardBg.setStrokeStyle(1.5, isLocked ? 0x3a3a4a : room.color, isLocked ? 0.4 : 0.5);
-        container.add(cardBg);
-
-        const lockIcon = this.add.text(0, -10, '🔒', { fontSize: '20px' });
-        lockIcon.setOrigin(0.5);
-        lockIcon.setAlpha(0.4);
-        container.add(lockIcon);
-
-        const nameText = this.add.text(0, 14, room.name, {
+        const questionMark = this.add.text(0, -14, '?', {
           fontFamily: FONT,
-          fontSize: '10px',
-          color: TextColors.mutedBlue,
-          align: 'center',
+          fontSize: '28px',
+          color: TextColors.goldDim,
+        }).setOrigin(0.5).setAlpha(0.4);
+        container.add(questionMark);
+
+        // Faint pulsing mystery effect
+        this.tweens.add({
+          targets: questionMark,
+          alpha: { from: 0.25, to: 0.5 },
+          duration: 2000,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
         });
-        nameText.setOrigin(0.5, 0);
-        container.add(nameText);
 
-        if (isLocked && room.requiresChapter) {
-          const lockText = this.add.text(0, 30, `Chapter ${room.requiresChapter}`, {
-            fontFamily: FONT,
-            fontSize: '8px',
-            color: TextColors.mutedBlue,
-          });
-          lockText.setOrigin(0.5);
-          lockText.setAlpha(0.6);
-          container.add(lockText);
-        }
+        const unknownLabel = this.add.text(0, 20, '???', {
+          fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+        }).setOrigin(0.5).setAlpha(0.4);
+        container.add(unknownLabel);
       }
-
-      this.roomCards.set(room.id, container);
     }
 
-    // --- Subtitle ---
-    const subtitleY = panelY + panelH / 2 - 22;
-    const subtitle = this.add.text(panelX, subtitleY, 'Select a location to travel', {
+    // --- Discovery count ---
+    const discovered = ROOMS.filter(r => save.isRoomDiscovered(r.id)).length;
+    const subtitleY = panelY + panelH / 2 - 20;
+    this.add.text(panelX, subtitleY, `${discovered} of ${ROOMS.length} locations discovered`, {
       fontFamily: FONT,
-      fontSize: '11px',
+      fontSize: '10px',
       color: TextColors.goldDim,
-    });
-    subtitle.setOrigin(0.5);
-    subtitle.setAlpha(0.5);
-    subtitle.setDepth(contentDepth + 1);
+    }).setOrigin(0.5).setAlpha(0.5).setDepth(contentDepth + 1);
 
     // --- Fade in ---
     this.cameras.main.fadeIn(200, 0, 0, 0);
   }
 
-  /**
-   * Draw a dark aged parchment texture as the map background.
-   */
+  /** Fallback card for rooms with missing textures */
+  private createFallbackCard(
+    container: Phaser.GameObjects.Container,
+    room: RoomDef,
+    isCurrent: boolean,
+    isLocked: boolean,
+  ): void {
+    const cardBg = this.add.rectangle(0, 0, 90, 70, 0x0a0a1a, 0.7);
+    cardBg.setStrokeStyle(1.5, isLocked ? 0x3a3a4a : Colors.gold, isLocked ? 0.4 : 0.5);
+    container.add(cardBg);
+
+    const nameText = this.add.text(0, isCurrent ? -8 : 0, room.name, {
+      fontFamily: FONT, fontSize: '10px', color: isCurrent ? TextColors.gold : TextColors.mutedBlue,
+      align: 'center', wordWrap: { width: 80 },
+    }).setOrigin(0.5);
+    container.add(nameText);
+
+    if (isCurrent) {
+      const hereText = this.add.text(0, 12, '— here —', {
+        fontFamily: FONT, fontSize: '9px', color: '#fff4d0',
+      }).setOrigin(0.5).setAlpha(0.7);
+      container.add(hereText);
+    }
+
+    if (!isLocked && !isCurrent) {
+      cardBg.setInteractive({ cursor: HAND_CURSOR });
+      cardBg.on('pointerover', () => cardBg.setStrokeStyle(1.5, Colors.gold, 0.8));
+      cardBg.on('pointerout', () => cardBg.setStrokeStyle(1.5, Colors.gold, 0.5));
+      cardBg.on('pointerdown', () => this.navigateToRoom(room.id));
+    }
+  }
+
   private drawParchmentBackground(
     cx: number, cy: number, w: number, h: number, depth: number,
   ): void {
-    const gfx = this.add.graphics();
-    gfx.setDepth(depth);
-
+    const gfx = this.add.graphics().setDepth(depth);
     const left = cx - w / 2;
     const top = cy - h / 2;
 
-    // Base dark parchment color
     gfx.fillStyle(0x1a1610, 1);
     gfx.fillRect(left, top, w, h);
 
-    // Layered noise-like patches for aged texture
     const patchColors = [0x1e1a14, 0x16120e, 0x201c14, 0x14100c, 0x221e16];
     for (let i = 0; i < 40; i++) {
       const px = left + Math.random() * w;
@@ -327,58 +391,41 @@ export class MapScene extends Phaser.Scene {
       gfx.fillRect(px - pw / 2, py - ph / 2, pw, ph);
     }
 
-    // Subtle horizontal grain lines
     gfx.lineStyle(1, 0x2a2418, 0.15);
     for (let y = top + 10; y < top + h; y += 8 + Math.random() * 6) {
-      const x1 = left + Math.random() * 20;
-      const x2 = left + w - Math.random() * 20;
-      gfx.lineBetween(x1, y, x2, y);
+      gfx.lineBetween(left + Math.random() * 20, y, left + w - Math.random() * 20, y);
     }
 
-    // Warm vignette overlay — darker at edges
-    // Top edge
+    // Vignette
     gfx.fillStyle(0x0a0806, 0.5);
     gfx.fillRect(left, top, w, 40);
     gfx.fillStyle(0x0a0806, 0.3);
     gfx.fillRect(left, top, w, 80);
-    // Bottom edge
     gfx.fillStyle(0x0a0806, 0.5);
     gfx.fillRect(left, top + h - 40, w, 40);
     gfx.fillStyle(0x0a0806, 0.3);
     gfx.fillRect(left, top + h - 80, w, 80);
-    // Left edge
     gfx.fillStyle(0x0a0806, 0.4);
     gfx.fillRect(left, top, 30, h);
-    // Right edge
     gfx.fillStyle(0x0a0806, 0.4);
     gfx.fillRect(left + w - 30, top, 30, h);
 
-    // Faint gold wash in the center
     gfx.fillStyle(Colors.gold, 0.03);
     gfx.fillRect(cx - w / 4, cy - h / 4, w / 2, h / 2);
   }
 
-  /**
-   * Draw an art deco styled border frame.
-   */
   private drawArtDecoBorder(
     cx: number, cy: number, w: number, h: number, depth: number,
   ): void {
-    const gfx = this.add.graphics();
-    gfx.setDepth(depth + 1);
-
+    const gfx = this.add.graphics().setDepth(depth + 1);
     const left = cx - w / 2;
     const top = cy - h / 2;
 
-    // Outer border
     gfx.lineStyle(3, Colors.gold, 0.7);
     gfx.strokeRect(left, top, w, h);
-
-    // Inner border
     gfx.lineStyle(1, Colors.gold, 0.3);
     gfx.strokeRect(left + 8, top + 8, w - 16, h - 16);
 
-    // Corner accents — art deco diamonds
     const corners = [
       { x: left + 8, y: top + 8 },
       { x: left + w - 8, y: top + 8 },
@@ -389,19 +436,14 @@ export class MapScene extends Phaser.Scene {
       this.drawDiamond(gfx, c.x, c.y, 6, Colors.gold, 0.5);
     }
 
-    // Art deco line accents at top corners
     const accentLen = 40;
     gfx.lineStyle(1, Colors.gold, 0.4);
-    // Top-left
     gfx.lineBetween(left + 16, top + 16, left + 16 + accentLen, top + 16);
     gfx.lineBetween(left + 16, top + 16, left + 16, top + 16 + accentLen);
-    // Top-right
     gfx.lineBetween(left + w - 16, top + 16, left + w - 16 - accentLen, top + 16);
     gfx.lineBetween(left + w - 16, top + 16, left + w - 16, top + 16 + accentLen);
-    // Bottom-left
     gfx.lineBetween(left + 16, top + h - 16, left + 16 + accentLen, top + h - 16);
     gfx.lineBetween(left + 16, top + h - 16, left + 16, top + h - 16 - accentLen);
-    // Bottom-right
     gfx.lineBetween(left + w - 16, top + h - 16, left + w - 16 - accentLen, top + h - 16);
     gfx.lineBetween(left + w - 16, top + h - 16, left + w - 16, top + h - 16 - accentLen);
   }

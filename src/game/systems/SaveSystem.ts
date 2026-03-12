@@ -12,6 +12,7 @@ interface SaveData {
   puzzles: ReturnType<PuzzleSystem['toJSON']>;
   journal: string[];
   flags: Record<string, boolean | string>;
+  discoveredRooms?: string[];
 }
 
 const SAVE_KEY = 'nancy-drew-save';
@@ -23,6 +24,7 @@ export class SaveSystem {
   private chapter = 1;
   private journal: string[] = [];
   private flags: Record<string, boolean | string> = {};
+  private discoveredRooms: Set<string> = new Set(['lobby']);
 
   static getInstance(): SaveSystem {
     if (!SaveSystem.instance) {
@@ -33,6 +35,7 @@ export class SaveSystem {
 
   setCurrentRoom(roomId: string): void {
     this.currentRoom = roomId;
+    this.discoveredRooms.add(roomId);
   }
 
   getCurrentRoom(): string {
@@ -57,6 +60,18 @@ export class SaveSystem {
     return [...this.journal];
   }
 
+  discoverRoom(roomId: string): void {
+    this.discoveredRooms.add(roomId);
+  }
+
+  isRoomDiscovered(roomId: string): boolean {
+    return this.discoveredRooms.has(roomId);
+  }
+
+  getDiscoveredRooms(): string[] {
+    return [...this.discoveredRooms];
+  }
+
   setFlag(flag: string, value: boolean | string): void {
     this.flags[flag] = value;
   }
@@ -76,6 +91,7 @@ export class SaveSystem {
       puzzles: PuzzleSystem.getInstance().toJSON(),
       journal: [...this.journal],
       flags: { ...this.flags },
+      discoveredRooms: [...this.discoveredRooms],
     };
 
     try {
@@ -97,6 +113,7 @@ export class SaveSystem {
       this.chapter = data.chapter;
       this.journal = data.journal || [];
       this.flags = data.flags || {};
+      this.discoveredRooms = new Set(data.discoveredRooms ?? ['lobby']);
 
       InventorySystem.getInstance().loadFromJSON(data.inventory);
       DialogueSystem.getInstance().loadFromJSON(data.dialogue);
