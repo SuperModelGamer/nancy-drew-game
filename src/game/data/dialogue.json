@@ -6,11 +6,11 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Vivian", "text": "Nancy Drew? Oh, thank heavens. I wasn't sure anyone would come." },
+            { "speaker": "Vivian", "text": "Nancy Drew? Oh, mon Dieu, thank heavens. I wasn't sure anyone would come." },
             { "speaker": "Nancy", "text": "Ms. Delacroix? You called about a poisoning — and a ghost?" },
-            { "speaker": "Vivian", "text": "Both, dear. Roland Ashworth — the man demolishing my theater — collapsed last night. Doctors say he was poisoned. And before that... she appeared again." },
+            { "speaker": "Vivian", "text": "Both, ma chère. Roland Ashworth — the man demolishing my theater — collapsed last night. Doctors say he was poisoned. And before that... she appeared again." },
             { "speaker": "Nancy", "text": "She?" },
-            { "speaker": "Vivian", "text": "Margaux Fontaine. The greatest actress who ever stood on that stage. She died here in 1928 — on stage, during her final performance. And now her ghost walks the Monarch." }
+            { "speaker": "Vivian", "text": "Margaux Fontaine. The greatest actress who ever graced that stage. She died here in 1928 — on stage, during her final performance. And now her ghost walks the Monarch." }
           ],
           "choices": [
             {
@@ -30,10 +30,10 @@
         {
           "id": "about_margaux",
           "lines": [
-            { "speaker": "Vivian", "text": "Margaux Fontaine was a legend. She was performing 'The Crimson Veil' — her signature role — when she collapsed during the final act. Poison in the prop goblet, they said. An accident." },
-            { "speaker": "Vivian", "text": "But I never believed that. She was my godmother, Nancy. She held me as a baby. And I've spent my whole life in this theater, waiting for the truth." },
+            { "speaker": "Vivian", "text": "Margaux Fontaine was... how do I say this... she was luminous. She was performing 'The Crimson Veil' — her signature role — when she collapsed during the final act. Poison in the prop goblet, they said. Un accident terrible." },
+            { "speaker": "Vivian", "text": "But I never believed that. She was my godmother, Nancy. She held me as a baby. I still remember her perfume — jasmine and something warm. And I've spent my whole life in this theater, waiting for the truth." },
             { "speaker": "Nancy", "text": "You think she was murdered?" },
-            { "speaker": "Vivian", "text": "I know she was. And I think her ghost knows it too." }
+            { "speaker": "Vivian", "text": "I know she was, ma chère. In my bones, I know. And I think her ghost knows it too." }
           ],
           "choices": [
             {
@@ -51,10 +51,10 @@
         {
           "id": "about_ashworth",
           "lines": [
-            { "speaker": "Vivian", "text": "Roland Ashworth bought the Monarch six months ago. Plans to demolish it in three days and build luxury condominiums." },
-            { "speaker": "Vivian", "text": "Last night, he was found unconscious in his office. Some kind of toxin — non-lethal, but deliberate. He's recovering upstairs, furious and suspicious of everyone." },
+            { "speaker": "Vivian", "text": "Roland Ashworth bought the Monarch six months ago. Plans to demolish it — mon beau théâtre — in three days. Luxury condominiums, he says. As if the world needs more of those." },
+            { "speaker": "Vivian", "text": "Last night, he was found unconscious in his office. Some kind of toxin — non-lethal, but très deliberate. He's recovering upstairs, furious and suspicious of everyone." },
             { "speaker": "Nancy", "text": "Does he have enemies here?" },
-            { "speaker": "Vivian", "text": "Everyone in this theater has a reason to want the demolition stopped. Myself included. I won't pretend otherwise." }
+            { "speaker": "Vivian", "text": "Everyone in this theater has a reason to want the demolition stopped. Myself included. I won't insult your intelligence by pretending otherwise." }
           ],
           "choices": [
             {
@@ -72,18 +72,18 @@
         {
           "id": "about_others",
           "lines": [
-            { "speaker": "Vivian", "text": "There's Edwin Hale — a theater historian. He's been documenting the Monarch for years. You'll find him in the auditorium, practically living in those seats." },
-            { "speaker": "Vivian", "text": "Stella Morrow is our stage manager. Practical woman, knows every inch of this building. She's backstage." },
-            { "speaker": "Vivian", "text": "And young Diego Reyes — a playwright renting the projection booth. Sweet boy, but he's heard things at night he can't explain." },
-            { "speaker": "Vivian", "text": "Then there's Ashworth himself, recovering in the manager's office. He won't be happy to see a detective." }
+            { "speaker": "Vivian", "text": "There's Edwin Hale — un historien, a theater historian. He's been documenting the Monarch for... oh, it must be fifteen years now. You'll find him in the auditorium. He practically lives in those seats." },
+            { "speaker": "Vivian", "text": "Stella Morrow is our stage manager. Practical woman — no nonsense, that one. Knows every inch of this building. She's backstage, as always." },
+            { "speaker": "Vivian", "text": "And young Diego Reyes — a playwright renting the projection booth. Un garçon charmant, but he's heard things at night he can't explain. It's rattled him, poor dear." },
+            { "speaker": "Vivian", "text": "Then there's Ashworth himself, recovering in the manager's office. He won't be happy to see a detective. He isn't happy about anything, vraiment." }
           ],
           "nextNode": "start"
         },
         {
           "id": "end",
           "lines": [
-            { "speaker": "Vivian", "text": "I left a master key at the concierge desk. It opens most doors in the theater. There's also a magnifying glass — my late husband's." },
-            { "speaker": "Vivian", "text": "And Nancy — be careful. The Monarch has kept its secrets for almost a century. It won't give them up easily." }
+            { "speaker": "Vivian", "text": "I left a master key at the concierge desk — it opens most doors in the theater. There's also a magnifying glass. It belonged to my late husband. He was... he had sharp eyes. You'll need them." },
+            { "speaker": "Vivian", "text": "And Nancy — sois prudente. Be careful. The Monarch has kept its secrets for almost a century. It won't give them up easily." }
           ]
         }
       ]
@@ -95,7 +95,7 @@
           "id": "start",
           "lines": [
             { "speaker": "Nancy", "text": "Vivian, I found something in the dressing room. Margaux's diary." },
-            { "speaker": "Vivian", "text": "Oh... oh my. I always hoped it survived. What does it say?" },
+            { "speaker": "Vivian", "text": "Oh... oh, mon Dieu. I always hoped it survived. What does it say? Tell me — s'il te plaît." },
             { "speaker": "Nancy", "text": "She suspected she was being poisoned. Long before the final night. 'The tea tastes wrong again,' she wrote." },
             { "speaker": "Vivian", "text": "I knew it. I always knew it wasn't an accident." }
           ],
@@ -119,10 +119,10 @@
           "id": "cecilia_reveal",
           "lines": [
             { "speaker": "Vivian", "text": "C.D... Cecilia Drake. Margaux's understudy." },
-            { "speaker": "Vivian", "text": "She was young, ambitious, talented. Margaux adored her — took her under her wing. But Cecilia wanted more than mentorship. She wanted the role." },
+            { "speaker": "Vivian", "text": "She was young, ambitious, très talentueuse. Margaux adored her — took her under her wing. But Cecilia wanted more than mentorship. She wanted the role. She wanted... everything." },
             { "speaker": "Nancy", "text": "And after Margaux died—" },
-            { "speaker": "Vivian", "text": "Cecilia took over Lady Ashford the very next night. She became a star. Built a forty-year career on the role she stole." },
-            { "speaker": "Vivian", "text": "She died in 1987. Celebrated. Beloved. While Margaux was forgotten." }
+            { "speaker": "Vivian", "text": "Cecilia took over Lady Ashford the very next night. The very next night, Nancy. She became a star. Built a forty-year career on the role she stole from a dead woman." },
+            { "speaker": "Vivian", "text": "She died in 1987. Celebrated. Beloved. While my Margaux was forgotten. C'est injuste. It's unbearable." }
           ],
           "nextNode": "end",
           "triggerEvent": "learned_about_cecilia"
@@ -140,9 +140,9 @@
         {
           "id": "lover_reveal",
           "lines": [
-            { "speaker": "Vivian", "text": "J? I... yes. Margaux had a great love. A man named James — James Hale. He was a stagehand here at the Monarch." },
+            { "speaker": "Vivian", "text": "J? I... oui, yes. Margaux had a great love. Un grand amour. A man named James — James Hale. He was a stagehand here at the Monarch." },
             { "speaker": "Nancy", "text": "Hale? As in Edwin Hale?" },
-            { "speaker": "Vivian", "text": "Edwin is James's grandson. That's why he's so obsessed with this theater, with Margaux's story. It's personal for him. His grandfather lost the love of his life on that stage." },
+            { "speaker": "Vivian", "text": "Edwin is James's grandson. That's why he's so... how shall I say... consumed by this theater, by Margaux's story. It's personal for him. His grandfather lost the love of his life on that stage." },
             { "speaker": "Nancy", "text": "That changes everything." }
           ],
           "nextNode": "end",
@@ -151,7 +151,7 @@
         {
           "id": "end",
           "lines": [
-            { "speaker": "Vivian", "text": "Nancy... promise me something. Whatever you find out — whoever is responsible, past or present — make sure Margaux's name is cleared. She deserves that much." }
+            { "speaker": "Vivian", "text": "Nancy... promets-moi — promise me something. Whatever you find out — whoever is responsible, past or present — make sure Margaux's name is cleared. She deserves that much. She deserves everything." }
           ]
         }
       ]
@@ -176,9 +176,9 @@
           "id": "locket_reaction",
           "lines": [
             { "speaker": "Vivian", "text": "..." },
-            { "speaker": "Vivian", "text": "That's... that's me. I was four years old." },
-            { "speaker": "Vivian", "text": "'To my little star.' She called me that. Every time she held me." },
-            { "speaker": "Vivian", "text": "She kept it in the trunk. All these years. She locked it away because she knew... she knew she wouldn't be coming back." }
+            { "speaker": "Vivian", "text": "That's... c'est moi. That's me. I was four years old." },
+            { "speaker": "Vivian", "text": "'To my little star.' Ma petite étoile. She called me that. Every time she held me. Every time." },
+            { "speaker": "Vivian", "text": "She kept it in the trunk. All these years, she... pardonne-moi... she locked it away because she knew. She knew she wouldn't be coming back." }
           ],
           "choices": [
             {
@@ -195,9 +195,9 @@
           "id": "locket_comfort",
           "lines": [
             { "speaker": "Nancy", "text": "She wanted to protect what mattered most." },
-            { "speaker": "Vivian", "text": "I've been waiting seventy years to know what happened to her. I've lived my whole life in this theater because I couldn't leave her behind." },
-            { "speaker": "Vivian", "text": "There are private archives in my office — Margaux's personal effects, letters, photographs. I've never let anyone touch them. Take whatever you need." },
-            { "speaker": "Vivian", "text": "Don't let this building come down without the truth coming out. Please." }
+            { "speaker": "Vivian", "text": "I've been waiting seventy years to know what happened to her. Soixante-dix ans. I've lived my whole life in this theater because I couldn't leave her behind." },
+            { "speaker": "Vivian", "text": "There are private archives in my office — Margaux's personal effects, letters, photographs. I've never let anyone touch them. Not once. Take whatever you need, ma chère." },
+            { "speaker": "Vivian", "text": "Don't let this building come down without the truth coming out. Je t'en prie. Please." }
           ],
           "triggerEvent": "vivian_full_trust"
         },
@@ -219,10 +219,10 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Edwin", "text": "Ah — you must be the detective Vivian called. Edwin Hale. Theater historian. Please, sit anywhere — the whole auditorium's empty, as usual." },
+            { "speaker": "Edwin", "text": "Ah — you must be the detective Vivian called. Edwin Hale. Theater historian, Emerson College adjunct, author of — well, three books on New England theater history, if we're keeping track. Please, sit anywhere. The whole auditorium's empty, as usual." },
             { "speaker": "Nancy", "text": "Nancy Drew. How long have you been studying the Monarch?" },
-            { "speaker": "Edwin", "text": "Fifteen years. I've written three books on New England theater history. The Monarch is my life's work." },
-            { "speaker": "Edwin", "text": "This building isn't just bricks and velvet, Ms. Drew. It's a living archive. Every floorboard has a story. And if Ashworth has his way, it'll all be rubble in seventy-two hours." }
+            { "speaker": "Edwin", "text": "Fifteen years. Well — fifteen years and four months, to be precise. I started in November of 2010. The Monarch is my life's work." },
+            { "speaker": "Edwin", "text": "This building isn't just bricks and velvet, Ms. Drew. It's a living archive. Every floorboard, every rivet, every scratch on these armrests has a story. And if Ashworth has his way, it'll all be rubble in exactly seventy-two hours." }
           ],
           "choices": [
             {
@@ -252,21 +252,23 @@
         {
           "id": "edwin_on_props",
           "lines": [
-            { "speaker": "Edwin", "text": "Missing props? That's... concerning. Some of those pieces are historically significant — they're original to the 1920s productions." },
+            { "speaker": "Edwin", "text": "Missing props? That's... concerning. Some of those pieces are historically significant — the Tiffany lamps alone date to 1923, and the candelabra is original to the opening gala." },
             { "speaker": "Nancy", "text": "Stella seems worried about it." },
-            { "speaker": "Edwin", "text": "Stella has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are connected. The props are a separate matter." },
-            { "speaker": "Nancy", "text": "You seem very sure they're separate." },
-            { "speaker": "Edwin", "text": "I'm a historian. I know how to sort through noise to find the signal. Trust me — the answer to this mystery is on the stage, not on a prop shelf." }
+            { "speaker": "Edwin", "text": "Stella has her — well, she has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are the real mystery. The props are a — a separate matter entirely. A distraction." },
+            { "speaker": "Nancy", "text": "You seem very sure they're separate. How would you know that unless you knew what was actually going on?" },
+            { "speaker": "Edwin", "text": "I — that's not what I — I'm a historian, Nancy. I know how to sort through noise to find the signal. That's literally my job. I'm not hiding anything, if that's what you're implying. I'm trying to help you prioritize." },
+            { "speaker": "Nancy", "text": "I didn't say you were hiding anything." },
+            { "speaker": "Edwin", "text": "No. No, you didn't. I just — forget I said that. The answer to this mystery is on the stage, not on a prop shelf. I'd stake my reputation on it. What's left of it." }
           ],
           "nextNode": "end"
         },
         {
           "id": "crimson_veil",
           "lines": [
-            { "speaker": "Edwin", "text": "The Crimson Veil was the jewel of the 1928 season. A gothic melodrama about a countess who discovers her husband has been poisoning her. Ironic, isn't it?" },
-            { "speaker": "Edwin", "text": "Margaux Fontaine was extraordinary in the role. In the final act, her character drinks from a poisoned goblet. But on opening night — October 31st — the prop goblet contained real poison." },
+            { "speaker": "Edwin", "text": "The Crimson Veil was the jewel of the 1928 season — premiered September 15th, ran for six weeks. A gothic melodrama about a countess who discovers her husband has been poisoning her. The irony is... well, you'll see." },
+            { "speaker": "Edwin", "text": "Margaux Fontaine was extraordinary in the role. Extraordinary. In the final act, her character drinks from a poisoned goblet. But on opening night — October 31st, 1928, a Thursday — the prop goblet contained real poison." },
             { "speaker": "Nancy", "text": "And it was ruled an accident?" },
-            { "speaker": "Edwin", "text": "The official story was that a stagehand made a terrible mistake. But the stagehand was never identified. And Margaux's understudy, Cecilia Drake, took over the role the very next night and became a star." }
+            { "speaker": "Edwin", "text": "The official story — and I use that phrase with contempt — was that a stagehand made a terrible mistake. But the stagehand was never identified. Never named, never questioned. And Margaux's understudy, Cecilia Drake, took over the role the very next night and became a star. November 1st, 1928. I have the playbill." }
           ],
           "choices": [
             {
@@ -290,8 +292,8 @@
         {
           "id": "diary_reaction",
           "lines": [
-            { "speaker": "Edwin", "text": "You found her diary? Where? In the dressing room?" },
-            { "speaker": "Edwin", "text": "...May I see it? Please. I've been looking for primary sources about Margaux for fifteen years." },
+            { "speaker": "Edwin", "text": "You found her — wait. You found her diary? Where? In the dressing room?" },
+            { "speaker": "Edwin", "text": "...May I see it? Please. I've been looking for primary sources — firsthand accounts — about Margaux for fifteen years. This is... this is unprecedented." },
             { "speaker": "Nancy", "text": "She writes about feeling sick after tea, about a metallic taste. And she suspected someone specific." },
             { "speaker": "Edwin", "text": "Then she knew. She knew, and nobody listened. The police, the theater owners — they all called it an accident because it was easier." },
             { "speaker": "Edwin", "text": "That diary could be the evidence we need. Don't lose it, Nancy." }
@@ -302,9 +304,9 @@
         {
           "id": "ghost_opinion",
           "lines": [
-            { "speaker": "Edwin", "text": "I'm a historian, not a spiritualist. But I've seen things here I can't explain." },
-            { "speaker": "Edwin", "text": "Fog that rolls across the stage when no machine is running. A figure in white that appears under the ghost light and vanishes. The sound of a woman's voice reciting lines from The Crimson Veil." },
-            { "speaker": "Edwin", "text": "Whether it's truly Margaux's spirit or something else entirely... this theater is not at peace." }
+            { "speaker": "Edwin", "text": "I'm a historian, not a spiritualist. I deal in documents, not — not apparitions. But I've seen things here I can't explain. And I've tried, believe me." },
+            { "speaker": "Edwin", "text": "Fog that rolls across the stage when no machine is running. A figure in white that appears under the ghost light and vanishes. The sound of a woman's voice reciting lines from The Crimson Veil — Act Three, Scene Four, to be specific. Word perfect." },
+            { "speaker": "Edwin", "text": "Whether it's truly Margaux's spirit or something else entirely... this theater is not at peace. I can feel it. And I'm not a man who says things like that." }
           ],
           "choices": [
             {
@@ -325,21 +327,24 @@
         {
           "id": "effects_challenge",
           "lines": [
-            { "speaker": "Edwin", "text": "You've read the effects manual? Impressive — most people wouldn't bother with a century-old tech document." },
-            { "speaker": "Edwin", "text": "Yes, theoretically someone could use the old systems to stage a convincing ghost. Fog machines, the trapdoor, proper lighting..." },
-            { "speaker": "Edwin", "text": "But they'd need extensive knowledge of the building. They'd need to have practiced. And they'd need a reason." },
+            { "speaker": "Edwin", "text": "You've read the — you've actually read the effects manual? The whole thing? That's... thorough." },
+            { "speaker": "Edwin", "text": "Yes, theoretically, someone could use the old systems to stage a convincing ghost. Fog machines, the trapdoor — which is a Graves & Sons counterweight model, very reliable — proper lighting. It would be — it would be quite an undertaking." },
+            { "speaker": "Edwin", "text": "But they'd need extensive knowledge of the building. Months of preparation. They'd need to have — to have practiced. Extensively. Not that I've thought about it in detail. I'm just — speaking generally. As a historian." },
             { "speaker": "Nancy", "text": "Like saving the theater from demolition?" },
-            { "speaker": "Edwin", "text": "...That would certainly be a reason. Hypothetically." }
+            { "speaker": "Edwin", "text": "...That would certainly be a reason. Hypothetically speaking. But you'd want to — I mean, a person would want to look at all the suspects before jumping to conclusions. That's just good detective work, isn't it?" }
           ],
           "nextNode": "end"
         },
         {
           "id": "last_night",
           "lines": [
-            { "speaker": "Edwin", "text": "I was in my usual seat — row G, center — reviewing my notes. Around ten o'clock, I heard a crash from the manager's office. By the time I got there, Ashworth was on the floor." },
-            { "speaker": "Edwin", "text": "Stella called the ambulance. The rest of us waited. It was... unsettling." },
+            { "speaker": "Edwin", "text": "I was in my usual seat — row G, center — reviewing my notes. Chapter twelve revisions, if that matters. Around ten o'clock — well, closer to ten-fifteen, maybe ten-ten — I heard a crash from the manager's office." },
+            { "speaker": "Nancy", "text": "That's a fifteen-minute window you're not sure about." },
+            { "speaker": "Edwin", "text": "I — I wasn't watching the clock. I was working. By the time I got there, Ashworth was on the floor. Stella called the ambulance. The rest of us waited. It was... unsettling." },
             { "speaker": "Nancy", "text": "Did you notice anything else? Anyone missing?" },
-            { "speaker": "Edwin", "text": "Everyone was accounted for. But this is a big building with many hidden corners. Someone could have slipped away without being seen." }
+            { "speaker": "Edwin", "text": "Everyone was — well, I can't say everyone was accounted for. It's a big building. Many hidden corners. Someone could have slipped away and come back without anyone noticing. Hypothetically." },
+            { "speaker": "Nancy", "text": "You said 'hypothetically.'" },
+            { "speaker": "Edwin", "text": "I said what I said. I'm trying to be helpful, Nancy. That's all." }
           ],
           "nextNode": "start"
         },
@@ -355,11 +360,11 @@
         {
           "id": "grandfather",
           "lines": [
-            { "speaker": "Edwin", "text": "...Who told you that?" },
+            { "speaker": "Edwin", "text": "...Who told you — how did you—" },
             { "speaker": "Nancy", "text": "Vivian. She recognized the name." },
-            { "speaker": "Edwin", "text": "Yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux..." },
-            { "speaker": "Edwin", "text": "He never got over her death. He spent the rest of his life insisting it wasn't an accident. Nobody believed him. He died in 1971, still fighting." },
-            { "speaker": "Edwin", "text": "I promised him I'd find the truth. That's why I'm here. That's why I've always been here." },
+            { "speaker": "Edwin", "text": "I... yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux... they were..." },
+            { "speaker": "Edwin", "text": "He never got over her death. Forty-three years, Nancy. He spent forty-three years insisting it wasn't an accident. Nobody believed him. He died in 1971 — March 14th — still fighting. Still writing letters to the police department." },
+            { "speaker": "Edwin", "text": "I promised him I'd find the truth. I was twelve years old and I promised. That's why I'm here. That's why I've always been here." },
             { "speaker": "Nancy", "text": "That's a heavy promise to carry for fifteen years." },
             { "speaker": "Edwin", "text": "Some promises are worth the weight." }
           ],
@@ -369,8 +374,8 @@
         {
           "id": "end",
           "lines": [
-            { "speaker": "Edwin", "text": "If you need anything — history, floor plans, old records — I'm your man. I know this building better than anyone alive." },
-            { "speaker": "Edwin", "text": "Oh, and Nancy? If you see the ghost... try talking to her. You never know." }
+            { "speaker": "Edwin", "text": "If you need anything — history, floor plans, old records, architectural details — I'm your man. I know this building better than anyone alive. Better than anyone who's ever lived, probably. Forgive the immodesty." },
+            { "speaker": "Edwin", "text": "Oh, and Nancy? If you see the ghost... try talking to her. You never know. Stranger things have happened. Well — actually, have they? I'd need to check my notes." }
           ]
         }
       ]
@@ -381,9 +386,9 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Stella", "text": "Detective? Great. Another person poking around my backstage. I'm Stella Morrow — stage manager. Or I was, until Ashworth decided this place was worth more as rubble." },
+            { "speaker": "Stella", "text": "Detective? Great. Fantastic. Another person poking around my backstage. I'm Stella Morrow — stage manager. Or I was, until Ashworth decided this place was worth more as a pile of expensive rubble." },
             { "speaker": "Nancy", "text": "You don't seem happy about the investigation." },
-            { "speaker": "Stella", "text": "I'm not happy about any of this. A man was poisoned, there's supposedly a ghost, and in three days this whole building comes down. I just want to do my job and go home." }
+            { "speaker": "Stella", "text": "I'm not happy about any of this. A man was poisoned, there's supposedly a ghost, I'm running on four hours of sleep and my third coffee, and in three days this whole building comes down. I just want to do my job and go home. Is that too much to ask? Apparently yes." }
           ],
           "choices": [
             {
@@ -413,12 +418,12 @@
         {
           "id": "stella_on_ghost",
           "lines": [
-            { "speaker": "Stella", "text": "Edwin told you about The Crimson Veil? Of course he did. That man can't stop talking about 1928." },
-            { "speaker": "Stella", "text": "Could someone fake a ghost? Yes. Easily. The fog machines still work. The trapdoor mechanism is original and functional. The lighting board on the catwalk can create any effect you want." },
+            { "speaker": "Stella", "text": "Edwin told you about The Crimson Veil? Of course he did. You can't say hello to that man without getting a forty-minute lecture on 1928." },
+            { "speaker": "Stella", "text": "Could someone fake a ghost? Yes. Easily. I could do it in my sleep. The fog machines still work. The trapdoor is original and functional. The lighting board on the catwalk can create any effect you want." },
             { "speaker": "Nancy", "text": "You sound like you've thought about it." },
-            { "speaker": "Stella", "text": "I'm a stage manager. It's literally my job to know how everything in this building works. But if you're asking whether I staged a ghost — no. I have enough problems without adding haunting to my résumé." },
+            { "speaker": "Stella", "text": "I'm a stage manager. It's literally my job to know how everything in this building works. I've been doing this for eight years — I could run a haunting with my eyes closed. But if you're asking whether I staged a ghost — no. God, no. I have enough problems without adding 'theatrical necromancy' to my résumé." },
             { "speaker": "Nancy", "text": "Who else would know the systems well enough?" },
-            { "speaker": "Stella", "text": "Edwin knows this building better than I do. He's been studying it for fifteen years. He's mapped every passage, every mechanism, every hidden corner. If anyone could make a convincing ghost... it's him." }
+            { "speaker": "Stella", "text": "Edwin. Full stop. He knows this building better than I do, and I hate admitting that. Fifteen years of studying every passage, every mechanism, every hidden corner. If anyone could make a convincing ghost... look, just — talk to Edwin." }
           ],
           "nextNode": "start",
           "triggerEvent": "effects_manual_location"
@@ -426,10 +431,11 @@
         {
           "id": "missing_props",
           "lines": [
+            { "speaker": "Stella", "text": "Missing? No. Nothing's missing. Everything is exactly where it —" },
             { "speaker": "Stella", "text": "..." },
-            { "speaker": "Stella", "text": "Some things have... been relocated. For safekeeping. Valuable antique props, costumes — they shouldn't be destroyed with the building." },
+            { "speaker": "Stella", "text": "Okay. Some things have been... relocated. For safekeeping. Look — valuable antique props, irreplaceable costumes — they shouldn't be destroyed with the building. That's just common sense. Anyone would do the same." },
             { "speaker": "Nancy", "text": "Relocated where, exactly?" },
-            { "speaker": "Stella", "text": "Look, those props are irreplaceable. I did what I had to do. That doesn't make me a poisoner." }
+            { "speaker": "Stella", "text": "Does it matter? I'm not going to stand here and justify basic preservation to a detective who's supposed to be investigating a poisoning. Those props are irreplaceable. I did what I had to do. That doesn't make me a poisoner. I'm tired, Nancy, not homicidal." }
           ],
           "choices": [
             {
@@ -452,11 +458,13 @@
         {
           "id": "lockbox_confronted",
           "lines": [
-            { "speaker": "Stella", "text": "You opened my—" },
+            { "speaker": "Stella", "text": "You opened my — that was locked. How did you even — you know what, it doesn't matter." },
+            { "speaker": "Stella", "text": "I didn't do anything wrong. I didn't —" },
             { "speaker": "Stella", "text": "..." },
-            { "speaker": "Stella", "text": "Yes. My mother has stage four lymphoma. The bills are... I can't keep up. Those props were going to be destroyed in three days anyway. At least this way someone gets something." },
+            { "speaker": "Stella", "text": "Fine. Yes. My mother has stage four lymphoma. The bills are — you want a number? $47,000 and counting. So yes. I sold some props. Props that were going to be smashed into dust in three days anyway. At least this way someone — at least my mom gets something out of this disaster." },
             { "speaker": "Nancy", "text": "I'm not here about the props, Stella. I'm here about the poisoning." },
-            { "speaker": "Stella", "text": "I know who's been in the basement. I've known for weeks. I wrote him a note. He ignored it." },
+            { "speaker": "Stella", "text": "Then why are you opening my lockbox? Why are you digging through my —" },
+            { "speaker": "Stella", "text": "No. You know what. Fine. You want the truth? I know who's been in the basement. I've known for weeks. I wrote him a note. He ignored it." },
             { "speaker": "Nancy", "text": "Who?" },
             { "speaker": "Stella", "text": "Edwin. It's always been Edwin." }
           ],
@@ -477,12 +485,13 @@
         {
           "id": "confronted_note",
           "lines": [
-            { "speaker": "Stella", "text": "Where did you find that?" },
+            { "speaker": "Stella", "text": "Where did you find that? That was — I put that under —" },
             { "speaker": "Nancy", "text": "On the stage floor. 'Stop now or I go to the police — S.M.' You wrote it." },
-            { "speaker": "Stella", "text": "I wrote it three days ago. Slipped it under the basement door. Whoever's down there never responded." },
+            { "speaker": "Stella", "text": "It could be anyone's initials. Sandra Mitchell, Steve — no. Fine. I wrote it. Three days ago. Slipped it under the basement door. Whoever's down there never responded." },
             { "speaker": "Nancy", "text": "You know who's in the basement." },
-            { "speaker": "Stella", "text": "I have a pretty good idea. But I need to know — are you going to report what I've done? The props?" },
-            { "speaker": "Nancy", "text": "I'm interested in the truth, Stella. All of it." }
+            { "speaker": "Stella", "text": "I don't — I'm not sure. I have suspicions. But I need to know something first. Are you going to report what I've done? The props?" },
+            { "speaker": "Nancy", "text": "I'm interested in the truth, Stella. All of it." },
+            { "speaker": "Stella", "text": "The truth. Right. Because that always works out so well for the person telling it." }
           ],
           "choices": [
             {
@@ -543,8 +552,8 @@
         {
           "id": "alibi",
           "lines": [
-            { "speaker": "Stella", "text": "I was right here, backstage, doing inventory. When I heard the crash I ran to the office and called 911. You can check the call log." },
-            { "speaker": "Stella", "text": "I didn't poison anyone. I don't even drink tea." }
+            { "speaker": "Stella", "text": "I was right here, backstage, doing inventory. Because that's what I do. Every night. When I heard the crash I ran to the office and called 911. Check the call log if you want — 10:07 PM." },
+            { "speaker": "Stella", "text": "I didn't poison anyone. I don't even drink tea. Coffee. Black. Three cups minimum. That's my poison." }
           ],
           "nextNode": "start"
         },
@@ -576,8 +585,8 @@
         {
           "id": "blueprints_reaction",
           "lines": [
-            { "speaker": "Stella", "text": "I knew about the passages — the effects manual mentions them. But I've never seen a complete map like this." },
-            { "speaker": "Stella", "text": "Look — this passage connects the basement to the dressing room. And this one goes from behind the orchestra pit to the lobby. Someone could move through the entire building without ever being seen in the open." },
+            { "speaker": "Stella", "text": "I knew about the passages — the effects manual mentions them in chapter six, I think. But I've never seen a complete map like this. Where did you even find this?" },
+            { "speaker": "Stella", "text": "Okay, look — this passage connects the basement to the dressing room. And this one goes from behind the orchestra pit to the lobby. Someone could move through the entire building without ever being seen. That's... that's not great, actually." },
             { "speaker": "Nancy", "text": "Someone like our ghost." }
           ],
           "choices": [
@@ -594,20 +603,20 @@
         {
           "id": "stella_passage_experience",
           "lines": [
-            { "speaker": "Stella", "text": "Once. Last month I heard footsteps behind the backstage wall at 2 AM. I told myself it was the building settling." },
-            { "speaker": "Stella", "text": "But buildings don't settle in rhythm. Someone was walking. And they knew exactly where they were going." },
+            { "speaker": "Stella", "text": "Once. Last month. 2 AM — I was here doing lighting inventory because apparently that's my life now. I heard footsteps behind the backstage wall. Told myself it was the building settling." },
+            { "speaker": "Stella", "text": "But buildings don't settle in rhythm. Someone was walking back there. Steady, purposeful. They knew exactly where they were going." },
             { "speaker": "Nancy", "text": "Someone who's studied these blueprints." },
-            { "speaker": "Stella", "text": "There's only one person who knows this theater well enough to navigate those passages in the dark. And he's been here every day for fifteen years." },
-            { "speaker": "Stella", "text": "You need to get to the catwalk. I'll unlock the ladder for you. There's a lighting board up there — if someone's been running a light show, that's where they set it up." }
+            { "speaker": "Stella", "text": "There's only one person who knows this theater well enough to navigate those passages in the dark. And he's been here every day for fifteen years. Do the math." },
+            { "speaker": "Stella", "text": "You need to get to the catwalk. I'll unlock the ladder — it's a pain, the lock sticks, but I'll deal with it. There's a lighting board up there. If someone's been running a light show, that's where they set it up." }
           ],
           "triggerEvent": "catwalk_access"
         },
         {
           "id": "stella_catwalk",
           "lines": [
-            { "speaker": "Stella", "text": "Exactly what I was thinking. I'll unlock the ladder for you. There's a lighting board up there that controls the whole stage. If someone's been running a light show, that's where they set it up." },
+            { "speaker": "Stella", "text": "Yeah. That's exactly what I was thinking. I'll unlock the ladder for you — fair warning, it's original 1920s metalwork and it creaks like a horror movie." },
             { "speaker": "Nancy", "text": "Thank you, Stella. You've been more helpful than you know." },
-            { "speaker": "Stella", "text": "Just... be careful up there. The catwalk is original 1920s construction. And whatever you find — remember that not everyone in this theater is a villain. Some of us are just trying to survive." }
+            { "speaker": "Stella", "text": "Just be careful up there. I've already got one person poisoned and a ghost haunting the building — I don't need someone falling off a ninety-year-old catwalk on top of everything else. And whatever you find... remember that not everyone in this theater is a villain. Some of us are just trying to keep the lights on. Literally." }
           ],
           "triggerEvent": "catwalk_access"
         }
@@ -619,9 +628,9 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Diego", "text": "Oh! Sorry — didn't hear you come up. I get lost in my writing. Diego Reyes. I'm renting the projection booth as a studio." },
+            { "speaker": "Diego", "text": "Oh! Whoa — sorry, didn't hear you come up. I was in the zone. You know how it is — 'the pen is the tongue of the mind,' as Cervantes said. Diego Reyes. I'm renting the projection booth as a writing studio." },
             { "speaker": "Nancy", "text": "Nancy Drew. I'm investigating the poisoning — and the ghost." },
-            { "speaker": "Diego", "text": "The ghost is real. I mean — I've heard her. At night, from up here, I can hear someone reciting lines on the empty stage. Act three of The Crimson Veil. Word for word." }
+            { "speaker": "Diego", "text": "The ghost is real. I mean — okay, I know how that sounds coming from a playwright, but I've heard her. At night, from up here, I can hear someone reciting lines on the empty stage. Act three of The Crimson Veil. Word for word. It's like something out of Phantom of the Opera, except scarier because it's actually happening." }
           ],
           "choices": [
             {
@@ -642,8 +651,8 @@
         {
           "id": "found_script",
           "lines": [
-            { "speaker": "Diego", "text": "Actually, yes. I found an original script of The Crimson Veil in one of the film canisters. Handwritten annotations all through the margins in red ink." },
-            { "speaker": "Diego", "text": "I thought it was blocking notes at first, but the marks are weird. Circled letters that don't match any stage directions I know. It's like a code." },
+            { "speaker": "Diego", "text": "Actually, yes! I found an original script of The Crimson Veil stuffed inside a film canister. Handwritten annotations all through the margins in red ink. It's like finding a first folio in a dumpster — sorry, I'm a theater nerd." },
+            { "speaker": "Diego", "text": "I thought it was blocking notes at first, but the marks are weird. Circled letters that don't match any stage directions I know. It's like — you know in mystery novels when there's a cipher? It's exactly like that, except I'm terrible at ciphers." },
             { "speaker": "Nancy", "text": "How many circled letters are there?" },
             { "speaker": "Diego", "text": "I counted six in Act III alone. G, O, B, L, E, T — but I couldn't figure out what they mean. They're scattered through the stage directions, not the dialogue." }
           ],
@@ -666,11 +675,11 @@
         {
           "id": "cipher_solved",
           "lines": [
-            { "speaker": "Diego", "text": "Goblet? As in — the prop goblet from the play?" },
+            { "speaker": "Diego", "text": "Goblet? As in — THE prop goblet from the play? The murder weapon?" },
             { "speaker": "Nancy", "text": "The circled letters in order: G-O-B-L-E-T. Someone annotated the script to record that the goblet was the murder weapon." },
-            { "speaker": "Diego", "text": "Holy... that means someone knew. Someone wrote it down in code in the margins of the actual script. And that script has been sitting in a film canister up here for almost a century." },
+            { "speaker": "Diego", "text": "Holy — okay, this is like Chekhov's gun except it's Margaux's goblet. Someone knew. Someone wrote it down in code in the margins of the actual script. And that script has been sitting in a film canister up here for almost a century!" },
             { "speaker": "Nancy", "text": "The question is who wrote the annotations. And when." },
-            { "speaker": "Diego", "text": "The ink is old — really old. That's not modern handwriting. Whoever coded that message did it close to 1928." }
+            { "speaker": "Diego", "text": "The ink is old — really old. That's not modern handwriting, trust me, I've studied enough old scripts. Whoever coded that message did it close to 1928. This is... this is the kind of thing that wins Pulitzers. Or gets people killed. Or both." }
           ],
           "nextNode": "end",
           "triggerEvent": "cipher_discussed"
@@ -678,9 +687,9 @@
         {
           "id": "night_sounds",
           "lines": [
-            { "speaker": "Diego", "text": "It started about a month ago. I stay late — the booth is quiet, good for writing. Around midnight, I hear footsteps below. Then fog drifts across the stage." },
-            { "speaker": "Diego", "text": "Last week, I heard what sounded like machinery — grinding, mechanical sounds from under the stage. Like old gears turning." },
-            { "speaker": "Diego", "text": "And then one night... I looked down from the booth window and saw a woman in white, standing center stage. She turned, looked up — right at me — and vanished. Through the floor." }
+            { "speaker": "Diego", "text": "It started about a month ago. I stay late — the booth is quiet, great for writing. You know, 'the midnight hour is close at hand' — sorry, that's Michael Jackson, not Shakespeare. Anyway, around midnight, I hear footsteps below. Then fog drifts across the stage." },
+            { "speaker": "Diego", "text": "Last week, I heard what sounded like machinery — grinding, mechanical sounds from under the stage. Like old gears turning. I almost called the cops, but what was I going to say? 'Hello, 911? The floor is angry?'" },
+            { "speaker": "Diego", "text": "And then one night... I looked down from the booth window and saw a woman in white, standing center stage. She turned, looked up — right at me — and vanished. Through the floor. I'm not going to lie, Nancy, I screamed. Out loud. Like a character in a bad horror movie. It was not my finest moment." }
           ],
           "choices": [
             {
@@ -699,26 +708,26 @@
         {
           "id": "trapdoor_hint",
           "lines": [
-            { "speaker": "Diego", "text": "That's... actually a really good point. I didn't think of it as a trapdoor because — well, ghosts don't need trapdoors." },
-            { "speaker": "Diego", "text": "But a person would." }
+            { "speaker": "Diego", "text": "That's... actually a really good point. I didn't think of it as a trapdoor because — well, ghosts don't need trapdoors. That's like, Haunting 101." },
+            { "speaker": "Diego", "text": "But a person would. Oh man. I feel like the guy in the Scooby-Doo episode who doesn't realize it's Old Man Jenkins until the very end." }
           ],
           "nextNode": "end"
         },
         {
           "id": "manual_connection",
           "lines": [
-            { "speaker": "Diego", "text": "Wait — you're saying the theater has an actual trapdoor in the stage? That someone could use to appear and disappear?" },
+            { "speaker": "Diego", "text": "Wait — you're saying the theater has an actual trapdoor in the stage? Like, a real one? That someone could use to pull a full Hamlet's Ghost?" },
             { "speaker": "Nancy", "text": "The 1925 effects manual describes a counterweight system that can lift a person from the basement to center stage in seconds." },
-            { "speaker": "Diego", "text": "So the ghost isn't floating through the floor. Someone is riding an elevator through it." },
-            { "speaker": "Diego", "text": "I feel stupid. I'm a playwright. I should know about trapdoors." }
+            { "speaker": "Diego", "text": "So the ghost isn't floating through the floor. Someone is riding an elevator through it. That's... diabolically theatrical." },
+            { "speaker": "Diego", "text": "I feel so stupid. I'm a playwright. I literally write stage directions for a living. I should know about trapdoors. Shakespeare used trapdoors! Marlowe used trapdoors! What is wrong with me?" }
           ],
           "nextNode": "end"
         },
         {
           "id": "end",
           "lines": [
-            { "speaker": "Diego", "text": "Hey, one more thing — I've been writing a play about all this. 'The Ghost of the Monarch.' My agent says it's the best thing I've ever written." },
-            { "speaker": "Diego", "text": "I hope the real ending is worth writing about too." }
+            { "speaker": "Diego", "text": "Hey, one more thing — I've been writing a play about all this. 'The Ghost of the Monarch.' My agent says it's the best thing I've ever written, which is either exciting or a devastating commentary on everything I wrote before." },
+            { "speaker": "Diego", "text": "I hope the real ending is worth writing about too. Every good story deserves a third act, right?" }
           ]
         }
       ]
@@ -729,9 +738,10 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Ashworth", "text": "Another vulture. What do you want?" },
+            { "speaker": "Ashworth", "text": "Oh, wonderful. Another vulture. What do you want? I'm on a deadline — literally." },
             { "speaker": "Nancy", "text": "Nancy Drew. I'm here to find out who poisoned you, Mr. Ashworth." },
-            { "speaker": "Ashworth", "text": "Oh, take your pick. Everyone in this building wants me dead. The old actress, the historian, even my own stage manager. This theater is full of people who'd rather see me in the ground than see one brick moved." }
+            { "speaker": "Ashworth", "text": "Ha. Take your pick. Everyone in this building wants me dead. The old actress, the historian, even my own stage manager. This theater is full of people who'd rather see me in the ground than see one brick moved." },
+            { "speaker": "Ashworth", "text": "You want my opinion? Start with Hale. The man's been circling this building like a vulture for fifteen years. He's got keys he shouldn't have, he knows rooms that aren't on the blueprints, and he looks at me like I'm a war criminal for filing a demolition permit. Start with Hale." }
           ],
           "choices": [
             {
@@ -756,10 +766,10 @@
         {
           "id": "the_night",
           "lines": [
-            { "speaker": "Ashworth", "text": "I was working late. Had a cup of tea from the kettle in here — same as every night. Within twenty minutes, my vision blurred and I couldn't stand." },
-            { "speaker": "Ashworth", "text": "Before I blacked out, I saw... someone. A shape in the doorway. They were watching me fall." },
+            { "speaker": "Ashworth", "text": "I was working late. Had a cup of tea from the kettle — same as every night. Earl Grey, two sugars, not that it matters. Within twenty minutes, my vision went sideways and I couldn't stand. I'm a big man, Drew. I don't just fall down." },
+            { "speaker": "Ashworth", "text": "Before I blacked out, I saw... someone. A shape in the doorway. Just standing there. Watching me fall." },
             { "speaker": "Nancy", "text": "Can you describe them?" },
-            { "speaker": "Ashworth", "text": "Dark clothes. Average build. They didn't help. They just watched, and then they were gone." }
+            { "speaker": "Ashworth", "text": "Dark clothes. Average build. They didn't help. They didn't call out. They just watched, like I was — like I was a show. And then they were gone. I woke up on the floor with Stella shaking me." }
           ],
           "choices": [
             {
@@ -782,22 +792,22 @@
         {
           "id": "poison_identified",
           "lines": [
-            { "speaker": "Ashworth", "text": "Antimony? That's... that's an old-fashioned poison. Victorian era. Who even knows how to use that?" },
+            { "speaker": "Ashworth", "text": "Antimony? That's — you're serious. That's a Victorian poison. Nobody uses that. Nobody even thinks about that unless they've got their nose in some dusty —" },
             { "speaker": "Nancy", "text": "Someone who's been researching a murder from 1928." },
-            { "speaker": "Ashworth", "text": "Hale. You're talking about Hale, aren't you. That man and his obsession with the dead actress." },
-            { "speaker": "Nancy", "text": "I'm not accusing anyone yet. But the connection between the compounds used on you and the ones used on Margaux Fontaine is... significant." },
-            { "speaker": "Ashworth", "text": "Get him out of my theater. Get him out and let me tear this place down in peace." }
+            { "speaker": "Ashworth", "text": "Hale. You're talking about Hale. Of course you are. That man treats a seventy-year-old crime scene like it's a personal hobby." },
+            { "speaker": "Nancy", "text": "I'm not accusing anyone yet. But the connection between the compounds used on you and the ones used on Margaux Fontaine is significant." },
+            { "speaker": "Ashworth", "text": "Then stop not accusing and start acting. Get him out of my theater. I want him gone, I want his boxes gone, and I want this demolition back on schedule. Am I making myself clear?" }
           ],
           "nextNode": "end"
         },
         {
           "id": "insurance_confronted",
           "lines": [
-            { "speaker": "Ashworth", "text": "How did you — that safe was locked." },
+            { "speaker": "Ashworth", "text": "How did you — that safe was locked. I changed the combination myself." },
             { "speaker": "Nancy", "text": "The Historical Society offered you $800,000 for the theater. You turned it down because the demolition insurance pays $2.3 million." },
-            { "speaker": "Ashworth", "text": "That's... a business decision. Not a crime." },
+            { "speaker": "Ashworth", "text": "That's a business decision. It's called math, Drew. Not a crime." },
             { "speaker": "Nancy", "text": "It's a motive. If the theater gets landmark status, you can't demolish it. You lose the insurance payout and have to accept the lower offer. Everyone in this building wants to save the theater — and you have a $1.5 million reason to destroy it." },
-            { "speaker": "Ashworth", "text": "I'm the victim here, Drew. Someone poisoned ME. Don't turn this around." }
+            { "speaker": "Ashworth", "text": "I'm the victim here. Someone poisoned ME. I was on a hospital floor for six hours. So don't you dare turn this around on me — I won't have it." }
           ],
           "nextNode": "end",
           "triggerEvent": "ashworth_motive_revealed"
@@ -805,10 +815,10 @@
         {
           "id": "blueprints",
           "lines": [
-            { "speaker": "Ashworth", "text": "I didn't draw those red marks. They were already there when I pinned them up. Someone's been mapping hidden passages, sealed rooms, a tunnel network beneath the stage." },
-            { "speaker": "Ashworth", "text": "This theater is a maze. Someone could move through this building without ever being seen." },
+            { "speaker": "Ashworth", "text": "I didn't draw those red marks. Don't look at me like that — I didn't. They were already there when I pinned the blueprints up. Someone's been mapping hidden passages, sealed rooms, a whole tunnel network beneath the stage." },
+            { "speaker": "Ashworth", "text": "This theater is a maze. Whoever built it wanted people to disappear. And apparently, someone still does." },
             { "speaker": "Nancy", "text": "Do you know who made the annotations?" },
-            { "speaker": "Ashworth", "text": "My money's on the historian. Hale. He's obsessed with this place." }
+            { "speaker": "Ashworth", "text": "My money's on the historian. Hale. The man practically lives here — he knows more about this building than the people who built it. And that makes me nervous." }
           ],
           "choices": [
             {
@@ -826,19 +836,19 @@
         {
           "id": "intruder",
           "lines": [
-            { "speaker": "Ashworth", "text": "Two weeks ago, I came in early and heard noises from below the stage. Mechanical sounds. I found the basement door unlocked and went down." },
-            { "speaker": "Ashworth", "text": "Someone had set up a workshop down there. Tools, documents, chemicals. I couldn't see everything — they heard me coming and the lights went out. I barely made it back upstairs." },
-            { "speaker": "Ashworth", "text": "That's when the 'ghost' sightings got worse. And three days later, I was poisoned." },
+            { "speaker": "Ashworth", "text": "Two weeks ago. I came in early — 5 AM, because the demolition crew needed measurements. I heard noises from below the stage. Mechanical sounds. Rhythmic, like machinery. The basement door was unlocked, which it shouldn't have been. I went down." },
+            { "speaker": "Ashworth", "text": "Someone had set up a workshop down there. Tools, documents, chemicals I couldn't identify. And then they heard me coming. The lights went out — all of them, at once. I couldn't see my hand in front of my face. I barely made it back to the stairs." },
+            { "speaker": "Ashworth", "text": "That's when the 'ghost' sightings ramped up. Fog in the hallways, voices from the walls. And three days later — three days — I was poisoned. You tell me that's a coincidence." },
             { "speaker": "Nancy", "text": "You think they poisoned you to keep you quiet?" },
-            { "speaker": "Ashworth", "text": "I don't think. I know." }
+            { "speaker": "Ashworth", "text": "I don't think. I know. And I'll tell you something else — if you find whoever's down there, you'll find whoever tried to kill me. Count on it." }
           ],
           "nextNode": "end"
         },
         {
           "id": "end",
           "lines": [
-            { "speaker": "Ashworth", "text": "Find whoever did this. Fast. Because in seventy-two hours, this building comes down regardless." },
-            { "speaker": "Ashworth", "text": "Ghost or no ghost." }
+            { "speaker": "Ashworth", "text": "Find whoever did this. Fast. I'm not asking — I'm telling you. Because in seventy-two hours, my crew arrives and this building comes down. Permits are signed, inspections are done." },
+            { "speaker": "Ashworth", "text": "Ghost or no ghost. That's the deadline. Work with it." }
           ]
         }
       ]
@@ -850,9 +860,9 @@
           "id": "start",
           "lines": [
             { "speaker": "Nancy", "text": "Hello, Edwin." },
-            { "speaker": "Edwin", "text": "...Nancy. I was wondering when you'd find your way down here." },
+            { "speaker": "Edwin", "text": "...Nancy. I was — I was wondering when you'd find your way down here. Hoping, actually. Dreading. Both." },
             { "speaker": "Nancy", "text": "The fog machines. The trapdoor. The white costume. Your notebook on the catwalk. You're the ghost of the Monarch Theatre." },
-            { "speaker": "Edwin", "text": "And you're as good as Vivian said you were." }
+            { "speaker": "Edwin", "text": "And you're as good as Vivian said you were. Better, actually. She said you'd take a week. It's been — what, three days?" }
           ],
           "choices": [
             {
@@ -873,12 +883,12 @@
         {
           "id": "personal",
           "lines": [
-            { "speaker": "Edwin", "text": "...You know about my grandfather?" },
+            { "speaker": "Edwin", "text": "...You know about my grandfather? How did you — the parish records? The employment ledgers? I thought I was the only one who'd —" },
             { "speaker": "Nancy", "text": "James Hale. He was a stagehand here. He loved Margaux. He spent his whole life trying to prove she was murdered." },
-            { "speaker": "Edwin", "text": "He died when I was twelve. The last thing he said to me was: 'Promise me you'll find the truth about Margaux.' I was a kid. I didn't understand what he meant." },
-            { "speaker": "Edwin", "text": "But I grew up. I became a historian. And fifteen years ago, I started keeping that promise." },
+            { "speaker": "Edwin", "text": "He died when I was twelve. November 3rd, 1986 — I remember the date because it snowed and grandfathers aren't supposed to die when it snows. The last thing he said to me was: 'Promise me you'll find the truth about Margaux.' I was a kid. I didn't understand." },
+            { "speaker": "Edwin", "text": "But I grew up. I became a historian — well, an architectural historian, technically, but the Monarch kept pulling me back. And fifteen years ago, I started keeping that promise." },
             { "speaker": "Nancy", "text": "And six months ago, you found the proof." },
-            { "speaker": "Edwin", "text": "Cecilia Drake's letters. Hidden in the basement wall. Proof that she ordered the poison. Proof that she swapped the goblet. Proof that my grandfather was right all along." }
+            { "speaker": "Edwin", "text": "Cecilia Drake's letters. Hidden in a sealed compartment in the basement wall — behind the original plaster, if you can believe it. Proof that she ordered the poison. Proof that she swapped the goblet. Proof that my grandfather was right. All along, he was right." }
           ],
           "choices": [
             {
@@ -894,11 +904,11 @@
         {
           "id": "confession",
           "lines": [
-            { "speaker": "Edwin", "text": "Fifteen years I've been researching this theater. And six months ago, I found them — Cecilia Drake's letters to a pharmacist. She ordered the exact compound that killed Margaux." },
-            { "speaker": "Edwin", "text": "I had the proof. But Ashworth had the demolition permits. In three days, this evidence would be buried under concrete. The historical society's petition was stalled in review. So I did the only thing I could think of." },
-            { "speaker": "Edwin", "text": "I made Margaux's ghost real enough to matter. If the Monarch was haunted — truly haunted — the media attention could force a landmark designation. The demolition would be delayed. The truth would come out." },
+            { "speaker": "Edwin", "text": "Fifteen years. Fifteen years and — well, fifteen years and four months, technically. And six months ago, I found them. Cecilia Drake's letters to a pharmacist named Whitford. She ordered the exact compound that killed Margaux." },
+            { "speaker": "Edwin", "text": "I had the proof. But Ashworth had the demolition permits. In three days, this evidence — a century of evidence — would be buried under concrete. The historical society's petition was stalled. So I did the only thing I could think of. Which was, admittedly, insane." },
+            { "speaker": "Edwin", "text": "I made Margaux's ghost real enough to matter. If the Monarch was haunted — truly, demonstrably haunted — the media attention could force a landmark designation. The demolition would be delayed. The truth would come out." },
             { "speaker": "Nancy", "text": "You used her costume, her blocking, her lines. You studied the effects manual and rebuilt the original systems." },
-            { "speaker": "Edwin", "text": "I spent six months down here, rehearsing. Learning the trapdoor timing, the fog sequences, the lighting cues. I wanted it to be perfect. I wanted her to be seen one last time." }
+            { "speaker": "Edwin", "text": "I spent six months down here, rehearsing. Learning the trapdoor timing — four-point-two seconds from trigger to stage level — the fog sequences, the lighting cues. I wanted it to be perfect. I wanted her to be seen one last time, the way she deserved." }
           ],
           "choices": [
             {
@@ -914,10 +924,10 @@
         {
           "id": "poisoning",
           "lines": [
-            { "speaker": "Edwin", "text": "Ashworth found the basement two weeks ago. He saw everything — the costume, the fog controls, the letters. He laughed. He said: 'I'll have the wrecking ball here by morning.'" },
-            { "speaker": "Edwin", "text": "I panicked. I'd spent fifteen years on this. My grandfather spent fifty. And it was all about to be crushed into rubble by a man who saw a century of history as an insurance payout." },
+            { "speaker": "Edwin", "text": "Ashworth found the basement two weeks ago. He saw everything — the costume, the fog controls, the letters. He laughed. He actually laughed. He said: 'I'll have the wrecking ball here by morning.' Like it was nothing. Like sixty-five years of history was — was nothing." },
+            { "speaker": "Edwin", "text": "I panicked. I'd spent fifteen years on this. My grandfather spent fifty. Sixty-five years of work, two lifetimes, and it was all about to be crushed into rubble by a man who saw a century of art as an insurance payout." },
             { "speaker": "Nancy", "text": "So you poisoned him." },
-            { "speaker": "Edwin", "text": "I used antimony tartrate — the same compound from Margaux's alchemy book. I calculated a non-lethal dose. Just enough to make him too ill to sign the demolition orders." }
+            { "speaker": "Edwin", "text": "I... yes. I used antimony potassium tartrate — the same compound from Margaux's alchemy book, page forty-seven. I calculated a non-lethal dose. Point-three grams dissolved in — I'm not going to pretend the precision makes it better. I poisoned him. I put it in his tea." }
           ],
           "nextNode": "poisoning_guilt"
         },
@@ -926,10 +936,11 @@
           "lines": [
             { "speaker": "Nancy", "text": "You used the same poison that killed Margaux." },
             { "speaker": "Edwin", "text": "..." },
-            { "speaker": "Edwin", "text": "Do you think I don't know that?" },
-            { "speaker": "Edwin", "text": "I couldn't sleep for three days after. I sat down here in the dark, listening to make sure he was still breathing upstairs. Every time a pipe creaked, I thought — what if I got the dose wrong? What if he dies and I'm exactly what Cecilia was?" },
+            { "speaker": "Edwin", "text": "Do you think I don't — do you think that hasn't been eating me alive?" },
+            { "speaker": "Edwin", "text": "I couldn't sleep for three days after. I sat down here in the dark, listening. Just listening. Making sure he was still breathing upstairs. Every time a pipe creaked, I thought — what if I got the calculation wrong? What if he dies and I'm exactly what Cecilia was? A poisoner in a theater. The same theater." },
             { "speaker": "Nancy", "text": "You poisoned a man, Edwin. You became exactly what you were investigating." },
-            { "speaker": "Edwin", "text": "I know. God, I know. My hands haven't stopped shaking since." }
+            { "speaker": "Edwin", "text": "I know. God help me, I know. My hands haven't stopped shaking since. Look —" },
+            { "speaker": "Edwin", "text": "I'm a historian. I catalog facts. I organize timelines. I don't — I'm not supposed to be the kind of person who does this." }
           ],
           "choices": [
             {
@@ -945,12 +956,12 @@
         {
           "id": "was_it_worth_it",
           "lines": [
-            { "speaker": "Edwin", "text": "I saved a theater. I saved a woman's legacy. I found the truth about a murder that went unsolved for a century." },
+            { "speaker": "Edwin", "text": "I saved a theater. I saved a woman's legacy. I found the truth about a murder that went unsolved for — ninety-seven years, if we're counting. And we're always counting." },
             { "speaker": "Edwin", "text": "Was it worth it?" },
-            { "speaker": "Edwin", "text": "...Ask me on a good day and I'll say yes. Ask me at three in the morning when I can hear Ashworth coughing through the floorboards and I'll say I don't know anymore." },
+            { "speaker": "Edwin", "text": "...Ask me on a good day and I'll say yes. Ask me at three in the morning when I can hear Ashworth coughing through the floorboards and I'll say I don't know anymore. I genuinely don't know." },
             { "speaker": "Nancy", "text": "I'm asking you right now." },
-            { "speaker": "Edwin", "text": "Right now I'm a fifty-year-old man standing in a basement, waiting for a twenty-year-old detective to decide my fate. Right now I'm terrified. And I'm ashamed. And I'd do it all again tomorrow if it meant Margaux's name wasn't buried under concrete." },
-            { "speaker": "Edwin", "text": "That's the truth. I wish it were simpler." }
+            { "speaker": "Edwin", "text": "Right now I'm a fifty-three-year-old man — fifty-three and a half, not that it matters — standing in a basement, waiting for a detective half my age to decide my fate. Right now I'm terrified. And I'm ashamed. And I'd do it all again tomorrow if it meant Margaux's name wasn't buried under concrete." },
+            { "speaker": "Edwin", "text": "That's the truth. I wish it were simpler. I'm a historian — I'm supposed to make things simpler. But this one I can't." }
           ],
           "choices": [
             {
@@ -971,10 +982,10 @@
         {
           "id": "what_now",
           "lines": [
-            { "speaker": "Edwin", "text": "Honestly? I don't know. I've been running on fifteen years of momentum and I don't know how to stop." },
-            { "speaker": "Edwin", "text": "Part of me wants to turn myself in. Part of me wants to run. Part of me wants to stand on that stage and tell the whole world what Cecilia Drake did." },
+            { "speaker": "Edwin", "text": "Honestly? I don't — I haven't thought that far ahead. Fifteen years of momentum and I don't know how to stop. I never planned for 'after.' Historians aren't supposed to become part of the story." },
+            { "speaker": "Edwin", "text": "Part of me wants to turn myself in. Part of me wants to run — I have a colleague in Edinburgh, I could disappear into an archive and never come out. And part of me wants to stand on that stage and tell the whole world what Cecilia Drake did." },
             { "speaker": "Nancy", "text": "And what about what you did?" },
-            { "speaker": "Edwin", "text": "I'll carry that either way. Whether I'm in a jail cell or on a plane or standing in this theater — I'll carry it. I poisoned a man with the same compound that killed someone I loved. There's no version of my future where that doesn't haunt me." },
+            { "speaker": "Edwin", "text": "I'll carry that either way. Whether I'm in a jail cell or a library in Scotland or standing in this theater — I'll carry it. I poisoned a man with the same compound that killed someone my grandfather loved. The irony isn't lost on me. It's never lost on me." },
             { "speaker": "Nancy", "text": "Then the question is what happens to the Monarch. And to Margaux's story." }
           ],
           "choices": [
@@ -997,37 +1008,37 @@
           "id": "ending_justice",
           "lines": [
             { "speaker": "Edwin", "text": "..." },
-            { "speaker": "Edwin", "text": "I've been waiting for someone to say that. Part of me is relieved." },
+            { "speaker": "Edwin", "text": "I've been waiting for someone to say that. Isn't that strange? Part of me is... relieved. Genuinely relieved." },
             { "speaker": "Nancy", "text": "Edwin—" },
-            { "speaker": "Edwin", "text": "No, I mean it. I've been carrying this alone for weeks. The lying, the hiding, checking on Ashworth at night to make sure he was still alive. I can't keep doing this." },
-            { "speaker": "Edwin", "text": "Just... promise me one thing. Make sure Cecilia's letters get to the historical society. Margaux deserves to be remembered for more than how she died." },
+            { "speaker": "Edwin", "text": "No, I mean it. I've been carrying this alone for weeks. The lying, the hiding, creeping upstairs at 2 AM to check that Ashworth was still breathing. I can't — I can't keep cataloging my own lies. I'm running out of filing space." },
+            { "speaker": "Edwin", "text": "Just — promise me one thing. Make sure Cecilia's letters get to the historical society. All forty-seven of them. Margaux deserves to be remembered for more than how she died." },
             { "speaker": "Nancy", "text": "I promise." },
-            { "speaker": "Edwin", "text": "My grandfather kept his promise for fifty years. You'll keep yours. I can tell." },
+            { "speaker": "Edwin", "text": "My grandfather kept his promise for fifty years. You'll keep yours. I can tell — you have that same look he had. Stubborn. Certain." },
             { "speaker": "Nancy", "text": "Sometimes the truth isn't enough to save what we love. But it's always enough to matter." }
           ]
         },
         {
           "id": "ending_exposure",
           "lines": [
-            { "speaker": "Edwin", "text": "Together? You'd... you'd do that?" },
+            { "speaker": "Edwin", "text": "Together? You'd — you'd actually do that? After everything I've —" },
             { "speaker": "Nancy", "text": "The world should know what happened to Margaux Fontaine. And they should know what you did to protect her memory — the sacrifice and the crime. All of it." },
-            { "speaker": "Edwin", "text": "I'll face whatever comes. The arrest, the trial, whatever. But the Monarch—" },
+            { "speaker": "Edwin", "text": "I'll face whatever comes. The arrest, the trial, the — I don't care. I've spent fifteen years in archives. A courtroom can't be worse. But the Monarch —" },
             { "speaker": "Nancy", "text": "The 1928 murder, the cover-up, your grandfather's research, the landmark petition — we put it all in front of the public and let them decide what this building means." },
-            { "speaker": "Edwin", "text": "Vivian will never forgive me for the poisoning. But maybe she'll understand why." },
+            { "speaker": "Edwin", "text": "Vivian will never forgive me for the poisoning. But maybe — maybe she'll understand why. She knew my grandfather. She knows what promises mean." },
             { "speaker": "Nancy", "text": "Then let's give the Monarch one last opening night. Not for a ghost — for the woman who deserved to be remembered." }
           ]
         },
         {
           "id": "ending_mercy",
           "lines": [
-            { "speaker": "Edwin", "text": "You'd let me go? After what I did?" },
+            { "speaker": "Edwin", "text": "You'd let me go? After what I — you can't be serious." },
             { "speaker": "Nancy", "text": "I'm letting Margaux's story be told. What happens to you... that's between you and your conscience." },
-            { "speaker": "Edwin", "text": "My conscience. Right." },
-            { "speaker": "Edwin", "text": "...Tell Vivian I'm sorry. For all of it. For hiding down here, for using Margaux's memory as a weapon, for not trusting her enough to ask for help. Tell her I'm sorry I couldn't say goodbye." },
+            { "speaker": "Edwin", "text": "My conscience. Right. My well-organized, thoroughly documented, deeply guilty conscience." },
+            { "speaker": "Edwin", "text": "...Tell Vivian I'm sorry. For all of it. For hiding down here like a — like a character in one of her old plays. For using Margaux's memory as a weapon. For not trusting her enough to ask for help. Tell her I'm sorry I couldn't say goodbye." },
             { "speaker": "Nancy", "text": "Edwin." },
             { "speaker": "Edwin", "text": "Yes?" },
             { "speaker": "Nancy", "text": "Your grandfather would be proud of what you found. Not how you found it. But what you found." },
-            { "speaker": "Edwin", "text": "That's the kindest lie anyone's ever told me." },
+            { "speaker": "Edwin", "text": "That's the kindest lie anyone's ever told me. And I've read a lot of lies — professionally speaking." },
             { "speaker": "Nancy", "text": "I told myself it was the right call. I still tell myself that. Most days, I believe it." }
           ]
         }
@@ -1071,14 +1082,15 @@
         {
           "id": "bess_george",
           "lines": [
-            { "speaker": "Bess", "text": "Nancy! How's the haunted theater? George and I looked it up — the Monarch Theatre was designed by the same architect who built the Ryerson Opera House. He loved hidden passages." },
-            { "speaker": "George", "text": "I ran some searches. Cecilia Drake had a long career after 1928. She won three theater awards and never once mentioned Margaux Fontaine in any interview. Not once in forty years." },
-            { "speaker": "Bess", "text": "That's suspicious, right? If your mentor died tragically and you took over her role, you'd at least mention her?" },
-            { "speaker": "Nancy", "text": "Definitely. Oh — the stage tech here, Diego, has been really helpful. He knows the theater inside and out." },
-            { "speaker": "Bess", "text": "Diego? Is he cute?" },
-            { "speaker": "George", "text": "Bess!" },
-            { "speaker": "Bess", "text": "What? It's a valid investigative question!" },
-            { "speaker": "Nancy", "text": "I'll call back when I know more. About the case, Bess. The case." }
+            { "speaker": "Bess", "text": "Nancy! Oh my gosh, finally! George and I have been going down the biggest rabbit hole — okay, so the Monarch Theatre was designed by the same architect who built the Ryerson Opera House. He was obsessed with hidden passages. Like, obsessed obsessed. There are blueprints online and half the walls have secret compartments!" },
+            { "speaker": "George", "text": "What Bess is trying to say, between exclamation points, is that the building probably has more hidden rooms than visible ones. I also ran some searches on Cecilia Drake. She had a long career after 1928 — three theater awards, two memoirs, dozens of interviews. And she never once mentioned Margaux Fontaine. Not once in forty years." },
+            { "speaker": "Bess", "text": "That's suspicious, right? If your mentor died tragically and you took over her role, you'd at least mention her! Unless you had a really, really good reason not to." },
+            { "speaker": "Nancy", "text": "Definitely suspicious. Oh — the stage tech here, Diego, has been really helpful. He knows the theater inside and out." },
+            { "speaker": "Bess", "text": "Diego? Is he cute? Wait — how old is he? What does he look like?" },
+            { "speaker": "George", "text": "Bess. She's investigating a poisoning." },
+            { "speaker": "Bess", "text": "What? Multitasking is a valid investigative skill! Nancy, you can solve crimes AND notice if someone has nice eyes. I believe in you." },
+            { "speaker": "Nancy", "text": "I'll call back when I know more. About the case, Bess. The case." },
+            { "speaker": "Bess", "text": "Fine, fine. But I want details. ALL the details." }
           ],
           "nextNode": "start",
           "triggerEvent": "called_friends"
@@ -1086,12 +1098,13 @@
         {
           "id": "carson",
           "lines": [
-            { "speaker": "Carson Drew", "text": "Nancy! How's the case?" },
-            { "speaker": "Nancy", "text": "Complicated, Dad. There's a modern poisoning connected to a possible murder from 1928. And the theater is being demolished in three days." },
-            { "speaker": "Carson Drew", "text": "The statute of limitations on a 1928 murder expired decades ago — you can't prosecute Cecilia Drake even if she did it. But if the evidence proves murder, it could qualify the theater for landmark protection under the Cultural Heritage Act." },
-            { "speaker": "Nancy", "text": "So proving Margaux was murdered could save the theater?" },
-            { "speaker": "Carson Drew", "text": "If the evidence is strong enough, yes. A site of a documented historical crime qualifies for emergency heritage review. That would halt the demolition." },
-            { "speaker": "Nancy", "text": "Thanks, Dad. That changes everything." }
+            { "speaker": "Carson Drew", "text": "Nancy! I was just thinking about you. Are you eating? The last time you called from a case, you'd been living on vending machine peanuts for two days." },
+            { "speaker": "Nancy", "text": "I'm fine, Dad. But the case is complicated. There's a modern poisoning connected to a possible murder from 1928. And the theater is being demolished in three days." },
+            { "speaker": "Carson Drew", "text": "Hmm. Well, the statute of limitations on a 1928 murder expired decades ago — you can't prosecute Cecilia Drake even posthumously. But here's the interesting thing. If the evidence proves murder, it could qualify the theater for landmark protection under the Cultural Heritage Act. Section 14(b), if I'm remembering correctly." },
+            { "speaker": "Nancy", "text": "So proving Margaux was murdered could actually save the theater?" },
+            { "speaker": "Carson Drew", "text": "If the evidence is strong enough, yes. A site of a documented historical crime qualifies for emergency heritage review. That would legally halt any demolition until the review is complete. It's not a permanent solution, but it buys time." },
+            { "speaker": "Nancy", "text": "Thanks, Dad. That changes everything." },
+            { "speaker": "Carson Drew", "text": "Just be careful, sweetheart. Old theaters and old secrets — neither one is as stable as it looks. And eat something." }
           ],
           "nextNode": "start",
           "triggerEvent": "called_dad"
@@ -1112,11 +1125,13 @@
         {
           "id": "ned",
           "lines": [
-            { "speaker": "Ned", "text": "Nancy! I was hoping you'd call. How's the haunted theater?" },
+            { "speaker": "Ned", "text": "Nancy! I was hoping you'd call. I've been staring at my phone between classes like a weirdo. How's the haunted theater?" },
             { "speaker": "Nancy", "text": "Complicated. There's a murder from 1928, a modern poisoning, a fake ghost, and the building might be demolished in three days." },
-            { "speaker": "Ned", "text": "So... a normal Tuesday for you. Just promise me you'll be careful? Old buildings have a way of falling apart at the worst possible moment." },
+            { "speaker": "Ned", "text": "So... a normal Tuesday for you. My biggest problem today was a jammed stapler, so clearly our lives are equally exciting." },
+            { "speaker": "Nancy", "text": "I'd trade you for the stapler right about now." },
+            { "speaker": "Ned", "text": "No you wouldn't. You love this stuff. Just promise me you'll be careful? Old buildings have a way of falling apart at the worst possible moment. And I'd really like my girlfriend back in one piece." },
             { "speaker": "Nancy", "text": "I always am. Well, mostly." },
-            { "speaker": "Ned", "text": "That's what worries me. Call me when you solve it — I know you will." }
+            { "speaker": "Ned", "text": "'Mostly' is exactly the word that keeps me up at night. Call me when you solve it — I know you will." }
           ],
           "nextNode": "start",
           "triggerEvent": "called_ned"
@@ -1126,7 +1141,7 @@
           "lines": [
             { "speaker": "Nancy", "text": "I dial a number I've had memorized for years. It rings twice, then clicks to voicemail." },
             { "speaker": "Nancy", "text": "'You've reached Frank and Joe Hardy. We're probably on a case. Leave a message and we'll call you back — unless we're tied up. Literally. Again.' *beep*" },
-            { "speaker": "Nancy", "text": "Hey, it's Nancy. I'm at the Monarch Theatre in River Heights — haunted theater, 1928 murder, the works. If you're ever in town, I could use a second opinion. Or a third. Talk soon." }
+            { "speaker": "Nancy", "text": "Hey boys, it's Nancy. I'm at the Monarch Theatre in River Heights — haunted theater, 1928 murder, poisoning, secret passages, the whole package. Honestly, it's the kind of case you two would fight over. If you're ever in town, I could use a second opinion. Or a third. But no rush — I'll probably have it solved by the time you check your messages. Talk soon." }
           ],
           "nextNode": "start"
         },
