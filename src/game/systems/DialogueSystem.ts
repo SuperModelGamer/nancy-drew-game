@@ -61,7 +61,7 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
 // ─── Layout Constants ───────────────────────────────────────────────────────
 const PORTRAIT_W = 160;
 const PORTRAIT_H = 200;
-const BOX_H = 200;
+const BOX_H = 260;
 const TEXT_SIZE = '20px';
 const SPEAKER_SIZE = '22px';
 const CHOICE_H = 56;
@@ -248,22 +248,24 @@ export class DialogueSystem {
       this.container.add(gfx);
     }
 
-    // ── Portrait (large, on the left) ──
+    // ── Portrait (large, on the left) — frame + image slide in together ──
     if (hasPortrait && portraitKey) {
       const portraitX = boxLeft + 20 + PORTRAIT_W / 2;
       const portraitY = boxCenterY - 6;
       const isNewSpeaker = line.speaker !== this.lastSpeaker;
 
+      // Group portrait and frame in a sub-container so they animate together
+      const portraitGroup = this.scene.add.container(0, 0);
+
       // Portrait frame (image or procedural)
       if (this.scene.textures.exists('dlg_portrait_frame')) {
         const frame = this.scene.add.image(portraitX, portraitY - 8, 'dlg_portrait_frame');
-        // Preserve the frame's aspect ratio (has crown accent at top)
         const frameTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
         const frameRatio = frameTex.width / frameTex.height;
         const frameH = PORTRAIT_H + 30;
         const frameW = frameH * frameRatio;
         frame.setDisplaySize(frameW, frameH);
-        this.container.add(frame);
+        portraitGroup.add(frame);
       } else {
         // Procedural frame
         const frameGfx = this.scene.add.graphics();
@@ -278,12 +280,11 @@ export class DialogueSystem {
           portraitX - PORTRAIT_W / 2 - 8, portraitY - PORTRAIT_H / 2 - 8,
           PORTRAIT_W + 16, PORTRAIT_H + 16, 6
         );
-        this.container.add(frameGfx);
+        portraitGroup.add(frameGfx);
       }
 
       // Portrait image
       const portrait = this.scene.add.image(portraitX, portraitY, portraitKey);
-      // Scale to fill the portrait area (crop to fit)
       const texW = portrait.width;
       const texH = portrait.height;
       const scaleToFill = Math.max(PORTRAIT_W / texW, PORTRAIT_H / texH);
@@ -293,16 +294,17 @@ export class DialogueSystem {
       const maskGraphics = this.scene.make.graphics({});
       maskGraphics.fillRect(portraitX - PORTRAIT_W / 2, portraitY - PORTRAIT_H / 2, PORTRAIT_W, PORTRAIT_H);
       portrait.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, maskGraphics));
+      portraitGroup.add(portrait);
 
-      this.container.add(portrait);
+      this.container.add(portraitGroup);
 
-      // Entrance animation for new speakers
+      // Entrance animation for new speakers — whole group slides in
       if (isNewSpeaker) {
-        portrait.setAlpha(0);
-        portrait.x = portraitX - 30;
+        portraitGroup.setAlpha(0);
+        portraitGroup.x = -30;
         this.scene.tweens.add({
-          targets: portrait,
-          x: portraitX,
+          targets: portraitGroup,
+          x: 0,
           alpha: 1,
           duration: 300,
           ease: 'Power2',
@@ -548,14 +550,27 @@ export class DialogueSystem {
       if (itemAvailable) {
         btn.setInteractive({ cursor: HAND_CURSOR });
 
-        // Hover: scale up + brighten
+        // Store the base scales set by setDisplaySize so hover tweens are relative
+        const baseBtnSX = btn.scaleX;
+        const baseBtnSY = btn.scaleY;
+        const baseTextSX = text.scaleX;
+        const baseTextSY = text.scaleY;
+
+        // Hover: subtle scale up + brighten
         btn.on('pointerover', () => {
           this.scene!.tweens.killTweensOf(btn);
           this.scene!.tweens.killTweensOf(text);
           this.scene!.tweens.add({
-            targets: [btn, text],
-            scaleX: 1.03,
-            scaleY: 1.03,
+            targets: btn,
+            scaleX: baseBtnSX * 1.03,
+            scaleY: baseBtnSY * 1.03,
+            duration: 150,
+            ease: 'Back.easeOut',
+          });
+          this.scene!.tweens.add({
+            targets: text,
+            scaleX: baseTextSX * 1.03,
+            scaleY: baseTextSY * 1.03,
             duration: 150,
             ease: 'Back.easeOut',
           });
@@ -572,9 +587,16 @@ export class DialogueSystem {
           this.scene!.tweens.killTweensOf(btn);
           this.scene!.tweens.killTweensOf(text);
           this.scene!.tweens.add({
-            targets: [btn, text],
-            scaleX: 1,
-            scaleY: 1,
+            targets: btn,
+            scaleX: baseBtnSX,
+            scaleY: baseBtnSY,
+            duration: 200,
+            ease: 'Back.easeOut',
+          });
+          this.scene!.tweens.add({
+            targets: text,
+            scaleX: baseTextSX,
+            scaleY: baseTextSY,
             duration: 200,
             ease: 'Back.easeOut',
           });
@@ -590,9 +612,17 @@ export class DialogueSystem {
         // Press: push animation then select
         btn.on('pointerdown', () => {
           this.scene!.tweens.add({
-            targets: [btn, text],
-            scaleX: 0.97,
-            scaleY: 0.97,
+            targets: btn,
+            scaleX: baseBtnSX * 0.97,
+            scaleY: baseBtnSY * 0.97,
+            duration: 60,
+            ease: 'Power2',
+            yoyo: true,
+          });
+          this.scene!.tweens.add({
+            targets: text,
+            scaleX: baseTextSX * 0.97,
+            scaleY: baseTextSY * 0.97,
             duration: 60,
             ease: 'Power2',
             yoyo: true,
