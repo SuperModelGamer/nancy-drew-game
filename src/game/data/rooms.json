@@ -791,6 +791,19 @@
           "description": "The original script of 'The Crimson Veil' — the annotations in the margins are in old red ink. Someone circled specific letters throughout the stage directions. That's deliberate. If I read them in order, they might spell something. I should take this with me."
         },
         {
+          "id": "pb_script_cipher",
+          "x": 950,
+          "y": 460,
+          "width": 80,
+          "height": 50,
+          "label": "Decode Script",
+          "type": "locked",
+          "requiredItem": "annotated_script",
+          "puzzleId": "script_cipher",
+          "description": "Now that I have the script, I can study the red-circled letters more carefully. They follow the stage directions through Act III — the poisoning scene. If I click each circled letter in order, they should spell out a hidden word. Someone left a message buried in this script nearly a hundred years ago.",
+          "showWhen": "has_annotated_script"
+        },
+        {
           "id": "pb_film_canisters",
           "x": 1060,
           "y": 220,
@@ -910,6 +923,19 @@
           "itemId": "poisoned_teacup",
           "onceOnly": true,
           "description": "A porcelain teacup with dried residue at the bottom. I lean close — there's a faint metallic smell. Whatever Ashworth drank, the evidence is still right here. I should take this. Carefully."
+        },
+        {
+          "id": "mo_tea_analysis",
+          "x": 620,
+          "y": 365,
+          "width": 70,
+          "height": 55,
+          "label": "Analyze Residue",
+          "type": "locked",
+          "requiredItem": "poisoned_teacup",
+          "puzzleId": "tea_analysis",
+          "description": "With the teacup and the alchemy book from the dressing room, I can try to identify the poison. I'll need to test the residue step by step — heat it, add reagents, observe the reactions. The alchemy book has reference charts for common compounds. If I'm right about what this is, it connects the modern poisoning directly to Margaux's murder in 1928.",
+          "showWhen": "has_poisoned_teacup"
         },
         {
           "id": "mo_laptop",
@@ -1212,6 +1238,18 @@
           "label": "Work Lamp",
           "type": "inspect",
           "description": "A modern work lamp — the only real light down here. It's plugged into an extension cord that someone ran along the ceiling and back toward the stairs. A long-term setup. Whoever works down here planned to stay a while."
+        },
+        {
+          "id": "bm_passage_map",
+          "x": 380,
+          "y": 190,
+          "width": 100,
+          "height": 70,
+          "label": "Passage Entrance",
+          "type": "locked",
+          "requiredItem": "blueprints",
+          "puzzleId": "passage_navigation",
+          "description": "A narrow passage entrance, half-hidden behind old set pieces. Using the blueprints, I can see this connects to a whole network of hidden passages behind the theater walls. If I follow the right route, I'll find where the ghost has been coming and going. I need to trace the path carefully — some tunnels are collapsed or bricked up."
         },
         {
           "id": "bm_edwin",

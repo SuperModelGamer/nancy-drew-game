@@ -4,12 +4,22 @@ import { SaveSystem } from './SaveSystem';
 interface PuzzleData {
   id: string;
   name: string;
-  type: 'code' | 'sequence' | 'combination' | 'logic';
+  type: 'code' | 'sequence' | 'combination' | 'logic' | 'cipher' | 'lighting_board' | 'mirror_reveal' | 'film_strip' | 'prop_match' | 'maze' | 'chemistry';
   description: string;
   answer: string;
   clues: string[];
   hints?: string[];
   unlocks?: string;
+  // Interactive puzzle data (type-specific)
+  scriptLines?: { text: string; letters: { char: string; pos: number; circled: boolean }[] }[];
+  channels?: { label: string; correctColor: string; options: string[] }[];
+  mirrorMessage?: string;
+  frames?: { id: string; label: string; description: string; icon: string }[];
+  symbols?: string[];
+  correctSymbols?: string[];
+  symbolIcons?: Record<string, string>;
+  mazeNodes?: { id: string; label: string; x: number; y: number; connections: string[]; deadEnd?: boolean; goal?: boolean }[];
+  steps?: { instruction: string; options: string[]; correct: number; result: string }[];
 }
 
 export class PuzzleSystem {
