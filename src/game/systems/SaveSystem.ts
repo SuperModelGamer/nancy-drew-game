@@ -132,5 +132,14 @@ export class SaveSystem {
 
   deleteSave(): void {
     localStorage.removeItem(SAVE_KEY);
+    // Reset in-memory state so a new game starts clean
+    this.currentRoom = 'lobby';
+    this.chapter = 1;
+    this.journal = [];
+    this.flags = {};
+    this.discoveredRooms = new Set(['lobby']);
+    InventorySystem.getInstance().loadFromJSON({ items: [], selectedItem: null });
+    DialogueSystem.getInstance().loadFromJSON({ triggeredEvents: [] });
+    PuzzleSystem.getInstance().loadFromJSON({ solvedPuzzles: [] });
   }
 }
