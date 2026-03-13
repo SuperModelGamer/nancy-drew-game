@@ -25,10 +25,8 @@ export function createCloseButton(
     // Compute base scale once to avoid compounding on rapid hover
     const baseScale = size / btn.width;
 
-    // Gold glow ring (hidden by default, shown on hover)
+    // Gold glow ring (empty at rest, drawn on hover)
     const glow = scene.add.graphics();
-    glow.lineStyle(3, Colors.gold, 0);
-    glow.strokeCircle(0, 0, size / 2 + 4);
     glow.setAlpha(0);
     container.add(glow);
 
