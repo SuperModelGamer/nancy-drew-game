@@ -7,7 +7,7 @@ import { PuzzleSystem } from '../systems/PuzzleSystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import { ScriptedEventScene } from './ScriptedEventScene';
 import { ChapterSystem } from '../systems/ChapterSystem';
-import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { Colors, TextColors, FONT, Depths, UI_BAR_RESERVED } from '../utils/constants';
 import { drawRoomBackground } from '../utils/room-backgrounds';
 // Tutorial removed — how-to-play is accessible from the start menu
 import { Cursors, createGlowSpyglass } from '../utils/cursors';
@@ -65,11 +65,16 @@ export class RoomScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
+    // Clip the camera so the room doesn't render behind the bottom UI bar.
+    // The UI toolbar is drawn by UIScene in its own full-screen camera.
+    const gameViewH = height - UI_BAR_RESERVED;
+    this.cameras.main.setViewport(0, 0, width, gameViewH);
+
     // Room background - use real image if available, fall back to procedural art
     const bgKey = `bg_${this.currentRoom.id}`;
     if (this.textures.exists(bgKey)) {
-      const bg = this.add.image(width / 2, height / 2, bgKey);
-      bg.setDisplaySize(width, height);
+      const bg = this.add.image(width / 2, gameViewH / 2, bgKey);
+      bg.setDisplaySize(width, gameViewH);
     } else {
       drawRoomBackground(this, this.currentRoom.id);
     }

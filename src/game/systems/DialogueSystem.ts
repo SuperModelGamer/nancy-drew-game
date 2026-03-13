@@ -75,7 +75,7 @@ const NAMEPLATE_GAP = 8;   // gap between portrait bottom and nameplate
 // Measured from the innermost gold ornament edges, not the PNG bounds.
 // The dialogue-box corner star ornaments extend well inward from each side.
 const DLG_BOX_INSET_X = 0.155; // dialogue-box.png: corner ornaments
-const DLG_BOX_INSET_Y = 0.19;  // dialogue-box.png: top/bottom gold lines
+const DLG_BOX_INSET_Y = 0.22;  // dialogue-box.png: top/bottom gold lines (generous)
 const NP_INSET_X = 0.11;       // nameplate.png: corner ornaments
 const CHOICE_INSET_X = 0.04;   // choice-btn.png: side ornaments
 const CHOICE_INSET_TOP = 0.20; // choice-btn.png: crown ornament at top
@@ -256,15 +256,28 @@ export class DialogueSystem {
     this.container.add(hitArea);
     overlay.on('pointerdown', () => this.advance());
 
-    // ── 3. Dialogue text (within gold border inner bounds, vertically centered) ──
+    // ── 3. Skip button (top-right of inner area — gets its own reserved row) ──
+    const skipRowH = 22; // height reserved for the skip label
+    const skipX = innerRight - 4;
+    const skipY = innerTop + 2;
+    const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
+      fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim, letterSpacing: 2,
+    }).setOrigin(1, 0);
+    skipBtn.setInteractive({ cursor: POINTER_CURSOR });
+    skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.gold));
+    skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.goldDim));
+    skipBtn.on('pointerdown', () => this.skipToEnd());
+    this.container.add(skipBtn);
+
+    // ── 4. Dialogue text (below skip row, vertically balanced within remaining space) ──
     const textPadX = 8;
     const textLeft = innerLeft + textPadX;
     const textRight = innerRight - textPadX;
     const textW = textRight - textLeft;
-    const textY = innerTop;
-    const textH = innerBottom - innerTop;
+    const textTop = innerTop + skipRowH;
+    const textH = innerBottom - textTop;
 
-    this.dialogueTextObj = this.scene.add.text(textLeft, textY, '', {
+    this.dialogueTextObj = this.scene.add.text(textLeft, textTop, '', {
       fontFamily: FONT,
       fontSize: TEXT_SIZE,
       color: TextColors.light,
@@ -272,17 +285,16 @@ export class DialogueSystem {
       lineSpacing: 8,
     });
     const textMask = this.scene.make.graphics({});
-    textMask.fillRect(textLeft - 2, textY - 2, textW + 4, textH + 4);
+    textMask.fillRect(textLeft - 2, textTop - 2, textW + 4, textH + 4);
     this.dialogueTextObj.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, textMask));
     this.container.add(this.dialogueTextObj);
 
     this.fullLineText = line.text;
     this.startTypewriter();
 
-    // ── 4. Continue arrow (inside bottom gold border area) ──
+    // ── 5. Continue arrow (inside bottom gold border area) ──
     const continueY = innerBottom + Math.round((boxTop + BOX_H - innerBottom) / 2);
     const continueX = innerRight - 4;
-    const arrowText = this.scene.textures.exists('dlg_continue_arrow') ? null : true;
     if (this.scene.textures.exists('dlg_continue_arrow')) {
       const arrow = this.scene.add.image(continueX, continueY, 'dlg_continue_arrow');
       arrow.setDisplaySize(24, 24);
@@ -301,18 +313,6 @@ export class DialogueSystem {
       });
       this.container.add(arrow);
     }
-
-    // ── 5. Skip button (top-right, inside the content area) ──
-    const skipX = innerRight;
-    const skipY = innerTop + 2;
-    const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
-      fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim, letterSpacing: 2,
-    }).setOrigin(1, 0);
-    skipBtn.setInteractive({ cursor: POINTER_CURSOR });
-    skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.gold));
-    skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.goldDim));
-    skipBtn.on('pointerdown', () => this.skipToEnd());
-    this.container.add(skipBtn);
 
     // ── 6–7. Portrait frame BESIDE the dialogue box (frame behind, portrait on top) ──
     if (hasPortrait && portraitKey) {

@@ -102,3 +102,7 @@ export const Sizes = {
   panelBorderWidth: 2,
   toolbarY: 40, // offset from bottom
 } as const;
+
+// Total height reserved at the bottom for the UI toolbar bar (toolbar + margin).
+// Used by RoomScene to clip its camera viewport above the bar.
+export const UI_BAR_RESERVED = 124; // TOOLBAR_H (112) + BOTTOM_MARGIN (12)
