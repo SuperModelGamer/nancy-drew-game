@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import roomsData from '../data/rooms.json';
+import itemsData from '../data/items.json';
 import { InventorySystem } from '../systems/InventorySystem';
 import { DialogueSystem } from '../systems/DialogueSystem';
 import { PuzzleSystem } from '../systems/PuzzleSystem';
@@ -12,7 +13,6 @@ import { showTutorialIfNeeded } from '../utils/tutorial';
 import { Cursors, CursorType, POINTER_CURSOR } from '../utils/cursors';
 import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
-import itemsData from '../data/items.json';
 import { UISounds } from '../utils/sounds';
 
 interface Hotspot {
@@ -45,7 +45,9 @@ export class RoomScene extends Phaser.Scene {
   private currentRoom!: RoomData;
   private hotspotObjects: Phaser.GameObjects.Container[] = [];
   private tooltipText!: Phaser.GameObjects.Text;
-  private descriptionBox!: Phaser.GameObjects.Container;
+  private descriptionBox: Phaser.GameObjects.Container | null = null;
+  private _descriptionDismiss: (() => void) | null = null;
+  private _descriptionDismissKey: ((event: KeyboardEvent) => void) | null = null;
   private usedHotspots: Set<string> = new Set();
   private selectedItemIndicator!: Phaser.GameObjects.Text;
 
@@ -95,10 +97,6 @@ export class RoomScene extends Phaser.Scene {
     this.tooltipText.setVisible(false);
     this.tooltipText.setDepth(Depths.tooltip);
 
-    // Description box (hidden)
-    this.descriptionBox = this.createDescriptionBox();
-    this.descriptionBox.setVisible(false);
-    this.descriptionBox.setDepth(Depths.descriptionBox);
 
     // Selected item indicator (top-right)
     this.selectedItemIndicator = this.add.text(width - 20, 20, '', {
@@ -300,7 +298,10 @@ export class RoomScene extends Phaser.Scene {
     switch (hotspot.type) {
       case 'inspect':
         this.showDescription(hotspot.description || 'Nothing noteworthy.');
-        if (hotspot.onceOnly) this.usedHotspots.add(hotspot.id);
+        if (hotspot.onceOnly) {
+          this.usedHotspots.add(hotspot.id);
+          SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
+        }
         break;
 
       case 'pickup':
@@ -313,6 +314,7 @@ export class RoomScene extends Phaser.Scene {
             UISounds.itemPickup();
             this.showPickupToast(hotspot.label);
             this.usedHotspots.add(hotspot.id);
+            SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
             this.events.emit('item-picked-up', hotspot.itemId);
             // Add journal entry for key evidence pickups
             const item = itemsData.items.find(i => i.id === hotspot.itemId);
@@ -373,6 +375,7 @@ export class RoomScene extends Phaser.Scene {
         // Use the selected item on this hotspot
         this.showDescription(hotspot.description || 'Unlocked!');
         this.usedHotspots.add(hotspot.id);
+        SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
         // Consume key items that are used to unlock
         if (hotspot.targetRoom) {
           inv.removeItem(hotspot.requiredItem);
@@ -405,6 +408,14 @@ export class RoomScene extends Phaser.Scene {
       const puzzle = PuzzleSystem.getInstance().getPuzzle(puzzleId);
       if (puzzle?.unlocks) {
         SaveSystem.getInstance().setFlag(puzzle.unlocks, true);
+        // If the unlock matches an item ID, grant it to inventory
+        const isItem = (itemsData.items as { id: string }[]).some(i => i.id === puzzle.unlocks);
+        if (isItem) {
+          InventorySystem.getInstance().addItem(puzzle.unlocks!);
+          this.showPickupToast(
+            (itemsData.items as { id: string; name: string }[]).find(i => i.id === puzzle.unlocks)?.name || puzzle.unlocks!
+          );
+        }
       }
     };
 
@@ -429,9 +440,18 @@ export class RoomScene extends Phaser.Scene {
   private showDescription(text: string): void {
     const { width, height } = this.cameras.main;
 
-    // Destroy previous description box if visible
+    // Destroy previous description box and clean up its listeners
     if (this.descriptionBox) {
       this.descriptionBox.destroy();
+      this.descriptionBox = null;
+    }
+    if (this._descriptionDismiss) {
+      this.input.off('pointerdown', this._descriptionDismiss);
+      this._descriptionDismiss = null;
+    }
+    if (this._descriptionDismissKey) {
+      this.input.keyboard!.off('keydown', this._descriptionDismissKey);
+      this._descriptionDismissKey = null;
     }
 
     // Create a centered modal overlay
@@ -439,9 +459,8 @@ export class RoomScene extends Phaser.Scene {
     container.setDepth(Depths.descriptionBox);
     this.descriptionBox = container;
 
-    // Dark backdrop — click anywhere to dismiss
+    // Dark backdrop
     const backdrop = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
-    backdrop.setInteractive({ cursor: POINTER_CURSOR });
     container.add(backdrop);
 
     // Text box in center
@@ -463,7 +482,6 @@ export class RoomScene extends Phaser.Scene {
     const bgH = textObj.height + padY * 2 + 30;
     const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.96);
     bg.setStrokeStyle(1.5, Colors.gold, 0.4);
-    bg.setInteractive({ useHandCursor: true });
     container.sendToBack(backdrop);
     container.moveTo(bg, 1); // behind text, in front of backdrop
 
@@ -490,21 +508,41 @@ export class RoomScene extends Phaser.Scene {
     container.setAlpha(0);
     this.tweens.add({ targets: container, alpha: 1, duration: 200 });
 
-    // Dismiss handler — shared by backdrop and bg panel
+    // Dismiss handler — use scene-level input to guarantee clicks are caught.
+    // Delay by one frame so the hotspot click that opened this doesn't immediately dismiss it.
+    let dismissed = false;
     const dismiss = () => {
+      if (dismissed) return;
+      dismissed = true;
+      this.input.off('pointerdown', dismiss);
+      this.input.keyboard!.off('keydown', dismissKey);
+      this._descriptionDismiss = null;
+      this._descriptionDismissKey = null;
       this.tweens.add({
         targets: container,
         alpha: 0,
         duration: 200,
-        onComplete: () => container.destroy(),
+        onComplete: () => {
+          container.destroy();
+          this.descriptionBox = null;
+        },
       });
     };
-    backdrop.on('pointerdown', dismiss);
-    bg.on('pointerdown', dismiss);
-    textObj.setInteractive({ useHandCursor: true });
-    textObj.on('pointerdown', dismiss);
-    prompt.setInteractive({ useHandCursor: true });
-    prompt.on('pointerdown', dismiss);
+    const dismissKey = (event: KeyboardEvent) => {
+      if (event.code === 'Space' || event.code === 'Enter' || event.code === 'Escape') {
+        dismiss();
+      }
+    };
+    // Store refs so we can clean up if a new description opens before this one is dismissed
+    this._descriptionDismiss = dismiss;
+    this._descriptionDismissKey = dismissKey;
+    // Wait one frame before arming the dismiss listener so the opening click doesn't close it
+    this.time.delayedCall(50, () => {
+      if (!dismissed) {
+        this.input.on('pointerdown', dismiss);
+        this.input.keyboard!.on('keydown', dismissKey);
+      }
+    });
   }
 
   private showPickupToast(label: string): void {
@@ -568,10 +606,6 @@ export class RoomScene extends Phaser.Scene {
     });
   }
 
-  private createDescriptionBox(): Phaser.GameObjects.Container {
-    // Now created dynamically in showDescription, return empty container as placeholder
-    return this.add.container(0, 0);
-  }
 
   private getHotspotColor(type: string): number {
     switch (type) {
@@ -747,6 +781,7 @@ export class RoomScene extends Phaser.Scene {
     const dismiss = () => {
       if (dismissed) return;
       dismissed = true;
+      this.input.off('pointerdown', dismiss);
       this.input.keyboard!.off('keydown', dismissKey);
       this.tweens.add({
         targets: container,
@@ -759,20 +794,13 @@ export class RoomScene extends Phaser.Scene {
       });
     };
 
-    // Click anywhere to dismiss — overlay, text, and prompt all need handlers
-    // because non-interactive children on top of the overlay block pointer events
-    overlay.setInteractive({ cursor: POINTER_CURSOR });
-    overlay.on('pointerdown', dismiss);
-    roomName.setInteractive({ useHandCursor: true });
-    roomName.on('pointerdown', dismiss);
-    desc.setInteractive({ useHandCursor: true });
-    desc.on('pointerdown', dismiss);
-    prompt.setInteractive({ useHandCursor: true });
-    prompt.on('pointerdown', dismiss);
+    // Click anywhere to dismiss — use scene-level input to guarantee clicks
+    // are caught regardless of container child ordering issues
+    this.input.on('pointerdown', dismiss);
 
-    // Also allow spacebar/enter to dismiss
+    // Also allow spacebar/enter/escape to dismiss
     const dismissKey = (event: KeyboardEvent) => {
-      if (event.code === 'Space' || event.code === 'Enter') {
+      if (event.code === 'Space' || event.code === 'Enter' || event.code === 'Escape') {
         dismiss();
       }
     };

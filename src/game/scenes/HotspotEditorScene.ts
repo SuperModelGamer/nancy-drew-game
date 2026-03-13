@@ -99,7 +99,7 @@ export class HotspotEditorScene extends Phaser.Scene {
     }).setDepth(960);
 
     // Info text (bottom)
-    this.infoText = this.add.text(width / 2, height - 14, 'Drag to move | Shift+R = toggle resize mode | E = export JSON | Shift+Q = close', {
+    this.infoText = this.add.text(width / 2, height - 14, 'Drag to move | Shift+R = resize mode | E = copy room | Shift+E = copy all | Shift+Q = close', {
       fontFamily: 'monospace',
       fontSize: '11px',
       color: '#aaaaaa',
@@ -119,7 +119,13 @@ export class HotspotEditorScene extends Phaser.Scene {
     this.drawHotspots();
 
     // Keyboard shortcuts
-    this.input.keyboard!.on('keydown-E', () => this.exportJSON());
+    this.input.keyboard!.on('keydown-E', (event: KeyboardEvent) => {
+      if (event.shiftKey) {
+        this.exportJSON();
+      } else {
+        this.exportCurrentRoom();
+      }
+    });
     this.input.keyboard!.on('keydown-Q', (event: KeyboardEvent) => {
       if (event.shiftKey) this.closeEditor();
     });
@@ -271,6 +277,49 @@ export class HotspotEditorScene extends Phaser.Scene {
 
     // Redraw hotspots
     this.drawHotspots();
+  }
+
+  private exportCurrentRoom(): void {
+    const room = this.currentRoom;
+    const output = {
+      id: room.id,
+      name: room.name,
+      description: room.description,
+      hotspots: room.hotspots.map(hs => {
+        const clean: Record<string, unknown> = {
+          id: hs.id,
+          x: hs.x,
+          y: hs.y,
+          width: hs.width,
+          height: hs.height,
+          label: hs.label,
+          type: hs.type,
+        };
+        if (hs.description) clean.description = hs.description;
+        if (hs.itemId) clean.itemId = hs.itemId;
+        if (hs.requiredItem) clean.requiredItem = hs.requiredItem;
+        if (hs.dialogueId) clean.dialogueId = hs.dialogueId;
+        if (hs.targetRoom) clean.targetRoom = hs.targetRoom;
+        if (hs.puzzleId) clean.puzzleId = hs.puzzleId;
+        if (hs.onceOnly) clean.onceOnly = hs.onceOnly;
+        if (hs.showWhen) clean.showWhen = hs.showWhen;
+        return clean;
+      }),
+    };
+
+    const json = JSON.stringify(output, null, 2);
+    console.log(`%c[Hotspot Editor] Exported ${room.name} (${room.id}):`, 'color: #00ff88; font-weight: bold');
+    console.log(json);
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(json).then(() => {
+        this.showToast(`${room.name} copied to clipboard!`);
+      }).catch(() => {
+        this.showToast('JSON logged to console (clipboard unavailable)');
+      });
+    } else {
+      this.showToast('JSON logged to console');
+    }
   }
 
   private exportJSON(): void {
