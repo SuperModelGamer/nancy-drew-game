@@ -111,102 +111,14 @@ export class UIScene extends Phaser.Scene {
 
     barBg.setDepth(Depths.tooltip - 1);
 
-    // ─── Story progress indicator — visual act tracker in toolbar center ───
-    const TOTAL_ACTS = 5;
-    const progressY = toolbarTop + 18;
-    const progressContainer = this.add.container(width / 2, progressY);
-    progressContainer.setDepth(Depths.tooltip);
-
-    // Act pip dots with connecting lines
-    const pipSpacing = 42;
-    const totalPipW = (TOTAL_ACTS - 1) * pipSpacing;
-    const pipStartX = -totalPipW / 2;
-    const pipR = 6;
-    const pipGfx = this.add.graphics();
-    progressContainer.add(pipGfx);
-
-    // Tooltip for act title (hidden by default)
-    const actTooltip = this.add.text(0, 21, '', {
-      fontFamily: FONT,
-      fontSize: '15px',
-      color: DecoTextColors.cream,
-      fontStyle: 'italic',
-      letterSpacing: 1,
-    }).setOrigin(0.5, 0).setAlpha(0);
-    progressContainer.add(actTooltip);
-
-    // Hit area for hover to show act title
-    const progressHit = this.add.rectangle(0, 0, totalPipW + 60, 30, 0x000000, 0);
-    progressHit.setInteractive({ cursor: POINTER_CURSOR });
-    progressContainer.add(progressHit);
-
-    const drawProgress = (chapter: number) => {
-      pipGfx.clear();
-
-      // Connecting line (track)
-      pipGfx.lineStyle(1, DecoColors.gold, 0.15);
-      pipGfx.lineBetween(pipStartX, 0, pipStartX + totalPipW, 0);
-
-      // Filled progress line
-      if (chapter > 1) {
-        const filledW = ((chapter - 1) / (TOTAL_ACTS - 1)) * totalPipW;
-        pipGfx.lineStyle(2, DecoColors.gold, 0.6);
-        pipGfx.lineBetween(pipStartX, 0, pipStartX + filledW, 0);
-      }
-
-      // Act pips
-      for (let i = 1; i <= TOTAL_ACTS; i++) {
-        const px = pipStartX + (i - 1) * pipSpacing;
-        const isComplete = i < chapter;
-        const isCurrent = i === chapter;
-
-        if (isCurrent) {
-          // Current act — bright gold filled diamond
-          pipGfx.fillStyle(DecoColors.gold, 0.9);
-          pipGfx.fillPoints([
-            new Phaser.Geom.Point(px, -pipR - 2),
-            new Phaser.Geom.Point(px + pipR + 2, 0),
-            new Phaser.Geom.Point(px, pipR + 2),
-            new Phaser.Geom.Point(px - pipR - 2, 0),
-          ], true);
-        } else if (isComplete) {
-          // Completed act — filled gold circle
-          pipGfx.fillStyle(DecoColors.gold, 0.6);
-          pipGfx.fillCircle(px, 0, pipR);
-        } else {
-          // Future act — empty circle outline
-          pipGfx.lineStyle(1, DecoColors.gold, 0.25);
-          pipGfx.strokeCircle(px, 0, pipR);
-        }
-      }
-
-      // Update tooltip text
-      actTooltip.setText(ChapterSystem.getInstance().getChapterTitle(chapter));
-    };
-
-    // Show/hide tooltip on hover
-    progressHit.on('pointerover', () => {
-      this.tweens.add({ targets: actTooltip, alpha: 1, duration: 150 });
-    });
-    progressHit.on('pointerout', () => {
-      this.tweens.add({ targets: actTooltip, alpha: 0, duration: 150 });
-    });
-
-    const updateChapter = () => {
-      const ch = SaveSystem.getInstance().getChapter();
-      drawProgress(ch);
-    };
-    updateChapter();
-    this.events.on('wake', updateChapter);
-
-    // ─── Toolbar buttons — positioned below progress indicator ───
-    const buttonY = toolbarTop + 63;
+    // ─── Toolbar buttons — centered vertically in the toolbar bar ───
+    const buttonY = toolbarTop + TOOLBAR_H / 2;
 
     const buttons = [
-      { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: width * 0.12, action: () => this.toggleInventory() },
-      { label: 'SUSPECTS', icon: '◉', color: 0xb4a0d4, x: width * 0.38, action: () => this.scene.launch('SuspectScene') },
-      { label: 'MAP', icon: '◇', color: Colors.mapBlue, x: width * 0.62, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
-      { label: 'JOURNAL', icon: '◆', color: DecoColors.gold, x: width * 0.88, action: () => this.toggleJournal() },
+      { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: width * 0.125, action: () => this.toggleInventory() },
+      { label: 'SUSPECTS', icon: '◉', color: 0xb4a0d4, x: width * 0.375, action: () => this.scene.launch('SuspectScene') },
+      { label: 'MAP', icon: '◇', color: Colors.mapBlue, x: width * 0.625, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
+      { label: 'JOURNAL', icon: '◆', color: DecoColors.gold, x: width * 0.875, action: () => this.toggleJournal() },
     ];
 
     buttons.forEach(btn => {
@@ -845,15 +757,74 @@ export class UIScene extends Phaser.Scene {
     const { panelW, panelX, contentTop, contentBottom } = this.bookLayout;
     const save = SaveSystem.getInstance();
     const journal = save.getJournal();
+    const chapter = save.getChapter();
 
     const contentLeft = panelX - panelW / 2 + 30;
     const contentRight = panelX + panelW / 2 - 30;
     const usableW = contentRight - contentLeft;
 
+    // ─── Act progress indicator at top of journal ───
+    const TOTAL_ACTS = 5;
+    const progressY = contentTop + 18;
+    const progressGfx = this.add.graphics();
+
+    const pipSpacing = 42;
+    const totalPipW = (TOTAL_ACTS - 1) * pipSpacing;
+    const pipStartX = panelX - totalPipW / 2;
+    const pipR = 6;
+
+    // Connecting line (track)
+    progressGfx.lineStyle(1, 0x8B7355, 0.3);
+    progressGfx.lineBetween(pipStartX, progressY, pipStartX + totalPipW, progressY);
+
+    // Filled progress line
+    if (chapter > 1) {
+      const filledW = ((chapter - 1) / (TOTAL_ACTS - 1)) * totalPipW;
+      progressGfx.lineStyle(2, 0x5a3a2a, 0.6);
+      progressGfx.lineBetween(pipStartX, progressY, pipStartX + filledW, progressY);
+    }
+
+    // Act pips
+    for (let i = 1; i <= TOTAL_ACTS; i++) {
+      const px = pipStartX + (i - 1) * pipSpacing;
+      const isComplete = i < chapter;
+      const isCurrent = i === chapter;
+
+      if (isCurrent) {
+        progressGfx.fillStyle(0x5a3a2a, 0.9);
+        progressGfx.fillPoints([
+          new Phaser.Geom.Point(px, progressY - pipR - 2),
+          new Phaser.Geom.Point(px + pipR + 2, progressY),
+          new Phaser.Geom.Point(px, progressY + pipR + 2),
+          new Phaser.Geom.Point(px - pipR - 2, progressY),
+        ], true);
+      } else if (isComplete) {
+        progressGfx.fillStyle(0x5a3a2a, 0.5);
+        progressGfx.fillCircle(px, progressY, pipR);
+      } else {
+        progressGfx.lineStyle(1, 0x8B7355, 0.3);
+        progressGfx.strokeCircle(px, progressY, pipR);
+      }
+    }
+    this.journalContent.add(progressGfx);
+
+    // Act title text below pips
+    const actTitle = this.add.text(panelX, progressY + 20, ChapterSystem.getInstance().getChapterTitle(chapter), {
+      fontFamily: JOURNAL_FONT,
+      fontSize: '18px',
+      color: '#5a3a2a',
+      fontStyle: 'italic',
+      letterSpacing: 1,
+    }).setOrigin(0.5, 0);
+    this.journalContent.add(actTitle);
+
+    // Offset the rest of the journal content below the progress indicator
+    const journalContentTop = progressY + 52;
+
     // ─── Ruled lines on the journal page ───
     const ruledGfx = this.add.graphics();
     const lineSpacing = 33;
-    const ruledStart = contentTop + 10;
+    const ruledStart = journalContentTop;
     const ruledEnd = contentBottom - 50;
     ruledGfx.lineStyle(1, BOOK_STAIN, 0.12);
     for (let ly = ruledStart; ly < ruledEnd; ly += lineSpacing) {
@@ -862,11 +833,11 @@ export class UIScene extends Phaser.Scene {
     // Red margin line
     const marginX = contentLeft + 55;
     ruledGfx.lineStyle(1, BOOK_MARGIN_RED, 0.2);
-    ruledGfx.lineBetween(marginX, contentTop, marginX, contentBottom - 45);
+    ruledGfx.lineBetween(marginX, journalContentTop, marginX, contentBottom - 45);
     this.journalContent.add(ruledGfx);
 
     if (journal.length === 0) {
-      const empty = this.add.text(panelX, (contentTop + contentBottom) / 2, "No entries yet.\n\nExplore the theater and talk to people\nto fill Nancy's journal.", {
+      const empty = this.add.text(panelX, (journalContentTop + contentBottom) / 2, "No entries yet.\n\nExplore the theater and talk to people\nto fill Nancy's journal.", {
         fontFamily: JOURNAL_FONT,
         fontSize: '21px',
         color: '#6a5a4a',
@@ -888,7 +859,7 @@ export class UIScene extends Phaser.Scene {
     const pageEntries = journal.slice(startIdx, endIdx);
 
     // Render entries
-    let y = contentTop + 20;
+    let y = journalContentTop + 10;
     const entryLeft = marginX + 15;
 
     pageEntries.forEach((entry, i) => {
