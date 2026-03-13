@@ -59,14 +59,16 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
 };
 
 // ─── Layout Constants ───────────────────────────────────────────────────────
-const PORTRAIT_W = 240;
-const PORTRAIT_H = 300;
-const BOX_H = 390;
-const TEXT_SIZE = '30px';
-const SPEAKER_SIZE = '33px';
+const PORTRAIT_W = 320;
+const PORTRAIT_H = 400;
+const BOX_H = 310;
+const BOX_BOTTOM_MARGIN = 48;
+const TEXT_SIZE = '32px';
+const SPEAKER_SIZE = '36px';
 const CHOICE_H = 84;
 const CHOICE_FONT = '26px';
 const TYPEWRITER_SPEED = 28; // ms per character
+const ANIM_DURATION = 400; // ms for box entrance/exit
 
 export class DialogueSystem {
   private static instance: DialogueSystem;
@@ -153,7 +155,7 @@ export class DialogueSystem {
     }
   }
 
-  // ─── Visual Novel Layout: Centered Dialogue ──────────────────────────────
+  // ─── Visual Novel Layout: Bottom-anchored Dialogue ─────────────────────────
 
   private renderLine(line: DialogueLine): void {
     if (!this.scene || !this.container) return;
@@ -165,56 +167,59 @@ export class DialogueSystem {
     this.container.removeAll(true);
 
     const { width, height } = this.scene.cameras.main;
+    const isNewSpeaker = line.speaker !== this.lastSpeaker;
+    const isFirstLine = this.lastSpeaker === '';
 
-    // ── Dark overlay (stronger dim for focus) ──
-    const overlay = this.scene.add.rectangle(width / 2, height / 2, width, height, Colors.darkBg, 0.7);
+    // ── Dark overlay (softer gradient feel) ──
+    const overlay = this.scene.add.rectangle(width / 2, height / 2, width, height, Colors.darkBg, 0.45);
     overlay.setInteractive(); // block clicks through
     this.container.add(overlay);
 
     // ── Layout calculations ──
-    // Box is centered vertically in the lower 60% of the screen
-    const boxCenterY = height * 0.62;
-    const boxW = Math.min(1320, width * 0.92);
+    // Box anchored to bottom of screen with margin
+    const boxW = Math.min(1680, width * 0.88);
     const boxLeft = (width - boxW) / 2;
+    const boxTop = height - BOX_H - BOX_BOTTOM_MARGIN;
+    const boxCenterY = boxTop + BOX_H / 2;
 
-    // Portrait area on the left
+    // Portrait area on the left — portrait extends ABOVE the box
     const portraitKey = this.getSpeakerPortraitKey(line.speaker);
     const hasPortrait = portraitKey !== null && this.scene.textures.exists(portraitKey);
-    const portraitAreaW = hasPortrait ? PORTRAIT_W + 60 : 0;
+    // The portrait frame inner opening: frame is 370x470, border ~30px thick
+    // so inner opening is ~310x410. We size portrait to fill that.
+    const FRAME_BORDER = 30; // approx border thickness of the frame asset
+    const portraitAreaW = hasPortrait ? PORTRAIT_W + 48 : 0;
 
     // Text area to the right of portrait
-    const textAreaLeft = boxLeft + portraitAreaW + 30;
-    const textAreaW = boxW - portraitAreaW - 60;
+    const textAreaLeft = boxLeft + portraitAreaW + 24;
+    const textAreaW = boxW - portraitAreaW - 48;
 
     // ── Dialogue box background ──
     if (this.scene.textures.exists('dlg_box')) {
-      // The art deco banner asset is wide and thin — use it as a decorative frame
-      // scaled to fill width, with proportional height to preserve the gold corners
       const tex = this.scene.textures.get('dlg_box').getSourceImage();
       const assetRatio = tex.width / tex.height;
-      const bannerH = Math.round(boxW / assetRatio);
 
-      // Dark fill behind the full dialogue area (extends below the banner)
+      // Dark fill behind the full dialogue area
       const bgGfx = this.scene.add.graphics();
-      const boxTop = boxCenterY - BOX_H / 2;
       bgGfx.fillStyle(0x0e0c14, 0.92);
-      bgGfx.fillRoundedRect(boxLeft + 6, boxTop + bannerH * 0.4, boxW - 12, BOX_H - bannerH * 0.4 + 6, 6);
+      bgGfx.fillRoundedRect(boxLeft + 4, boxTop + 4, boxW - 8, BOX_H - 4, 6);
       this.container.add(bgGfx);
 
-      // Art deco banner at the top of the dialogue area
-      const boxBg = this.scene.add.image(width / 2, boxTop + bannerH / 2, 'dlg_box');
-      boxBg.setDisplaySize(boxW, bannerH);
-      this.container.add(boxBg);
+      // Art deco banner across the top edge of the box
+      const bannerH = Math.round(boxW / assetRatio);
+      const topBanner = this.scene.add.image(width / 2, boxTop + bannerH / 2, 'dlg_box');
+      topBanner.setDisplaySize(boxW, bannerH);
+      this.container.add(topBanner);
 
-      // Bottom border line
-      const borderGfx = this.scene.add.graphics();
-      borderGfx.lineStyle(2, Colors.gold, 0.3);
-      borderGfx.lineBetween(boxLeft + 24, boxTop + BOX_H, boxLeft + boxW - 24, boxTop + BOX_H);
-      this.container.add(borderGfx);
+      // Bottom banner (flipped)
+      const bottomBanner = this.scene.add.image(width / 2, boxTop + BOX_H - bannerH / 2, 'dlg_box');
+      bottomBanner.setDisplaySize(boxW, bannerH);
+      bottomBanner.setFlipY(true);
+      bottomBanner.setAlpha(0.6);
+      this.container.add(bottomBanner);
     } else {
-      // Procedural fallback: dark panel with gold border and inner glow
+      // Procedural fallback: dark panel with gold border
       const gfx = this.scene.add.graphics();
-      const boxTop = boxCenterY - BOX_H / 2;
 
       // Outer glow
       gfx.fillStyle(Colors.gold, 0.04);
@@ -248,34 +253,46 @@ export class DialogueSystem {
       this.container.add(gfx);
     }
 
-    // ── Portrait (large, on the left) — frame + image slide in together ──
+    // ── Portrait (large, overlapping above the box) ──
     if (hasPortrait && portraitKey) {
-      const portraitX = boxLeft + 30 + PORTRAIT_W / 2;
-      const portraitY = boxCenterY;
-      const isNewSpeaker = line.speaker !== this.lastSpeaker;
+      // Portrait center sits so the bottom aligns with the box bottom
+      const portraitX = boxLeft + 24 + PORTRAIT_W / 2;
+      const portraitY = boxTop + BOX_H - PORTRAIT_H / 2 - 8;
 
       // Group portrait and frame in a sub-container so they animate together
       const portraitGroup = this.scene.add.container(0, 0);
+
+      // Measure the frame's inner opening so portrait fills it exactly
+      let innerW = PORTRAIT_W;
+      let innerH = PORTRAIT_H;
+      if (this.scene.textures.exists('dlg_portrait_frame')) {
+        const frameTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
+        const frameRatio = frameTex.width / frameTex.height;
+        const frameH = PORTRAIT_H + 24;
+        const frameW = frameH * frameRatio;
+        // Inner opening is frame size minus border on each side
+        innerW = frameW - FRAME_BORDER * 2;
+        innerH = frameH - FRAME_BORDER * 2;
+      }
 
       // Portrait image first (frame renders on top)
       const portrait = this.scene.add.image(portraitX, portraitY, portraitKey);
       const texW = portrait.width;
       const texH = portrait.height;
-      const scaleToFill = Math.max(PORTRAIT_W / texW, PORTRAIT_H / texH);
+      const scaleToFill = Math.max(innerW / texW, innerH / texH);
       portrait.setScale(scaleToFill);
 
-      // Rectangular mask
+      // Rectangular mask sized to inner opening
       const maskGraphics = this.scene.make.graphics({});
-      maskGraphics.fillRect(portraitX - PORTRAIT_W / 2, portraitY - PORTRAIT_H / 2, PORTRAIT_W, PORTRAIT_H);
+      maskGraphics.fillRect(portraitX - innerW / 2, portraitY - innerH / 2, innerW, innerH);
       portrait.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, maskGraphics));
       portraitGroup.add(portrait);
 
-      // Portrait frame (rendered ON TOP of portrait for proper framing)
+      // Portrait frame (rendered ON TOP of portrait)
       if (this.scene.textures.exists('dlg_portrait_frame')) {
         const frame = this.scene.add.image(portraitX, portraitY, 'dlg_portrait_frame');
         const frameTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
         const frameRatio = frameTex.width / frameTex.height;
-        // Size frame to tightly wrap portrait
         const frameH = PORTRAIT_H + 24;
         const frameW = frameH * frameRatio;
         frame.setDisplaySize(frameW, frameH);
@@ -302,12 +319,12 @@ export class DialogueSystem {
       // Entrance animation for new speakers — whole group slides in
       if (isNewSpeaker) {
         portraitGroup.setAlpha(0);
-        portraitGroup.x = -45;
+        portraitGroup.x = -60;
         this.scene.tweens.add({
           targets: portraitGroup,
           x: 0,
           alpha: 1,
-          duration: 300,
+          duration: 350,
           ease: 'Power2',
         });
       }
@@ -315,16 +332,15 @@ export class DialogueSystem {
 
     this.lastSpeaker = line.speaker;
 
-    // ── Speaker nameplate — centered over text area ──
-    const nameplateY = boxCenterY - BOX_H / 2 - 24;
+    // ── Speaker nameplate — positioned above the text area ──
     const speakerColor = this.getSpeakerColor(line.speaker);
+    const nameplateY = boxTop - 20;
     const nameplateCenterX = textAreaLeft + textAreaW / 2;
 
     if (this.scene.textures.exists('dlg_nameplate')) {
-      // Preserve art deco banner proportions
       const npTex = this.scene.textures.get('dlg_nameplate').getSourceImage();
       const npRatio = npTex.width / npTex.height;
-      const npH = 63;
+      const npH = 80;
       const npW = npH * npRatio;
       const nameplate = this.scene.add.image(nameplateCenterX, nameplateY, 'dlg_nameplate');
       nameplate.setDisplaySize(npW, npH);
@@ -333,8 +349,8 @@ export class DialogueSystem {
     } else {
       // Procedural nameplate
       const npGfx = this.scene.add.graphics();
-      const npW = 270;
-      const npH = 48;
+      const npW = 320;
+      const npH = 56;
       const npX = nameplateCenterX - npW / 2;
       const npY = nameplateY - npH / 2;
       npGfx.fillStyle(0x0e0c14, 0.9);
@@ -354,21 +370,36 @@ export class DialogueSystem {
         offsetX: 0,
         offsetY: 0,
         color: '#000000',
-        blur: 6,
+        blur: 8,
         fill: true,
       },
     }).setOrigin(0.5, 0.5);
+
+    // Nameplate fade-in on speaker change
+    if (isNewSpeaker) {
+      speakerText.setAlpha(0);
+      this.scene.tweens.add({
+        targets: speakerText,
+        alpha: 1,
+        y: { from: nameplateY + 8, to: nameplateY },
+        duration: 300,
+        delay: 50,
+        ease: 'Power2',
+      });
+    }
     this.container.add(speakerText);
 
     // ── Dialogue text (typewriter reveal) ──
-    const textY = boxCenterY - BOX_H / 2 + 42;
-    const textMaxH = BOX_H - 90; // leave room for padding top/bottom
+    const textPadTop = 30;
+    const textPadBottom = 44;
+    const textY = boxTop + textPadTop;
+    const textMaxH = BOX_H - textPadTop - textPadBottom;
     this.dialogueTextObj = this.scene.add.text(textAreaLeft, textY, '', {
       fontFamily: FONT,
       fontSize: TEXT_SIZE,
       color: TextColors.light,
       wordWrap: { width: textAreaW },
-      lineSpacing: 6,
+      lineSpacing: 8,
     });
     // Clip text that overflows the dialogue box
     const textMask = this.scene.make.graphics({});
@@ -380,32 +411,34 @@ export class DialogueSystem {
     this.fullLineText = line.text;
     this.startTypewriter();
 
-    // ── Continue indicator (bottom-right of box) ──
-    const continueY = boxCenterY + BOX_H / 2 - 30;
-    const continueX = boxLeft + boxW - 36;
+    // ── Continue indicator (bottom-right, larger with bounce) ──
+    const continueY = boxTop + BOX_H - 28;
+    const continueX = boxLeft + boxW - 42;
 
     if (this.scene.textures.exists('dlg_continue_arrow')) {
       const arrow = this.scene.add.image(continueX, continueY, 'dlg_continue_arrow');
-      arrow.setDisplaySize(36, 36);
+      arrow.setDisplaySize(44, 44);
       this.scene.tweens.add({
         targets: arrow,
-        alpha: { from: 1, to: 0.3 },
-        duration: 800,
+        y: { from: continueY - 3, to: continueY + 3 },
+        alpha: { from: 1, to: 0.4 },
+        duration: 900,
         yoyo: true,
         repeat: -1,
         ease: 'Sine.easeInOut',
       });
       this.container.add(arrow);
     } else {
-      const arrow = this.scene.add.text(continueX, continueY, '▶', {
+      const arrow = this.scene.add.text(continueX, continueY, '▼', {
         fontFamily: FONT,
-        fontSize: '24px',
+        fontSize: '28px',
         color: TextColors.goldDim,
       }).setOrigin(0.5);
       this.scene.tweens.add({
         targets: arrow,
-        alpha: { from: 1, to: 0.3 },
-        duration: 800,
+        y: { from: continueY - 3, to: continueY + 3 },
+        alpha: { from: 1, to: 0.4 },
+        duration: 900,
         yoyo: true,
         repeat: -1,
         ease: 'Sine.easeInOut',
@@ -413,24 +446,24 @@ export class DialogueSystem {
       this.container.add(arrow);
     }
 
-    // ── Skip button (top-right of box) ──
-    const skipX = boxLeft + boxW - 24;
-    const skipY = boxCenterY - BOX_H / 2 + 24;
+    // ── Skip button (top-right, more visible) ──
+    const skipX = boxLeft + boxW - 28;
+    const skipY = boxTop + 22;
     const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
       fontFamily: FONT,
-      fontSize: '17px',
-      color: TextColors.muted,
+      fontSize: '20px',
+      color: TextColors.goldDim,
       letterSpacing: 2,
     }).setOrigin(1, 0.5);
     skipBtn.setInteractive({ cursor: POINTER_CURSOR });
-    skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.goldDim));
-    skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.muted));
+    skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.gold));
+    skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.goldDim));
     skipBtn.on('pointerdown', () => this.skipToEnd());
     this.container.add(skipBtn);
 
     // ── Click anywhere on box to advance ──
     const hitArea = this.scene.add.rectangle(
-      width / 2, boxCenterY, boxW, BOX_H, 0x000000, 0
+      width / 2, boxCenterY, boxW, BOX_H + 40, 0x000000, 0
     );
     hitArea.setInteractive({ cursor: POINTER_CURSOR });
     hitArea.on('pointerdown', () => this.advance());
@@ -438,6 +471,19 @@ export class DialogueSystem {
 
     // Also click overlay to advance (anywhere on screen)
     overlay.on('pointerdown', () => this.advance());
+
+    // ── Box entrance animation ──
+    if (isFirstLine) {
+      this.container.setAlpha(0);
+      this.container.y = 30;
+      this.scene.tweens.add({
+        targets: this.container,
+        y: 0,
+        alpha: 1,
+        duration: ANIM_DURATION,
+        ease: 'Power2',
+      });
+    }
   }
 
   // ─── Typewriter Effect ────────────────────────────────────────────────────
@@ -491,7 +537,7 @@ export class DialogueSystem {
     const save = SaveSystem.getInstance();
 
     // ── Dark overlay ──
-    const overlay = this.scene.add.rectangle(width / 2, height / 2, width, height, Colors.darkBg, 0.75);
+    const overlay = this.scene.add.rectangle(width / 2, height / 2, width, height, Colors.darkBg, 0.55);
     overlay.setInteractive();
     this.container.add(overlay);
 
@@ -504,7 +550,7 @@ export class DialogueSystem {
     });
 
     // Layout — centered on screen
-    const choiceW = Math.min(1020, width * 0.8);
+    const choiceW = Math.min(1200, width * 0.65);
 
     // Sort: unasked questions first, already-asked (dimmed) at the bottom
     const sortedChoices = [...visibleChoices].sort((a, b) => {
@@ -782,7 +828,25 @@ export class DialogueSystem {
     this.active = false;
     this.currentDialogue = null;
     this.lastSpeaker = '';
-    this.destroyUI();
+
+    // Exit animation: fade out and slide down
+    if (this.container && this.scene) {
+      const containerRef = this.container;
+      this.scene.tweens.add({
+        targets: containerRef,
+        y: 20,
+        alpha: 0,
+        duration: 250,
+        ease: 'Power2',
+        onComplete: () => {
+          containerRef.destroy();
+        },
+      });
+      this.container = null;
+      this.dialogueTextObj = null;
+    } else {
+      this.destroyUI();
+    }
   }
 
   private destroyUI(): void {
