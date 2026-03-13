@@ -16,11 +16,17 @@ interface SuspectProfile {
   color: number;
   metFlag: string; // dialogue event that indicates the player has met this suspect
   facts: SuspectFact[];
+  thoughts: NancyThought[]; // Nancy's inner monologue about this person
 }
 
 interface SuspectFact {
   text: string;
   requiresFlag?: string;
+}
+
+interface NancyThought {
+  text: string;
+  requiresFlag?: string; // only show after a certain event/flag
 }
 
 const SUSPECTS: SuspectProfile[] = [
@@ -40,6 +46,11 @@ const SUSPECTS: SuspectProfile[] = [
       { text: 'The locket in the trunk contained her childhood photo.', requiresFlag: 'vivian_full_trust' },
       { text: 'Vivian\'s connection to Margaux is deeper than she initially let on.', requiresFlag: 'learned_about_hale_family' },
     ],
+    thoughts: [
+      { text: '"She reminds me of someone who\'s been holding their breath for a very long time. Everything she says has a careful weight to it — like she\'s choosing which truths to share."' },
+      { text: '"Vivian knows more about this theater than anyone alive. The question is how much of that knowledge she\'s deliberately keeping from me."', requiresFlag: 'learned_about_cecilia' },
+      { text: '"I don\'t think she\'s the villain here. But she\'s definitely protecting someone — or something. That locket wasn\'t just sentimental. It was her reason for staying."', requiresFlag: 'vivian_full_trust' },
+    ],
   },
   {
     id: 'edwin',
@@ -56,6 +67,12 @@ const SUSPECTS: SuspectProfile[] = [
       { text: 'His grandfather James Hale was Margaux\'s lover.', requiresFlag: 'learned_about_hale_family' },
       { text: 'Stella identified him as the person using the basement.', requiresFlag: 'stella_confession' },
       { text: 'HE IS THE GHOST. Confessed to staging hauntings and poisoning Ashworth.', requiresFlag: 'edwin_personal_revealed' },
+    ],
+    thoughts: [
+      { text: '"There\'s something about the way he talks about Margaux — like she\'s still alive to him. Fifteen years of research on a ninety-year-old case? That\'s not academic interest. That\'s obsession."' },
+      { text: '"His family funded this theater. His grandfather loved Margaux. There\'s a personal stake here he hasn\'t told me about yet."', requiresFlag: 'learned_about_hale_family' },
+      { text: '"The pieces are clicking into place. Edwin had the knowledge, the access, and the motivation. He built himself a ghost because he couldn\'t let go of a woman he never even met."', requiresFlag: 'stella_confession' },
+      { text: '"He poisoned Ashworth to stop the demolition — the same poison that killed Margaux. He\'s been living in the past so long he started recreating it."', requiresFlag: 'edwin_personal_revealed' },
     ],
   },
   {
@@ -74,6 +91,11 @@ const SUSPECTS: SuspectProfile[] = [
       { text: 'Found someone living in the basement two weeks ago.', requiresFlag: 'learned_about_basement_intruder' },
       { text: 'Rejected $800K sale; demolition insurance pays $2.3M.', requiresFlag: 'ashworth_motive_revealed' },
     ],
+    thoughts: [
+      { text: '"He looks at this theater and sees dollar signs. I look at it and see a hundred years of stories. We\'re not going to be friends."' },
+      { text: '"Getting poisoned doesn\'t automatically make you innocent. Ashworth has a $2.3 million reason to want this building demolished — and being a victim might just be convenient cover."', requiresFlag: 'learned_about_ashworth' },
+      { text: '"He rejected the Historical Society\'s offer. He chose destruction over preservation for an extra million and a half. I\'ve met a lot of villains — some of them wear suits and carry spreadsheets."', requiresFlag: 'ashworth_motive_revealed' },
+    ],
   },
   {
     id: 'stella',
@@ -91,6 +113,11 @@ const SUSPECTS: SuspectProfile[] = [
       { text: 'Left a threatening note to the basement intruder.', requiresFlag: 'basement_key_location' },
       { text: 'Knows where the basement key is hidden. Told Nancy.', requiresFlag: 'basement_key_location' },
     ],
+    thoughts: [
+      { text: '"She carries herself like someone used to being invisible — working behind the scenes while everyone else takes the spotlight. I know that feeling."' },
+      { text: '"Stella\'s been selling props to survive, not to profit. There\'s a difference. But desperation makes people do things they wouldn\'t normally consider."', requiresFlag: 'learned_about_missing_props' },
+      { text: '"$3,800 a month for her mother\'s care. I can\'t judge her for that. But she knows things about this theater she hasn\'t shared with everyone — and secrets have a way of making people look guilty."', requiresFlag: 'stella_confession' },
+    ],
   },
   {
     id: 'diego',
@@ -106,6 +133,11 @@ const SUSPECTS: SuspectProfile[] = [
       { text: 'Found the annotated script with coded margin notes.', requiresFlag: 'annotated_script_found' },
       { text: 'Has heard a woman\'s voice reciting lines at night from the stage.', requiresFlag: 'heard_basement_noises' },
       { text: 'Recognized the cipher spells "goblet" — the murder weapon.', requiresFlag: 'cipher_discussed' },
+    ],
+    thoughts: [
+      { text: '"He\'s young and earnest — the kind of person who came here to write the next great American play and accidentally stumbled into a real mystery. I don\'t think he\'s involved, but he\'s observant."' },
+      { text: '"Diego hears things late at night from his booth. A woman\'s voice, reciting lines from a play that ended in murder. He\'s scared, but he\'s also fascinated. Writers are like detectives that way — we can\'t resist a good story."', requiresFlag: 'heard_basement_noises' },
+      { text: '"He cracked the cipher faster than I did. \'Goblet.\' The murder weapon hidden in plain sight inside the script. Diego has good instincts. I should keep him close."', requiresFlag: 'cipher_discussed' },
     ],
   },
 ];
@@ -482,5 +514,60 @@ export class SuspectScene extends Phaser.Scene {
 
       y += Math.max(factText.height + 21, 54);
     });
+
+    // ── Nancy's Inner Monologue ──
+    const unlockedThoughts = suspect.thoughts.filter(t =>
+      !t.requiresFlag || save.getFlag(t.requiresFlag) || dialogue.hasTriggeredEvent(t.requiresFlag)
+    );
+
+    if (unlockedThoughts.length > 0) {
+      y += 12;
+
+      // Divider
+      const thoughtDivGfx = this.add.graphics();
+      drawDecoDivider(thoughtDivGfx, rightCx, y, rightW - 90, suspect.color, 0.2);
+      this.container.add(thoughtDivGfx);
+      y += 24;
+
+      // Section header
+      this.container.add(this.add.text(rightX + 30, y, 'NANCY\'S THOUGHTS', {
+        fontFamily: FONT,
+        fontSize: '18px',
+        color: TextColors.goldDim,
+        fontStyle: 'bold italic',
+        letterSpacing: 4,
+      }));
+      y += 36;
+
+      // Show the most recent unlocked thought (last in array = most progression)
+      const latestThought = unlockedThoughts[unlockedThoughts.length - 1];
+      const thoughtText = this.add.text(rightX + 36, y, latestThought.text, {
+        fontFamily: FONT,
+        fontSize: '19px',
+        color: '#a0b4c4',
+        fontStyle: 'italic',
+        wordWrap: { width: factMaxW },
+        lineSpacing: 5,
+      });
+      this.container.add(thoughtText);
+      y += thoughtText.height + 12;
+
+      // If there are earlier thoughts, show them dimmer
+      if (unlockedThoughts.length > 1) {
+        for (let ti = unlockedThoughts.length - 2; ti >= 0; ti--) {
+          const olderThought = unlockedThoughts[ti];
+          const olderText = this.add.text(rightX + 36, y, olderThought.text, {
+            fontFamily: FONT,
+            fontSize: '17px',
+            color: TextColors.muted,
+            fontStyle: 'italic',
+            wordWrap: { width: factMaxW },
+            lineSpacing: 4,
+          });
+          this.container.add(olderText);
+          y += olderText.height + 10;
+        }
+      }
+    }
   }
 }

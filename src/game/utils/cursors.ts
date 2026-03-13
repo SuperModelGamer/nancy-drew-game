@@ -84,3 +84,50 @@ export async function createGlowSpyglass(): Promise<string> {
     img.src = 'assets/ui/cursors/spyglass.png';
   });
 }
+
+/**
+ * Generate a cursor from a Phaser texture (item icon asset).
+ * Renders the item image at 48×48 with a subtle golden glow, cached per key.
+ * Must be called from a scene that has the texture loaded.
+ * Returns a CSS cursor string (data URL), or the pickup cursor as fallback.
+ */
+const _itemCursorCache = new Map<string, string>();
+export function createItemCursor(scene: Phaser.Scene, textureKey: string): string {
+  if (_itemCursorCache.has(textureKey)) return _itemCursorCache.get(textureKey)!;
+
+  if (!scene.textures.exists(textureKey)) return Cursors.pickup;
+
+  const size = 48;
+  const pad = 6; // space for glow
+  const totalSize = size + pad * 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = totalSize;
+  canvas.height = totalSize;
+  const ctx = canvas.getContext('2d')!;
+
+  // Get the source image from the Phaser texture
+  const sourceImage = scene.textures.get(textureKey).getSourceImage() as HTMLImageElement;
+
+  // Compute uniform scale to fit in cursor size
+  const scale = Math.min(size / sourceImage.width, size / sourceImage.height);
+  const drawW = sourceImage.width * scale;
+  const drawH = sourceImage.height * scale;
+  const drawX = pad + (size - drawW) / 2;
+  const drawY = pad + (size - drawH) / 2;
+
+  // Golden glow
+  ctx.shadowColor = '#c9a84c';
+  ctx.shadowBlur = 5;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+  ctx.drawImage(sourceImage, drawX, drawY, drawW, drawH);
+  // Second pass for stronger glow
+  ctx.drawImage(sourceImage, drawX, drawY, drawW, drawH);
+
+  const dataUrl = canvas.toDataURL('image/png');
+  const hotX = totalSize / 2;
+  const hotY = totalSize / 2;
+  const cursor = `url("${dataUrl}") ${hotX} ${hotY}, auto`;
+  _itemCursorCache.set(textureKey, cursor);
+  return cursor;
+}

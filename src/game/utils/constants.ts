@@ -107,10 +107,48 @@ export const Sizes = {
 // Used by RoomScene to clip its camera viewport above the bar.
 export const UI_BAR_RESERVED = 124; // TOOLBAR_H (112) + BOTTOM_MARGIN (12)
 
-// Decorative frame border around the entire game screen.
-// The game viewport is inset by these values on each side.
+// ─── Viewfinder Frame Layout ───
+// The game art is natively 1920×1080 (16:9). We uniformly scale it down to fit
+// above the toolbar, preserving aspect ratio. The leftover space becomes thick
+// decorative borders — like a camera viewfinder.
+//
+//  ┌─────────────── 1920 ───────────────┐
+//  │ top border (FRAME_TOP)              │
+//  │ ┌─side─┌─────────────────┐─side─┐  │
+//  │ │      │  game viewport  │      │  │
+//  │ │      │  (uniform zoom) │      │  │
+//  │ │      └─────────────────┘      │  │
+//  │ └───────────────────────────────┘  │
+//  │ toolbar (FRAME_BOTTOM)              │
+//  └────────────────────────────────────┘
+//
+// FRAME_SIDE is computed dynamically from the zoom factor.
+
+export const FRAME_TOP = 28;
+export const FRAME_BOTTOM = 124; // toolbar + margin
+
+/** Compute the viewfinder layout from the canvas dimensions (1920×1080). */
+export function computeViewfinderLayout(canvasW: number, canvasH: number) {
+  const availH = canvasH - FRAME_TOP - FRAME_BOTTOM; // vertical space for game
+  const zoom = availH / canvasH;                      // uniform scale (height-limited)
+  const renderedW = canvasW * zoom;                   // game width at this zoom
+  const sideMargin = Math.floor((canvasW - renderedW) / 2); // auto side borders
+
+  return {
+    zoom,
+    viewportX: sideMargin,
+    viewportY: FRAME_TOP,
+    viewportW: Math.ceil(renderedW),
+    viewportH: availH,
+    sideMargin,
+    topMargin: FRAME_TOP,
+    bottomMargin: FRAME_BOTTOM,
+  };
+}
+
+// Legacy alias kept for any old references
 export const FRAME = {
-  top: 36,
-  side: 36,
-  bottom: 124, // toolbar + margin (same as UI_BAR_RESERVED)
+  top: FRAME_TOP,
+  side: 110, // approximate; real value computed by computeViewfinderLayout
+  bottom: FRAME_BOTTOM,
 } as const;
