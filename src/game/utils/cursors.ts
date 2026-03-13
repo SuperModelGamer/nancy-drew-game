@@ -41,3 +41,46 @@ export function setGameCursor(scene: Phaser.Scene, type: CursorType): void {
 export function initSceneCursor(scene: Phaser.Scene): void {
   scene.input.setDefaultCursor(Cursors.default);
 }
+
+/**
+ * Generate a glowing version of a cursor image at runtime using canvas.
+ * Draws the source PNG with a golden shadowBlur to create a soft glow effect.
+ * Returns a CSS cursor string (data URL) once the image loads.
+ */
+let _glowCursorCache: string | null = null;
+export async function createGlowSpyglass(): Promise<string> {
+  if (_glowCursorCache) return _glowCursorCache;
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const glowSize = 6;
+      const pad = glowSize * 2;
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width + pad * 2;
+      canvas.height = img.height + pad * 2;
+      const ctx = canvas.getContext('2d')!;
+
+      // Draw golden glow (multiple passes for stronger effect)
+      ctx.shadowColor = '#c9a84c';
+      ctx.shadowBlur = glowSize;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      for (let i = 0; i < 3; i++) {
+        ctx.drawImage(img, pad, pad);
+      }
+
+      const dataUrl = canvas.toDataURL('image/png');
+      // Hotspot offset accounts for the padding added around the image
+      const hotX = 32 + pad;
+      const hotY = 32 + pad;
+      _glowCursorCache = `url("${dataUrl}") ${hotX} ${hotY}, auto`;
+      resolve(_glowCursorCache);
+    };
+    img.onerror = () => {
+      // Fallback to regular spyglass if image fails to load
+      resolve(Cursors.inspect);
+    };
+    img.src = 'assets/ui/cursors/spyglass.png';
+  });
+}

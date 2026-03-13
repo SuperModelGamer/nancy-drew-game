@@ -10,7 +10,7 @@ import { ChapterSystem } from '../systems/ChapterSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { drawRoomBackground } from '../utils/room-backgrounds';
 import { showTutorialIfNeeded } from '../utils/tutorial';
-import { Cursors, CursorType, POINTER_CURSOR } from '../utils/cursors';
+import { Cursors, createGlowSpyglass } from '../utils/cursors';
 import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 import { UISounds } from '../utils/sounds';
@@ -50,6 +50,7 @@ export class RoomScene extends Phaser.Scene {
   private _descriptionDismissKey: ((event: KeyboardEvent) => void) | null = null;
   private usedHotspots: Set<string> = new Set();
   private selectedItemIndicator!: Phaser.GameObjects.Text;
+  private glowCursor: string = Cursors.inspect; // fallback until glow loads
 
   constructor() {
     super({ key: 'RoomScene' });
@@ -119,8 +120,13 @@ export class RoomScene extends Phaser.Scene {
     // Auto-save on room entry
     SaveSystem.getInstance().save();
 
-    // Set default magnifying glass cursor
-    this.input.setDefaultCursor(Cursors.default);
+    // Default cursor is the magnifying glass — Nancy's always investigating
+    this.input.setDefaultCursor(Cursors.inspect);
+
+    // Pre-generate the glowing spyglass cursor for hotspot hover
+    createGlowSpyglass().then((cursor) => {
+      this.glowCursor = cursor;
+    });
 
     // Curtain open reveal
     this.playCurtainOpen(() => {
@@ -216,8 +222,7 @@ export class RoomScene extends Phaser.Scene {
 
       const bg = this.add.rectangle(0, 0, w, h, hotspotColor, 0.15);
       bg.setStrokeStyle(1, hotspotColor, 0.4);
-      const hotspotCursor = Cursors[hotspot.type as CursorType] || Cursors.default;
-      bg.setInteractive({ cursor: hotspotCursor });
+      bg.setInteractive({ cursor: Cursors.inspect });
 
       // Label starts hidden, fades in on hover
       const label = this.add.text(0, h / 2 + 10, hotspot.label, {
@@ -242,15 +247,14 @@ export class RoomScene extends Phaser.Scene {
         ease: 'Sine.easeInOut',
       });
 
-      // Hover feedback (desktop) — cursor changes by hotspot type, label fades in
-      const cursorType: CursorType = hotspot.type as CursorType;
+      // Hover feedback (desktop) — glowing magnifying glass on hover, label fades in
       bg.on('pointerover', () => {
         bg.setFillStyle(hotspotColor, 0.3);
         bg.setStrokeStyle(2, hotspotColor, 0.7);
         this.tweens.add({ targets: label, alpha: 1, duration: 200 });
         this.tooltipText.setText(hotspot.label);
         this.tooltipText.setVisible(true);
-        this.input.setDefaultCursor(Cursors[cursorType] || Cursors.default);
+        this.input.setDefaultCursor(this.glowCursor);
       });
 
       bg.on('pointermove', (pointer: Phaser.Input.Pointer) => {
@@ -262,7 +266,7 @@ export class RoomScene extends Phaser.Scene {
         bg.setStrokeStyle(1, hotspotColor, 0.4);
         this.tweens.add({ targets: label, alpha: 0, duration: 200 });
         this.tooltipText.setVisible(false);
-        this.input.setDefaultCursor(Cursors.default);
+        this.input.setDefaultCursor(Cursors.inspect);
       });
 
       // Click/tap handler with sparkle feedback and sound
@@ -479,30 +483,11 @@ export class RoomScene extends Phaser.Scene {
     // Background panel behind text
     const padX = 50, padY = 40;
     const bgW = Math.min(textObj.width + padX * 2, width * 0.8);
-    const bgH = textObj.height + padY * 2 + 30;
+    const bgH = textObj.height + padY * 2;
     const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.96);
     bg.setStrokeStyle(1.5, Colors.gold, 0.4);
     container.sendToBack(backdrop);
     container.moveTo(bg, 1); // behind text, in front of backdrop
-
-    // "Click anywhere to continue" prompt
-    const prompt = this.add.text(width / 2, height / 2 - 20 + bgH / 2 - 18, '— click anywhere to continue —', {
-      fontFamily: FONT,
-      fontSize: '16px',
-      color: TextColors.goldDim,
-      fontStyle: 'italic',
-    }).setOrigin(0.5);
-    container.add(prompt);
-
-    // Pulse the prompt
-    this.tweens.add({
-      targets: prompt,
-      alpha: { from: 1, to: 0.4 },
-      duration: 900,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
-    });
 
     // Fade in
     container.setAlpha(0);
