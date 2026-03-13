@@ -7,10 +7,10 @@ import { PuzzleSystem } from '../systems/PuzzleSystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import { ScriptedEventScene } from './ScriptedEventScene';
 import { ChapterSystem } from '../systems/ChapterSystem';
-import { Colors, TextColors, FONT, Depths, FRAME } from '../utils/constants';
+import { Colors, TextColors, FONT, Depths, computeViewfinderLayout } from '../utils/constants';
 import { drawRoomBackground } from '../utils/room-backgrounds';
 // Tutorial removed — how-to-play is accessible from the start menu
-import { Cursors, createGlowSpyglass, createEmojiCursor } from '../utils/cursors';
+import { Cursors, createGlowSpyglass, createItemCursor } from '../utils/cursors';
 import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 import { UISounds } from '../utils/sounds';
@@ -65,26 +65,22 @@ export class RoomScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
-    // The game world is 1920 × (1080 - FRAME.bottom) = 1920 × 956.
-    // The decorative frame drawn by UIScene reduces the available viewport.
-    // We use camera zoom to scale the full game world into the smaller viewport
-    // so hotspots, backgrounds, and all game objects keep their original positions.
-    const gameW = width;               // 1920 — full game world width
-    const gameH = height - FRAME.bottom; // 956 — game world height (above toolbar)
-    const viewW = width - 2 * FRAME.side; // 1892 — viewport pixel width
-    const viewH = height - FRAME.top - FRAME.bottom; // 942 — viewport pixel height
-    this.cameras.main.setViewport(FRAME.side, FRAME.top, viewW, viewH);
-
-    // Zoom to fit the full game world inside the viewport (uniform scale)
-    const zoom = Math.min(viewW / gameW, viewH / gameH);
-    this.cameras.main.setZoom(zoom);
+    // The game world is the native art resolution: 1920 × 1080 (16:9).
+    // We uniformly scale it down to fit above the toolbar, preserving aspect ratio.
+    // The leftover space becomes the thick viewfinder borders drawn by UIScene.
+    const gameW = width;   // 1920
+    const gameH = height;  // 1080 — FULL native resolution
+    const vf = computeViewfinderLayout(width, height);
+    this.cameras.main.setViewport(vf.viewportX, vf.viewportY, vf.viewportW, vf.viewportH);
+    this.cameras.main.setZoom(vf.zoom);
     // Camera scroll stays at (0,0) so world (0,0) maps to viewport top-left
 
     // Room background - use real image if available, fall back to procedural art
+    // Display at full 1920×1080 (native art) — uniform zoom handles the scaling
     const bgKey = `bg_${this.currentRoom.id}`;
     if (this.textures.exists(bgKey)) {
       const bg = this.add.image(gameW / 2, gameH / 2, bgKey);
-      bg.setDisplaySize(gameW, gameH);
+      bg.setDisplaySize(gameW, gameH); // 1920×1080 — no aspect ratio distortion
     } else {
       drawRoomBackground(this, this.currentRoom.id);
     }
@@ -642,17 +638,14 @@ export class RoomScene extends Phaser.Scene {
 
   /** If an inventory item is equipped/selected, return a cursor for it.
    *  The magnifying glass item gets the glowing spyglass; other items
-   *  use an emoji cursor matching the item's icon. Returns null if nothing equipped. */
+   *  use the item's actual PNG asset as a cursor. Returns null if nothing equipped. */
   private getEquippedItemCursor(): string | null {
     const selected = InventorySystem.getInstance().getSelectedItem();
     if (!selected) return null;
     if (selected === 'magnifying_glass') return this.glowCursor;
-    // Render the item's emoji as a cursor
-    const itemData = (itemsData.items as { id: string; icon?: string }[]).find(i => i.id === selected);
-    if (itemData?.icon) {
-      return createEmojiCursor(itemData.icon);
-    }
-    return Cursors.pickup;
+    // Use the item's actual image asset as the cursor
+    const textureKey = `item_icon_${selected}`;
+    return createItemCursor(this, textureKey);
   }
 
   private playClickSparkle(x: number, y: number, color: number): void {

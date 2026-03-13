@@ -3,7 +3,7 @@ import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import roomsData from '../data/rooms.json';
 import itemsData from '../data/items.json';
-import { Colors, TextColors, FONT, Depths, FRAME } from '../utils/constants';
+import { Colors, TextColors, FONT, Depths, computeViewfinderLayout, FRAME_TOP, FRAME_BOTTOM } from '../utils/constants';
 import { POINTER_CURSOR } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
@@ -86,19 +86,20 @@ export class UIScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
-    // ─── Full-screen art deco frame border ───
-    const fTop = FRAME.top;
-    const fSide = FRAME.side;
-    const toolbarTop = height - BOTTOM_MARGIN - TOOLBAR_H;
+    // ─── Viewfinder frame — thick borders around the uniformly-scaled game ───
+    const vf = computeViewfinderLayout(width, height);
+    const fSide = vf.sideMargin;
+    const fTop = vf.topMargin;
+    const toolbarTop = vf.viewportY + vf.viewportH;
 
     const frameBg = this.add.graphics();
 
     // Solid opaque fill for all four border strips
     frameBg.fillStyle(DecoColors.navy, 1);
-    frameBg.fillRect(0, 0, width, fTop);
-    frameBg.fillRect(0, fTop, fSide, height - fTop);
-    frameBg.fillRect(width - fSide, fTop, fSide, height - fTop);
-    frameBg.fillRect(fSide, toolbarTop, width - 2 * fSide, TOOLBAR_H);
+    frameBg.fillRect(0, 0, width, fTop);                              // top
+    frameBg.fillRect(0, fTop, fSide, toolbarTop - fTop);              // left
+    frameBg.fillRect(width - fSide, fTop, fSide, toolbarTop - fTop);  // right
+    frameBg.fillRect(0, toolbarTop, width, TOOLBAR_H);                // toolbar
     frameBg.fillStyle(0x060810, 1);
     frameBg.fillRect(0, height - BOTTOM_MARGIN, width, BOTTOM_MARGIN);
 
@@ -110,9 +111,9 @@ export class UIScene extends Phaser.Scene {
 
     // Inner frame line (game viewport boundary)
     frameBg.lineStyle(2, DecoColors.gold, 0.5);
-    frameBg.strokeRect(fSide, fTop, width - 2 * fSide, toolbarTop - fTop);
+    frameBg.strokeRect(fSide, fTop, vf.viewportW, vf.viewportH);
 
-    // Center diamond on bottom frame border
+    // Center diamond below viewport
     const diamondSize = 9;
     frameBg.fillStyle(DecoColors.gold, 0.6);
     frameBg.fillPoints([
@@ -122,7 +123,7 @@ export class UIScene extends Phaser.Scene {
       new Phaser.Geom.Point(width / 2 - diamondSize, toolbarTop),
     ], true);
 
-    // Corner ornaments where toolbar meets side borders
+    // Corner ornaments where viewport meets side borders
     const cornerOrnW = 30;
     frameBg.fillStyle(DecoColors.gold, 0.4);
     frameBg.fillTriangle(fSide, toolbarTop - 4, fSide + cornerOrnW, toolbarTop, fSide, toolbarTop + 4);
@@ -144,7 +145,30 @@ export class UIScene extends Phaser.Scene {
       new Phaser.Geom.Point(width / 2 - topDiamond, fTop / 2),
     ], true);
 
+    // ─── Side border decorations: vertical art deco lines ───
+    // Left side — decorative vertical accent lines
+    if (fSide > 40) {
+      frameBg.lineStyle(1, DecoColors.gold, 0.15);
+      frameBg.lineBetween(fSide - 8, fTop + 20, fSide - 8, toolbarTop - 20);
+      frameBg.lineStyle(1, DecoColors.gold, 0.08);
+      frameBg.lineBetween(fSide - 14, fTop + 40, fSide - 14, toolbarTop - 40);
+      // Right side
+      frameBg.lineStyle(1, DecoColors.gold, 0.15);
+      frameBg.lineBetween(width - fSide + 8, fTop + 20, width - fSide + 8, toolbarTop - 20);
+      frameBg.lineStyle(1, DecoColors.gold, 0.08);
+      frameBg.lineBetween(width - fSide + 14, fTop + 40, width - fSide + 14, toolbarTop - 40);
+
+      // Corner ornaments at viewport corners
+      drawCornerOrnament(frameBg, fSide + 2, fTop + 2, 16, 'tl', DecoColors.gold, 0.3);
+      drawCornerOrnament(frameBg, width - fSide - 2, fTop + 2, 16, 'tr', DecoColors.gold, 0.3);
+      drawCornerOrnament(frameBg, fSide + 2, toolbarTop - 2, 16, 'bl', DecoColors.gold, 0.3);
+      drawCornerOrnament(frameBg, width - fSide - 2, toolbarTop - 2, 16, 'br', DecoColors.gold, 0.3);
+    }
+
     frameBg.setDepth(Depths.tooltip - 1);
+
+    // ─── Room stats in side borders ───
+    this.createSideBorderStats(fSide, fTop, toolbarTop, width);
 
     // ─── Toolbar buttons ───
     const buttonY = toolbarTop + TOOLBAR_H / 2;
@@ -202,14 +226,82 @@ export class UIScene extends Phaser.Scene {
     this.journalContainer = this.createJournalPanel();
     this.journalContainer.setVisible(false);
 
-    // Listen for inventory changes
+    // Listen for inventory changes — update both evidence panel and border stats
     const onInventoryChange = () => {
       if (this.evidenceOpen) this.refreshInventoryGrid();
+      this.updateSideBorderStats();
     };
     InventorySystem.getInstance().onChange(onInventoryChange);
     this.events.on('shutdown', () => {
       InventorySystem.getInstance().offChange(onInventoryChange);
     });
+  }
+
+  // ─── Side border room stats ────────────────────────────────────────────────
+
+  private borderItemCountText!: Phaser.GameObjects.Text;
+  private borderClueCountText!: Phaser.GameObjects.Text;
+
+  private createSideBorderStats(
+    fSide: number, fTop: number, toolbarTop: number, canvasW: number,
+  ): void {
+    // Only show if the side borders are wide enough (>60px)
+    if (fSide < 60) return;
+
+    const rightCenterX = canvasW - fSide / 2;
+    const midY = fTop + (toolbarTop - fTop) / 2;
+
+    // Right side border — room item count
+    this.borderItemCountText = this.add.text(rightCenterX, midY - 30, '', {
+      fontFamily: FONT, fontSize: '16px', color: '#8a7a5a',
+      align: 'center', wordWrap: { width: fSide - 20 },
+    }).setOrigin(0.5).setDepth(Depths.tooltip).setAngle(90);
+
+    this.borderClueCountText = this.add.text(rightCenterX, midY + 50, '', {
+      fontFamily: FONT, fontSize: '15px', color: '#5a5a6a',
+      align: 'center', wordWrap: { width: fSide - 20 },
+    }).setOrigin(0.5).setDepth(Depths.tooltip).setAngle(90);
+
+    // Left side border — settings gear
+    const leftCenterX = fSide / 2;
+    const gearBtn = this.add.text(leftCenterX, toolbarTop - 40, '⚙', {
+      fontSize: '28px', color: '#6a6a7a',
+    }).setOrigin(0.5).setDepth(Depths.tooltip);
+    gearBtn.setInteractive({ cursor: POINTER_CURSOR });
+    gearBtn.on('pointerover', () => gearBtn.setColor('#c9a84c'));
+    gearBtn.on('pointerout', () => gearBtn.setColor('#6a6a7a'));
+
+    this.updateSideBorderStats();
+  }
+
+  private updateSideBorderStats(): void {
+    if (!this.borderItemCountText) return;
+
+    const save = SaveSystem.getInstance();
+    const inventory = InventorySystem.getInstance();
+    const currentRoomId = save.getCurrentRoom();
+    const rooms = roomsData.rooms as { id: string; name: string; hotspots: { id: string; type: string; itemId?: string }[] }[];
+    const currentRoom = rooms.find(r => r.id === currentRoomId);
+
+    // Per-room item counter
+    if (currentRoom) {
+      const roomPickups = currentRoom.hotspots.filter(hs => hs.type === 'pickup' && hs.itemId);
+      const foundInRoom = roomPickups.filter(hs => inventory.hasItem(hs.itemId!) || inventory.isUsed(hs.itemId!)).length;
+      this.borderItemCountText.setText(`${foundInRoom}/${roomPickups.length} ITEMS`);
+    }
+
+    // Global clue counter
+    let totalClues = 0;
+    let foundClues = 0;
+    for (const room of rooms) {
+      for (const hs of room.hotspots) {
+        if (hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked') {
+          totalClues++;
+          if (save.getFlag('used_hotspot_' + hs.id)) foundClues++;
+        }
+      }
+    }
+    this.borderClueCountText.setText(`${foundClues}/${totalClues} CLUES`);
   }
 
   // ─── Toggle methods ──────────────────────────────────────────────────────────

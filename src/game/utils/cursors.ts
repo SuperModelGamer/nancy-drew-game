@@ -86,35 +86,48 @@ export async function createGlowSpyglass(): Promise<string> {
 }
 
 /**
- * Generate a cursor from an emoji character using canvas rendering.
- * Renders the emoji at 40px with a subtle golden glow, cached per emoji.
- * Returns a CSS cursor string (data URL).
+ * Generate a cursor from a Phaser texture (item icon asset).
+ * Renders the item image at 48×48 with a subtle golden glow, cached per key.
+ * Must be called from a scene that has the texture loaded.
+ * Returns a CSS cursor string (data URL), or the pickup cursor as fallback.
  */
-const _emojiCursorCache = new Map<string, string>();
-export function createEmojiCursor(emoji: string): string {
-  if (_emojiCursorCache.has(emoji)) return _emojiCursorCache.get(emoji)!;
+const _itemCursorCache = new Map<string, string>();
+export function createItemCursor(scene: Phaser.Scene, textureKey: string): string {
+  if (_itemCursorCache.has(textureKey)) return _itemCursorCache.get(textureKey)!;
+
+  if (!scene.textures.exists(textureKey)) return Cursors.pickup;
 
   const size = 48;
+  const pad = 6; // space for glow
+  const totalSize = size + pad * 2;
   const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
+  canvas.width = totalSize;
+  canvas.height = totalSize;
   const ctx = canvas.getContext('2d')!;
 
-  // Golden glow behind the emoji
+  // Get the source image from the Phaser texture
+  const sourceImage = scene.textures.get(textureKey).getSourceImage() as HTMLImageElement;
+
+  // Compute uniform scale to fit in cursor size
+  const scale = Math.min(size / sourceImage.width, size / sourceImage.height);
+  const drawW = sourceImage.width * scale;
+  const drawH = sourceImage.height * scale;
+  const drawX = pad + (size - drawW) / 2;
+  const drawY = pad + (size - drawH) / 2;
+
+  // Golden glow
   ctx.shadowColor = '#c9a84c';
-  ctx.shadowBlur = 6;
+  ctx.shadowBlur = 5;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = 0;
-
-  ctx.font = '36px serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  // Draw twice for stronger glow
-  ctx.fillText(emoji, size / 2, size / 2);
-  ctx.fillText(emoji, size / 2, size / 2);
+  ctx.drawImage(sourceImage, drawX, drawY, drawW, drawH);
+  // Second pass for stronger glow
+  ctx.drawImage(sourceImage, drawX, drawY, drawW, drawH);
 
   const dataUrl = canvas.toDataURL('image/png');
-  const cursor = `url("${dataUrl}") ${size / 2} ${size / 2}, auto`;
-  _emojiCursorCache.set(emoji, cursor);
+  const hotX = totalSize / 2;
+  const hotY = totalSize / 2;
+  const cursor = `url("${dataUrl}") ${hotX} ${hotY}, auto`;
+  _itemCursorCache.set(textureKey, cursor);
   return cursor;
 }
