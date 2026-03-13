@@ -439,9 +439,19 @@ export class RoomScene extends Phaser.Scene {
     container.setDepth(Depths.descriptionBox);
     this.descriptionBox = container;
 
+    const dismiss = () => {
+      this.tweens.add({
+        targets: container,
+        alpha: 0,
+        duration: 200,
+        onComplete: () => container.destroy(),
+      });
+    };
+
     // Dark backdrop — click anywhere to dismiss
     const backdrop = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
     backdrop.setInteractive({ cursor: POINTER_CURSOR });
+    backdrop.on('pointerdown', dismiss);
     container.add(backdrop);
 
     // Text box in center
@@ -457,12 +467,14 @@ export class RoomScene extends Phaser.Scene {
     textObj.setOrigin(0.5);
     container.add(textObj);
 
-    // Background panel behind text
+    // Background panel behind text — also clickable to dismiss
     const padX = 50, padY = 40;
     const bgW = Math.min(textObj.width + padX * 2, width * 0.8);
     const bgH = textObj.height + padY * 2 + 30;
-    const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.92);
+    const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.96);
     bg.setStrokeStyle(1.5, Colors.gold, 0.4);
+    bg.setInteractive({ cursor: POINTER_CURSOR });
+    bg.on('pointerdown', dismiss);
     container.sendToBack(backdrop);
     container.moveTo(bg, 1); // behind text, in front of backdrop
 
@@ -488,16 +500,6 @@ export class RoomScene extends Phaser.Scene {
     // Fade in
     container.setAlpha(0);
     this.tweens.add({ targets: container, alpha: 1, duration: 200 });
-
-    // Click anywhere to dismiss
-    backdrop.on('pointerdown', () => {
-      this.tweens.add({
-        targets: container,
-        alpha: 0,
-        duration: 200,
-        onComplete: () => container.destroy(),
-      });
-    });
   }
 
   private showPickupToast(label: string): void {
@@ -517,7 +519,7 @@ export class RoomScene extends Phaser.Scene {
     const padX = 50, padY = 20;
     const bgW = textObj.width + padX * 2;
     const bgH = textObj.height + padY * 2;
-    const bg = this.add.rectangle(width / 2, height * 0.35, bgW, bgH, 0x1a1020, 0.85);
+    const bg = this.add.rectangle(width / 2, height * 0.35, bgW, bgH, 0x1a1020, 0.96);
     bg.setStrokeStyle(2, Colors.gold, 0.7);
 
     // Glow effect behind the panel
