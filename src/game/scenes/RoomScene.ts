@@ -222,7 +222,7 @@ export class RoomScene extends Phaser.Scene {
 
       const bg = this.add.rectangle(0, 0, w, h, hotspotColor, 0.15);
       bg.setStrokeStyle(1, hotspotColor, 0.4);
-      bg.setInteractive({ cursor: Cursors.inspect });
+      bg.setInteractive();
 
       // Label starts hidden, fades in on hover
       const label = this.add.text(0, h / 2 + 10, hotspot.label, {
