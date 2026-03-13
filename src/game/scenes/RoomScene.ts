@@ -99,7 +99,12 @@ export class RoomScene extends Phaser.Scene {
     this.updateSelectedItemIndicator();
 
     // Listen for inventory selection changes
-    InventorySystem.getInstance().onChange(() => this.updateSelectedItemIndicator());
+    InventorySystem.getInstance().onChange(() => {
+      this.updateSelectedItemIndicator();
+      // Update scene cursor to reflect equipped item
+      const equippedCursor = this.getEquippedItemCursor();
+      this.input.setDefaultCursor(equippedCursor || Cursors.inspect);
+    });
 
     // Check chapter progression — show transition if advanced
     const newChapter = ChapterSystem.getInstance().checkProgression();
@@ -207,55 +212,62 @@ export class RoomScene extends Phaser.Scene {
       const w = Math.max(hotspot.width, 48);
       const h = Math.max(hotspot.height, 48);
 
-      // Color by hotspot type
-      const hotspotColor = this.getHotspotColor(hotspot.type);
-
-      const bg = this.add.rectangle(0, 0, w, h, hotspotColor, 0.15);
-      bg.setStrokeStyle(1, hotspotColor, 0.4);
+      // Nancy Drew style: invisible hitbox, no colored overlay
+      const bg = this.add.rectangle(0, 0, w, h, 0x000000, 0);
       bg.setInteractive();
 
-      // Label starts hidden, fades in on hover
-      const label = this.add.text(0, h / 2 + 10, hotspot.label, {
+      // Subtle shimmer edge that appears on hover (initially invisible)
+      const shimmer = this.add.rectangle(0, 0, w + 4, h + 4, 0x000000, 0);
+      shimmer.setStrokeStyle(1.5, Colors.gold, 0);
+
+      // Label: larger, high-contrast, with glow — hidden until hover
+      const label = this.add.text(0, -(h / 2) - 12, hotspot.label, {
         fontFamily: FONT,
-        fontSize: '21px',
-        color: TextColors.gold,
+        fontSize: '26px',
+        color: '#ffe8a0',
+        fontStyle: 'bold',
         align: 'center',
+        shadow: {
+          offsetX: 0,
+          offsetY: 0,
+          color: '#000000',
+          blur: 8,
+          fill: true,
+        },
+        backgroundColor: '#0a0a1280',
+        padding: { x: 14, y: 6 },
       });
-      label.setOrigin(0.5, 0);
+      label.setOrigin(0.5, 1);
       label.setAlpha(0);
 
-      container.add([bg, label]);
+      container.add([shimmer, bg, label]);
       container.setSize(w, h);
 
-      // Subtle glow pulse animation (color matches type)
-      this.tweens.add({
-        targets: bg,
-        alpha: { from: 0.15, to: 0.35 },
-        duration: 1500,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
+      // Get cursor for this hotspot type
+      const hoverCursor = this.getHotspotCursor(hotspot.type);
 
-      // Hover feedback (desktop) — glowing magnifying glass on hover, gold label fades in
+      // Hover: change cursor by type, show label, subtle gold edge shimmer
       bg.on('pointerover', () => {
-        bg.setFillStyle(hotspotColor, 0.3);
-        bg.setStrokeStyle(2, hotspotColor, 0.7);
-        this.tweens.add({ targets: label, alpha: 1, duration: 200 });
-        this.input.setDefaultCursor(this.glowCursor);
+        // Show shimmer edge
+        shimmer.setStrokeStyle(1.5, Colors.gold, 0.35);
+        this.tweens.add({ targets: label, alpha: 1, duration: 180 });
+        // Set type-specific cursor (or equipped item cursor)
+        const equippedCursor = this.getEquippedItemCursor();
+        this.input.setDefaultCursor(equippedCursor || hoverCursor);
       });
 
       bg.on('pointerout', () => {
-        bg.setFillStyle(hotspotColor, 0.15);
-        bg.setStrokeStyle(1, hotspotColor, 0.4);
-        this.tweens.add({ targets: label, alpha: 0, duration: 200 });
-        this.input.setDefaultCursor(Cursors.inspect);
+        shimmer.setStrokeStyle(1.5, Colors.gold, 0);
+        this.tweens.add({ targets: label, alpha: 0, duration: 180 });
+        // Restore default cursor (spyglass if exploring, or equipped item)
+        const equippedCursor = this.getEquippedItemCursor();
+        this.input.setDefaultCursor(equippedCursor || Cursors.inspect);
       });
 
       // Click/tap handler with sparkle feedback and sound
       bg.on('pointerdown', () => {
         UISounds.click();
-        this.playClickSparkle(hotspot.x, hotspot.y, hotspotColor);
+        this.playClickSparkle(hotspot.x, hotspot.y, Colors.gold);
         this.handleHotspot(hotspot);
       });
 
@@ -336,6 +348,10 @@ export class RoomScene extends Phaser.Scene {
 
       case 'navigate':
         if (hotspot.targetRoom) {
+          // Clear equipped item when navigating
+          if (selectedItem) {
+            InventorySystem.getInstance().selectItem(null);
+          }
           this.navigateToRoom(hotspot.targetRoom);
         }
         break;
@@ -584,31 +600,44 @@ export class RoomScene extends Phaser.Scene {
   }
 
 
-  private getHotspotColor(type: string): number {
+  /** Return the appropriate cursor for a hotspot type — Nancy Drew style */
+  private getHotspotCursor(type: string): string {
     switch (type) {
-      case 'inspect': return Colors.hotspotInspect;
-      case 'pickup': return Colors.hotspotPickup;
-      case 'navigate': return Colors.hotspotNavigate;
-      case 'talk': return Colors.hotspotTalk;
-      case 'locked': return Colors.hotspotLocked;
-      default: return Colors.gold;
+      case 'inspect': return this.glowCursor; // glowing spyglass
+      case 'pickup': return Cursors.pickup;    // grabbing hand
+      case 'navigate': return Cursors.navigate; // door with arrow
+      case 'talk': return Cursors.talk;         // speech bubble
+      case 'locked': return Cursors.locked;     // padlock
+      default: return this.glowCursor;
     }
   }
 
+  /** If an inventory item is equipped/selected, return a cursor for it.
+   *  The magnifying glass item gets the glowing spyglass; other items
+   *  use the hand cursor (holding something). Returns null if nothing equipped. */
+  private getEquippedItemCursor(): string | null {
+    const selected = InventorySystem.getInstance().getSelectedItem();
+    if (!selected) return null;
+    if (selected === 'magnifying_glass') return this.glowCursor;
+    // Any other equipped item shows the hand cursor (carrying an item)
+    return Cursors.pickup;
+  }
+
   private playClickSparkle(x: number, y: number, color: number): void {
-    // Create 6 small sparkle dots that burst outward and fade
-    for (let i = 0; i < 6; i++) {
-      const angle = (i / 6) * Math.PI * 2;
-      const spark = this.add.circle(x, y, 3, color, 0.8);
+    // Create 5 small sparkle dots that burst outward and fade — subtle, gold-only
+    for (let i = 0; i < 5; i++) {
+      const angle = (i / 5) * Math.PI * 2 + Math.random() * 0.4;
+      const dist = 18 + Math.random() * 12;
+      const spark = this.add.circle(x, y, 2.5, color, 0.6);
       spark.setDepth(Depths.tooltip + 1);
       this.tweens.add({
         targets: spark,
-        x: x + Math.cos(angle) * 25,
-        y: y + Math.sin(angle) * 25,
+        x: x + Math.cos(angle) * dist,
+        y: y + Math.sin(angle) * dist,
         alpha: 0,
-        scaleX: 0.2,
-        scaleY: 0.2,
-        duration: 350,
+        scaleX: 0.1,
+        scaleY: 0.1,
+        duration: 400,
         ease: 'Power2',
         onComplete: () => spark.destroy(),
       });
