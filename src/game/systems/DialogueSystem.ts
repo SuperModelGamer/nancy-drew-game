@@ -61,7 +61,7 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
 // ─── Layout Constants ───────────────────────────────────────────────────────
 const PORTRAIT_W = 320;
 const PORTRAIT_H = 400;
-const BOX_H = 310;
+const BOX_H = 400;
 const BOX_BOTTOM_MARGIN = 48;
 const TEXT_SIZE = '32px';
 const SPEAKER_SIZE = '36px';
@@ -194,72 +194,128 @@ export class DialogueSystem {
     const textAreaLeft = boxLeft + portraitAreaW + 24;
     const textAreaW = boxW - portraitAreaW - 48;
 
-    // ── Dialogue box background ──
-    if (this.scene.textures.exists('dlg_box')) {
-      // Dark fill behind the full dialogue area
-      const bgGfx = this.scene.add.graphics();
-      bgGfx.fillStyle(0x0e0c14, 0.92);
-      bgGfx.fillRoundedRect(boxLeft + 4, boxTop + 4, boxW - 8, BOX_H - 4, 6);
-      this.container.add(bgGfx);
+    // ══════════════════════════════════════════════════════════════════════════
+    // LAYER ORDER (back → front):
+    //   1. bgGfx        – dark box fill
+    //   2. topBanner     – art deco border strip (top)
+    //   3. bottomBanner  – art deco border strip (bottom)
+    //   4. hitArea       – invisible click-to-advance (BEFORE interactive UI)
+    //   5. dialogueText  – typewriter text
+    //   6. continueArrow – bounce indicator
+    //   7. skipBtn       – must be ABOVE hitArea to receive clicks
+    //   8. portraitGroup – portrait + ornate frame (floats above box)
+    //   9. nameplate     – speaker name background
+    //  10. speakerText   – speaker name label
+    // ══════════════════════════════════════════════════════════════════════════
 
-      // Art deco border strips — thin, decorative, don't cover the text
-      const BANNER_H = 48;
+    // ── 1. Dialogue box background fill ──
+    const bgGfx = this.scene.add.graphics();
+    bgGfx.fillStyle(0x0e0c14, 0.94);
+    bgGfx.fillRoundedRect(boxLeft, boxTop, boxW, BOX_H, 8);
+    this.container.add(bgGfx);
+
+    // ── 2–3. Art deco ornate border strips ──
+    const BANNER_H = 52;
+    if (this.scene.textures.exists('dlg_box')) {
       const topBanner = this.scene.add.image(width / 2, boxTop + BANNER_H / 2, 'dlg_box');
       topBanner.setDisplaySize(boxW, BANNER_H);
       this.container.add(topBanner);
 
-      // Bottom banner (flipped)
       const bottomBanner = this.scene.add.image(width / 2, boxTop + BOX_H - BANNER_H / 2, 'dlg_box');
       bottomBanner.setDisplaySize(boxW, BANNER_H);
       bottomBanner.setFlipY(true);
       bottomBanner.setAlpha(0.6);
       this.container.add(bottomBanner);
     } else {
-      // Procedural fallback: dark panel with gold border
-      const gfx = this.scene.add.graphics();
-
-      // Outer glow
-      gfx.fillStyle(Colors.gold, 0.04);
-      gfx.fillRoundedRect(boxLeft - 6, boxTop - 6, boxW + 12, BOX_H + 12, 8);
-
-      // Main background
-      gfx.fillStyle(0x0e0c14, 0.95);
-      gfx.fillRoundedRect(boxLeft, boxTop, boxW, BOX_H, 6);
-
-      // Gold border
-      gfx.lineStyle(3, Colors.gold, 0.6);
-      gfx.strokeRoundedRect(boxLeft, boxTop, boxW, BOX_H, 6);
-
-      // Inner border
-      gfx.lineStyle(1.5, Colors.gold, 0.15);
-      gfx.strokeRoundedRect(boxLeft + 9, boxTop + 9, boxW - 18, BOX_H - 18, 3);
-
-      // Corner accents (small diamond at each corner)
-      const corners = [
-        { x: boxLeft + 15, y: boxTop + 15 },
-        { x: boxLeft + boxW - 15, y: boxTop + 15 },
-        { x: boxLeft + 15, y: boxTop + BOX_H - 15 },
-        { x: boxLeft + boxW - 15, y: boxTop + BOX_H - 15 },
-      ];
-      for (const c of corners) {
-        gfx.fillStyle(Colors.gold, 0.4);
-        gfx.fillTriangle(c.x, c.y - 6, c.x + 6, c.y, c.x, c.y + 6);
-        gfx.fillTriangle(c.x, c.y - 6, c.x - 6, c.y, c.x, c.y + 6);
-      }
-
-      this.container.add(gfx);
+      // Procedural gold border fallback
+      const borderGfx = this.scene.add.graphics();
+      borderGfx.lineStyle(3, Colors.gold, 0.6);
+      borderGfx.strokeRoundedRect(boxLeft, boxTop, boxW, BOX_H, 8);
+      borderGfx.lineStyle(1.5, Colors.gold, 0.15);
+      borderGfx.strokeRoundedRect(boxLeft + 10, boxTop + 10, boxW - 20, BOX_H - 20, 4);
+      this.container.add(borderGfx);
     }
 
-    // ── Portrait (large, overlapping above the box) ──
+    // ── 4. Click-to-advance hit area (added BEFORE skip/arrow so they stay clickable) ──
+    const hitArea = this.scene.add.rectangle(
+      width / 2, boxCenterY, boxW, BOX_H, 0x000000, 0
+    );
+    hitArea.setInteractive({ cursor: POINTER_CURSOR });
+    hitArea.on('pointerdown', () => this.advance());
+    this.container.add(hitArea);
+    // Also clicking the dim overlay advances
+    overlay.on('pointerdown', () => this.advance());
+
+    // ── 5. Dialogue text (typewriter reveal) ──
+    const textInset = BANNER_H + 12; // clear the ornate border + breathing room
+    const textY = boxTop + textInset;
+    const textMaxH = BOX_H - textInset * 2;
+    this.dialogueTextObj = this.scene.add.text(textAreaLeft, textY, '', {
+      fontFamily: FONT,
+      fontSize: TEXT_SIZE,
+      color: TextColors.light,
+      wordWrap: { width: textAreaW },
+      lineSpacing: 8,
+    });
+    // Clip text that overflows the box interior
+    const textMask = this.scene.make.graphics({});
+    textMask.fillRect(textAreaLeft - 6, textY - 3, textAreaW + 12, textMaxH + 6);
+    this.dialogueTextObj.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, textMask));
+    this.container.add(this.dialogueTextObj);
+
+    // Start typewriter
+    this.fullLineText = line.text;
+    this.startTypewriter();
+
+    // ── 6. Continue indicator (inside bottom border area) ──
+    const continueY = boxTop + BOX_H - BANNER_H / 2;
+    const continueX = boxLeft + boxW - 42;
+    if (this.scene.textures.exists('dlg_continue_arrow')) {
+      const arrow = this.scene.add.image(continueX, continueY, 'dlg_continue_arrow');
+      arrow.setDisplaySize(36, 36);
+      this.scene.tweens.add({
+        targets: arrow,
+        y: { from: continueY - 3, to: continueY + 3 },
+        alpha: { from: 1, to: 0.4 },
+        duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      });
+      this.container.add(arrow);
+    } else {
+      const arrow = this.scene.add.text(continueX, continueY, '▶', {
+        fontFamily: FONT, fontSize: '24px', color: TextColors.goldDim,
+      }).setOrigin(0.5);
+      this.scene.tweens.add({
+        targets: arrow,
+        y: { from: continueY - 3, to: continueY + 3 },
+        alpha: { from: 1, to: 0.4 },
+        duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      });
+      this.container.add(arrow);
+    }
+
+    // ── 7. Skip button (inside top border area, ABOVE hitArea) ──
+    const skipX = boxLeft + boxW - 28;
+    const skipY = boxTop + BANNER_H / 2;
+    const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
+      fontFamily: FONT,
+      fontSize: '20px',
+      color: TextColors.goldDim,
+      letterSpacing: 2,
+    }).setOrigin(1, 0.5);
+    skipBtn.setInteractive({ cursor: POINTER_CURSOR });
+    skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.gold));
+    skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.goldDim));
+    skipBtn.on('pointerdown', () => this.skipToEnd());
+    this.container.add(skipBtn);
+
+    // ── 8. Portrait (overlaps above the box — rendered on top of everything) ──
     if (hasPortrait && portraitKey) {
-      // Portrait center sits so the bottom aligns with the box bottom
       const portraitX = boxLeft + 24 + PORTRAIT_W / 2;
       const portraitY = boxTop + BOX_H - PORTRAIT_H / 2 - 8;
 
-      // Group portrait and frame in a sub-container so they animate together
       const portraitGroup = this.scene.add.container(0, 0);
 
-      // Measure the frame's inner opening so portrait fills it exactly
+      // Measure frame inner opening
       let innerW = PORTRAIT_W;
       let innerH = PORTRAIT_H;
       if (this.scene.textures.exists('dlg_portrait_frame')) {
@@ -267,19 +323,16 @@ export class DialogueSystem {
         const frameRatio = frameTex.width / frameTex.height;
         const frameH = PORTRAIT_H + 24;
         const frameW = frameH * frameRatio;
-        // Inner opening is frame size minus border on each side
         innerW = frameW - FRAME_BORDER * 2;
         innerH = frameH - FRAME_BORDER * 2;
       }
 
-      // Portrait image first (frame renders on top)
+      // Portrait image
       const portrait = this.scene.add.image(portraitX, portraitY, portraitKey);
       const texW = portrait.width;
       const texH = portrait.height;
       const scaleToFill = Math.max(innerW / texW, innerH / texH);
       portrait.setScale(scaleToFill);
-
-      // Crop to inner frame opening (setCrop avoids nested-container mask bugs)
       const cropW = Math.round(innerW / scaleToFill);
       const cropH = Math.round(innerH / scaleToFill);
       const cropX = Math.round((texW - cropW) / 2);
@@ -287,17 +340,15 @@ export class DialogueSystem {
       portrait.setCrop(cropX, cropY, cropW, cropH);
       portraitGroup.add(portrait);
 
-      // Portrait frame (rendered ON TOP of portrait)
+      // Ornate frame ON TOP of portrait
       if (this.scene.textures.exists('dlg_portrait_frame')) {
         const frame = this.scene.add.image(portraitX, portraitY, 'dlg_portrait_frame');
         const frameTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
         const frameRatio = frameTex.width / frameTex.height;
         const frameH = PORTRAIT_H + 24;
-        const frameW = frameH * frameRatio;
-        frame.setDisplaySize(frameW, frameH);
+        frame.setDisplaySize(frameH * frameRatio, frameH);
         portraitGroup.add(frame);
       } else {
-        // Procedural frame
         const frameGfx = this.scene.add.graphics();
         const speakerColorHex = parseInt(this.getSpeakerColor(line.speaker).replace('#', ''), 16);
         frameGfx.lineStyle(4, speakerColorHex, 0.7);
@@ -305,53 +356,38 @@ export class DialogueSystem {
           portraitX - PORTRAIT_W / 2 - 6, portraitY - PORTRAIT_H / 2 - 6,
           PORTRAIT_W + 12, PORTRAIT_H + 12, 6
         );
-        frameGfx.lineStyle(1.5, Colors.gold, 0.3);
-        frameGfx.strokeRoundedRect(
-          portraitX - PORTRAIT_W / 2 - 12, portraitY - PORTRAIT_H / 2 - 12,
-          PORTRAIT_W + 24, PORTRAIT_H + 24, 8
-        );
         portraitGroup.add(frameGfx);
       }
 
       this.container.add(portraitGroup);
 
-      // Entrance animation for new speakers — whole group slides in
+      // Entrance slide-in for new speakers
       if (isNewSpeaker) {
         portraitGroup.setAlpha(0);
         portraitGroup.x = -60;
         this.scene.tweens.add({
-          targets: portraitGroup,
-          x: 0,
-          alpha: 1,
-          duration: 350,
-          ease: 'Power2',
+          targets: portraitGroup, x: 0, alpha: 1, duration: 350, ease: 'Power2',
         });
       }
     }
 
     this.lastSpeaker = line.speaker;
 
-    // ── Speaker nameplate — positioned above the text area, sized to fit name ──
+    // ── 9–10. Speaker nameplate (rendered on top of portrait frame) ──
     const speakerColor = this.getSpeakerColor(line.speaker);
-    const nameplateY = boxTop - 20;
+    const nameplateY = boxTop - 8;
     const nameplateCenterX = textAreaLeft + textAreaW / 2;
 
-    // Measure speaker name first so the nameplate can fit it
+    // Measure text first to size the nameplate
     const speakerText = this.scene.add.text(nameplateCenterX, nameplateY, line.speaker, {
       fontFamily: FONT,
       fontSize: SPEAKER_SIZE,
       color: speakerColor,
       fontStyle: 'bold',
-      shadow: {
-        offsetX: 0,
-        offsetY: 0,
-        color: '#000000',
-        blur: 8,
-        fill: true,
-      },
+      shadow: { offsetX: 0, offsetY: 0, color: '#000000', blur: 8, fill: true },
     }).setOrigin(0.5, 0.5);
 
-    const npPadX = 60; // horizontal padding around the name
+    const npPadX = 60;
     const npH = 64;
     const npW = Math.max(200, speakerText.width + npPadX * 2);
 
@@ -361,7 +397,6 @@ export class DialogueSystem {
       nameplate.setOrigin(0.5);
       this.container.add(nameplate);
     } else {
-      // Procedural nameplate
       const npGfx = this.scene.add.graphics();
       const npX = nameplateCenterX - npW / 2;
       const npY = nameplateY - npH / 2;
@@ -377,98 +412,12 @@ export class DialogueSystem {
     if (isNewSpeaker) {
       speakerText.setAlpha(0);
       this.scene.tweens.add({
-        targets: speakerText,
-        alpha: 1,
+        targets: speakerText, alpha: 1,
         y: { from: nameplateY + 8, to: nameplateY },
-        duration: 300,
-        delay: 50,
-        ease: 'Power2',
+        duration: 300, delay: 50, ease: 'Power2',
       });
     }
     this.container.add(speakerText);
-
-    // ── Dialogue text (typewriter reveal) ──
-    const textPadTop = 56;   // clear the top art deco banner (48px)
-    const textPadBottom = 56; // clear the bottom art deco banner
-    const textY = boxTop + textPadTop;
-    const textMaxH = BOX_H - textPadTop - textPadBottom;
-    this.dialogueTextObj = this.scene.add.text(textAreaLeft, textY, '', {
-      fontFamily: FONT,
-      fontSize: TEXT_SIZE,
-      color: TextColors.light,
-      wordWrap: { width: textAreaW },
-      lineSpacing: 8,
-    });
-    // Clip text that overflows the dialogue box
-    const textMask = this.scene.make.graphics({});
-    textMask.fillRect(textAreaLeft - 6, textY - 3, textAreaW + 12, textMaxH);
-    this.dialogueTextObj.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, textMask));
-    this.container.add(this.dialogueTextObj);
-
-    // Start typewriter
-    this.fullLineText = line.text;
-    this.startTypewriter();
-
-    // ── Continue indicator (bottom-right, larger with bounce) ──
-    const continueY = boxTop + BOX_H - 28;
-    const continueX = boxLeft + boxW - 42;
-
-    if (this.scene.textures.exists('dlg_continue_arrow')) {
-      const arrow = this.scene.add.image(continueX, continueY, 'dlg_continue_arrow');
-      arrow.setDisplaySize(44, 44);
-      this.scene.tweens.add({
-        targets: arrow,
-        y: { from: continueY - 3, to: continueY + 3 },
-        alpha: { from: 1, to: 0.4 },
-        duration: 900,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
-      this.container.add(arrow);
-    } else {
-      const arrow = this.scene.add.text(continueX, continueY, '▼', {
-        fontFamily: FONT,
-        fontSize: '28px',
-        color: TextColors.goldDim,
-      }).setOrigin(0.5);
-      this.scene.tweens.add({
-        targets: arrow,
-        y: { from: continueY - 3, to: continueY + 3 },
-        alpha: { from: 1, to: 0.4 },
-        duration: 900,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
-      this.container.add(arrow);
-    }
-
-    // ── Skip button (top-right, more visible) ──
-    const skipX = boxLeft + boxW - 28;
-    const skipY = boxTop + 22;
-    const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
-      fontFamily: FONT,
-      fontSize: '20px',
-      color: TextColors.goldDim,
-      letterSpacing: 2,
-    }).setOrigin(1, 0.5);
-    skipBtn.setInteractive({ cursor: POINTER_CURSOR });
-    skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.gold));
-    skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.goldDim));
-    skipBtn.on('pointerdown', () => this.skipToEnd());
-    this.container.add(skipBtn);
-
-    // ── Click anywhere on box to advance ──
-    const hitArea = this.scene.add.rectangle(
-      width / 2, boxCenterY, boxW, BOX_H + 40, 0x000000, 0
-    );
-    hitArea.setInteractive({ cursor: POINTER_CURSOR });
-    hitArea.on('pointerdown', () => this.advance());
-    this.container.add(hitArea);
-
-    // Also click overlay to advance (anywhere on screen)
-    overlay.on('pointerdown', () => this.advance());
 
     // ── Box entrance animation ──
     if (isFirstLine) {
