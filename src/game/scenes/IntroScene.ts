@@ -57,7 +57,7 @@ const INTRO_SLIDES: IntroSlide[] = [
     effect: 'typewriter',
     pauseAfter: 2000,
     bgImage: 'intro_stage_1928',
-    bgAlpha: 0.4,
+    bgAlpha: 0.65,
     camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -10 },
     audio: [
       { key: 'ambient_theater', volume: 0.3, loop: true },
@@ -77,14 +77,14 @@ const INTRO_SLIDES: IntroSlide[] = [
     effect: 'typewriter',
     pauseAfter: 2500,
     bgImage: 'intro_goblet',
-    bgAlpha: 0.35,
+    bgAlpha: 0.55,
     camera: { scaleFrom: 1.05, scaleTo: 1.2, panY: 5 },
     audio: [
       { key: 'sfx_goblet', delay: 1500, volume: 0.5 },
-      { key: 'sfx_thud', delay: 5500, volume: 0.4 },
+      { key: 'sfx_thud', delay: 4500, volume: 0.4 },
     ],
     effects: [
-      { type: 'screenShake', delay: 5500, duration: 300 },
+      { type: 'screenShake', delay: 4500, duration: 300 },
     ],
   },
   {
@@ -98,7 +98,7 @@ const INTRO_SLIDES: IntroSlide[] = [
     effect: 'fade',
     pauseAfter: 2500,
     bgImage: 'intro_stage_empty',
-    bgAlpha: 0.3,
+    bgAlpha: 0.5,
     camera: { scaleFrom: 1.0, scaleTo: 1.05, panX: -15 },
   },
 
@@ -124,11 +124,11 @@ const INTRO_SLIDES: IntroSlide[] = [
     effect: 'fade',
     pauseAfter: 2500,
     bgImage: 'intro_exterior',
-    bgAlpha: 0.35,
+    bgAlpha: 0.55,
     camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: -8 },
     fogIntensity: 0.08,
     effects: [
-      { type: 'screenShake', delay: 5500, duration: 400 },
+      { type: 'screenShake', delay: 1400, duration: 400 },
     ],
   },
 
@@ -145,7 +145,7 @@ const INTRO_SLIDES: IntroSlide[] = [
     effect: 'typewriter',
     pauseAfter: 2500,
     bgImage: 'intro_ghost',
-    bgAlpha: 0.3,
+    bgAlpha: 0.5,
     camera: { scaleFrom: 1.0, scaleTo: 1.1, panY: 5 },
     fogIntensity: 0.15,
     audio: [
@@ -165,7 +165,7 @@ const INTRO_SLIDES: IntroSlide[] = [
     effect: 'fade',
     pauseAfter: 2000,
     bgImage: 'intro_phone',
-    bgAlpha: 0.3,
+    bgAlpha: 0.5,
     camera: { scaleFrom: 1.0, scaleTo: 1.05, panX: 10 },
     audio: [
       { key: 'sfx_phone_ring', delay: 1500, volume: 0.4 },
@@ -184,7 +184,7 @@ const INTRO_SLIDES: IntroSlide[] = [
     effect: 'typewriter',
     pauseAfter: 2500,
     bgImage: 'intro_phone',
-    bgAlpha: 0.25,
+    bgAlpha: 0.45,
     camera: { scaleFrom: 1.05, scaleTo: 1.12, panX: -5 },
   },
   {
@@ -200,7 +200,7 @@ const INTRO_SLIDES: IntroSlide[] = [
     effect: 'fade',
     pauseAfter: 2000,
     bgImage: 'intro_doors',
-    bgAlpha: 0.35,
+    bgAlpha: 0.55,
     camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -5 },
     fogIntensity: 0.05,
     audio: [
@@ -250,7 +250,7 @@ export class IntroScene extends Phaser.Scene {
     this.add.rectangle(width / 2, height / 2, width, height, 0x000000).setDepth(0);
 
     // Background darkening layer (sits between bg image and text)
-    this.bgDarken = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.6);
+    this.bgDarken = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.35);
     this.bgDarken.setDepth(0.5);
 
     // Subtle fog overlay
