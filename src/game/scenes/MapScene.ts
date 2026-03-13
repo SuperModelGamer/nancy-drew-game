@@ -121,7 +121,7 @@ export class MapScene extends Phaser.Scene {
     const closeBtnX = panelX + panelW / 2 - 42;
     const closeBtnY = panelY - panelH / 2 + 42;
 
-    const closeBtnContainer = createCloseButton(this, closeBtnX, closeBtnY, () => this.scene.stop(), 66);
+    const closeBtnContainer = createCloseButton(this, closeBtnX, closeBtnY, () => this.scene.stop(), 80);
     closeBtnContainer.setDepth(contentDepth + 3);
 
     // --- Content area (inside border, below title) ---

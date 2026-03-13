@@ -404,7 +404,7 @@ export class UIScene extends Phaser.Scene {
     container.add(flourishGfx);
 
     // Close button
-    const closeBtn = createCloseButton(this, panelLeft + panelW - leatherBorder - 30, headerY, () => this.closeCaseBook(), 56);
+    const closeBtn = createCloseButton(this, panelLeft + panelW - leatherBorder - 30, headerY, () => this.closeCaseBook(), 80);
     container.add(closeBtn);
 
     // ─── Tab buttons (below header) ───
