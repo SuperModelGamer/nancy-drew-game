@@ -9,16 +9,16 @@
           "id": "lobby_ticket_booth",
           "x": 159,
           "y": 608,
-          "width": 40,
-          "height": 30,
+          "width": 52,
+          "height": 126,
           "label": "Ticket Booth",
           "type": "inspect",
           "description": "The brass ticket booth — the glass is clouded with age, but I can make out a price card: 'Orchestra: $2.00 / Balcony: $0.75 / Standing: $0.25.' There's a stack of unsold tickets for the October 31st show inside. They never got to sell them. I wonder if people had already started staying away... if rumors about Margaux were circulating before that night."
         },
         {
           "id": "lobby_desk",
-          "x": 477,
-          "y": 768,
+          "x": 458,
+          "y": 610,
           "width": 77,
           "height": 72,
           "label": "Concierge Desk",
@@ -50,10 +50,10 @@
         },
         {
           "id": "lobby_chandelier",
-          "x": 1000,
-          "y": 248,
-          "width": 172,
-          "height": 98,
+          "x": 1002,
+          "y": 216,
+          "width": 253,
+          "height": 145,
           "label": "Chandelier",
           "type": "inspect",
           "description": "A massive crystal chandelier — most of the prisms are dark, but a few still catch the light and scatter tiny rainbows across the marble. Hold on. One of the chain links is shinier than the rest. That's a recent repair. Someone's been maintaining this chandelier. In a building that's supposed to be condemned? That doesn't add up."
@@ -104,8 +104,8 @@
           "id": "lobby_marble_floor",
           "x": 1079,
           "y": 899,
-          "width": 131,
-          "height": 76,
+          "width": 611,
+          "height": 81,
           "label": "Marble Floor",
           "type": "inspect",
           "description": "Black and white marble checkerboard — gorgeous, even cracked. There's a worn path from the front doors to the auditorium, which makes sense. But there's a second path, fainter, heading toward a corridor marked 'STAFF ONLY.' The dust is scuffed. Someone's been using this route regularly, and recently. I should find out where it leads."
@@ -131,19 +131,19 @@
           "description": "An old coat check — mothballs and empty hangers. Wait. There's a modern rain jacket on one hook. That doesn't belong here. The pockets have a granola bar wrapper and... a receipt from a chemical supply company. Dated last week. Someone bought antimony tartrate, glycol fog fluid, and UV-reactive paint. Paid cash — smart, no card trail. But they left the receipt in their pocket — not so smart. And the store is three blocks from Edwin's address. Antimony for poison, glycol for fog, UV paint for glowing. Whoever bought this was building a ghost AND planning to hurt someone. I'd better hang onto this information."
         },
         {
-          "id": "lobby_art_deco_mirror",
+          "id": "lobby_wall_sconce",
           "x": 1824,
           "y": 607,
           "width": 30,
           "height": 30,
-          "label": "Art Deco Mirror",
+          "label": "Wall Sconce",
           "type": "inspect",
-          "description": "A gorgeous art deco mirror — geometric gold frame, tarnished glass. My reflection looks tired. But behind me in the mirror... is that an outline on the wall? I turn around. There's a faint rectangular shape where a door used to be, plastered over. Someone sealed off a doorway. I wonder what's on the other side."
+          "description": "An ornate wall sconce — brass, art deco style, shaped like a sunburst. One of the glass shades is missing. I reach up to touch it and the fixture shifts slightly. There's a gap in the wall behind it... a faint rectangular outline where a door used to be, plastered over. Someone sealed off a doorway. I wonder what's on the other side."
         },
         {
           "id": "lobby_phone",
-          "x": 297,
-          "y": 623,
+          "x": 296,
+          "y": 653,
           "width": 81,
           "height": 44,
           "label": "Lobby Phone",
