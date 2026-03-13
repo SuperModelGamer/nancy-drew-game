@@ -471,32 +471,13 @@ export class RoomScene extends Phaser.Scene {
 
     const padX = 50, padY = 40;
     const bgW = Math.min(textObj.width + padX * 2, width * 0.8);
-    const bgH = textObj.height + padY * 2 + 30;
+    const bgH = textObj.height + padY * 2;
     const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.96);
     bg.setStrokeStyle(1.5, Colors.gold, 0.4);
     bg.setDepth(Depths.dialogueBox + 52);
 
-    // "Click anywhere to continue" prompt
-    const prompt = this.add.text(width / 2, height / 2 - 20 + bgH / 2 - 18, '— click anywhere to continue —', {
-      fontFamily: FONT,
-      fontSize: '16px',
-      color: TextColors.goldDim,
-      fontStyle: 'italic',
-    }).setOrigin(0.5);
-    prompt.setDepth(Depths.dialogueBox + 53);
-
-    // Pulse the prompt
-    this.tweens.add({
-      targets: prompt,
-      alpha: { from: 1, to: 0.4 },
-      duration: 900,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
-    });
-
     // Group all elements for tracking
-    const allElements = [overlay, bg, textObj, prompt];
+    const allElements = [overlay, bg, textObj];
 
     // Store as a container-like reference for cleanup
     const container = this.add.container(0, 0);
