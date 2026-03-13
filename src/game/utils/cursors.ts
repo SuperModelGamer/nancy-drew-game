@@ -54,7 +54,7 @@ export async function createGlowSpyglass(): Promise<string> {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
-      const glowSize = 6;
+      const glowSize = 4;
       const pad = glowSize * 2;
       const canvas = document.createElement('canvas');
       canvas.width = img.width + pad * 2;
