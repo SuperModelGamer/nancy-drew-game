@@ -4,12 +4,13 @@ import { SaveSystem } from './SaveSystem';
 interface PuzzleData {
   id: string;
   name: string;
-  type: 'code' | 'sequence' | 'combination' | 'logic';
+  type: 'code' | 'sequence' | 'combination' | 'logic' | 'mirror_reveal' | 'cipher' | 'lighting_board' | 'film_assembly' | 'symbol_match' | 'maze' | 'chemistry';
   description: string;
   answer: string;
   clues: string[];
   hints?: string[];
   unlocks?: string;
+  interactiveData?: Record<string, unknown>;
 }
 
 export class PuzzleSystem {
@@ -43,6 +44,21 @@ export class PuzzleSystem {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Marks a puzzle as solved without comparing answers.
+   * Used by interactive puzzle types that validate internally.
+   */
+  solvePuzzle(puzzleId: string): boolean {
+    const puzzle = this.getPuzzle(puzzleId);
+    if (!puzzle) return false;
+
+    this.solvedPuzzles.add(puzzleId);
+    if (puzzle.unlocks) {
+      SaveSystem.getInstance().setFlag(puzzle.unlocks, true);
+    }
+    return true;
   }
 
   isSolved(puzzleId: string): boolean {

@@ -46,6 +46,8 @@ export class HotspotEditorScene extends Phaser.Scene {
   private roomSelector!: Phaser.GameObjects.Text;
   private roomNames: string[] = [];
   private currentRoomIndex = 0;
+  private resizeMode = false;
+  private modeIndicator!: Phaser.GameObjects.Text;
 
   constructor() {
     super({ key: 'HotspotEditorScene' });
@@ -87,8 +89,17 @@ export class HotspotEditorScene extends Phaser.Scene {
       .setInteractive({ cursor: POINTER_CURSOR }).setDepth(952);
     rightArrow.on('pointerdown', () => this.switchRoom(1));
 
+    // Mode indicator (top-left)
+    this.modeIndicator = this.add.text(12, 40, 'MODE: DRAG', {
+      fontFamily: 'monospace',
+      fontSize: '13px',
+      color: '#00ff88',
+      backgroundColor: '#000000cc',
+      padding: { x: 8, y: 4 },
+    }).setDepth(960);
+
     // Info text (bottom)
-    this.infoText = this.add.text(width / 2, height - 14, 'Drag hotspots to move | Shift+drag edge to resize | E = export JSON | ` = close', {
+    this.infoText = this.add.text(width / 2, height - 14, 'Drag to move | Shift+R = toggle resize mode | E = export JSON | Shift+Q = close', {
       fontFamily: 'monospace',
       fontSize: '11px',
       color: '#aaaaaa',
@@ -109,7 +120,15 @@ export class HotspotEditorScene extends Phaser.Scene {
 
     // Keyboard shortcuts
     this.input.keyboard!.on('keydown-E', () => this.exportJSON());
-    this.input.keyboard!.on('keydown-BACKQUOTE', () => this.closeEditor());
+    this.input.keyboard!.on('keydown-Q', (event: KeyboardEvent) => {
+      if (event.shiftKey) this.closeEditor();
+    });
+    this.input.keyboard!.on('keydown-R', (event: KeyboardEvent) => {
+      if (!event.shiftKey) return;
+      this.resizeMode = !this.resizeMode;
+      this.modeIndicator.setText(`MODE: ${this.resizeMode ? 'RESIZE' : 'DRAG'}`);
+      this.modeIndicator.setColor(this.resizeMode ? '#ff6666' : '#00ff88');
+    });
     this.input.keyboard!.on('keydown-LEFT', () => this.switchRoom(-1));
     this.input.keyboard!.on('keydown-RIGHT', () => this.switchRoom(1));
 
@@ -194,17 +213,10 @@ export class HotspotEditorScene extends Phaser.Scene {
       this.selectedHotspot = hotspot;
       this.isDragging = true;
 
-      // Check if near edge (within 10px) for resize
-      const localX = pointer.x - hotspot.x;
-      const localY = pointer.y - hotspot.y;
-      const nearRight = Math.abs(localX - w / 2) < 10;
-      const nearBottom = Math.abs(localY - h / 2) < 10;
-
-      if (pointer.event.shiftKey && (nearRight || nearBottom)) {
+      if (this.resizeMode) {
+        // In resize mode, always resize from corner
         this.isResizing = true;
-        if (nearRight && nearBottom) this.resizeEdge = 'corner';
-        else if (nearRight) this.resizeEdge = 'right';
-        else this.resizeEdge = 'bottom';
+        this.resizeEdge = 'corner';
       } else {
         this.isResizing = false;
         this.dragOffsetX = pointer.x - hotspot.x;
