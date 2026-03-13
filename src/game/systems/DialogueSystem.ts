@@ -175,7 +175,7 @@ export class DialogueSystem {
     this.stopTypewriter();
     this.container.removeAll(true);
 
-    const { width, height } = this.scene.cameras.main;
+    const { width, height } = this.scene.cameras.main.worldView;
     const isNewSpeaker = line.speaker !== this.lastSpeaker;
     const isFirstLine = this.lastSpeaker === '';
 
@@ -480,7 +480,7 @@ export class DialogueSystem {
     this.stopTypewriter();
     this.container.removeAll(true);
 
-    const { width, height } = this.scene.cameras.main;
+    const { width, height } = this.scene.cameras.main.worldView;
     const inventory = InventorySystem.getInstance();
     const save = SaveSystem.getInstance();
 

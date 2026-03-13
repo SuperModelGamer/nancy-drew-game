@@ -8,7 +8,7 @@ import { Colors } from './constants';
  */
 
 export function drawRoomBackground(scene: Phaser.Scene, roomId: string): void {
-  const { width, height } = scene.cameras.main;
+  const { width, height } = scene.cameras.main.worldView;
   const gfx = scene.add.graphics();
   gfx.setDepth(0);
 

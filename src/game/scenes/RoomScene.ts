@@ -65,18 +65,26 @@ export class RoomScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
-    // Clip the camera to fit inside the decorative frame drawn by UIScene.
-    // The frame border occupies FRAME.top at top, FRAME.side on each side,
-    // and FRAME.bottom at the bottom (toolbar area).
-    const gameViewW = width - 2 * FRAME.side;
-    const gameViewH = height - FRAME.top - FRAME.bottom;
-    this.cameras.main.setViewport(FRAME.side, FRAME.top, gameViewW, gameViewH);
+    // The game world is 1920 × (1080 - FRAME.bottom) = 1920 × 956.
+    // The decorative frame drawn by UIScene reduces the available viewport.
+    // We use camera zoom to scale the full game world into the smaller viewport
+    // so hotspots, backgrounds, and all game objects keep their original positions.
+    const gameW = width;               // 1920 — full game world width
+    const gameH = height - FRAME.bottom; // 956 — game world height (above toolbar)
+    const viewW = width - 2 * FRAME.side; // 1892 — viewport pixel width
+    const viewH = height - FRAME.top - FRAME.bottom; // 942 — viewport pixel height
+    this.cameras.main.setViewport(FRAME.side, FRAME.top, viewW, viewH);
+
+    // Zoom to fit the full game world inside the viewport (uniform scale)
+    const zoom = Math.min(viewW / gameW, viewH / gameH);
+    this.cameras.main.setZoom(zoom);
+    // Camera scroll stays at (0,0) so world (0,0) maps to viewport top-left
 
     // Room background - use real image if available, fall back to procedural art
     const bgKey = `bg_${this.currentRoom.id}`;
     if (this.textures.exists(bgKey)) {
-      const bg = this.add.image(gameViewW / 2, gameViewH / 2, bgKey);
-      bg.setDisplaySize(gameViewW, gameViewH);
+      const bg = this.add.image(gameW / 2, gameH / 2, bgKey);
+      bg.setDisplaySize(gameW, gameH);
     } else {
       drawRoomBackground(this, this.currentRoom.id);
     }
@@ -90,7 +98,7 @@ export class RoomScene extends Phaser.Scene {
     const visitedFlag = `visited_room_${roomId}`;
     if (!SaveSystem.getInstance().getFlag(visitedFlag)) {
       SaveSystem.getInstance().setFlag(visitedFlag, true);
-      this.showRoomAnnouncement(gameViewW, gameViewH, () => {
+      this.showRoomAnnouncement(gameW, gameH, () => {
         this.input.setDefaultCursor(this.getExploreCursor());
       });
     } else {
@@ -101,11 +109,8 @@ export class RoomScene extends Phaser.Scene {
     // Create hotspots (filtered by showWhen)
     this.createHotspots();
 
-    // Tooltip removed — gold label on each hotspot handles hover display
-
-
     // Selected item indicator (top-right)
-    this.selectedItemIndicator = this.add.text(gameViewW - 20, 20, '', {
+    this.selectedItemIndicator = this.add.text(gameW - 20, 20, '', {
       fontFamily: FONT,
       fontSize: '20px',
       color: TextColors.gold,
@@ -165,7 +170,7 @@ export class RoomScene extends Phaser.Scene {
       save.save();
       console.log('%c[DEBUG] All rooms unlocked, chapter set to 5', 'color: #00ff88; font-weight: bold');
       // Show confirmation toast
-      const toast = this.add.text(this.cameras.main.width / 2, 60, 'All rooms unlocked!', {
+      const toast = this.add.text(this.cameras.main.worldView.width / 2, 60, 'All rooms unlocked!', {
         fontFamily: FONT,
         fontSize: '24px',
         color: '#00ff88',
@@ -473,7 +478,7 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private showDescription(text: string): void {
-    const { width, height } = this.cameras.main;
+    const { width, height } = this.cameras.main.worldView;
 
     // Destroy previous description box and clean up its listeners
     this.dismissDescriptionBox();
@@ -553,7 +558,7 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private showPickupToast(label: string): void {
-    const { width, height } = this.cameras.main;
+    const { width, height } = this.cameras.main.worldView;
     const container = this.add.container(0, 0);
     container.setDepth(Depths.descriptionBox);
 
@@ -666,7 +671,7 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private playCurtainOpen(onComplete: () => void): void {
-    const { width, height } = this.cameras.main;
+    const { width, height } = this.cameras.main.worldView;
     const curtainColor = 0x4a0a0a; // deep crimson
 
     const left = this.add.rectangle(width / 4, height / 2, width / 2, height, curtainColor, 1);
@@ -699,7 +704,7 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private playCurtainClose(onComplete: () => void): void {
-    const { width, height } = this.cameras.main;
+    const { width, height } = this.cameras.main.worldView;
     const curtainColor = 0x4a0a0a;
 
     const left = this.add.rectangle(-width / 4, height / 2, width / 2, height, curtainColor, 1);
