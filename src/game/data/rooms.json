@@ -7,30 +7,30 @@
       "hotspots": [
         {
           "id": "lobby_ticket_booth",
-          "x": 220,
-          "y": 310,
-          "width": 140,
-          "height": 130,
+          "x": 376,
+          "y": 617,
+          "width": 30,
+          "height": 30,
           "label": "Ticket Booth",
           "type": "inspect",
           "description": "The brass ticket booth — the glass is clouded with age, but I can make out a price card: 'Orchestra: $2.00 / Balcony: $0.75 / Standing: $0.25.' There's a stack of unsold tickets for the October 31st show inside. They never got to sell them. I wonder if people had already started staying away... if rumors about Margaux were circulating before that night."
         },
         {
           "id": "lobby_desk",
-          "x": 240,
-          "y": 440,
-          "width": 130,
-          "height": 60,
+          "x": 496,
+          "y": 649,
+          "width": 37,
+          "height": 34,
           "label": "Concierge Desk",
           "type": "inspect",
           "description": "An old concierge desk. There's a master key sitting on a brass hook and a note in shaky handwriting: 'Nancy — take the key. V.D.' Vivian's hand was trembling when she wrote this. She's more frightened than she's letting on."
         },
         {
           "id": "lobby_key",
-          "x": 275,
-          "y": 425,
-          "width": 50,
-          "height": 45,
+          "x": 1815,
+          "y": 640,
+          "width": 30,
+          "height": 30,
           "label": "Master Key",
           "type": "pickup",
           "itemId": "master_key",
@@ -38,20 +38,20 @@
         },
         {
           "id": "lobby_magnifying_glass",
-          "x": 195,
-          "y": 445,
-          "width": 50,
-          "height": 40,
+          "x": 152,
+          "y": 883,
+          "width": 30,
+          "height": 30,
           "label": "Magnifying Glass",
           "type": "pickup",
+          "description": "A silver-handled magnifying glass. Vivian left another note: 'You'll need sharp eyes here.' She's been preparing for my visit. Almost like she's done this before — set up a trail of breadcrumbs for someone to follow.",
           "itemId": "magnifying_glass",
-          "onceOnly": true,
-          "description": "A silver-handled magnifying glass. Vivian left another note: 'You'll need sharp eyes here.' She's been preparing for my visit. Almost like she's done this before — set up a trail of breadcrumbs for someone to follow."
+          "onceOnly": true
         },
         {
           "id": "lobby_chandelier",
-          "x": 620,
-          "y": 120,
+          "x": 999,
+          "y": 248,
           "width": 200,
           "height": 120,
           "label": "Chandelier",
@@ -60,50 +60,50 @@
         },
         {
           "id": "lobby_staircase",
-          "x": 660,
-          "y": 370,
-          "width": 220,
-          "height": 200,
+          "x": 1119,
+          "y": 605,
+          "width": 148,
+          "height": 122,
           "label": "Grand Staircase",
           "type": "locked",
-          "requiredItem": "master_key",
           "description": "An ornate staircase — the carpet is worn right down the center, but the brass handrails are recently polished. Whoever's been walking through this lobby has been taking care of the place. That's not demolition crew behavior.",
+          "requiredItem": "master_key",
           "targetRoom": "auditorium"
         },
         {
           "id": "lobby_playbills",
-          "x": 1035,
-          "y": 330,
-          "width": 100,
-          "height": 110,
+          "x": 1702,
+          "y": 603,
+          "width": 30,
+          "height": 30,
           "label": "Wall Paintings",
           "type": "inspect",
           "description": "Dozens of playbills covering the wall like wallpaper — decades of shows. 'The Secret of the Old Clock,' 'Treasure in the Royal Tower,' 'Danger on Deception Island' — the Monarch hosted touring companies from everywhere. But one has a gold frame: 'THE CRIMSON VEIL — Starring Margaux Fontaine — Final Performance, October 31, 1928.' Fresh flowers underneath. Someone's still honoring her, almost a hundred years later. That kind of devotion is either beautiful or obsessive. Maybe both."
         },
         {
           "id": "lobby_old_poster",
-          "x": 905,
-          "y": 330,
-          "width": 90,
-          "height": 110,
+          "x": 1590,
+          "y": 603,
+          "width": 30,
+          "height": 30,
           "label": "Faded Poster",
           "type": "inspect",
           "description": "A half-torn touring poster: 'BLACKMOOR PLAYERS present: The Penvellyn Curse — A Tale of Alchemy and Shadows.' There's pencil at the bottom: 'Brilliant. Almost too real. —M.F.' Margaux's handwriting. A play about alchemy... and later she'd be poisoned by an alchemical compound. 'Almost too real' is right, Margaux. Next to it, a smaller bill: 'Mystico the Magnificent — One Night Only!' with a cartoon magician in a top hat. Cute."
         },
         {
           "id": "lobby_vivian",
-          "x": 500,
-          "y": 420,
-          "width": 80,
-          "height": 120,
+          "x": 855,
+          "y": 653,
+          "width": 104,
+          "height": 237,
           "label": "Vivian Delacroix",
           "type": "talk",
           "dialogueId": "vivian_intro"
         },
         {
           "id": "lobby_marble_floor",
-          "x": 640,
-          "y": 610,
+          "x": 871,
+          "y": 896,
           "width": 300,
           "height": 60,
           "label": "Marble Floor",
@@ -112,48 +112,48 @@
         },
         {
           "id": "lobby_guestbook",
-          "x": 260,
-          "y": 460,
-          "width": 60,
-          "height": 40,
+          "x": 194,
+          "y": 631,
+          "width": 30,
+          "height": 30,
           "label": "Guest Ledger",
           "type": "inspect",
           "description": "The guest ledger is open to recent entries. Mostly Ashworth's contractors — plumbers, electricians, structural engineers. But one entry appears over and over, going back fifteen years: 'E. Hale — Research.' Every single week. The handwriting never changes. That's not dedication, that's obsession. Flipping to an older page, I spot signatures from a 1990s gala — 'F. & J. Hardy, Bayport' and 'S. Joon — still looking!!!' with three exclamation marks. That name sounds familiar somehow."
         },
         {
           "id": "lobby_coat_check",
-          "x": 75,
-          "y": 330,
-          "width": 80,
-          "height": 80,
+          "x": 674,
+          "y": 619,
+          "width": 41,
+          "height": 30,
           "label": "Coat Check",
           "type": "inspect",
           "description": "An old coat check — mothballs and empty hangers. Wait. There's a modern rain jacket on one hook. That doesn't belong here. The pockets have a granola bar wrapper and... a receipt from a chemical supply company. Dated last week. Someone bought antimony tartrate, glycol fog fluid, and UV-reactive paint. Paid cash — smart, no card trail. But they left the receipt in their pocket — not so smart. And the store is three blocks from Edwin's address. Antimony for poison, glycol for fog, UV paint for glowing. Whoever bought this was building a ghost AND planning to hurt someone. I'd better hang onto this information."
         },
         {
           "id": "lobby_art_deco_mirror",
-          "x": 1150,
-          "y": 310,
-          "width": 80,
-          "height": 100,
+          "x": 1131,
+          "y": 412,
+          "width": 30,
+          "height": 30,
           "label": "Art Deco Mirror",
           "type": "inspect",
           "description": "A gorgeous art deco mirror — geometric gold frame, tarnished glass. My reflection looks tired. But behind me in the mirror... is that an outline on the wall? I turn around. There's a faint rectangular shape where a door used to be, plastered over. Someone sealed off a doorway. I wonder what's on the other side."
         },
         {
           "id": "lobby_phone",
-          "x": 150,
-          "y": 455,
-          "width": 55,
-          "height": 55,
+          "x": 271,
+          "y": 651,
+          "width": 32,
+          "height": 30,
           "label": "Lobby Phone",
           "type": "talk",
           "dialogueId": "phone_calls"
         },
         {
           "id": "lobby_managers_door",
-          "x": 1180,
-          "y": 200,
+          "x": 1416,
+          "y": 685,
           "width": 80,
           "height": 120,
           "label": "Office Door",
@@ -163,10 +163,10 @@
         },
         {
           "id": "lobby_water_stain",
-          "x": 640,
-          "y": 45,
-          "width": 120,
-          "height": 50,
+          "x": 1713,
+          "y": 163,
+          "width": 66,
+          "height": 59,
           "label": "Ceiling Stain",
           "type": "inspect",
           "description": "A water stain spreading across the ceiling plaster. Most of the damage is old, but this one spot is fresh — and it's directly above where that sealed door used to be. That's not a coincidence. Something above this spot is active. Pipes? Or something else entirely?"
@@ -236,9 +236,9 @@
           "height": 50,
           "label": "1928 Playbill",
           "type": "pickup",
+          "description": "Tucked in a seat pocket near the front — a 1928 playbill in perfect condition. The cast page lists Margaux Fontaine as Lady Ashford and Cecilia Drake as understudy. Someone circled Cecilia's name in red ink. The ink is old — this wasn't done recently. Whoever marked this suspected Cecilia decades ago. I should hold onto this.",
           "itemId": "playbill_1928",
-          "onceOnly": true,
-          "description": "Tucked in a seat pocket near the front — a 1928 playbill in perfect condition. The cast page lists Margaux Fontaine as Lady Ashford and Cecilia Drake as understudy. Someone circled Cecilia's name in red ink. The ink is old — this wasn't done recently. Whoever marked this suspected Cecilia decades ago. I should hold onto this."
+          "onceOnly": true
         },
         {
           "id": "aud_edwin",
@@ -458,8 +458,8 @@
           "height": 100,
           "label": "Basement Door",
           "type": "locked",
-          "requiredItem": "basement_key",
           "description": "The door swings open and cold air rushes up from below. A steep staircase descends into pitch darkness beneath the stage. I can hear something down there — a faint mechanical hum. My flashlight barely reaches the bottom. Well, Nancy... you didn't come here to stand at the top of stairs. Although, for the record, standing at the top of stairs is significantly less terrifying.",
+          "requiredItem": "basement_key",
           "targetRoom": "basement"
         },
         {
@@ -503,7 +503,7 @@
           "height": 90,
           "label": "Call Board",
           "type": "inspect",
-          "description": "The stage manager's call board — layers of old notices going back decades. One recent note in Stella's handwriting stands out: 'INVENTORY DISCREPANCY — Missing: 3 Tiffany lamps, 1 silver candelabra, 2 gilt frames (est. value: $4,200). DO NOT DISCUSS.' She wrote 'do not discuss' and pinned it to a board? That's not how you keep secrets, Stella. Unless you want a record to cover yourself later. Pinned underneath, a faded flyer: 'KOKO KRINGLE — Official Candy of the Monarch Theatre. A Taste You Won't Forget!' There's a half-eaten wrapper in the trash. Some things never change."
+          "description": "The stage manager's call board — layers of old notices going back decades. One recent note in Stella's handwriting stands out: 'INVENTORY DISCREPANCY — Missing: 3 Tiffany lamps, 1 silver candelabra, 2 gilt frames (est. value: 4,200). DO NOT DISCUSS.' She wrote 'do not discuss' and pinned it to a board? That's not how you keep secrets, Stella. Unless you want a record to cover yourself later. Pinned underneath, a faded flyer: 'KOKO KRINGLE — Official Candy of the Monarch Theatre. A Taste You Won't Forget!' There's a half-eaten wrapper in the trash. Some things never change."
         },
         {
           "id": "bs_stella_lockbox",
@@ -513,8 +513,8 @@
           "height": 50,
           "label": "Stella's Lockbox",
           "type": "locked",
-          "puzzleId": "lockbox_puzzle",
-          "description": "A metal lockbox shoved under Stella's work station. Four-digit combination lock. She doesn't want anyone getting into this. Given what I found on the call board, I have a pretty good idea what's inside. Four digits. Knowing Stella, it's probably something practical — a date, a dollar amount. Something she'd never forget."
+          "description": "A metal lockbox shoved under Stella's work station. Four-digit combination lock. She doesn't want anyone getting into this. Given what I found on the call board, I have a pretty good idea what's inside. Four digits. Knowing Stella, it's probably something practical — a date, a dollar amount. Something she'd never forget.",
+          "puzzleId": "lockbox_puzzle"
         },
         {
           "id": "bs_table_lamp",
@@ -572,9 +572,9 @@
           "height": 180,
           "label": "Vanity Mirror",
           "type": "locked",
+          "description": "I hold the magnifying glass up to the mirror and tilt it in the light. There — barely visible — letters traced in wax on the glass surface. My hands are shaking a little. Margaux wrote this. Nearly a hundred years ago, she sat right where I'm standing and wrote: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.' She knew. She knew who was killing her, and nobody listened.",
           "requiredItem": "magnifying_glass",
-          "puzzleId": "mirror_puzzle",
-          "description": "I hold the magnifying glass up to the mirror and tilt it in the light. There — barely visible — letters traced in wax on the glass surface. My hands are shaking a little. Margaux wrote this. Nearly a hundred years ago, she sat right where I'm standing and wrote: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.' She knew. She knew who was killing her, and nobody listened."
+          "puzzleId": "mirror_puzzle"
         },
         {
           "id": "dr_diary",
@@ -584,9 +584,9 @@
           "height": 40,
           "label": "Vanity Drawer",
           "type": "pickup",
+          "description": "Inside the drawer: a leather-bound diary with M.F. embossed in gold on the cover.",
           "itemId": "margaux_diary",
-          "onceOnly": true,
-          "description": "Inside the drawer: a leather-bound diary with M.F. embossed in gold on the cover."
+          "onceOnly": true
         },
         {
           "id": "dr_perfume_bottles",
@@ -666,8 +666,8 @@
           "height": 70,
           "label": "Locked Trunk",
           "type": "locked",
-          "puzzleId": "trunk_puzzle",
-          "description": "An antique trunk with a combination lock. Three dials, each numbered 0–9. The trunk is engraved with Margaux's initials: M.F."
+          "description": "An antique trunk with a combination lock. Three dials, each numbered 0–9. The trunk is engraved with Margaux's initials: M.F.",
+          "puzzleId": "trunk_puzzle"
         },
         {
           "id": "dr_alchemy_book",
@@ -734,9 +734,9 @@
           "height": 50,
           "label": "Film Frames",
           "type": "locked",
+          "description": "I hold the magnifying glass to the film strip. I can just make out individual frames — four key moments from the rehearsal. But they're out of order. Someone spliced the film and rearranged the sequence. If I put them back in the right order, I might see exactly what happened on stage that night.",
           "requiredItem": "magnifying_glass",
-          "puzzleId": "film_puzzle",
-          "description": "I hold the magnifying glass to the film strip. I can just make out individual frames — four key moments from the rehearsal. But they're out of order. Someone spliced the film and rearranged the sequence. If I put them back in the right order, I might see exactly what happened on stage that night."
+          "puzzleId": "film_puzzle"
         },
         {
           "id": "pb_film_reels",
@@ -786,9 +786,9 @@
           "height": 50,
           "label": "Annotated Script",
           "type": "pickup",
+          "description": "The original script of 'The Crimson Veil' — the annotations in the margins are in old red ink. Someone circled specific letters throughout the stage directions. That's deliberate. If I read them in order, they might spell something. I should take this with me.",
           "itemId": "annotated_script",
-          "onceOnly": true,
-          "description": "The original script of 'The Crimson Veil' — the annotations in the margins are in old red ink. Someone circled specific letters throughout the stage directions. That's deliberate. If I read them in order, they might spell something. I should take this with me."
+          "onceOnly": true
         },
         {
           "id": "pb_script_cipher",
@@ -798,9 +798,9 @@
           "height": 50,
           "label": "Circled Letters",
           "type": "locked",
+          "description": "Now that I have the script, I can study the circled letters more carefully. Red ink circles specific letters in the Act III stage directions. If I read them in order, they spell something. Let me work through this.",
           "requiredItem": "annotated_script",
           "puzzleId": "script_cipher",
-          "description": "Now that I have the script, I can study the circled letters more carefully. Red ink circles specific letters in the Act III stage directions. If I read them in order, they spell something. Let me work through this.",
           "showWhen": "chapter_2"
         },
         {
@@ -920,9 +920,9 @@
           "height": 45,
           "label": "Teacup",
           "type": "pickup",
+          "description": "A porcelain teacup with dried residue at the bottom. I lean close — there's a faint metallic smell. Whatever Ashworth drank, the evidence is still right here. I should take this. Carefully.",
           "itemId": "poisoned_teacup",
-          "onceOnly": true,
-          "description": "A porcelain teacup with dried residue at the bottom. I lean close — there's a faint metallic smell. Whatever Ashworth drank, the evidence is still right here. I should take this. Carefully."
+          "onceOnly": true
         },
         {
           "id": "mo_laptop",
@@ -962,8 +962,8 @@
           "height": 55,
           "label": "Wall Safe",
           "type": "locked",
-          "puzzleId": "office_safe_puzzle",
-          "description": "A modern wall safe behind a painting of the theater. It has an electronic keypad."
+          "description": "A modern wall safe behind a painting of the theater. It has an electronic keypad.",
+          "puzzleId": "office_safe_puzzle"
         },
         {
           "id": "mo_window",
@@ -1006,15 +1006,15 @@
           "description": "A printed demolition timeline pinned to the wall. Day 1 — Final inspection. Day 2 — Utilities disconnected. Day 3 — Demolition begins, east wing. Today is circled: Day 1. Two days. That's all this theater has left. Two days to solve a century-old murder and a brand-new poisoning. No pressure, Drew."
         },
         {
-          "id": "mo_teacup",
+          "id": "mo_teacup_analysis",
           "x": 780,
           "y": 420,
           "width": 50,
           "height": 45,
           "label": "Poisoned Teacup",
           "type": "locked",
-          "puzzleId": "tea_analysis",
           "description": "The teacup from Ashworth's poisoning — still sitting on his desk with crystalline residue at the bottom. The police left it here as 'not evidence enough.' But I have Margaux's alchemy book from the dressing room. If I compare the residue to the compounds described in her annotations, I can identify exactly what was used.",
+          "puzzleId": "tea_analysis",
           "showWhen": "chapter_3"
         },
         {
@@ -1072,8 +1072,8 @@
           "height": 70,
           "label": "Lighting Board",
           "type": "locked",
-          "puzzleId": "lighting_sequence",
-          "description": "A lighting control board bolted to the catwalk. Four colored switches: Red, Blue, White, Red. There's a sequence panel — you can program lighting cues with it. I notice the board is slightly loose on one side. There might be something behind it. If I enter the right sequence, I bet I can find out."
+          "description": "A lighting control board bolted to the catwalk. Four colored switches: Red, Blue, White, Red. There's a sequence panel — you can program lighting cues with it. I notice the board is slightly loose on one side. There might be something behind it. If I enter the right sequence, I bet I can find out.",
+          "puzzleId": "lighting_sequence"
         },
         {
           "id": "cw_notebook",
@@ -1083,9 +1083,9 @@
           "height": 50,
           "label": "Leather Notebook",
           "type": "pickup",
+          "description": "A leather notebook hidden behind the compartment. I open it and my breath catches. The first page: 'The Ghost Project — E.H.' Edwin Hale. Pages and pages of research — timelines, passage diagrams, lighting cues, costume notes. This isn't a casual hobby. This is a blueprint for haunting a theater. He planned everything.",
           "itemId": "edwins_notebook",
           "onceOnly": true,
-          "description": "A leather notebook hidden behind the compartment. I open it and my breath catches. The first page: 'The Ghost Project — E.H.' Edwin Hale. Pages and pages of research — timelines, passage diagrams, lighting cues, costume notes. This isn't a casual hobby. This is a blueprint for haunting a theater. He planned everything.",
           "showWhen": "edwins_notebook"
         },
         {
@@ -1183,9 +1183,9 @@
           "height": 100,
           "label": "Fog Machine Controls",
           "type": "pickup",
+          "description": "A remote control system wired to the fog machines upstairs. Modified so one person can operate everything — fog, lights, and trapdoor, all from down here. The timing sequences are labeled in careful handwriting: 'Entrance,' 'The Walk,' 'Vanish.' Three acts of a one-man show. The ghost was never supernatural. It was a performance.",
           "itemId": "fog_machine_part",
-          "onceOnly": true,
-          "description": "A remote control system wired to the fog machines upstairs. Modified so one person can operate everything — fog, lights, and trapdoor, all from down here. The timing sequences are labeled in careful handwriting: 'Entrance,' 'The Walk,' 'Vanish.' Three acts of a one-man show. The ghost was never supernatural. It was a performance."
+          "onceOnly": true
         },
         {
           "id": "bm_trapdoor",
@@ -1246,8 +1246,8 @@
           "height": 90,
           "label": "Hidden Passage",
           "type": "locked",
-          "puzzleId": "passage_navigation",
           "description": "A narrow opening in the basement wall — the bricks here are older, part of the original construction. It leads into a dark network of passages behind the theater's walls. I found Edwin's blueprints earlier. If I trace the route correctly, I can figure out where this passage connects to above.",
+          "puzzleId": "passage_navigation",
           "showWhen": "chapter_4"
         },
         {
@@ -1271,7 +1271,7 @@
           "description": "Old set pieces stacked against the walls — a castle turret, a forest, a drawing room. Decades of stories piled up like cordwood. One flat makes me pause: it's from The Crimson Veil. A painted parlor with a table set for tea. And there, on the painted table — a goblet. The goblet. Seeing it painted so casually on a set piece, knowing what it actually did... it's chilling."
         },
         {
-          "id": "bm_passage_entrance",
+          "id": "bm_passage_inspect",
           "x": 550,
           "y": 250,
           "width": 80,
@@ -1328,8 +1328,8 @@
           "height": 70,
           "label": "Evidence Board",
           "type": "locked",
-          "puzzleId": "evidence_board",
           "description": "A corkboard covered in photographs, documents, and notes connected by strings. It's Edwin's investigation — his own version of what I do. Fifteen years of research mapped out on a board. But it's incomplete. He has the 1928 timeline but not the modern connections. I can finish this. I can connect both timelines and prove the full truth.",
+          "puzzleId": "evidence_board",
           "showWhen": "case_near_close"
         },
         {

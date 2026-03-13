@@ -461,10 +461,13 @@ export class RoomScene extends Phaser.Scene {
     const padX = 50, padY = 40;
     const bgW = Math.min(textObj.width + padX * 2, width * 0.8);
     const bgH = textObj.height + padY * 2 + 30;
-    const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.92);
+    const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.96);
     bg.setStrokeStyle(1.5, Colors.gold, 0.4);
     container.sendToBack(backdrop);
     container.moveTo(bg, 1); // behind text, in front of backdrop
+
+    // Make bg panel interactive so it doesn't block clicks from reaching backdrop
+    bg.setInteractive({ cursor: POINTER_CURSOR });
 
     // "Click anywhere to continue" prompt
     const prompt = this.add.text(width / 2, height / 2 - 20 + bgH / 2 - 18, '— click anywhere to continue —', {
@@ -489,15 +492,17 @@ export class RoomScene extends Phaser.Scene {
     container.setAlpha(0);
     this.tweens.add({ targets: container, alpha: 1, duration: 200 });
 
-    // Click anywhere to dismiss
-    backdrop.on('pointerdown', () => {
+    // Dismiss handler — shared by backdrop and bg panel
+    const dismiss = () => {
       this.tweens.add({
         targets: container,
         alpha: 0,
         duration: 200,
         onComplete: () => container.destroy(),
       });
-    });
+    };
+    backdrop.on('pointerdown', dismiss);
+    bg.on('pointerdown', dismiss);
   }
 
   private showPickupToast(label: string): void {
@@ -517,7 +522,7 @@ export class RoomScene extends Phaser.Scene {
     const padX = 50, padY = 20;
     const bgW = textObj.width + padX * 2;
     const bgH = textObj.height + padY * 2;
-    const bg = this.add.rectangle(width / 2, height * 0.35, bgW, bgH, 0x1a1020, 0.85);
+    const bg = this.add.rectangle(width / 2, height * 0.35, bgW, bgH, 0x1a1020, 0.96);
     bg.setStrokeStyle(2, Colors.gold, 0.7);
 
     // Glow effect behind the panel
