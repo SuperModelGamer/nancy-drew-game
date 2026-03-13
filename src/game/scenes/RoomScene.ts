@@ -45,7 +45,7 @@ export class RoomScene extends Phaser.Scene {
   private currentRoom!: RoomData;
   private hotspotObjects: Phaser.GameObjects.Container[] = [];
   private descriptionBox: Phaser.GameObjects.Container | null = null;
-  private _descriptionDismiss: (() => void) | null = null;
+  private _descriptionClickZone: Phaser.GameObjects.Rectangle | null = null;
   private _descriptionDismissKey: ((event: KeyboardEvent) => void) | null = null;
   private usedHotspots: Set<string> = new Set();
   private selectedItemIndicator!: Phaser.GameObjects.Text;
@@ -271,13 +271,13 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private dismissDescriptionBox(): void {
+    if (this._descriptionClickZone) {
+      this._descriptionClickZone.destroy();
+      this._descriptionClickZone = null;
+    }
     if (this.descriptionBox) {
       this.descriptionBox.destroy();
       this.descriptionBox = null;
-    }
-    if (this._descriptionDismiss) {
-      this.input.off('pointerdown', this._descriptionDismiss);
-      this._descriptionDismiss = null;
     }
     if (this._descriptionDismissKey) {
       this.input.keyboard!.off('keydown', this._descriptionDismissKey);
@@ -448,15 +448,18 @@ export class RoomScene extends Phaser.Scene {
     // Destroy previous description box and clean up its listeners
     this.dismissDescriptionBox();
 
-    // Create a centered modal overlay
-    const container = this.add.container(0, 0);
-    container.setDepth(Depths.descriptionBox);
-    this.descriptionBox = container;
+    // ── Full-screen click catcher ──
+    // This is a scene-level rectangle (NOT inside a container) so Phaser
+    // processes its hit-testing directly, avoiding container input quirks.
+    const clickZone = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
+    clickZone.setDepth(Depths.descriptionBox);
+    clickZone.setInteractive();
+    this._descriptionClickZone = clickZone;
 
-    // Dark backdrop — interactive to capture dismiss clicks
-    const backdrop = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
-    backdrop.setInteractive();
-    container.add(backdrop);
+    // Visual container for the text panel (sits on top of the click zone)
+    const container = this.add.container(0, 0);
+    container.setDepth(Depths.descriptionBox + 1);
+    this.descriptionBox = container;
 
     // Text box in center
     const maxTextW = Math.min(width * 0.7, 800);
@@ -469,7 +472,6 @@ export class RoomScene extends Phaser.Scene {
       lineSpacing: 6,
     });
     textObj.setOrigin(0.5);
-    container.add(textObj);
 
     // Background panel behind text
     const padX = 50, padY = 40;
@@ -477,29 +479,29 @@ export class RoomScene extends Phaser.Scene {
     const bgH = textObj.height + padY * 2;
     const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.96);
     bg.setStrokeStyle(1.5, Colors.gold, 0.4);
-    container.sendToBack(backdrop);
-    container.moveTo(bg, 1); // behind text, in front of backdrop
 
-    // Fade in
+    container.add([bg, textObj]); // bg first (behind), text on top
+
+    // Fade in both layers together
+    clickZone.setAlpha(0);
     container.setAlpha(0);
-    this.tweens.add({ targets: container, alpha: 1, duration: 200 });
+    this.tweens.add({ targets: [clickZone, container], alpha: 1, duration: 200 });
 
-    // Dismiss handler — use scene-level input to guarantee clicks are caught.
-    // Delay by one frame so the hotspot click that opened this doesn't immediately dismiss it.
+    // Dismiss handler
     let dismissed = false;
     const dismiss = () => {
       if (dismissed) return;
       dismissed = true;
-      this.input.off('pointerdown', dismiss);
       this.input.keyboard!.off('keydown', dismissKey);
-      this._descriptionDismiss = null;
       this._descriptionDismissKey = null;
       this.tweens.add({
-        targets: container,
+        targets: [clickZone, container],
         alpha: 0,
         duration: 200,
         onComplete: () => {
+          clickZone.destroy();
           container.destroy();
+          this._descriptionClickZone = null;
           this.descriptionBox = null;
         },
       });
@@ -509,14 +511,12 @@ export class RoomScene extends Phaser.Scene {
         dismiss();
       }
     };
-    // Store refs so we can clean up if a new description opens before this one is dismissed
-    this._descriptionDismiss = dismiss;
     this._descriptionDismissKey = dismissKey;
-    // Wait one frame before arming the dismiss listener so the opening click doesn't close it
-    this.time.delayedCall(50, () => {
+
+    // Arm dismiss after a short delay so the click that opened this doesn't close it
+    this.time.delayedCall(150, () => {
       if (!dismissed) {
-        backdrop.on('pointerdown', dismiss);
-        this.input.on('pointerdown', dismiss);
+        clickZone.on('pointerdown', dismiss);
         this.input.keyboard!.on('keydown', dismissKey);
       }
     });
