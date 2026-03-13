@@ -25,11 +25,6 @@ export function createCloseButton(
     // Compute base scale once to avoid compounding on rapid hover
     const baseScale = size / btn.width;
 
-    // Gold glow ring (empty at rest, drawn on hover)
-    const glow = scene.add.graphics();
-    glow.setAlpha(0);
-    container.add(glow);
-
     // Hit area
     const hitArea = scene.add.circle(0, 0, size / 2 + 6, 0x000000, 0);
     hitArea.setInteractive({ cursor: POINTER_CURSOR });
@@ -44,16 +39,6 @@ export function createCloseButton(
         ease: 'Back.easeOut',
       });
       btn.setTint(0xffeecc);
-      // Show glow
-      glow.clear();
-      glow.lineStyle(3, Colors.gold, 0.5);
-      glow.strokeCircle(0, 0, size / 2 + 4);
-      glow.setAlpha(1);
-      scene.tweens.add({
-        targets: glow,
-        alpha: 1,
-        duration: 150,
-      });
     });
 
     hitArea.on('pointerout', () => {
@@ -65,11 +50,6 @@ export function createCloseButton(
         ease: 'Back.easeOut',
       });
       btn.clearTint();
-      scene.tweens.add({
-        targets: glow,
-        alpha: 0,
-        duration: 150,
-      });
     });
 
     hitArea.on('pointerdown', () => {

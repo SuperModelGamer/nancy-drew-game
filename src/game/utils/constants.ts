@@ -110,7 +110,7 @@ export const UI_BAR_RESERVED = 124; // TOOLBAR_H (112) + BOTTOM_MARGIN (12)
 // Decorative frame border around the entire game screen.
 // The game viewport is inset by these values on each side.
 export const FRAME = {
-  top: 14,
-  side: 14,
+  top: 36,
+  side: 36,
   bottom: 124, // toolbar + margin (same as UI_BAR_RESERVED)
 } as const;
