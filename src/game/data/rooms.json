@@ -27,8 +27,8 @@
         },
         {
           "id": "lobby_key",
-          "x": 1869,
-          "y": 458,
+          "x": 363,
+          "y": 668,
           "width": 30,
           "height": 30,
           "label": "Master Key",
@@ -38,8 +38,8 @@
         },
         {
           "id": "lobby_magnifying_glass",
-          "x": 1236,
-          "y": 749,
+          "x": 207,
+          "y": 655,
           "width": 30,
           "height": 30,
           "label": "Magnifying Glass",
@@ -60,8 +60,8 @@
         },
         {
           "id": "lobby_staircase",
-          "x": 1231,
-          "y": 465,
+          "x": 1143,
+          "y": 591,
           "width": 155,
           "height": 154,
           "label": "Grand Staircase",
@@ -132,8 +132,8 @@
         },
         {
           "id": "lobby_wall_sconce",
-          "x": 1824,
-          "y": 607,
+          "x": 1860,
+          "y": 472,
           "width": 30,
           "height": 30,
           "label": "Wall Sconce",
