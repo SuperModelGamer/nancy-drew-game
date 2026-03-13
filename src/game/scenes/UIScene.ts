@@ -3,7 +3,7 @@ import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import roomsData from '../data/rooms.json';
 import itemsData from '../data/items.json';
-import { Colors, TextColors, FONT, Depths, computeViewfinderLayout, FRAME_TOP, FRAME_BOTTOM } from '../utils/constants';
+import { Colors, TextColors, FONT, Depths, computeViewfinderLayout } from '../utils/constants';
 import { POINTER_CURSOR } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
@@ -86,20 +86,23 @@ export class UIScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
-    // ─── Viewfinder frame — thick borders around the uniformly-scaled game ───
+    // ─── Viewfinder frame — thin left border, thick right info panel ───
     const vf = computeViewfinderLayout(width, height);
-    const fSide = vf.sideMargin;
+    const fLeft = vf.leftMargin;
     const fTop = vf.topMargin;
     const toolbarTop = vf.viewportY + vf.viewportH;
+    const rpX = vf.rightPanelX; // right panel left edge
+    const rpW = vf.rightPanelW; // right panel width
+    const rpCx = rpX + rpW / 2; // right panel center X
 
     const frameBg = this.add.graphics();
 
-    // Solid opaque fill for all four border strips
+    // Solid opaque fill for border strips
     frameBg.fillStyle(DecoColors.navy, 1);
-    frameBg.fillRect(0, 0, width, fTop);                              // top
-    frameBg.fillRect(0, fTop, fSide, toolbarTop - fTop);              // left
-    frameBg.fillRect(width - fSide, fTop, fSide, toolbarTop - fTop);  // right
-    frameBg.fillRect(0, toolbarTop, width, TOOLBAR_H);                // toolbar
+    frameBg.fillRect(0, 0, width, fTop);                                // top
+    frameBg.fillRect(0, fTop, fLeft, toolbarTop - fTop);                // left (thin)
+    frameBg.fillRect(rpX, fTop, rpW, toolbarTop - fTop);                // right panel
+    frameBg.fillRect(0, toolbarTop, width, TOOLBAR_H);                  // toolbar
     frameBg.fillStyle(0x060810, 1);
     frameBg.fillRect(0, height - BOTTOM_MARGIN, width, BOTTOM_MARGIN);
 
@@ -111,23 +114,11 @@ export class UIScene extends Phaser.Scene {
 
     // Inner frame line (game viewport boundary)
     frameBg.lineStyle(2, DecoColors.gold, 0.5);
-    frameBg.strokeRect(fSide, fTop, vf.viewportW, vf.viewportH);
+    frameBg.strokeRect(fLeft, fTop, vf.viewportW, vf.viewportH);
 
-    // Center diamond below viewport
-    const diamondSize = 9;
-    frameBg.fillStyle(DecoColors.gold, 0.6);
-    frameBg.fillPoints([
-      new Phaser.Geom.Point(width / 2, toolbarTop - diamondSize),
-      new Phaser.Geom.Point(width / 2 + diamondSize, toolbarTop),
-      new Phaser.Geom.Point(width / 2, toolbarTop + diamondSize),
-      new Phaser.Geom.Point(width / 2 - diamondSize, toolbarTop),
-    ], true);
-
-    // Corner ornaments where viewport meets side borders
-    const cornerOrnW = 30;
-    frameBg.fillStyle(DecoColors.gold, 0.4);
-    frameBg.fillTriangle(fSide, toolbarTop - 4, fSide + cornerOrnW, toolbarTop, fSide, toolbarTop + 4);
-    frameBg.fillTriangle(width - fSide, toolbarTop - 4, width - fSide - cornerOrnW, toolbarTop, width - fSide, toolbarTop + 4);
+    // Vertical separator between viewport and right panel
+    frameBg.lineStyle(1.5, DecoColors.gold, 0.35);
+    frameBg.lineBetween(rpX, fTop + 6, rpX, toolbarTop - 6);
 
     // Four outer corner ornaments
     drawCornerOrnament(frameBg, 6, 6, 24, 'tl', DecoColors.gold, 0.45);
@@ -135,49 +126,32 @@ export class UIScene extends Phaser.Scene {
     drawCornerOrnament(frameBg, 6, height - BOTTOM_MARGIN - 6, 24, 'bl', DecoColors.gold, 0.45);
     drawCornerOrnament(frameBg, width - 6, height - BOTTOM_MARGIN - 6, 24, 'br', DecoColors.gold, 0.45);
 
-    // Top border center ornament
+    // Top border ornament centered over viewport
+    const vpCenterX = fLeft + vf.viewportW / 2;
     const topDiamond = 6;
     frameBg.fillStyle(DecoColors.gold, 0.5);
     frameBg.fillPoints([
-      new Phaser.Geom.Point(width / 2, 1),
-      new Phaser.Geom.Point(width / 2 + topDiamond, fTop / 2),
-      new Phaser.Geom.Point(width / 2, fTop - 1),
-      new Phaser.Geom.Point(width / 2 - topDiamond, fTop / 2),
+      new Phaser.Geom.Point(vpCenterX, 1),
+      new Phaser.Geom.Point(vpCenterX + topDiamond, fTop / 2),
+      new Phaser.Geom.Point(vpCenterX, fTop - 1),
+      new Phaser.Geom.Point(vpCenterX - topDiamond, fTop / 2),
     ], true);
-
-    // ─── Side border decorations: vertical art deco lines ───
-    // Left side — decorative vertical accent lines
-    if (fSide > 40) {
-      frameBg.lineStyle(1, DecoColors.gold, 0.15);
-      frameBg.lineBetween(fSide - 8, fTop + 20, fSide - 8, toolbarTop - 20);
-      frameBg.lineStyle(1, DecoColors.gold, 0.08);
-      frameBg.lineBetween(fSide - 14, fTop + 40, fSide - 14, toolbarTop - 40);
-      // Right side
-      frameBg.lineStyle(1, DecoColors.gold, 0.15);
-      frameBg.lineBetween(width - fSide + 8, fTop + 20, width - fSide + 8, toolbarTop - 20);
-      frameBg.lineStyle(1, DecoColors.gold, 0.08);
-      frameBg.lineBetween(width - fSide + 14, fTop + 40, width - fSide + 14, toolbarTop - 40);
-
-      // Corner ornaments at viewport corners
-      drawCornerOrnament(frameBg, fSide + 2, fTop + 2, 16, 'tl', DecoColors.gold, 0.3);
-      drawCornerOrnament(frameBg, width - fSide - 2, fTop + 2, 16, 'tr', DecoColors.gold, 0.3);
-      drawCornerOrnament(frameBg, fSide + 2, toolbarTop - 2, 16, 'bl', DecoColors.gold, 0.3);
-      drawCornerOrnament(frameBg, width - fSide - 2, toolbarTop - 2, 16, 'br', DecoColors.gold, 0.3);
-    }
 
     frameBg.setDepth(Depths.tooltip - 1);
 
-    // ─── Room stats in side borders ───
-    this.createSideBorderStats(fSide, fTop, toolbarTop, width);
+    // ─── Right info panel content ───
+    this.createRightInfoPanel(rpX, rpW, rpCx, fTop, toolbarTop);
 
-    // ─── Toolbar buttons ───
+    // ─── Toolbar buttons (centered under viewport area) ───
+    const toolbarCenterX = fLeft + vf.viewportW / 2;
     const buttonY = toolbarTop + TOOLBAR_H / 2;
+    const btnSpacing = vf.viewportW / 5; // spread across viewport width
 
     const buttons = [
-      { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: width * 0.2, action: () => this.toggleEvidence() },
-      { label: 'SUSPECTS', icon: '◉', color: 0xb4a0d4, x: width * 0.4, action: () => this.scene.launch('SuspectScene') },
-      { label: 'MAP', icon: '◇', color: Colors.mapBlue, x: width * 0.6, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
-      { label: 'JOURNAL', icon: '◆', color: DecoColors.gold, x: width * 0.8, action: () => this.toggleJournal() },
+      { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: toolbarCenterX - btnSpacing * 1.5, action: () => this.toggleEvidence() },
+      { label: 'SUSPECTS', icon: '◉', color: 0xb4a0d4, x: toolbarCenterX - btnSpacing * 0.5, action: () => this.scene.launch('SuspectScene') },
+      { label: 'MAP', icon: '◇', color: Colors.mapBlue, x: toolbarCenterX + btnSpacing * 0.5, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
+      { label: 'JOURNAL', icon: '◆', color: DecoColors.gold, x: toolbarCenterX + btnSpacing * 1.5, action: () => this.toggleJournal() },
     ];
 
     buttons.forEach(btn => {
@@ -226,10 +200,10 @@ export class UIScene extends Phaser.Scene {
     this.journalContainer = this.createJournalPanel();
     this.journalContainer.setVisible(false);
 
-    // Listen for inventory changes — update both evidence panel and border stats
+    // Listen for inventory changes — update both evidence panel and right panel stats
     const onInventoryChange = () => {
       if (this.evidenceOpen) this.refreshInventoryGrid();
-      this.updateSideBorderStats();
+      this.updateRightPanelStats();
     };
     InventorySystem.getInstance().onChange(onInventoryChange);
     this.events.on('shutdown', () => {
@@ -237,44 +211,92 @@ export class UIScene extends Phaser.Scene {
     });
   }
 
-  // ─── Side border room stats ────────────────────────────────────────────────
+  // ─── Right info panel ───────────────────────────────────────────────────────
 
   private borderItemCountText!: Phaser.GameObjects.Text;
   private borderClueCountText!: Phaser.GameObjects.Text;
+  private borderRoomNameText!: Phaser.GameObjects.Text;
 
-  private createSideBorderStats(
-    fSide: number, fTop: number, toolbarTop: number, canvasW: number,
+  private createRightInfoPanel(
+    rpX: number, rpW: number, rpCx: number, fTop: number, toolbarTop: number,
   ): void {
-    // Only show if the side borders are wide enough (>60px)
-    if (fSide < 60) return;
+    const panelH = toolbarTop - fTop;
+    const contentX = rpCx;
+    const pad = 18;
+    let y = fTop + pad;
 
-    const rightCenterX = canvasW - fSide / 2;
-    const midY = fTop + (toolbarTop - fTop) / 2;
-
-    // Right side border — room item count
-    this.borderItemCountText = this.add.text(rightCenterX, midY - 30, '', {
-      fontFamily: FONT, fontSize: '16px', color: '#8a7a5a',
-      align: 'center', wordWrap: { width: fSide - 20 },
-    }).setOrigin(0.5).setDepth(Depths.tooltip).setAngle(90);
-
-    this.borderClueCountText = this.add.text(rightCenterX, midY + 50, '', {
-      fontFamily: FONT, fontSize: '15px', color: '#5a5a6a',
-      align: 'center', wordWrap: { width: fSide - 20 },
-    }).setOrigin(0.5).setDepth(Depths.tooltip).setAngle(90);
-
-    // Left side border — settings gear
-    const leftCenterX = fSide / 2;
-    const gearBtn = this.add.text(leftCenterX, toolbarTop - 40, '⚙', {
-      fontSize: '28px', color: '#6a6a7a',
-    }).setOrigin(0.5).setDepth(Depths.tooltip);
+    // ── Settings gear (top of panel) ──
+    const gearBtn = this.add.text(rpX + rpW - pad - 4, y + 2, '⚙', {
+      fontSize: '24px', color: '#5a5a6a',
+    }).setOrigin(1, 0).setDepth(Depths.tooltip);
     gearBtn.setInteractive({ cursor: POINTER_CURSOR });
     gearBtn.on('pointerover', () => gearBtn.setColor('#c9a84c'));
-    gearBtn.on('pointerout', () => gearBtn.setColor('#6a6a7a'));
+    gearBtn.on('pointerout', () => gearBtn.setColor('#5a5a6a'));
 
-    this.updateSideBorderStats();
+    // ── Room name ──
+    this.borderRoomNameText = this.add.text(contentX, y + 8, '', {
+      fontFamily: FONT, fontSize: '17px', color: '#c9a84c',
+      fontStyle: 'bold', align: 'center', letterSpacing: 2,
+      wordWrap: { width: rpW - pad * 2 - 36 },
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 48;
+
+    // ── Divider ──
+    const divGfx = this.add.graphics().setDepth(Depths.tooltip);
+    divGfx.lineStyle(1, DecoColors.gold, 0.2);
+    divGfx.lineBetween(rpX + pad, y, rpX + rpW - pad, y);
+    y += 18;
+
+    // ── Items found ──
+    const itemLabel = this.add.text(contentX, y, 'ITEMS', {
+      fontFamily: FONT, fontSize: '13px', color: '#5a5a6a',
+      letterSpacing: 3, align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 22;
+
+    this.borderItemCountText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '32px', color: '#c9a84c',
+      fontStyle: 'bold', align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 50;
+
+    // ── Divider ──
+    const divGfx2 = this.add.graphics().setDepth(Depths.tooltip);
+    divGfx2.lineStyle(1, DecoColors.gold, 0.12);
+    divGfx2.lineBetween(rpX + pad + 20, y, rpX + rpW - pad - 20, y);
+    y += 18;
+
+    // ── Clues discovered ──
+    const clueLabel = this.add.text(contentX, y, 'CLUES', {
+      fontFamily: FONT, fontSize: '13px', color: '#5a5a6a',
+      letterSpacing: 3, align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 22;
+
+    this.borderClueCountText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '28px', color: '#7a8a9a',
+      align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+
+    // ── Decorative art deco accent at bottom of panel ──
+    const accentY = toolbarTop - 20;
+    const accentGfx = this.add.graphics().setDepth(Depths.tooltip);
+    const ad = 5;
+    accentGfx.fillStyle(DecoColors.gold, 0.3);
+    accentGfx.fillPoints([
+      new Phaser.Geom.Point(rpCx, accentY - ad),
+      new Phaser.Geom.Point(rpCx + ad, accentY),
+      new Phaser.Geom.Point(rpCx, accentY + ad),
+      new Phaser.Geom.Point(rpCx - ad, accentY),
+    ], true);
+    accentGfx.lineStyle(1, DecoColors.gold, 0.15);
+    accentGfx.lineBetween(rpX + pad, accentY, rpCx - ad - 6, accentY);
+    accentGfx.lineBetween(rpCx + ad + 6, accentY, rpX + rpW - pad, accentY);
+
+    this.updateRightPanelStats();
   }
 
-  private updateSideBorderStats(): void {
+  private updateRightPanelStats(): void {
     if (!this.borderItemCountText) return;
 
     const save = SaveSystem.getInstance();
@@ -283,11 +305,19 @@ export class UIScene extends Phaser.Scene {
     const rooms = roomsData.rooms as { id: string; name: string; hotspots: { id: string; type: string; itemId?: string }[] }[];
     const currentRoom = rooms.find(r => r.id === currentRoomId);
 
+    // Room name
+    if (currentRoom && this.borderRoomNameText) {
+      // Extract short name (e.g. "Grand Lobby" from "The Monarch Theatre — Grand Lobby")
+      const parts = currentRoom.name.split('—');
+      const shortName = (parts[1] || parts[0]).trim().toUpperCase();
+      this.borderRoomNameText.setText(shortName);
+    }
+
     // Per-room item counter
     if (currentRoom) {
       const roomPickups = currentRoom.hotspots.filter(hs => hs.type === 'pickup' && hs.itemId);
       const foundInRoom = roomPickups.filter(hs => inventory.hasItem(hs.itemId!) || inventory.isUsed(hs.itemId!)).length;
-      this.borderItemCountText.setText(`${foundInRoom}/${roomPickups.length} ITEMS`);
+      this.borderItemCountText.setText(`${foundInRoom} / ${roomPickups.length}`);
     }
 
     // Global clue counter
@@ -301,7 +331,7 @@ export class UIScene extends Phaser.Scene {
         }
       }
     }
-    this.borderClueCountText.setText(`${foundClues}/${totalClues} CLUES`);
+    this.borderClueCountText.setText(`${foundClues} / ${totalClues}`);
   }
 
   // ─── Toggle methods ──────────────────────────────────────────────────────────
