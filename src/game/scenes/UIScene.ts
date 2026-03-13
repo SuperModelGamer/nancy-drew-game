@@ -642,7 +642,13 @@ export class UIScene extends Phaser.Scene {
     this.layout = { leftX, contentTop, contentH, leftW, rightW, rightX };
   }
 
+  private _refreshingGrid = false;
+
   private refreshInventoryGrid(): void {
+    // Guard against re-entrant calls (selectItem → notify → refresh loop)
+    if (this._refreshingGrid) return;
+    this._refreshingGrid = true;
+
     // Clear old item cards
     this.itemsGrid.removeAll(true);
 
@@ -757,6 +763,8 @@ export class UIScene extends Phaser.Scene {
 
       this.itemsGrid.add([cardBg, icon, label]);
     });
+
+    this._refreshingGrid = false;
   }
 
   private resetDetailPanel(): void {

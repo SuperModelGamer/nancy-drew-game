@@ -311,7 +311,7 @@ export class RoomScene extends Phaser.Scene {
           } else {
             inventory.addItem(hotspot.itemId);
             UISounds.itemPickup();
-            this.showDescription(`Picked up: ${hotspot.label}`);
+            this.showPickupToast(hotspot.label);
             this.usedHotspots.add(hotspot.id);
             this.events.emit('item-picked-up', hotspot.itemId);
             // Add journal entry for key evidence pickups
@@ -497,6 +497,67 @@ export class RoomScene extends Phaser.Scene {
         duration: 200,
         onComplete: () => container.destroy(),
       });
+    });
+  }
+
+  private showPickupToast(label: string): void {
+    const { width, height } = this.cameras.main;
+    const container = this.add.container(0, 0);
+    container.setDepth(Depths.descriptionBox);
+
+    const text = `✦  ${label}  ✦`;
+    const textObj = this.add.text(width / 2, height * 0.35, text, {
+      fontFamily: FONT,
+      fontSize: '28px',
+      color: TextColors.gold,
+      fontStyle: 'bold',
+      align: 'center',
+    }).setOrigin(0.5);
+
+    const padX = 50, padY = 20;
+    const bgW = textObj.width + padX * 2;
+    const bgH = textObj.height + padY * 2;
+    const bg = this.add.rectangle(width / 2, height * 0.35, bgW, bgH, 0x1a1020, 0.85);
+    bg.setStrokeStyle(2, Colors.gold, 0.7);
+
+    // Glow effect behind the panel
+    const glow = this.add.rectangle(width / 2, height * 0.35, bgW + 20, bgH + 20, Colors.gold, 0.08);
+    container.add([glow, bg, textObj]);
+
+    // Animate: slide up and fade in, then auto-dismiss
+    container.setAlpha(0);
+    container.y = 30;
+    this.tweens.add({
+      targets: container,
+      alpha: 1,
+      y: 0,
+      duration: 350,
+      ease: 'Back.easeOut',
+      onComplete: () => {
+        // Hold for a moment, then fade out
+        this.time.delayedCall(1600, () => {
+          this.tweens.add({
+            targets: container,
+            alpha: 0,
+            y: -20,
+            duration: 400,
+            ease: 'Sine.easeIn',
+            onComplete: () => container.destroy(),
+          });
+        });
+      },
+    });
+
+    // Pulsing glow
+    this.tweens.add({
+      targets: glow,
+      alpha: { from: 0.08, to: 0.2 },
+      scaleX: { from: 1, to: 1.05 },
+      scaleY: { from: 1, to: 1.05 },
+      duration: 600,
+      yoyo: true,
+      repeat: 2,
+      ease: 'Sine.easeInOut',
     });
   }
 
