@@ -14,6 +14,7 @@ interface SuspectProfile {
   location: string;
   icon: string;
   color: number;
+  metFlag: string; // dialogue event that indicates the player has met this suspect
   facts: SuspectFact[];
 }
 
@@ -31,6 +32,7 @@ const SUSPECTS: SuspectProfile[] = [
     location: 'Grand Lobby',
     icon: 'V',
     color: 0xb4a0d4,
+    metFlag: 'vivian_intro',
     facts: [
       { text: 'Margaux Fontaine\'s goddaughter. Has lived in the Monarch her whole life.' },
       { text: 'Wants to save the theater from demolition.' },
@@ -47,6 +49,7 @@ const SUSPECTS: SuspectProfile[] = [
     location: 'Auditorium',
     icon: 'E',
     color: 0x7ba3c9,
+    metFlag: 'edwin_auditorium',
     facts: [
       { text: 'Has been studying the Monarch for 15 years. Sits in seat G-12 regularly.' },
       { text: 'Knows the Crimson Veil in detail — lighting cues, blocking, everything.', requiresFlag: 'learned_about_crimson_veil' },
@@ -63,6 +66,7 @@ const SUSPECTS: SuspectProfile[] = [
     location: 'Manager\'s Office',
     icon: 'R',
     color: 0xc97b7b,
+    metFlag: 'ashworth_office',
     facts: [
       { text: 'Owns the Monarch. Plans to demolish it in 72 hours for condominiums.' },
       { text: 'Was poisoned and collapsed. Recovering in his office.', requiresFlag: 'learned_about_ashworth' },
@@ -79,6 +83,7 @@ const SUSPECTS: SuspectProfile[] = [
     location: 'Backstage',
     icon: 'S',
     color: 0xc9947b,
+    metFlag: 'stella_backstage',
     facts: [
       { text: 'Stage manager for 8 years. Knows every inch of the building.' },
       { text: 'Has been selling theater props — $4,200 worth.', requiresFlag: 'learned_about_missing_props' },
@@ -95,6 +100,7 @@ const SUSPECTS: SuspectProfile[] = [
     location: 'Projection Booth',
     icon: 'D',
     color: 0x7bc98a,
+    metFlag: 'diego_booth',
     facts: [
       { text: 'Renting the projection booth as a writing studio.' },
       { text: 'Found the annotated script with coded margin notes.', requiresFlag: 'annotated_script_found' },
@@ -184,16 +190,29 @@ export class SuspectScene extends Phaser.Scene {
     const totalTabsW = SUSPECTS.length * tabW + (SUSPECTS.length - 1) * tabGap;
     const tabStartX = panelX - totalTabsW / 2 + tabW / 2;
 
+    const save = SaveSystem.getInstance();
+    const dialogue = DialogueSystem.getInstance();
+
+    // If selected suspect hasn't been met, fall back to the first met suspect
+    const isMet = (s: SuspectProfile) =>
+      save.getFlag(s.metFlag) || dialogue.hasTriggeredEvent(s.metFlag);
+    if (!isMet(SUSPECTS[this.selectedIndex])) {
+      const firstMet = SUSPECTS.findIndex(s => isMet(s));
+      this.selectedIndex = firstMet >= 0 ? firstMet : 0;
+    }
+
     SUSPECTS.forEach((suspect, i) => {
       const tx = tabStartX + i * (tabW + tabGap);
       const isSelected = i === this.selectedIndex;
+      const met = isMet(suspect);
       const colorHex = `#${suspect.color.toString(16).padStart(6, '0')}`;
 
       // Tab card
       const tabBg = this.add.rectangle(tx, tabStripY, tabW, 81,
         isSelected ? 0x1e1d2e : 0x15141e, isSelected ? 1 : 0.85);
-      tabBg.setStrokeStyle(isSelected ? 2 : 1, suspect.color, isSelected ? 0.7 : 0.2);
-      tabBg.setInteractive({ cursor: POINTER_CURSOR });
+      tabBg.setStrokeStyle(isSelected ? 2 : 1,
+        met ? suspect.color : 0x3a3a4a,
+        isSelected ? 0.7 : 0.2);
 
       // Bottom accent bar when selected
       if (isSelected) {
@@ -201,53 +220,65 @@ export class SuspectScene extends Phaser.Scene {
         this.container.add(accent);
       }
 
-      // Small portrait
+      // Small portrait / lock icon
       const portraitX = tx - tabW / 2 + 36;
-      const portraitKey = `portrait_${suspect.id}`;
-      if (this.textures.exists(portraitKey)) {
-        const portrait = this.add.image(portraitX, tabStripY, portraitKey);
-        portrait.setDisplaySize(54, 54);
-        const maskGfx = this.make.graphics({});
-        maskGfx.fillCircle(portraitX, tabStripY, 27);
-        portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
-        this.container.add(portrait);
+      if (met) {
+        const portraitKey = `portrait_${suspect.id}`;
+        if (this.textures.exists(portraitKey)) {
+          const portrait = this.add.image(portraitX, tabStripY, portraitKey);
+          portrait.setDisplaySize(54, 54);
+          const maskGfx = this.make.graphics({});
+          maskGfx.fillCircle(portraitX, tabStripY, 27);
+          portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
+          this.container.add(portrait);
+        } else {
+          const circle = this.add.ellipse(portraitX, tabStripY, 54, 54, suspect.color, 0.15);
+          const letter = this.add.text(portraitX, tabStripY, suspect.icon, {
+            fontFamily: FONT, fontSize: '27px', color: colorHex, fontStyle: 'bold',
+          }).setOrigin(0.5);
+          this.container.add([circle, letter]);
+        }
+        tabBg.setInteractive({ cursor: POINTER_CURSOR });
       } else {
-        const circle = this.add.ellipse(portraitX, tabStripY, 54, 54, suspect.color, 0.15);
-        const letter = this.add.text(portraitX, tabStripY, suspect.icon, {
-          fontFamily: FONT, fontSize: '27px', color: colorHex, fontStyle: 'bold',
+        // Locked silhouette
+        const circle = this.add.ellipse(portraitX, tabStripY, 54, 54, 0x3a3a4a, 0.15);
+        const lock = this.add.text(portraitX, tabStripY, '🔒', {
+          fontSize: '24px',
         }).setOrigin(0.5);
-        this.container.add([circle, letter]);
+        this.container.add([circle, lock]);
       }
 
-      // Name
-      const firstName = suspect.name.split(' ')[0];
+      // Name / ???
+      const firstName = met ? suspect.name.split(' ')[0] : '???';
       const nameText = this.add.text(tx + 2, tabStripY - 10, firstName, {
         fontFamily: FONT,
         fontSize: isSelected ? '22px' : '21px',
-        color: isSelected ? TextColors.light : TextColors.goldDim,
+        color: met ? (isSelected ? TextColors.light : TextColors.goldDim) : TextColors.hidden,
         fontStyle: isSelected ? 'bold' : 'normal',
       }).setOrigin(0.5, 0.5);
 
-      // Role
-      const roleText = this.add.text(tx + 2, tabStripY + 15, suspect.role, {
+      // Role / Unknown
+      const roleText = this.add.text(tx + 2, tabStripY + 15, met ? suspect.role : 'Unknown', {
         fontFamily: FONT,
         fontSize: '15px',
-        color: isSelected ? colorHex : TextColors.muted,
+        color: met ? (isSelected ? colorHex : TextColors.muted) : TextColors.hidden,
         fontStyle: 'italic',
       }).setOrigin(0.5, 0.5);
 
       this.container.add([tabBg, nameText, roleText]);
 
-      tabBg.on('pointerdown', () => {
-        this.selectedIndex = i;
-        this.scene.restart();
-      });
-      tabBg.on('pointerover', () => {
-        if (i !== this.selectedIndex) tabBg.setFillStyle(0x1e1d2e, 0.9);
-      });
-      tabBg.on('pointerout', () => {
-        if (i !== this.selectedIndex) tabBg.setFillStyle(0x15141e, 0.85);
-      });
+      if (met) {
+        tabBg.on('pointerdown', () => {
+          this.selectedIndex = i;
+          this.scene.restart();
+        });
+        tabBg.on('pointerover', () => {
+          if (i !== this.selectedIndex) tabBg.setFillStyle(0x1e1d2e, 0.9);
+        });
+        tabBg.on('pointerout', () => {
+          if (i !== this.selectedIndex) tabBg.setFillStyle(0x15141e, 0.85);
+        });
+      }
     });
 
     // ─── Detail area (below tabs) ───
@@ -258,7 +289,16 @@ export class SuspectScene extends Phaser.Scene {
     const detailCenterX = panelX;
     const detailCenterY = detailTop + detailH / 2;
 
-    this.showSuspectDetail(SUSPECTS[this.selectedIndex], detailCenterX, detailCenterY, detailW, detailH);
+    if (isMet(SUSPECTS[this.selectedIndex])) {
+      this.showSuspectDetail(SUSPECTS[this.selectedIndex], detailCenterX, detailCenterY, detailW, detailH);
+    } else {
+      // No suspects met yet — show placeholder
+      const placeholder = this.add.text(detailCenterX, detailCenterY, 'Talk to people in the theater\nto learn about suspects.', {
+        fontFamily: FONT, fontSize: '24px', color: TextColors.muted,
+        fontStyle: 'italic', align: 'center', lineSpacing: 8,
+      }).setOrigin(0.5);
+      this.container.add(placeholder);
+    }
 
     // Fade in
     this.container.setAlpha(0);
