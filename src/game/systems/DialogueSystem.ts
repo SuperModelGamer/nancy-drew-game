@@ -282,10 +282,12 @@ export class DialogueSystem {
       const scaleToFill = Math.max(innerW / texW, innerH / texH);
       portrait.setScale(scaleToFill);
 
-      // Rectangular mask sized to inner opening
-      const maskGraphics = this.scene.make.graphics({});
-      maskGraphics.fillRect(portraitX - innerW / 2, portraitY - innerH / 2, innerW, innerH);
-      portrait.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, maskGraphics));
+      // Crop to inner frame opening (setCrop avoids nested-container mask bugs)
+      const cropW = Math.round(innerW / scaleToFill);
+      const cropH = Math.round(innerH / scaleToFill);
+      const cropX = Math.round((texW - cropW) / 2);
+      const cropY = Math.round((texH - cropH) / 2);
+      portrait.setCrop(cropX, cropY, cropW, cropH);
       portraitGroup.add(portrait);
 
       // Portrait frame (rendered ON TOP of portrait)
@@ -585,12 +587,8 @@ export class DialogueSystem {
 
       if (this.scene!.textures.exists('dlg_choice_btn')) {
         btn = this.scene!.add.image(width / 2, y, 'dlg_choice_btn');
-        // Preserve the art deco banner's aspect ratio
-        const btnTex = this.scene!.textures.get('dlg_choice_btn').getSourceImage();
-        const btnRatio = btnTex.width / btnTex.height;
-        const btnH = CHOICE_H;
-        const btnW = Math.min(choiceW, btnH * btnRatio);
-        (btn as Phaser.GameObjects.Image).setDisplaySize(btnW, btnH);
+        // Stretch to full choice width so text always fits
+        (btn as Phaser.GameObjects.Image).setDisplaySize(choiceW, CHOICE_H);
       } else {
         // Procedural fallback
         btn = this.scene!.add.rectangle(width / 2, y, choiceW, CHOICE_H, 0x0e0c14, 0.92);

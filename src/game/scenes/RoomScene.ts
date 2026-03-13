@@ -251,9 +251,8 @@ export class RoomScene extends Phaser.Scene {
         // Show shimmer edge
         shimmer.setStrokeStyle(1.5, Colors.gold, 0.35);
         this.tweens.add({ targets: label, alpha: 1, duration: 180 });
-        // Set type-specific cursor (or equipped item cursor)
-        const equippedCursor = this.getEquippedItemCursor();
-        this.input.setDefaultCursor(equippedCursor || hoverCursor);
+        // Always show the hotspot-type cursor (talk bubble, grab hand, etc.)
+        this.input.setDefaultCursor(hoverCursor);
       });
 
       bg.on('pointerout', () => {
