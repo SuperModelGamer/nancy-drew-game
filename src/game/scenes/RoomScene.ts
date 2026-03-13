@@ -45,7 +45,9 @@ export class RoomScene extends Phaser.Scene {
   private currentRoom!: RoomData;
   private hotspotObjects: Phaser.GameObjects.Container[] = [];
   private tooltipText!: Phaser.GameObjects.Text;
-  private descriptionBox!: Phaser.GameObjects.Container;
+  private descriptionBox: Phaser.GameObjects.Container | null = null;
+  private _descriptionDismiss: (() => void) | null = null;
+  private _descriptionDismissKey: ((event: KeyboardEvent) => void) | null = null;
   private usedHotspots: Set<string> = new Set();
   private selectedItemIndicator!: Phaser.GameObjects.Text;
 
@@ -95,10 +97,7 @@ export class RoomScene extends Phaser.Scene {
     this.tooltipText.setVisible(false);
     this.tooltipText.setDepth(Depths.tooltip);
 
-    // Description box (hidden)
-    this.descriptionBox = this.createDescriptionBox();
-    this.descriptionBox.setVisible(false);
-    this.descriptionBox.setDepth(Depths.descriptionBox);
+    // Description box is created dynamically in showDescription()
 
     // Selected item indicator (top-right)
     this.selectedItemIndicator = this.add.text(width - 20, 20, '', {
@@ -429,9 +428,18 @@ export class RoomScene extends Phaser.Scene {
   private showDescription(text: string): void {
     const { width, height } = this.cameras.main;
 
-    // Destroy previous description box if visible
+    // Destroy previous description box and clean up its listeners
     if (this.descriptionBox) {
       this.descriptionBox.destroy();
+      this.descriptionBox = null;
+    }
+    if (this._descriptionDismiss) {
+      this.input.off('pointerdown', this._descriptionDismiss);
+      this._descriptionDismiss = null;
+    }
+    if (this._descriptionDismissKey) {
+      this.input.keyboard!.off('keydown', this._descriptionDismissKey);
+      this._descriptionDismissKey = null;
     }
 
     // Create a centered modal overlay
@@ -488,14 +496,16 @@ export class RoomScene extends Phaser.Scene {
     container.setAlpha(0);
     this.tweens.add({ targets: container, alpha: 1, duration: 200 });
 
-    // Dismiss handler — use scene-level input to guarantee clicks are caught
-    // regardless of container child ordering or interactive state issues
+    // Dismiss handler — use scene-level input to guarantee clicks are caught.
+    // Delay by one frame so the hotspot click that opened this doesn't immediately dismiss it.
     let dismissed = false;
     const dismiss = () => {
       if (dismissed) return;
       dismissed = true;
       this.input.off('pointerdown', dismiss);
       this.input.keyboard!.off('keydown', dismissKey);
+      this._descriptionDismiss = null;
+      this._descriptionDismissKey = null;
       this.tweens.add({
         targets: container,
         alpha: 0,
@@ -511,8 +521,16 @@ export class RoomScene extends Phaser.Scene {
         dismiss();
       }
     };
-    this.input.on('pointerdown', dismiss);
-    this.input.keyboard!.on('keydown', dismissKey);
+    // Store refs so we can clean up if a new description opens before this one is dismissed
+    this._descriptionDismiss = dismiss;
+    this._descriptionDismissKey = dismissKey;
+    // Wait one frame before arming the dismiss listener so the opening click doesn't close it
+    this.time.delayedCall(50, () => {
+      if (!dismissed) {
+        this.input.on('pointerdown', dismiss);
+        this.input.keyboard!.on('keydown', dismissKey);
+      }
+    });
   }
 
   private showPickupToast(label: string): void {
