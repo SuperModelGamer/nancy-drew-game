@@ -13,7 +13,6 @@ import { showTutorialIfNeeded } from '../utils/tutorial';
 import { Cursors, CursorType, POINTER_CURSOR } from '../utils/cursors';
 import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
-import itemsData from '../data/items.json';
 import { UISounds } from '../utils/sounds';
 
 interface Hotspot {
