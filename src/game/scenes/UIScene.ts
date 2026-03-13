@@ -9,8 +9,12 @@ import { UISounds } from '../utils/sounds';
 import { drawArtDecoFrame, drawDecoDivider, drawChevronTab, drawCornerOrnament, DecoColors, DecoTextColors } from '../utils/art-deco';
 
 // Height of the bottom toolbar strip (buttons + chapter label)
-const TOOLBAR_H = 96;
+const TOOLBAR_H = 112;
 const BOTTOM_MARGIN = 12; // negative space below toolbar to prevent misclicks
+const BTN_W = 260;
+const BTN_H = 66;
+const BTN_FONT = '24px';
+const BTN_CHEVRON = 6;
 
 // Pre-index items for O(1) lookup
 const itemMap = new Map(itemsData.items.map(i => [i.id, i]));
@@ -128,36 +132,36 @@ export class UIScene extends Phaser.Scene {
 
       // Chevron-shaped button background
       const btnGfx = this.add.graphics();
-      drawChevronTab(btnGfx, 0, 0, 195, 51, {
+      drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
         fillColor: DecoColors.navy,
         fillAlpha: 0.6,
         strokeColor: btn.color,
         strokeAlpha: 0.4,
-        chevronDepth: 5,
+        chevronDepth: BTN_CHEVRON,
       });
       container.add(btnGfx);
 
       // Hit area
-      const hitArea = this.add.rectangle(0, 0, 195, 51, 0x000000, 0);
+      const hitArea = this.add.rectangle(0, 0, BTN_W, BTN_H, 0x000000, 0);
       hitArea.setInteractive({ cursor: POINTER_CURSOR });
       hitArea.on('pointerover', () => {
         btnGfx.clear();
-        drawChevronTab(btnGfx, 0, 0, 195, 51, {
+        drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
           fillColor: DecoColors.navyLight,
           fillAlpha: 0.8,
           strokeColor: btn.color,
           strokeAlpha: 0.8,
-          chevronDepth: 5,
+          chevronDepth: BTN_CHEVRON,
         });
       });
       hitArea.on('pointerout', () => {
         btnGfx.clear();
-        drawChevronTab(btnGfx, 0, 0, 195, 51, {
+        drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
           fillColor: DecoColors.navy,
           fillAlpha: 0.6,
           strokeColor: btn.color,
           strokeAlpha: 0.4,
-          chevronDepth: 5,
+          chevronDepth: BTN_CHEVRON,
         });
       });
       hitArea.on('pointerdown', btn.action);
@@ -166,10 +170,10 @@ export class UIScene extends Phaser.Scene {
       const colorHex = `#${btn.color.toString(16).padStart(6, '0')}`;
       const text = this.add.text(0, 0, btn.label, {
         fontFamily: FONT,
-        fontSize: '20px',
+        fontSize: BTN_FONT,
         color: colorHex,
         fontStyle: 'bold',
-        letterSpacing: 3,
+        letterSpacing: 4,
       }).setOrigin(0.5);
       container.add(text);
     });

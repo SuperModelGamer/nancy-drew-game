@@ -60,7 +60,7 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
 
 // ─── Layout Constants ───────────────────────────────────────────────────────
 const BOX_H = 340;
-const BOX_BOTTOM_MARGIN = 48;
+const BOX_BOTTOM_MARGIN = 110;  // raised higher to make room for nameplate below portrait
 const TEXT_SIZE = '32px';
 const SPEAKER_SIZE = '36px';
 const CHOICE_H = 110;
@@ -68,12 +68,14 @@ const CHOICE_FONT = '26px';
 const TYPEWRITER_SPEED = 28; // ms per character
 const ANIM_DURATION = 400; // ms for box entrance/exit
 const PORTRAIT_GAP = 16;   // gap between portrait frame and dialogue box
+const FRAME_BORDER = 44;   // portrait frame gold border thickness (px at display size)
+const NAMEPLATE_GAP = 8;   // gap between portrait bottom and nameplate
 
 // Gold border insets — fractions of the DISPLAYED asset size.
 // Measured from the innermost gold ornament edges, not the PNG bounds.
-// The dialogue-box corner star ornaments extend ~11% inward from each side.
-const DLG_BOX_INSET_X = 0.11;  // dialogue-box.png: corner ornaments
-const DLG_BOX_INSET_Y = 0.12;  // dialogue-box.png: top/bottom gold lines
+// The dialogue-box corner star ornaments extend well inward from each side.
+const DLG_BOX_INSET_X = 0.155; // dialogue-box.png: corner ornaments
+const DLG_BOX_INSET_Y = 0.19;  // dialogue-box.png: top/bottom gold lines
 const NP_INSET_X = 0.11;       // nameplate.png: corner ornaments
 const CHOICE_INSET_X = 0.04;   // choice-btn.png: side ornaments
 const CHOICE_INSET_TOP = 0.20; // choice-btn.png: crown ornament at top
@@ -184,7 +186,6 @@ export class DialogueSystem {
     // ── Portrait detection ──
     const portraitKey = this.getSpeakerPortraitKey(line.speaker);
     const hasPortrait = portraitKey !== null && this.scene.textures.exists(portraitKey);
-    const FRAME_BORDER = 28;
 
     // ── Portrait frame dimensions (sits BESIDE the dialogue box, not overlapping) ──
     let pfDisplayW = 0;
@@ -255,12 +256,13 @@ export class DialogueSystem {
     this.container.add(hitArea);
     overlay.on('pointerdown', () => this.advance());
 
-    // ── 3. Dialogue text (within gold border inner bounds) ──
-    const textLeft = innerLeft + 10;
-    const textRight = innerRight - 10;
+    // ── 3. Dialogue text (within gold border inner bounds, vertically centered) ──
+    const textPadX = 8;
+    const textLeft = innerLeft + textPadX;
+    const textRight = innerRight - textPadX;
     const textW = textRight - textLeft;
-    const textY = innerTop + 6;
-    const textH = innerBottom - innerTop - 12;
+    const textY = innerTop;
+    const textH = innerBottom - innerTop;
 
     this.dialogueTextObj = this.scene.add.text(textLeft, textY, '', {
       fontFamily: FONT,
@@ -300,12 +302,12 @@ export class DialogueSystem {
       this.container.add(arrow);
     }
 
-    // ── 5. Skip button (top-right, inside the gold border inner area) ──
-    const skipX = innerRight - 6;
-    const skipY = innerTop - Math.round((innerTop - boxTop) / 2);
+    // ── 5. Skip button (top-right, inside the content area) ──
+    const skipX = innerRight;
+    const skipY = innerTop + 2;
     const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
-      fontFamily: FONT, fontSize: '16px', color: TextColors.goldDim, letterSpacing: 2,
-    }).setOrigin(1, 0.5);
+      fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim, letterSpacing: 2,
+    }).setOrigin(1, 0);
     skipBtn.setInteractive({ cursor: POINTER_CURSOR });
     skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.gold));
     skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.goldDim));
@@ -362,12 +364,25 @@ export class DialogueSystem {
 
     this.lastSpeaker = line.speaker;
 
-    // ── 8–9. Speaker nameplate (centered above dialogue box) ──
+    // ── 8–9. Speaker nameplate (below portrait if present, else centered above dialogue) ──
     const speakerColor = this.getSpeakerColor(line.speaker);
-    const nameplateY = boxTop - 4;
-    const nameplateCenterX = dlgBoxLeft + dlgBoxW / 2;
+    const boxBottom = boxTop + BOX_H;
+    const nameplateCenterX = hasPortrait
+      ? totalLeft + pfDisplayW / 2           // centered under portrait
+      : dlgBoxLeft + dlgBoxW / 2;            // centered above dialogue box
+    const nameplateY = hasPortrait
+      ? boxBottom + NAMEPLATE_GAP + 32       // below portrait/dialogue bottom
+      : boxTop - 4;                          // above dialogue box (no portrait)
 
-    const speakerText = this.scene.add.text(nameplateCenterX, nameplateY, line.speaker, {
+    // Size nameplate so text fits inside its gold borders
+    // Measure text first (off-screen) to compute nameplate width
+    const npInnerPad = 24;
+    const npH = 64;
+    // The nameplate asset has a slightly heavier top ornament; nudge text
+    // down by a couple of pixels so it sits at the visual center.
+    const npTextOffsetY = 2;
+
+    const speakerText = this.scene.add.text(nameplateCenterX, nameplateY + npTextOffsetY, line.speaker, {
       fontFamily: FONT,
       fontSize: SPEAKER_SIZE,
       color: speakerColor,
@@ -375,11 +390,8 @@ export class DialogueSystem {
       shadow: { offsetX: 0, offsetY: 0, color: '#000000', blur: 8, fill: true },
     }).setOrigin(0.5, 0.5);
 
-    // Size nameplate so text fits inside its gold borders
-    const npInnerPad = 24;
     const npTextW = speakerText.width + npInnerPad * 2;
     const npW = Math.max(220, Math.round(npTextW / (1 - NP_INSET_X * 2)));
-    const npH = 64;
 
     if (this.scene.textures.exists('dlg_nameplate')) {
       const nameplate = this.scene.add.image(nameplateCenterX, nameplateY, 'dlg_nameplate');

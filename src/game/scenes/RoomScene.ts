@@ -222,7 +222,7 @@ export class RoomScene extends Phaser.Scene {
 
       // Nancy Drew style: invisible hitbox, no colored overlay
       const bg = this.add.rectangle(0, 0, w, h, 0x000000, 0);
-      bg.setInteractive();
+      bg.setInteractive(new Phaser.Geom.Rectangle(0, 0, w, h), Phaser.Geom.Rectangle.Contains);
 
       // Subtle shimmer edge that appears on hover (initially invisible)
       const shimmer = this.add.rectangle(0, 0, w + 4, h + 4, 0x000000, 0);
