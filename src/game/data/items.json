@@ -5,112 +5,128 @@
       "name": "Master Key",
       "description": "A heavy brass key on a velvet ribbon. Vivian left it for you at the concierge desk. It opens the main auditorium doors.",
       "icon": "🔑",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "This key has been in continuous use since the Monarch opened in 1922. The velvet ribbon was Margaux Fontaine's idea — she insisted every key in the theater be dressed 'as if it were part of the costume.' The brass is worn smooth from decades of hands, but the teeth are still sharp. Vivian kept it polished all these years, waiting for someone to need it. The ribbon smells faintly of lavender — Vivian's perfume. She's trusting me with the whole theater."
     },
     {
       "id": "magnifying_glass",
       "name": "Magnifying Glass",
       "description": "A silver-handled magnifying glass from Vivian's desk. 'You'll need sharp eyes here,' her note said. Useful for examining fine details invisible to the naked eye.",
       "icon": "🔍",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "The handle is engraved with the initials 'C.D.' — not Vivian's. This belonged to someone else first. Cecilia Drake? The lens is surprisingly pristine for something nearly a century old. Vivian must have cared for it. Through the glass, I can see things the naked eye misses — faded ink, hairline cracks, fingerprints in dust. Every detective needs one good tool. This is mine."
     },
     {
       "id": "playbill_1928",
       "name": "1928 Playbill",
       "description": "The playbill from the final performance of 'The Crimson Veil' — October 31, 1928. Cast: Margaux Fontaine as Lady Ashford. Understudy: Cecilia Drake (circled in red ink). The program includes Act III stage directions.",
       "icon": "🎭",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "The paper is heavy cotton stock — they don't make programs like this anymore. The cover features an art deco illustration of a woman in a crimson gown reaching for a goblet. Prophetic, or planned? Someone circled Cecilia Drake's name in red ink so hard it almost tore through. The October 31st date is underlined three times. On the back: 'Post-Show Reception: Champagne & Hors d'oeuvres in the Grand Lobby. Sponsored by the Hale Foundation.' The Hale family funded this theater. Edwin's family."
     },
     {
       "id": "effects_manual",
       "name": "Effects Manual",
       "description": "The Monarch Theatre Special Effects Manual, 1925. Detailed diagrams of fog machines, trapdoors, hidden passages, and lighting systems. Someone has added fresh pencil notes translating the old theatrical terms to modern equivalents.",
       "icon": "📖",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "This manual was written by Theodore 'Teddy' Barlow, the Monarch's original technical director. His handwriting is meticulous — every mechanism drawn to scale, every timing cue documented. The fresh pencil notes are in a different hand entirely. Whoever updated this knows both old-school stagecraft and modern electronics. They've mapped every trapdoor, every hidden corridor. Page 47 has a coffee ring on it and a bookmark made from a Monarch ticket stub. Someone's been studying this recently — and thoroughly."
     },
     {
       "id": "margaux_diary",
       "name": "Margaux's Diary",
       "description": "A leather diary with 'M.F.' embossed in gold. The final entries describe feeling ill after tea, suspecting someone, metallic tastes, and her final entry: 'If I do not survive the final curtain, look to the one who stands in the wings.'",
       "icon": "📔",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "The diary spans three months — August through October 1928. Early entries are warm and hopeful: reviews of her performance, notes about a young goddaughter she adores, dinner plans with James Hale. But starting in September, the tone shifts. She writes about 'a bitter taste in the afternoon tea,' headaches, nausea. She suspects someone but won't name them directly — only hints. 'The understudy watches too closely.' 'The goblet felt heavier tonight.' Her handwriting deteriorates in the final pages, growing shaky and erratic. She knew. She knew and she still went on stage."
     },
     {
       "id": "annotated_script",
       "name": "Annotated Script",
       "description": "The original script of 'The Crimson Veil' with coded margin notes in red ink. Red-circled letters scattered through the Act III stage directions. Read in order, they spell a word.",
       "icon": "📜",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "The script itself is a gothic melodrama — a noblewoman poisoned at a banquet by a jealous rival. Art imitating life, or the other way around? The margin notes are in two different inks: black (original stage directions) and red (the coded annotations). The red-circled letters are subtle — you'd miss them if you weren't looking. Someone wanted to hide a message in plain sight, buried inside the script of the very play that killed Margaux. It's clever. It's also deeply unsettling. Who writes a coded confession inside a murder weapon?"
     },
     {
       "id": "poisoned_teacup",
       "name": "Poisoned Teacup",
       "description": "Ashworth's porcelain teacup with dried metallic, crystalline residue at the bottom. The alchemy book in the dressing room might help identify the compound.",
       "icon": "🍵",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "Fine bone china, made by Limoges — this is an expensive cup. The Monarch crest is painted on the side in faded gold. The residue at the bottom is grayish-white with a metallic sheen, crystalline structure visible even without magnification. It doesn't smell like anything — which is itself suspicious. Most poisons have at least a faint odor. This one was designed to be undetectable in tea. The same method used on Margaux in 1928. Someone is recreating the original crime, almost step for step."
     },
     {
       "id": "blueprints",
       "name": "Theater Blueprints",
       "description": "Demolition blueprints annotated in red pen (Edwin's handwriting). Hidden passages, sealed rooms, and a tunnel network beneath the stage are all marked. The passages connect the basement to the dressing room, lobby walls, and orchestra pit.",
       "icon": "📐",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "The original blueprints are from 1921, signed by architect Alonzo Delacroix — Vivian's grandfather designed this theater. The red annotations are meticulous: every hidden passage numbered, every sealed door marked with its approximate thickness. Edwin has spent years mapping what the original architect built in secret. There are passages Ashworth's demolition team doesn't know about. One runs directly beneath the stage to the basement. Another connects the dressing room to a hidden chamber behind the lobby walls. This theater has more secrets than rooms."
     },
     {
       "id": "basement_key",
       "name": "Basement Key",
       "description": "A heavy iron key found hidden behind the backstage lighting panel. It fits the basement door. Stella knew it was there.",
       "icon": "🗝️",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "Unlike the brass master key, this one is iron — cold, heavy, and slightly rusted. It was hidden behind a loose panel on the lighting board, wedged between two circuit breakers. Stella told me where to find it, which means she's known about the basement access for a while. The key has fresh scratches around the bow — it's been used recently, pulled in and out of its hiding spot many times. The teeth are worn on one side more than the other, suggesting the lock it fits has been forced before. Someone was desperate to get down there."
     },
     {
       "id": "edwins_notebook",
       "name": "Edwin's Notebook",
       "description": "A leather notebook labeled 'The Ghost Project — E.H.' Fifteen years of research into Margaux's death, diagrams of the hidden passage system, timing cues for ghost appearances, and a margin note: 'Like the Penvellyns and their curse — every old family has its poison.'",
       "icon": "📓",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "Fifteen years of obsession, condensed into 200 pages. Edwin started with newspaper clippings about Margaux's death — ruled 'natural causes' despite the symptoms. Then police reports he FOIA'd. Then interviews with elderly locals who remembered that night. The ghost staging notes are precise: fog machine timing, lighting sequences, the exact spot where Margaux collapsed on stage. He's been recreating her final performance, night after night, in an empty theater. The Penvellyn reference tells me he's well-read — that's an old English curse legend. His handwriting gets more agitated in the final pages. He was running out of time."
     },
     {
       "id": "fog_machine_part",
       "name": "Remote Control",
       "description": "A modified remote control system from the basement. Triggers fog machines, stage lights, and the trapdoor mechanism. Labeled sequences: 'Entrance,' 'The Walk,' 'Vanish.' One-person ghost operation.",
       "icon": "🎛️",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "This is sophisticated work. A modern wireless transmitter wired into the Monarch's original 1920s theatrical control system. Each button is labeled with theatrical precision: 'Entrance' triggers fog and a single spotlight. 'The Walk' activates a sequence of lights down the center aisle. 'Vanish' kills all lights and opens the stage trapdoor simultaneously. One person could operate this entire haunting from the basement. The battery compartment shows heavy use — corroded contacts, worn springs. This has been running for years. Edwin built himself a one-man ghost show."
     },
     {
       "id": "cecilia_letter",
       "name": "Cecilia's Letters",
       "description": "Correspondence between Cecilia Drake and a pharmacist, dated October 1928. She ordered antimony compounds — the same poison described in Margaux's symptoms. Includes a note: 'The prop goblet must be replaced before the 31st.'",
       "icon": "✉️",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "Three letters, carefully preserved between sheets of wax paper. The first is an inquiry — clinical, detached, asking about 'compounds for theatrical effects that produce realistic symptoms of illness.' The second confirms the order: antimony potassium tartrate, enough for several doses. The third is the damning one: handwritten, hurried, with ink smudges from a shaking hand. 'The prop goblet must be replaced before the 31st. The original has been examined too closely. Destroy this letter.' She didn't destroy it. Someone kept it — as insurance, or as guilt."
     },
     {
       "id": "margaux_locket",
       "name": "Margaux's Locket",
       "description": "A gold locket from the trunk. Inside: a photo of young Vivian as a child. Inscription: 'To my little star. One day you'll shine brighter than all of us. — Margaux.' This is why Vivian stayed at the Monarch her whole life.",
       "icon": "📿",
-      "isKeyItem": true
+      "isKeyItem": true,
+      "lore": "The locket is 18-karat gold, art nouveau style with tiny seed pearls along the edge. Inside, a sepia photograph of a girl no older than five — Vivian, with the same sharp cheekbones she has now. Margaux's inscription is in elegant copperplate. The chain has been repaired twice — once with gold, once with silver, as if the owner's fortunes declined over the decades. Vivian wore this for seventy years. It's warm from being in the trunk, as if Margaux's presence still lingers. This isn't just evidence — it's the emotional center of the whole case."
     },
     {
       "id": "stella_records",
       "name": "Stella's Records",
       "description": "A ledger from Stella's lockbox documenting every prop she sold, the buyer, and the price. Total: $4,200. A separate note: 'Mom's bills this month: $3,800. I'm sorry, Monarch.' She's not a villain — she's desperate.",
       "icon": "📋",
-      "isKeyItem": false
+      "isKeyItem": false,
+      "lore": "Every sale is documented with agonizing precision — item, buyer, price, date. She's been selling props for eight months. The values are modest: a vintage spotlight for $300, a set of silk curtains for $450, a box of costume jewelry for $125. She kept the most historically significant items and sold the replaceable ones. The note to 'Mom' in the margin breaks my heart a little. $3,800 a month for medical care is crushing. Stella isn't stealing — she's drowning. But her sales have been noticed, and that makes her a suspect whether she deserves it or not."
     },
     {
       "id": "ashworth_files",
       "name": "Ashworth's Files",
       "description": "Documents from Ashworth's wall safe. Includes the original purchase agreement for the Monarch, a demolition insurance policy worth $2.3 million, and a rejected offer from the Historical Society to buy the theater for $800,000. He could have sold. He chose demolition for the insurance payout.",
       "icon": "💼",
-      "isKeyItem": false
+      "isKeyItem": false,
+      "lore": "The purchase agreement shows Ashworth bought the Monarch for $340,000 at a distressed property auction — a fraction of its historical value. The insurance policy is the real story: $2.3 million for 'accidental demolition during renovation.' That's not standard coverage. He took out a specific policy designed to profit from destroying the building. The Historical Society's offer of $800,000 would have saved the theater and given him a healthy profit. He rejected it in writing: 'Not interested in preservation. Final.' Roland Ashworth isn't just a developer — he's a demolition profiteer."
     },
     {
       "id": "chemical_receipt",
       "name": "Chemical Receipt",
       "description": "A receipt from a chemical supply company found in the lobby coat check. Dated last week. Items purchased: antimony tartrate, glycol fog fluid, UV-reactive paint. Buyer: paid cash, no name. But the store is three blocks from Edwin's listed address.",
       "icon": "🧾",
-      "isKeyItem": false
+      "isKeyItem": false,
+      "lore": "The receipt is from 'Marlowe Chemical Supply' — a specialty shop that sells theatrical and laboratory chemicals. Three items: antimony potassium tartrate (the same compound that poisoned Margaux and Ashworth), glycol-based fog fluid (for the ghost's fog effects), and UV-reactive paint (for the glowing apparitions). Cash purchase, no name on file. But the store's address is 447 Birch Street — and Edwin's apartment is at 502 Birch, three blocks north. Circumstantial? Maybe. But combined with everything else, it paints a clear picture. Someone went shopping for a haunting and a poisoning on the same trip."
     }
   ]
 }

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
+import roomsData from '../data/rooms.json';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths, FRAME } from '../utils/constants';
 import { POINTER_CURSOR } from '../utils/cursors';
@@ -63,6 +64,11 @@ export class UIScene extends Phaser.Scene {
   private detailDesc!: Phaser.GameObjects.Text;
   private detailKeyBadge!: Phaser.GameObjects.Container;
   private detailPlaceholder!: Phaser.GameObjects.Text;
+  private detailLoreText: Phaser.GameObjects.Text | null = null;
+  private detailLoreDivider: Phaser.GameObjects.Graphics | null = null;
+  private detailUsedBadge: Phaser.GameObjects.Container | null = null;
+  private hotspotCounterText: Phaser.GameObjects.Text | null = null;
+  private roomItemCounterText: Phaser.GameObjects.Text | null = null;
   private selectedItemId: string | null = null;
   private evidenceLayout = { leftX: 0, contentTop: 0, contentH: 0, leftW: 0, rightW: 0, rightX: 0 };
 
@@ -446,6 +452,19 @@ export class UIScene extends Phaser.Scene {
       }).setOrigin(0.5, 1);
     this.evidenceContent.add(hint);
 
+    // ── Discovery counters (bottom of left panel) ──
+    this.hotspotCounterText = this.add.text(leftX + leftW / 2, contentBottom - 52, '', {
+      fontFamily: JOURNAL_FONT, fontSize: '17px', color: '#5a4a3a',
+      align: 'center',
+    }).setOrigin(0.5, 1);
+    this.evidenceContent.add(this.hotspotCounterText);
+
+    this.roomItemCounterText = this.add.text(leftX + leftW / 2, contentBottom - 30, '', {
+      fontFamily: JOURNAL_FONT, fontSize: '17px', color: '#5a4a3a',
+      align: 'center',
+    }).setOrigin(0.5, 1);
+    this.evidenceContent.add(this.roomItemCounterText);
+
     this.evidenceLayout = { leftX, contentTop, contentH, leftW, rightW, rightX };
   }
 
@@ -524,6 +543,16 @@ export class UIScene extends Phaser.Scene {
         this.itemsGrid.add(selBadge);
       }
 
+      // Show "USED" badge for consumed items
+      if (inventory.isUsed(itemId)) {
+        const usedBg = this.add.rectangle(x, y + cardW / 2 - 6, 60, 22, 0x5a3a2a, 0.85);
+        usedBg.setStrokeStyle(1, 0x8a6a4a, 0.5);
+        const usedLabel = this.add.text(x, y + cardW / 2 - 6, 'USED', {
+          fontFamily: FONT, fontSize: '13px', color: '#c9a84c', fontStyle: 'bold', letterSpacing: 2,
+        }).setOrigin(0.5);
+        this.itemsGrid.add([usedBg, usedLabel]);
+      }
+
       cardBg.on('pointerdown', () => {
         if (selectedItem === itemId) {
           inventory.selectItem(null);
@@ -550,7 +579,43 @@ export class UIScene extends Phaser.Scene {
       this.itemsGrid.add([cardBg, icon, label]);
     });
 
+    // Update discovery counters
+    this.updateDiscoveryCounters();
+
     this._refreshingGrid = false;
+  }
+
+  private updateDiscoveryCounters(): void {
+    const save = SaveSystem.getInstance();
+    const currentRoomId = save.getCurrentRoom();
+    const rooms = roomsData.rooms as { id: string; hotspots: { id: string; type: string; itemId?: string }[] }[];
+    const currentRoom = rooms.find(r => r.id === currentRoomId);
+
+    // Hotspot discovery counter (across all rooms)
+    let totalHotspots = 0;
+    let discoveredHotspots = 0;
+    for (const room of rooms) {
+      for (const hs of room.hotspots) {
+        if (hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked') {
+          totalHotspots++;
+          if (save.getFlag('used_hotspot_' + hs.id)) {
+            discoveredHotspots++;
+          }
+        }
+      }
+    }
+    if (this.hotspotCounterText) {
+      this.hotspotCounterText.setText(`🔍 Clues Discovered: ${discoveredHotspots} / ${totalHotspots}`);
+    }
+
+    // Per-room item counter
+    if (currentRoom && this.roomItemCounterText) {
+      const roomPickups = currentRoom.hotspots.filter(hs => hs.type === 'pickup' && hs.itemId);
+      const inventory = InventorySystem.getInstance();
+      const foundInRoom = roomPickups.filter(hs => inventory.hasItem(hs.itemId!) || inventory.isUsed(hs.itemId!)).length;
+      const roomName = currentRoomId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      this.roomItemCounterText.setText(`📍 ${roomName}: ${foundInRoom} / ${roomPickups.length} items found`);
+    }
   }
 
   private resetDetailPanel(): void {
@@ -560,6 +625,8 @@ export class UIScene extends Phaser.Scene {
     this.detailKeyBadge.setVisible(false);
     this.detailDesc.setVisible(false);
     if (this.detailImage) this.detailImage.setVisible(false);
+    this.hideLoreText();
+    this.hideUsedBadgeInDetail();
   }
 
   private scaleImageToFit(img: Phaser.GameObjects.Image, maxSize: number): void {
@@ -613,6 +680,63 @@ export class UIScene extends Phaser.Scene {
 
     this.detailDesc.setText(itemData.description);
     this.detailDesc.setVisible(true);
+
+    // Show lore text below description if available
+    const lore = (itemData as { lore?: string }).lore;
+    if (lore) {
+      this.showLoreText(detailCenterX, lore);
+    } else {
+      this.hideLoreText();
+    }
+
+    // Show "USED" indicator in detail panel if item was consumed
+    if (InventorySystem.getInstance().isUsed(itemId)) {
+      this.showUsedBadgeInDetail(detailCenterX, contentTop);
+    } else {
+      this.hideUsedBadgeInDetail();
+    }
+  }
+
+  // ─── Lore text helpers ──────────────────────────────────────────────────────
+
+  private showLoreText(centerX: number, lore: string): void {
+    this.hideLoreText();
+
+    const { rightW } = this.evidenceLayout;
+    const descBottom = this.detailDesc.y + this.detailDesc.height + 16;
+
+    // Divider line
+    this.detailLoreDivider = this.add.graphics();
+    this.detailLoreDivider.lineStyle(1, 0x5a4a3a, 0.3);
+    this.detailLoreDivider.lineBetween(centerX - (rightW - 80) / 2, descBottom, centerX + (rightW - 80) / 2, descBottom);
+    this.evidenceContent.add(this.detailLoreDivider);
+
+    this.detailLoreText = this.add.text(centerX, descBottom + 14, lore, {
+      fontFamily: JOURNAL_FONT, fontSize: '18px', color: '#5a4a3a',
+      fontStyle: 'italic', wordWrap: { width: rightW - 70 }, lineSpacing: 4, align: 'center',
+    }).setOrigin(0.5, 0);
+    this.evidenceContent.add(this.detailLoreText);
+  }
+
+  private hideLoreText(): void {
+    if (this.detailLoreText) { this.detailLoreText.destroy(); this.detailLoreText = null; }
+    if (this.detailLoreDivider) { this.detailLoreDivider.destroy(); this.detailLoreDivider = null; }
+  }
+
+  private showUsedBadgeInDetail(centerX: number, contentTop: number): void {
+    this.hideUsedBadgeInDetail();
+    this.detailUsedBadge = this.add.container(centerX, contentTop + 8);
+    const bg = this.add.rectangle(0, 0, 100, 28, 0x5a3a2a, 0.7);
+    bg.setStrokeStyle(1, 0x8a6a4a, 0.5);
+    const txt = this.add.text(0, 0, '✦ USED', {
+      fontFamily: FONT, fontSize: '14px', color: '#c9a84c', fontStyle: 'bold', letterSpacing: 2,
+    }).setOrigin(0.5);
+    this.detailUsedBadge.add([bg, txt]);
+    this.evidenceContent.add(this.detailUsedBadge);
+  }
+
+  private hideUsedBadgeInDetail(): void {
+    if (this.detailUsedBadge) { this.detailUsedBadge.destroy(); this.detailUsedBadge = null; }
   }
 
   // ─── Journal Panel ───────────────────────────────────────────────────────────

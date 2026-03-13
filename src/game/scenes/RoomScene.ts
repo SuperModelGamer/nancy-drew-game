@@ -10,7 +10,7 @@ import { ChapterSystem } from '../systems/ChapterSystem';
 import { Colors, TextColors, FONT, Depths, FRAME } from '../utils/constants';
 import { drawRoomBackground } from '../utils/room-backgrounds';
 // Tutorial removed — how-to-play is accessible from the start menu
-import { Cursors, createGlowSpyglass } from '../utils/cursors';
+import { Cursors, createGlowSpyglass, createEmojiCursor } from '../utils/cursors';
 import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 import { UISounds } from '../utils/sounds';
@@ -416,10 +416,12 @@ export class RoomScene extends Phaser.Scene {
         this.showDescription(hotspot.description || 'Unlocked!');
         this.usedHotspots.add(hotspot.id);
         SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
+        // Mark item as used and deselect — cursor reverts to magnifying glass
+        inv.markUsed(hotspot.requiredItem);
+        inv.selectItem(null);
         // Consume key items that are used to unlock
         if (hotspot.targetRoom) {
           inv.removeItem(hotspot.requiredItem);
-          inv.selectItem(null);
           this.time.delayedCall(1000, () => {
             this.navigateToRoom(hotspot.targetRoom!);
           });
@@ -640,12 +642,16 @@ export class RoomScene extends Phaser.Scene {
 
   /** If an inventory item is equipped/selected, return a cursor for it.
    *  The magnifying glass item gets the glowing spyglass; other items
-   *  use the hand cursor (holding something). Returns null if nothing equipped. */
+   *  use an emoji cursor matching the item's icon. Returns null if nothing equipped. */
   private getEquippedItemCursor(): string | null {
     const selected = InventorySystem.getInstance().getSelectedItem();
     if (!selected) return null;
     if (selected === 'magnifying_glass') return this.glowCursor;
-    // Any other equipped item shows the hand cursor (carrying an item)
+    // Render the item's emoji as a cursor
+    const itemData = (itemsData.items as { id: string; icon?: string }[]).find(i => i.id === selected);
+    if (itemData?.icon) {
+      return createEmojiCursor(itemData.icon);
+    }
     return Cursors.pickup;
   }
 

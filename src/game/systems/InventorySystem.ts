@@ -2,6 +2,7 @@ export class InventorySystem {
   private static instance: InventorySystem;
   private items: string[] = [];
   private selectedItem: string | null = null;
+  private usedItems: Set<string> = new Set();
   private maxSlots = 12;
   private listeners: Array<() => void> = [];
 
@@ -27,8 +28,22 @@ export class InventorySystem {
 
     this.items.splice(index, 1);
     if (this.selectedItem === itemId) this.selectedItem = null;
+    this.usedItems.add(itemId);
     this.notify();
     return true;
+  }
+
+  markUsed(itemId: string): void {
+    this.usedItems.add(itemId);
+    this.notify();
+  }
+
+  isUsed(itemId: string): boolean {
+    return this.usedItems.has(itemId);
+  }
+
+  getUsedItems(): string[] {
+    return [...this.usedItems];
   }
 
   hasItem(itemId: string): boolean {
@@ -61,13 +76,14 @@ export class InventorySystem {
     this.listeners.forEach(fn => fn());
   }
 
-  toJSON(): { items: string[]; selectedItem: string | null } {
-    return { items: [...this.items], selectedItem: this.selectedItem };
+  toJSON(): { items: string[]; selectedItem: string | null; usedItems: string[] } {
+    return { items: [...this.items], selectedItem: this.selectedItem, usedItems: [...this.usedItems] };
   }
 
-  loadFromJSON(data: { items: string[]; selectedItem: string | null }): void {
+  loadFromJSON(data: { items: string[]; selectedItem: string | null; usedItems?: string[] }): void {
     this.items = data.items || [];
     this.selectedItem = data.selectedItem || null;
+    this.usedItems = new Set(data.usedItems || []);
     this.notify();
   }
 }

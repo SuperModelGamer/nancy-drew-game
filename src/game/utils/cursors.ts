@@ -84,3 +84,37 @@ export async function createGlowSpyglass(): Promise<string> {
     img.src = 'assets/ui/cursors/spyglass.png';
   });
 }
+
+/**
+ * Generate a cursor from an emoji character using canvas rendering.
+ * Renders the emoji at 40px with a subtle golden glow, cached per emoji.
+ * Returns a CSS cursor string (data URL).
+ */
+const _emojiCursorCache = new Map<string, string>();
+export function createEmojiCursor(emoji: string): string {
+  if (_emojiCursorCache.has(emoji)) return _emojiCursorCache.get(emoji)!;
+
+  const size = 48;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+
+  // Golden glow behind the emoji
+  ctx.shadowColor = '#c9a84c';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+
+  ctx.font = '36px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  // Draw twice for stronger glow
+  ctx.fillText(emoji, size / 2, size / 2);
+  ctx.fillText(emoji, size / 2, size / 2);
+
+  const dataUrl = canvas.toDataURL('image/png');
+  const cursor = `url("${dataUrl}") ${size / 2} ${size / 2}, auto`;
+  _emojiCursorCache.set(emoji, cursor);
+  return cursor;
+}
