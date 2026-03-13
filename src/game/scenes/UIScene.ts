@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import itemsData from '../data/items.json';
-import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { Colors, TextColors, FONT, Depths, FRAME } from '../utils/constants';
 import { POINTER_CURSOR } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
@@ -79,47 +79,74 @@ export class UIScene extends Phaser.Scene {
     // Don't call initSceneCursor here — UIScene runs alongside RoomScene,
     // and setting the pointer as default would override the magnifying glass.
     // All interactive UI elements already specify their own cursor.
-    const barY = height - BOTTOM_MARGIN - TOOLBAR_H / 2;
 
-    // ─── Bottom toolbar — solid border with integrated chapter label ───
+    // ─── Full-screen art deco frame border ───
+    // The game viewport renders inside this frame; the border fills the edges.
+    const fTop = FRAME.top;
+    const fSide = FRAME.side;
     const toolbarTop = height - BOTTOM_MARGIN - TOOLBAR_H;
-    const barBg = this.add.graphics();
 
-    // Dark fill for the bottom margin area
-    barBg.fillStyle(0x060810, 1);
-    barBg.fillRect(0, height - BOTTOM_MARGIN, width, BOTTOM_MARGIN);
+    const frameBg = this.add.graphics();
 
-    // Solid opaque dark background for the entire toolbar region
-    barBg.fillStyle(DecoColors.navy, 1);
-    barBg.fillRect(0, toolbarTop, width, TOOLBAR_H);
+    // Solid opaque fill for all four border strips
+    frameBg.fillStyle(DecoColors.navy, 1);
+    // Top strip
+    frameBg.fillRect(0, 0, width, fTop);
+    // Left strip
+    frameBg.fillRect(0, fTop, fSide, height - fTop);
+    // Right strip
+    frameBg.fillRect(width - fSide, fTop, fSide, height - fTop);
+    // Bottom toolbar region
+    frameBg.fillRect(fSide, toolbarTop, width - 2 * fSide, TOOLBAR_H);
+    // Bottom margin below toolbar
+    frameBg.fillStyle(0x060810, 1);
+    frameBg.fillRect(0, height - BOTTOM_MARGIN, width, BOTTOM_MARGIN);
 
-    // ─── Decorative frame border between game view and toolbar ───
-    // Thick gold border line — acts as a visible "picture frame" edge
-    barBg.lineStyle(3, DecoColors.gold, 0.7);
-    barBg.lineBetween(0, toolbarTop, width, toolbarTop);
+    // ─── Outer gold frame rectangle ───
+    frameBg.lineStyle(3, DecoColors.gold, 0.7);
+    frameBg.strokeRect(1, 1, width - 2, height - BOTTOM_MARGIN - 1);
     // Inner accent line for art deco double-border feel
-    barBg.lineStyle(1, DecoColors.gold, 0.3);
-    barBg.lineBetween(0, toolbarTop + 5, width, toolbarTop + 5);
+    frameBg.lineStyle(1, DecoColors.gold, 0.3);
+    frameBg.strokeRect(5, 5, width - 10, height - BOTTOM_MARGIN - 9);
 
-    // Center diamond accent on the frame border
+    // ─── Inner frame line (game viewport boundary) ───
+    frameBg.lineStyle(2, DecoColors.gold, 0.5);
+    frameBg.strokeRect(fSide, fTop, width - 2 * fSide, toolbarTop - fTop);
+
+    // ─── Decorative border between game view and toolbar ───
+    // Center diamond accent on the bottom frame border
     const diamondSize = 9;
-    barBg.fillStyle(DecoColors.gold, 0.6);
-    barBg.fillPoints([
+    frameBg.fillStyle(DecoColors.gold, 0.6);
+    frameBg.fillPoints([
       new Phaser.Geom.Point(width / 2, toolbarTop - diamondSize),
       new Phaser.Geom.Point(width / 2 + diamondSize, toolbarTop),
       new Phaser.Geom.Point(width / 2, toolbarTop + diamondSize),
       new Phaser.Geom.Point(width / 2 - diamondSize, toolbarTop),
     ], true);
 
-    // Small corner ornaments at the frame border
+    // Small corner ornaments where the toolbar meets the side borders
     const cornerOrnW = 30;
-    barBg.fillStyle(DecoColors.gold, 0.4);
-    // Left corner
-    barBg.fillTriangle(0, toolbarTop - 4, cornerOrnW, toolbarTop, 0, toolbarTop + 4);
-    // Right corner
-    barBg.fillTriangle(width, toolbarTop - 4, width - cornerOrnW, toolbarTop, width, toolbarTop + 4);
+    frameBg.fillStyle(DecoColors.gold, 0.4);
+    frameBg.fillTriangle(fSide, toolbarTop - 4, fSide + cornerOrnW, toolbarTop, fSide, toolbarTop + 4);
+    frameBg.fillTriangle(width - fSide, toolbarTop - 4, width - fSide - cornerOrnW, toolbarTop, width - fSide, toolbarTop + 4);
 
-    barBg.setDepth(Depths.tooltip - 1);
+    // ─── Corner ornaments at the four outer corners ───
+    drawCornerOrnament(frameBg, 6, 6, 24, 'tl', DecoColors.gold, 0.45);
+    drawCornerOrnament(frameBg, width - 6, 6, 24, 'tr', DecoColors.gold, 0.45);
+    drawCornerOrnament(frameBg, 6, height - BOTTOM_MARGIN - 6, 24, 'bl', DecoColors.gold, 0.45);
+    drawCornerOrnament(frameBg, width - 6, height - BOTTOM_MARGIN - 6, 24, 'br', DecoColors.gold, 0.45);
+
+    // ─── Top border center ornament ───
+    const topDiamond = 6;
+    frameBg.fillStyle(DecoColors.gold, 0.5);
+    frameBg.fillPoints([
+      new Phaser.Geom.Point(width / 2, 1),
+      new Phaser.Geom.Point(width / 2 + topDiamond, fTop / 2),
+      new Phaser.Geom.Point(width / 2, fTop - 1),
+      new Phaser.Geom.Point(width / 2 - topDiamond, fTop / 2),
+    ], true);
+
+    frameBg.setDepth(Depths.tooltip - 1);
 
     // ─── Toolbar buttons — centered vertically in toolbar ───
     const buttonY = toolbarTop + TOOLBAR_H / 2;

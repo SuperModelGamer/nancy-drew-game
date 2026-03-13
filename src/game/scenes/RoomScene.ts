@@ -7,7 +7,7 @@ import { PuzzleSystem } from '../systems/PuzzleSystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import { ScriptedEventScene } from './ScriptedEventScene';
 import { ChapterSystem } from '../systems/ChapterSystem';
-import { Colors, TextColors, FONT, Depths, UI_BAR_RESERVED } from '../utils/constants';
+import { Colors, TextColors, FONT, Depths, FRAME } from '../utils/constants';
 import { drawRoomBackground } from '../utils/room-backgrounds';
 // Tutorial removed — how-to-play is accessible from the start menu
 import { Cursors, createGlowSpyglass } from '../utils/cursors';
@@ -65,16 +65,18 @@ export class RoomScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
-    // Clip the camera so the room doesn't render behind the bottom UI bar.
-    // The UI toolbar is drawn by UIScene in its own full-screen camera.
-    const gameViewH = height - UI_BAR_RESERVED;
-    this.cameras.main.setViewport(0, 0, width, gameViewH);
+    // Clip the camera to fit inside the decorative frame drawn by UIScene.
+    // The frame border occupies FRAME.top at top, FRAME.side on each side,
+    // and FRAME.bottom at the bottom (toolbar area).
+    const gameViewW = width - 2 * FRAME.side;
+    const gameViewH = height - FRAME.top - FRAME.bottom;
+    this.cameras.main.setViewport(FRAME.side, FRAME.top, gameViewW, gameViewH);
 
     // Room background - use real image if available, fall back to procedural art
     const bgKey = `bg_${this.currentRoom.id}`;
     if (this.textures.exists(bgKey)) {
-      const bg = this.add.image(width / 2, gameViewH / 2, bgKey);
-      bg.setDisplaySize(width, gameViewH);
+      const bg = this.add.image(gameViewW / 2, gameViewH / 2, bgKey);
+      bg.setDisplaySize(gameViewW, gameViewH);
     } else {
       drawRoomBackground(this, this.currentRoom.id);
     }
@@ -88,7 +90,7 @@ export class RoomScene extends Phaser.Scene {
     const visitedFlag = `visited_room_${roomId}`;
     if (!SaveSystem.getInstance().getFlag(visitedFlag)) {
       SaveSystem.getInstance().setFlag(visitedFlag, true);
-      this.showRoomAnnouncement(width, height, () => {
+      this.showRoomAnnouncement(gameViewW, gameViewH, () => {
         this.input.setDefaultCursor(this.getExploreCursor());
       });
     } else {
@@ -103,7 +105,7 @@ export class RoomScene extends Phaser.Scene {
 
 
     // Selected item indicator (top-right)
-    this.selectedItemIndicator = this.add.text(width - 20, 20, '', {
+    this.selectedItemIndicator = this.add.text(gameViewW - 20, 20, '', {
       fontFamily: FONT,
       fontSize: '20px',
       color: TextColors.gold,

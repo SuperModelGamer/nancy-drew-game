@@ -22,6 +22,9 @@ export function createCloseButton(
     btn.setDisplaySize(size, size);
     container.add(btn);
 
+    // Compute base scale once to avoid compounding on rapid hover
+    const baseScale = size / btn.width;
+
     // Gold glow ring (hidden by default, shown on hover)
     const glow = scene.add.graphics();
     glow.lineStyle(3, Colors.gold, 0);
@@ -37,8 +40,8 @@ export function createCloseButton(
     hitArea.on('pointerover', () => {
       scene.tweens.add({
         targets: btn,
-        scaleX: btn.scaleX * 1.12,
-        scaleY: btn.scaleY * 1.12,
+        scaleX: baseScale * 1.12,
+        scaleY: baseScale * 1.12,
         duration: 150,
         ease: 'Back.easeOut',
       });
@@ -56,7 +59,6 @@ export function createCloseButton(
     });
 
     hitArea.on('pointerout', () => {
-      const baseScale = size / btn.width;
       scene.tweens.add({
         targets: btn,
         scaleX: baseScale,
@@ -73,7 +75,6 @@ export function createCloseButton(
     });
 
     hitArea.on('pointerdown', () => {
-      const baseScale = size / btn.width;
       scene.tweens.add({
         targets: btn,
         scaleX: baseScale * 0.9,
