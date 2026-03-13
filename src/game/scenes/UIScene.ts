@@ -89,30 +89,35 @@ export class UIScene extends Phaser.Scene {
     barBg.fillStyle(0x060810, 1);
     barBg.fillRect(0, height - BOTTOM_MARGIN, width, BOTTOM_MARGIN);
 
-    // Solid dark background (feels like a proper frame border, not floating)
-    barBg.fillStyle(DecoColors.navy, 0.97);
+    // Solid opaque dark background for the entire toolbar region
+    barBg.fillStyle(DecoColors.navy, 1);
     barBg.fillRect(0, toolbarTop, width, TOOLBAR_H);
 
-    // Subtle gradient fade just above the bar (12px, very short)
-    for (let i = 0; i < 12; i++) {
-      barBg.fillStyle(DecoColors.navy, (i / 12) * 0.6);
-      barBg.fillRect(0, toolbarTop - 12 + i, width, 1);
-    }
-
-    // Gold top border — double line for art deco feel
-    barBg.lineStyle(2, DecoColors.gold, 0.5);
+    // ─── Decorative frame border between game view and toolbar ───
+    // Thick gold border line — acts as a visible "picture frame" edge
+    barBg.lineStyle(3, DecoColors.gold, 0.7);
     barBg.lineBetween(0, toolbarTop, width, toolbarTop);
-    barBg.lineStyle(0.5, DecoColors.gold, 0.2);
-    barBg.lineBetween(0, toolbarTop + 4, width, toolbarTop + 4);
+    // Inner accent line for art deco double-border feel
+    barBg.lineStyle(1, DecoColors.gold, 0.3);
+    barBg.lineBetween(0, toolbarTop + 5, width, toolbarTop + 5);
 
-    // Center diamond accent on the top border
-    barBg.fillStyle(DecoColors.gold, 0.5);
+    // Center diamond accent on the frame border
+    const diamondSize = 9;
+    barBg.fillStyle(DecoColors.gold, 0.6);
     barBg.fillPoints([
-      new Phaser.Geom.Point(width / 2, toolbarTop - 7),
-      new Phaser.Geom.Point(width / 2 + 7, toolbarTop),
-      new Phaser.Geom.Point(width / 2, toolbarTop + 7),
-      new Phaser.Geom.Point(width / 2 - 7, toolbarTop),
+      new Phaser.Geom.Point(width / 2, toolbarTop - diamondSize),
+      new Phaser.Geom.Point(width / 2 + diamondSize, toolbarTop),
+      new Phaser.Geom.Point(width / 2, toolbarTop + diamondSize),
+      new Phaser.Geom.Point(width / 2 - diamondSize, toolbarTop),
     ], true);
+
+    // Small corner ornaments at the frame border
+    const cornerOrnW = 30;
+    barBg.fillStyle(DecoColors.gold, 0.4);
+    // Left corner
+    barBg.fillTriangle(0, toolbarTop - 4, cornerOrnW, toolbarTop, 0, toolbarTop + 4);
+    // Right corner
+    barBg.fillTriangle(width, toolbarTop - 4, width - cornerOrnW, toolbarTop, width, toolbarTop + 4);
 
     barBg.setDepth(Depths.tooltip - 1);
 
@@ -404,7 +409,7 @@ export class UIScene extends Phaser.Scene {
     container.add(flourishGfx);
 
     // Close button
-    const closeBtn = createCloseButton(this, panelLeft + panelW - leatherBorder - 30, headerY, () => this.closeCaseBook(), 80);
+    const closeBtn = createCloseButton(this, panelLeft + panelW - leatherBorder - 30, headerY, () => this.closeCaseBook(), 120);
     container.add(closeBtn);
 
     // ─── Tab buttons (below header) ───

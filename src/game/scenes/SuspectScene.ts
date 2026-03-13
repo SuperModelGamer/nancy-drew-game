@@ -174,7 +174,7 @@ export class SuspectScene extends Phaser.Scene {
     this.container.add(divGfxHeader);
 
     // Close button
-    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 33, headerY, () => this.scene.stop(), 80);
+    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 33, headerY, () => this.scene.stop(), 120);
     closeBtn.setDepth(Depths.suspectContent);
 
     // ─── Suspect tabs (horizontal strip below header) ───

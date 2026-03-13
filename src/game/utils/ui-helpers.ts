@@ -12,7 +12,7 @@ export function createCloseButton(
   x: number,
   y: number,
   onClose: () => void,
-  size = 80,
+  size = 120,
 ): Phaser.GameObjects.Container {
   const container = scene.add.container(x, y);
 
