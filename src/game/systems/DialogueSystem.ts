@@ -498,10 +498,26 @@ export class DialogueSystem {
     // Layout — centered on screen
     const choiceW = Math.min(1200, width * 0.65);
 
+    // Helper: check if a choice (or its destination node) has already been triggered
+    const isChoiceAsked = (choice: DialogueChoice): boolean => {
+      // Check the choice's own triggerEvent
+      if (choice.triggerEvent) {
+        if (this.triggeredEvents.has(choice.triggerEvent) || save.getFlag(choice.triggerEvent)) return true;
+      }
+      // Also check the destination node's triggerEvent (e.g. phone call nodes)
+      if (choice.nextNode && this.currentDialogue) {
+        const destNode = this.currentDialogue.nodes.find(n => n.id === choice.nextNode);
+        if (destNode?.triggerEvent) {
+          if (this.triggeredEvents.has(destNode.triggerEvent) || save.getFlag(destNode.triggerEvent)) return true;
+        }
+      }
+      return false;
+    };
+
     // Sort: unasked questions first, already-asked (dimmed) at the bottom
     const sortedChoices = [...visibleChoices].sort((a, b) => {
-      const aAsked = a.triggerEvent ? (this.triggeredEvents.has(a.triggerEvent) || save.getFlag(a.triggerEvent)) : false;
-      const bAsked = b.triggerEvent ? (this.triggeredEvents.has(b.triggerEvent) || save.getFlag(b.triggerEvent)) : false;
+      const aAsked = isChoiceAsked(a);
+      const bAsked = isChoiceAsked(b);
       if (aAsked === bAsked) return 0;
       return aAsked ? 1 : -1;
     });
@@ -521,9 +537,7 @@ export class DialogueSystem {
 
     sortedChoices.forEach((choice, i) => {
       const itemAvailable = !choice.requiredItem || inventory.hasItem(choice.requiredItem);
-      const alreadyAsked = choice.triggerEvent
-        ? (this.triggeredEvents.has(choice.triggerEvent) || save.getFlag(choice.triggerEvent))
-        : false;
+      const alreadyAsked = isChoiceAsked(choice);
       const y = startY + i * (CHOICE_H + 15) + CHOICE_H / 2;
 
       // Choice button
