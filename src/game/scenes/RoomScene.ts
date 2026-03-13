@@ -79,7 +79,10 @@ export class RoomScene extends Phaser.Scene {
     addAmbientParticles(this, this.currentRoom.id);
 
     // ─── Room Entry Announcement (centered, click-to-continue) ───
-    this.showRoomAnnouncement(width, height);
+    // Pointer cursor during intro, magnifying glass after dismissal
+    this.showRoomAnnouncement(width, height, () => {
+      this.input.setDefaultCursor(Cursors.inspect);
+    });
 
     // Create hotspots (filtered by showWhen)
     this.createHotspots();
@@ -117,8 +120,8 @@ export class RoomScene extends Phaser.Scene {
     // Auto-save on room entry
     SaveSystem.getInstance().save();
 
-    // Default cursor is the magnifying glass — Nancy's always investigating
-    this.input.setDefaultCursor(Cursors.inspect);
+    // Start with pointer during room intro — switches to magnifying glass after dismissal
+    this.input.setDefaultCursor(Cursors.default);
 
     // Pre-generate the glowing spyglass cursor for hotspot hover
     createGlowSpyglass().then((cursor) => {
@@ -284,9 +287,27 @@ export class RoomScene extends Phaser.Scene {
     return SaveSystem.getInstance().getChapter() >= requiredChapter;
   }
 
+  private dismissDescriptionBox(): void {
+    if (this.descriptionBox) {
+      this.descriptionBox.destroy();
+      this.descriptionBox = null;
+    }
+    if (this._descriptionDismiss) {
+      this.input.off('pointerdown', this._descriptionDismiss);
+      this._descriptionDismiss = null;
+    }
+    if (this._descriptionDismissKey) {
+      this.input.keyboard!.off('keydown', this._descriptionDismissKey);
+      this._descriptionDismissKey = null;
+    }
+  }
+
   private handleHotspot(hotspot: Hotspot): void {
     // Don't handle if dialogue is active
     if (DialogueSystem.getInstance().isActive()) return;
+
+    // Dismiss any open description box before handling a new hotspot
+    this.dismissDescriptionBox();
 
     if (hotspot.onceOnly && this.usedHotspots.has(hotspot.id)) {
       this.showDescription('Nothing else to find here.');
@@ -442,18 +463,7 @@ export class RoomScene extends Phaser.Scene {
     const { width, height } = this.cameras.main;
 
     // Destroy previous description box and clean up its listeners
-    if (this.descriptionBox) {
-      this.descriptionBox.destroy();
-      this.descriptionBox = null;
-    }
-    if (this._descriptionDismiss) {
-      this.input.off('pointerdown', this._descriptionDismiss);
-      this._descriptionDismiss = null;
-    }
-    if (this._descriptionDismissKey) {
-      this.input.keyboard!.off('keydown', this._descriptionDismissKey);
-      this._descriptionDismissKey = null;
-    }
+    this.dismissDescriptionBox();
 
     // Create a centered modal overlay
     const container = this.add.container(0, 0);
@@ -729,25 +739,6 @@ export class RoomScene extends Phaser.Scene {
       lineSpacing: 6,
     }).setOrigin(0.5);
     container.add(desc);
-
-    // "Click to continue" prompt
-    const prompt = this.add.text(width / 2, height * 0.76, '— Click to continue —', {
-      fontFamily: FONT,
-      fontSize: '21px',
-      color: DecoTextColors.goldDim,
-      fontStyle: 'italic',
-    }).setOrigin(0.5);
-    container.add(prompt);
-
-    // Pulse the prompt
-    this.tweens.add({
-      targets: prompt,
-      alpha: { from: 1, to: 0.4 },
-      duration: 1000,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
-    });
 
     // Fade in the whole announcement
     container.setAlpha(0);
