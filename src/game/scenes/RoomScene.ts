@@ -44,7 +44,6 @@ interface RoomData {
 export class RoomScene extends Phaser.Scene {
   private currentRoom!: RoomData;
   private hotspotObjects: Phaser.GameObjects.Container[] = [];
-  private tooltipText!: Phaser.GameObjects.Text;
   private descriptionBox: Phaser.GameObjects.Container | null = null;
   private _descriptionDismiss: (() => void) | null = null;
   private _descriptionDismissKey: ((event: KeyboardEvent) => void) | null = null;
@@ -87,16 +86,7 @@ export class RoomScene extends Phaser.Scene {
     // Create hotspots (filtered by showWhen)
     this.createHotspots();
 
-    // Tooltip for hover
-    this.tooltipText = this.add.text(0, 0, '', {
-      fontFamily: FONT,
-      fontSize: '21px',
-      color: TextColors.white,
-      backgroundColor: '#000000aa',
-      padding: { x: 8, y: 4 },
-    });
-    this.tooltipText.setVisible(false);
-    this.tooltipText.setDepth(Depths.tooltip);
+    // Tooltip removed — gold label on each hotspot handles hover display
 
 
     // Selected item indicator (top-right)
@@ -247,25 +237,18 @@ export class RoomScene extends Phaser.Scene {
         ease: 'Sine.easeInOut',
       });
 
-      // Hover feedback (desktop) — glowing magnifying glass on hover, label fades in
+      // Hover feedback (desktop) — glowing magnifying glass on hover, gold label fades in
       bg.on('pointerover', () => {
         bg.setFillStyle(hotspotColor, 0.3);
         bg.setStrokeStyle(2, hotspotColor, 0.7);
         this.tweens.add({ targets: label, alpha: 1, duration: 200 });
-        this.tooltipText.setText(hotspot.label);
-        this.tooltipText.setVisible(true);
         this.input.setDefaultCursor(this.glowCursor);
-      });
-
-      bg.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-        this.tooltipText.setPosition(pointer.x + 15, pointer.y - 10);
       });
 
       bg.on('pointerout', () => {
         bg.setFillStyle(hotspotColor, 0.15);
         bg.setStrokeStyle(1, hotspotColor, 0.4);
         this.tweens.add({ targets: label, alpha: 0, duration: 200 });
-        this.tooltipText.setVisible(false);
         this.input.setDefaultCursor(Cursors.inspect);
       });
 
@@ -470,8 +453,9 @@ export class RoomScene extends Phaser.Scene {
     container.setDepth(Depths.descriptionBox);
     this.descriptionBox = container;
 
-    // Dark backdrop
+    // Dark backdrop — interactive to capture dismiss clicks
     const backdrop = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
+    backdrop.setInteractive();
     container.add(backdrop);
 
     // Text box in center
@@ -531,6 +515,7 @@ export class RoomScene extends Phaser.Scene {
     // Wait one frame before arming the dismiss listener so the opening click doesn't close it
     this.time.delayedCall(50, () => {
       if (!dismissed) {
+        backdrop.on('pointerdown', dismiss);
         this.input.on('pointerdown', dismiss);
         this.input.keyboard!.on('keydown', dismissKey);
       }
