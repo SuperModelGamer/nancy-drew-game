@@ -439,9 +439,8 @@ export class RoomScene extends Phaser.Scene {
     container.setDepth(Depths.descriptionBox);
     this.descriptionBox = container;
 
-    // Dark backdrop — click anywhere to dismiss
+    // Dark backdrop
     const backdrop = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
-    backdrop.setInteractive({ cursor: POINTER_CURSOR });
     container.add(backdrop);
 
     // Text box in center
@@ -463,7 +462,6 @@ export class RoomScene extends Phaser.Scene {
     const bgH = textObj.height + padY * 2 + 30;
     const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.96);
     bg.setStrokeStyle(1.5, Colors.gold, 0.4);
-    bg.setInteractive({ useHandCursor: true });
     container.sendToBack(backdrop);
     container.moveTo(bg, 1); // behind text, in front of backdrop
 
@@ -490,21 +488,31 @@ export class RoomScene extends Phaser.Scene {
     container.setAlpha(0);
     this.tweens.add({ targets: container, alpha: 1, duration: 200 });
 
-    // Dismiss handler — shared by backdrop and bg panel
+    // Dismiss handler — use scene-level input to guarantee clicks are caught
+    // regardless of container child ordering or interactive state issues
+    let dismissed = false;
     const dismiss = () => {
+      if (dismissed) return;
+      dismissed = true;
+      this.input.off('pointerdown', dismiss);
+      this.input.keyboard!.off('keydown', dismissKey);
       this.tweens.add({
         targets: container,
         alpha: 0,
         duration: 200,
-        onComplete: () => container.destroy(),
+        onComplete: () => {
+          container.destroy();
+          this.descriptionBox = null;
+        },
       });
     };
-    backdrop.on('pointerdown', dismiss);
-    bg.on('pointerdown', dismiss);
-    textObj.setInteractive({ useHandCursor: true });
-    textObj.on('pointerdown', dismiss);
-    prompt.setInteractive({ useHandCursor: true });
-    prompt.on('pointerdown', dismiss);
+    const dismissKey = (event: KeyboardEvent) => {
+      if (event.code === 'Space' || event.code === 'Enter' || event.code === 'Escape') {
+        dismiss();
+      }
+    };
+    this.input.on('pointerdown', dismiss);
+    this.input.keyboard!.on('keydown', dismissKey);
   }
 
   private showPickupToast(label: string): void {
@@ -747,6 +755,7 @@ export class RoomScene extends Phaser.Scene {
     const dismiss = () => {
       if (dismissed) return;
       dismissed = true;
+      this.input.off('pointerdown', dismiss);
       this.input.keyboard!.off('keydown', dismissKey);
       this.tweens.add({
         targets: container,
@@ -759,20 +768,13 @@ export class RoomScene extends Phaser.Scene {
       });
     };
 
-    // Click anywhere to dismiss — overlay, text, and prompt all need handlers
-    // because non-interactive children on top of the overlay block pointer events
-    overlay.setInteractive({ cursor: POINTER_CURSOR });
-    overlay.on('pointerdown', dismiss);
-    roomName.setInteractive({ useHandCursor: true });
-    roomName.on('pointerdown', dismiss);
-    desc.setInteractive({ useHandCursor: true });
-    desc.on('pointerdown', dismiss);
-    prompt.setInteractive({ useHandCursor: true });
-    prompt.on('pointerdown', dismiss);
+    // Click anywhere to dismiss — use scene-level input to guarantee clicks
+    // are caught regardless of container child ordering issues
+    this.input.on('pointerdown', dismiss);
 
-    // Also allow spacebar/enter to dismiss
+    // Also allow spacebar/enter/escape to dismiss
     const dismissKey = (event: KeyboardEvent) => {
-      if (event.code === 'Space' || event.code === 'Enter') {
+      if (event.code === 'Space' || event.code === 'Enter' || event.code === 'Escape') {
         dismiss();
       }
     };
