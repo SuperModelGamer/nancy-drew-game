@@ -109,38 +109,38 @@ export const UI_BAR_RESERVED = 124; // TOOLBAR_H (112) + BOTTOM_MARGIN (12)
 
 // ─── Viewfinder Frame Layout ───
 // The game art is natively 1920×1080 (16:9). We uniformly scale it down to fit
-// above the toolbar, preserving aspect ratio. The leftover space becomes thick
-// decorative borders — like a camera viewfinder.
+// above the toolbar, preserving aspect ratio. The viewport is pushed to the left
+// with a thin border, and all extra space goes to a thick right info panel.
 //
-//  ┌─────────────── 1920 ───────────────┐
-//  │ top border (FRAME_TOP)              │
-//  │ ┌─side─┌─────────────────┐─side─┐  │
-//  │ │      │  game viewport  │      │  │
-//  │ │      │  (uniform zoom) │      │  │
-//  │ │      └─────────────────┘      │  │
-//  │ └───────────────────────────────┘  │
-//  │ toolbar (FRAME_BOTTOM)              │
-//  └────────────────────────────────────┘
-//
-// FRAME_SIDE is computed dynamically from the zoom factor.
+//  ┌──────────────── 1920 ────────────────┐
+//  │ top border (FRAME_TOP)                │
+//  │ ┌thin┌─────────────────┐──right──┐   │
+//  │ │    │  game viewport  │  info   │   │
+//  │ │    │  (uniform zoom) │  panel  │   │
+//  │ │    └─────────────────┘─────────┘   │
+//  │ toolbar (FRAME_BOTTOM)                │
+//  └──────────────────────────────────────┘
 
 export const FRAME_TOP = 28;
 export const FRAME_BOTTOM = 124; // toolbar + margin
+export const FRAME_LEFT = 12;   // thin left border
 
 /** Compute the viewfinder layout from the canvas dimensions (1920×1080). */
 export function computeViewfinderLayout(canvasW: number, canvasH: number) {
   const availH = canvasH - FRAME_TOP - FRAME_BOTTOM; // vertical space for game
   const zoom = availH / canvasH;                      // uniform scale (height-limited)
-  const renderedW = canvasW * zoom;                   // game width at this zoom
-  const sideMargin = Math.floor((canvasW - renderedW) / 2); // auto side borders
+  const renderedW = Math.ceil(canvasW * zoom);         // game width at this zoom
+  const rightPanelW = canvasW - FRAME_LEFT - renderedW; // all extra goes right
 
   return {
     zoom,
-    viewportX: sideMargin,
+    viewportX: FRAME_LEFT,
     viewportY: FRAME_TOP,
-    viewportW: Math.ceil(renderedW),
+    viewportW: renderedW,
     viewportH: availH,
-    sideMargin,
+    leftMargin: FRAME_LEFT,
+    rightPanelX: FRAME_LEFT + renderedW,  // where the right panel starts
+    rightPanelW,
     topMargin: FRAME_TOP,
     bottomMargin: FRAME_BOTTOM,
   };
@@ -149,6 +149,6 @@ export function computeViewfinderLayout(canvasW: number, canvasH: number) {
 // Legacy alias kept for any old references
 export const FRAME = {
   top: FRAME_TOP,
-  side: 110, // approximate; real value computed by computeViewfinderLayout
+  side: FRAME_LEFT,
   bottom: FRAME_BOTTOM,
 } as const;
