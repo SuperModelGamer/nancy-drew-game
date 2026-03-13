@@ -78,10 +78,18 @@ export class RoomScene extends Phaser.Scene {
     addAmbientParticles(this, this.currentRoom.id);
 
     // ─── Room Entry Announcement (centered, click-to-continue) ───
-    // Pointer cursor during intro, magnifying glass after dismissal
-    this.showRoomAnnouncement(width, height, () => {
-      this.input.setDefaultCursor(Cursors.inspect);
-    });
+    // Pointer cursor during intro, explore cursor after dismissal
+    const roomId = this.currentRoom.id;
+    const visitedFlag = `visited_room_${roomId}`;
+    if (!SaveSystem.getInstance().getFlag(visitedFlag)) {
+      SaveSystem.getInstance().setFlag(visitedFlag, true);
+      this.showRoomAnnouncement(width, height, () => {
+        this.input.setDefaultCursor(this.getExploreCursor());
+      });
+    } else {
+      // Already visited — go straight to explore cursor
+      this.input.setDefaultCursor(this.getExploreCursor());
+    }
 
     // Create hotspots (filtered by showWhen)
     this.createHotspots();
@@ -103,7 +111,7 @@ export class RoomScene extends Phaser.Scene {
       this.updateSelectedItemIndicator();
       // Update scene cursor to reflect equipped item
       const equippedCursor = this.getEquippedItemCursor();
-      this.input.setDefaultCursor(equippedCursor || Cursors.inspect);
+      this.input.setDefaultCursor(equippedCursor || this.getExploreCursor());
     });
 
     // Check chapter progression — show transition if advanced
@@ -260,7 +268,7 @@ export class RoomScene extends Phaser.Scene {
         this.tweens.add({ targets: label, alpha: 0, duration: 180 });
         // Restore default cursor (spyglass if exploring, or equipped item)
         const equippedCursor = this.getEquippedItemCursor();
-        this.input.setDefaultCursor(equippedCursor || Cursors.inspect);
+        this.input.setDefaultCursor(equippedCursor || this.getExploreCursor());
       });
 
       // Click/tap handler with sparkle feedback and sound
@@ -598,6 +606,13 @@ export class RoomScene extends Phaser.Scene {
     });
   }
 
+
+  /** Default explore cursor: spyglass if player has the magnifying glass item, otherwise standard pointer */
+  private getExploreCursor(): string {
+    return InventorySystem.getInstance().hasItem('magnifying_glass')
+      ? this.glowCursor
+      : Cursors.default;
+  }
 
   /** Return the appropriate cursor for a hotspot type — Nancy Drew style */
   private getHotspotCursor(type: string): string {
