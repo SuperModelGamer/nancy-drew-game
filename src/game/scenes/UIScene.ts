@@ -1,10 +1,9 @@
 import Phaser from 'phaser';
 import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
-import { ChapterSystem } from '../systems/ChapterSystem';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
-import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
+import { POINTER_CURSOR } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
 import { drawArtDecoFrame, drawDecoDivider, drawChevronTab, drawCornerOrnament, DecoColors, DecoTextColors } from '../utils/art-deco';
@@ -73,7 +72,9 @@ export class UIScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = this.cameras.main;
-    initSceneCursor(this);
+    // Don't call initSceneCursor here — UIScene runs alongside RoomScene,
+    // and setting the pointer as default would override the magnifying glass.
+    // All interactive UI elements already specify their own cursor.
     const barY = height - BOTTOM_MARGIN - TOOLBAR_H / 2;
 
     // ─── Bottom toolbar — solid border with integrated chapter label ───
@@ -111,102 +112,14 @@ export class UIScene extends Phaser.Scene {
 
     barBg.setDepth(Depths.tooltip - 1);
 
-    // ─── Story progress indicator — visual act tracker in toolbar center ───
-    const TOTAL_ACTS = 5;
-    const progressY = toolbarTop + 18;
-    const progressContainer = this.add.container(width / 2, progressY);
-    progressContainer.setDepth(Depths.tooltip);
-
-    // Act pip dots with connecting lines
-    const pipSpacing = 42;
-    const totalPipW = (TOTAL_ACTS - 1) * pipSpacing;
-    const pipStartX = -totalPipW / 2;
-    const pipR = 6;
-    const pipGfx = this.add.graphics();
-    progressContainer.add(pipGfx);
-
-    // Tooltip for act title (hidden by default)
-    const actTooltip = this.add.text(0, 21, '', {
-      fontFamily: FONT,
-      fontSize: '15px',
-      color: DecoTextColors.cream,
-      fontStyle: 'italic',
-      letterSpacing: 1,
-    }).setOrigin(0.5, 0).setAlpha(0);
-    progressContainer.add(actTooltip);
-
-    // Hit area for hover to show act title
-    const progressHit = this.add.rectangle(0, 0, totalPipW + 60, 30, 0x000000, 0);
-    progressHit.setInteractive({ cursor: POINTER_CURSOR });
-    progressContainer.add(progressHit);
-
-    const drawProgress = (chapter: number) => {
-      pipGfx.clear();
-
-      // Connecting line (track)
-      pipGfx.lineStyle(1, DecoColors.gold, 0.15);
-      pipGfx.lineBetween(pipStartX, 0, pipStartX + totalPipW, 0);
-
-      // Filled progress line
-      if (chapter > 1) {
-        const filledW = ((chapter - 1) / (TOTAL_ACTS - 1)) * totalPipW;
-        pipGfx.lineStyle(2, DecoColors.gold, 0.6);
-        pipGfx.lineBetween(pipStartX, 0, pipStartX + filledW, 0);
-      }
-
-      // Act pips
-      for (let i = 1; i <= TOTAL_ACTS; i++) {
-        const px = pipStartX + (i - 1) * pipSpacing;
-        const isComplete = i < chapter;
-        const isCurrent = i === chapter;
-
-        if (isCurrent) {
-          // Current act — bright gold filled diamond
-          pipGfx.fillStyle(DecoColors.gold, 0.9);
-          pipGfx.fillPoints([
-            new Phaser.Geom.Point(px, -pipR - 2),
-            new Phaser.Geom.Point(px + pipR + 2, 0),
-            new Phaser.Geom.Point(px, pipR + 2),
-            new Phaser.Geom.Point(px - pipR - 2, 0),
-          ], true);
-        } else if (isComplete) {
-          // Completed act — filled gold circle
-          pipGfx.fillStyle(DecoColors.gold, 0.6);
-          pipGfx.fillCircle(px, 0, pipR);
-        } else {
-          // Future act — empty circle outline
-          pipGfx.lineStyle(1, DecoColors.gold, 0.25);
-          pipGfx.strokeCircle(px, 0, pipR);
-        }
-      }
-
-      // Update tooltip text
-      actTooltip.setText(ChapterSystem.getInstance().getChapterTitle(chapter));
-    };
-
-    // Show/hide tooltip on hover
-    progressHit.on('pointerover', () => {
-      this.tweens.add({ targets: actTooltip, alpha: 1, duration: 150 });
-    });
-    progressHit.on('pointerout', () => {
-      this.tweens.add({ targets: actTooltip, alpha: 0, duration: 150 });
-    });
-
-    const updateChapter = () => {
-      const ch = SaveSystem.getInstance().getChapter();
-      drawProgress(ch);
-    };
-    updateChapter();
-    this.events.on('wake', updateChapter);
-
-    // ─── Toolbar buttons — positioned below progress indicator ───
-    const buttonY = toolbarTop + 63;
+    // ─── Toolbar buttons — centered vertically in toolbar ───
+    const buttonY = toolbarTop + TOOLBAR_H / 2;
 
     const buttons = [
-      { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: width * 0.12, action: () => this.toggleInventory() },
-      { label: 'SUSPECTS', icon: '◉', color: 0xb4a0d4, x: width * 0.38, action: () => this.scene.launch('SuspectScene') },
-      { label: 'MAP', icon: '◇', color: Colors.mapBlue, x: width * 0.62, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
-      { label: 'JOURNAL', icon: '◆', color: DecoColors.gold, x: width * 0.88, action: () => this.toggleJournal() },
+      { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: width * 0.2, action: () => this.toggleInventory() },
+      { label: 'SUSPECTS', icon: '◉', color: 0xb4a0d4, x: width * 0.4, action: () => this.scene.launch('SuspectScene') },
+      { label: 'MAP', icon: '◇', color: Colors.mapBlue, x: width * 0.6, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
+      { label: 'JOURNAL', icon: '◆', color: DecoColors.gold, x: width * 0.8, action: () => this.toggleJournal() },
     ];
 
     buttons.forEach(btn => {

@@ -9,7 +9,7 @@ import { ScriptedEventScene } from './ScriptedEventScene';
 import { ChapterSystem } from '../systems/ChapterSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { drawRoomBackground } from '../utils/room-backgrounds';
-import { showTutorialIfNeeded } from '../utils/tutorial';
+// Tutorial removed — how-to-play is accessible from the start menu
 import { Cursors, createGlowSpyglass } from '../utils/cursors';
 import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
@@ -79,10 +79,7 @@ export class RoomScene extends Phaser.Scene {
     addAmbientParticles(this, this.currentRoom.id);
 
     // ─── Room Entry Announcement (centered, click-to-continue) ───
-    // Tutorial will be shown AFTER the announcement is dismissed (via callback)
-    this.showRoomAnnouncement(width, height, () => {
-      showTutorialIfNeeded(this);
-    });
+    this.showRoomAnnouncement(width, height);
 
     // Create hotspots (filtered by showWhen)
     this.createHotspots();
