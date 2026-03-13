@@ -157,7 +157,7 @@ export class PuzzleScene extends Phaser.Scene {
     this.panel.add(this.hintText);
 
     // Close button
-    const closeBtn = createCloseButton(this, panelW / 2 - 30, -panelH / 2 + 22, () => this.closePuzzle(), 66);
+    const closeBtn = createCloseButton(this, panelW / 2 - 30, -panelH / 2 + 22, () => this.closePuzzle(), 80);
     this.panel.add(closeBtn);
 
     // Build the puzzle UI based on type
