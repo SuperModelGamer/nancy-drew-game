@@ -374,7 +374,15 @@ export class DialogueSystem {
       ? boxBottom + NAMEPLATE_GAP + 32       // below portrait/dialogue bottom
       : boxTop - 4;                          // above dialogue box (no portrait)
 
-    const speakerText = this.scene.add.text(nameplateCenterX, nameplateY, line.speaker, {
+    // Size nameplate so text fits inside its gold borders
+    // Measure text first (off-screen) to compute nameplate width
+    const npInnerPad = 24;
+    const npH = 64;
+    // The nameplate asset has a slightly heavier top ornament; nudge text
+    // down by a couple of pixels so it sits at the visual center.
+    const npTextOffsetY = 2;
+
+    const speakerText = this.scene.add.text(nameplateCenterX, nameplateY + npTextOffsetY, line.speaker, {
       fontFamily: FONT,
       fontSize: SPEAKER_SIZE,
       color: speakerColor,
@@ -382,11 +390,8 @@ export class DialogueSystem {
       shadow: { offsetX: 0, offsetY: 0, color: '#000000', blur: 8, fill: true },
     }).setOrigin(0.5, 0.5);
 
-    // Size nameplate so text fits inside its gold borders
-    const npInnerPad = 24;
     const npTextW = speakerText.width + npInnerPad * 2;
     const npW = Math.max(220, Math.round(npTextW / (1 - NP_INSET_X * 2)));
-    const npH = 64;
 
     if (this.scene.textures.exists('dlg_nameplate')) {
       const nameplate = this.scene.add.image(nameplateCenterX, nameplateY, 'dlg_nameplate');
