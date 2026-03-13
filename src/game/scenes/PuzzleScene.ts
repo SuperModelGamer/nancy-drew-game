@@ -793,8 +793,8 @@ export class PuzzleScene extends Phaser.Scene {
     const dotsStartX = -(maxDots - 1) * dotSpacing / 2;
 
     // Slot outlines
-    const dotSlots: Phaser.GameObjects.Circle[] = [];
-    const dotFills: Phaser.GameObjects.Circle[] = [];
+    const dotSlots: Phaser.GameObjects.Arc[] = [];
+    const dotFills: Phaser.GameObjects.Arc[] = [];
     for (let i = 0; i < maxDots; i++) {
       const slot = this.add.circle(dotsStartX + i * dotSpacing, dotY, 14, 0x333333, 0.5);
       slot.setStrokeStyle(2, Colors.goldDim, 0.5);
@@ -1300,7 +1300,7 @@ export class PuzzleScene extends Phaser.Scene {
     this.panel.add(pathGraphics);
 
     // Draw nodes
-    const nodeCircles: Record<string, Phaser.GameObjects.Circle> = {};
+    const nodeCircles: Record<string, Phaser.GameObjects.Arc> = {};
     const nodeLabels: Record<string, Phaser.GameObjects.Text> = {};
 
     const startNode = nodes.find(n => n.start);
