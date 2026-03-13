@@ -510,10 +510,10 @@ export class DialogueSystem {
     const startY = height * 0.5 - totalH / 2;
 
     // Header text — must be in the container so it's cleaned up on next render
-    const headerY = startY - 60;
+    const headerY = startY - 70;
     const header = this.scene.add.text(width / 2, headerY, 'What would you like to say?', {
       fontFamily: FONT,
-      fontSize: '24px',
+      fontSize: '36px',
       color: TextColors.goldDim,
       fontStyle: 'italic',
     }).setOrigin(0.5);
