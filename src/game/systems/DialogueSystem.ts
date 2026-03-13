@@ -96,6 +96,7 @@ export class DialogueSystem {
   private isTyping = false;
   private fullLineText = '';
   private dialogueTextObj: Phaser.GameObjects.Text | null = null;
+  private textMaskGfx: Phaser.GameObjects.Graphics | null = null;
 
   // Track current speaker for entrance animations
   private lastSpeaker = '';
@@ -284,9 +285,11 @@ export class DialogueSystem {
       wordWrap: { width: textW },
       lineSpacing: 8,
     });
-    const textMask = this.scene.make.graphics({});
-    textMask.fillRect(textLeft - 2, textTop - 2, textW + 4, textH + 4);
-    this.dialogueTextObj.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, textMask));
+    // Destroy previous mask if re-rendering
+    if (this.textMaskGfx) { this.textMaskGfx.destroy(); this.textMaskGfx = null; }
+    this.textMaskGfx = this.scene.make.graphics({});
+    this.textMaskGfx.fillRect(textLeft - 2, textTop - 2, textW + 4, textH + 4);
+    this.dialogueTextObj.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, this.textMaskGfx));
     this.container.add(this.dialogueTextObj);
 
     this.fullLineText = line.text;
@@ -367,17 +370,16 @@ export class DialogueSystem {
     // ── 8–9. Speaker nameplate (below portrait if present, else centered above dialogue) ──
     const speakerColor = this.getSpeakerColor(line.speaker);
     const boxBottom = boxTop + BOX_H;
+    const npH = 64;
     const nameplateCenterX = hasPortrait
       ? totalLeft + pfDisplayW / 2           // centered under portrait
       : dlgBoxLeft + dlgBoxW / 2;            // centered above dialogue box
     const nameplateY = hasPortrait
-      ? boxBottom + NAMEPLATE_GAP + 32       // below portrait/dialogue bottom
+      ? boxBottom + NAMEPLATE_GAP + npH / 2  // below portrait/dialogue bottom
       : boxTop - 4;                          // above dialogue box (no portrait)
 
     // Size nameplate so text fits inside its gold borders
-    // Measure text first (off-screen) to compute nameplate width
     const npInnerPad = 24;
-    const npH = 64;
     // The nameplate asset has a slightly heavier top ornament; nudge text
     // down by a couple of pixels so it sits at the visual center.
     const npTextOffsetY = 2;
@@ -811,6 +813,10 @@ export class DialogueSystem {
 
   private destroyUI(): void {
     this.stopTypewriter();
+    if (this.textMaskGfx) {
+      this.textMaskGfx.destroy();
+      this.textMaskGfx = null;
+    }
     if (this.container) {
       this.container.destroy();
       this.container = null;
