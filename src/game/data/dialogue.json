@@ -1049,19 +1049,23 @@
             },
             {
               "text": "Call Dad.",
-              "nextNode": "carson"
+              "nextNode": "carson",
+              "requiredFlag": "learned_about_ashworth"
             },
             {
               "text": "Look up the local Historical Society.",
-              "nextNode": "historical_society"
+              "nextNode": "historical_society",
+              "requiredFlag": "called_dad"
             },
             {
               "text": "Call Ned.",
-              "nextNode": "ned"
+              "nextNode": "ned",
+              "requiredFlag": "heard_basement_noises"
             },
             {
               "text": "Try the Hardy boys' number.",
-              "nextNode": "hardy_boys"
+              "nextNode": "hardy_boys",
+              "requiredFlag": "learned_about_cecilia"
             },
             {
               "text": "Hang up.",

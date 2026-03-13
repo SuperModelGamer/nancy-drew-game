@@ -96,6 +96,7 @@ export class DialogueSystem {
   private isTyping = false;
   private fullLineText = '';
   private dialogueTextObj: Phaser.GameObjects.Text | null = null;
+  private textMaskGfx: Phaser.GameObjects.Graphics | null = null;
 
   // Track current speaker for entrance animations
   private lastSpeaker = '';
@@ -284,9 +285,11 @@ export class DialogueSystem {
       wordWrap: { width: textW },
       lineSpacing: 8,
     });
-    const textMask = this.scene.make.graphics({});
-    textMask.fillRect(textLeft - 2, textTop - 2, textW + 4, textH + 4);
-    this.dialogueTextObj.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, textMask));
+    // Destroy previous mask if re-rendering
+    if (this.textMaskGfx) { this.textMaskGfx.destroy(); this.textMaskGfx = null; }
+    this.textMaskGfx = this.scene.make.graphics({});
+    this.textMaskGfx.fillRect(textLeft - 2, textTop - 2, textW + 4, textH + 4);
+    this.dialogueTextObj.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, this.textMaskGfx));
     this.container.add(this.dialogueTextObj);
 
     this.fullLineText = line.text;
@@ -367,17 +370,16 @@ export class DialogueSystem {
     // ── 8–9. Speaker nameplate (below portrait if present, else centered above dialogue) ──
     const speakerColor = this.getSpeakerColor(line.speaker);
     const boxBottom = boxTop + BOX_H;
+    const npH = 64;
     const nameplateCenterX = hasPortrait
       ? totalLeft + pfDisplayW / 2           // centered under portrait
       : dlgBoxLeft + dlgBoxW / 2;            // centered above dialogue box
     const nameplateY = hasPortrait
-      ? boxBottom + NAMEPLATE_GAP + 32       // below portrait/dialogue bottom
+      ? boxBottom + NAMEPLATE_GAP + npH / 2  // below portrait/dialogue bottom
       : boxTop - 4;                          // above dialogue box (no portrait)
 
     // Size nameplate so text fits inside its gold borders
-    // Measure text first (off-screen) to compute nameplate width
     const npInnerPad = 24;
-    const npH = 64;
     // The nameplate asset has a slightly heavier top ornament; nudge text
     // down by a couple of pixels so it sits at the visual center.
     const npTextOffsetY = 2;
@@ -498,10 +500,26 @@ export class DialogueSystem {
     // Layout — centered on screen
     const choiceW = Math.min(1200, width * 0.65);
 
+    // Helper: check if a choice (or its destination node) has already been triggered
+    const isChoiceAsked = (choice: DialogueChoice): boolean => {
+      // Check the choice's own triggerEvent
+      if (choice.triggerEvent) {
+        if (this.triggeredEvents.has(choice.triggerEvent) || save.getFlag(choice.triggerEvent)) return true;
+      }
+      // Also check the destination node's triggerEvent (e.g. phone call nodes)
+      if (choice.nextNode && this.currentDialogue) {
+        const destNode = this.currentDialogue.nodes.find(n => n.id === choice.nextNode);
+        if (destNode?.triggerEvent) {
+          if (this.triggeredEvents.has(destNode.triggerEvent) || save.getFlag(destNode.triggerEvent)) return true;
+        }
+      }
+      return false;
+    };
+
     // Sort: unasked questions first, already-asked (dimmed) at the bottom
     const sortedChoices = [...visibleChoices].sort((a, b) => {
-      const aAsked = a.triggerEvent ? (this.triggeredEvents.has(a.triggerEvent) || save.getFlag(a.triggerEvent)) : false;
-      const bAsked = b.triggerEvent ? (this.triggeredEvents.has(b.triggerEvent) || save.getFlag(b.triggerEvent)) : false;
+      const aAsked = isChoiceAsked(a);
+      const bAsked = isChoiceAsked(b);
       if (aAsked === bAsked) return 0;
       return aAsked ? 1 : -1;
     });
@@ -521,9 +539,7 @@ export class DialogueSystem {
 
     sortedChoices.forEach((choice, i) => {
       const itemAvailable = !choice.requiredItem || inventory.hasItem(choice.requiredItem);
-      const alreadyAsked = choice.triggerEvent
-        ? (this.triggeredEvents.has(choice.triggerEvent) || save.getFlag(choice.triggerEvent))
-        : false;
+      const alreadyAsked = isChoiceAsked(choice);
       const y = startY + i * (CHOICE_H + 15) + CHOICE_H / 2;
 
       // Choice button
@@ -797,6 +813,10 @@ export class DialogueSystem {
 
   private destroyUI(): void {
     this.stopTypewriter();
+    if (this.textMaskGfx) {
+      this.textMaskGfx.destroy();
+      this.textMaskGfx = null;
+    }
     if (this.container) {
       this.container.destroy();
       this.container = null;

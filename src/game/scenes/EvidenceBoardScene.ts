@@ -88,7 +88,7 @@ export class EvidenceBoardScene extends Phaser.Scene {
     }).setOrigin(0.5));
 
     // Close button
-    const closeBtn = createCloseButton(this, boardX + boardW / 2 - 38, boardY - boardH / 2 + 30, () => this.scene.stop(), 80);
+    const closeBtn = createCloseButton(this, boardX + boardW / 2 - 38, boardY - boardH / 2 + 30, () => this.scene.stop(), 120);
     this.boardContainer.add(closeBtn);
 
     // Timeline labels
