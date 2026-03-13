@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import roomsData from '../data/rooms.json';
+import itemsData from '../data/items.json';
 import { InventorySystem } from '../systems/InventorySystem';
 import { DialogueSystem } from '../systems/DialogueSystem';
 import { PuzzleSystem } from '../systems/PuzzleSystem';
@@ -97,7 +98,6 @@ export class RoomScene extends Phaser.Scene {
     this.tooltipText.setVisible(false);
     this.tooltipText.setDepth(Depths.tooltip);
 
-    // Description box is created dynamically in showDescription()
 
     // Selected item indicator (top-right)
     this.selectedItemIndicator = this.add.text(width - 20, 20, '', {
@@ -299,7 +299,10 @@ export class RoomScene extends Phaser.Scene {
     switch (hotspot.type) {
       case 'inspect':
         this.showDescription(hotspot.description || 'Nothing noteworthy.');
-        if (hotspot.onceOnly) this.usedHotspots.add(hotspot.id);
+        if (hotspot.onceOnly) {
+          this.usedHotspots.add(hotspot.id);
+          SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
+        }
         break;
 
       case 'pickup':
@@ -312,6 +315,7 @@ export class RoomScene extends Phaser.Scene {
             UISounds.itemPickup();
             this.showPickupToast(hotspot.label);
             this.usedHotspots.add(hotspot.id);
+            SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
             this.events.emit('item-picked-up', hotspot.itemId);
             // Add journal entry for key evidence pickups
             const item = itemsData.items.find(i => i.id === hotspot.itemId);
@@ -372,6 +376,7 @@ export class RoomScene extends Phaser.Scene {
         // Use the selected item on this hotspot
         this.showDescription(hotspot.description || 'Unlocked!');
         this.usedHotspots.add(hotspot.id);
+        SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
         // Consume key items that are used to unlock
         if (hotspot.targetRoom) {
           inv.removeItem(hotspot.requiredItem);
@@ -404,6 +409,14 @@ export class RoomScene extends Phaser.Scene {
       const puzzle = PuzzleSystem.getInstance().getPuzzle(puzzleId);
       if (puzzle?.unlocks) {
         SaveSystem.getInstance().setFlag(puzzle.unlocks, true);
+        // If the unlock matches an item ID, grant it to inventory
+        const isItem = (itemsData.items as { id: string }[]).some(i => i.id === puzzle.unlocks);
+        if (isItem) {
+          InventorySystem.getInstance().addItem(puzzle.unlocks!);
+          this.showPickupToast(
+            (itemsData.items as { id: string; name: string }[]).find(i => i.id === puzzle.unlocks)?.name || puzzle.unlocks!
+          );
+        }
       }
     };
 
@@ -594,10 +607,6 @@ export class RoomScene extends Phaser.Scene {
     });
   }
 
-  private createDescriptionBox(): Phaser.GameObjects.Container {
-    // Now created dynamically in showDescription, return empty container as placeholder
-    return this.add.container(0, 0);
-  }
 
   private getHotspotColor(type: string): number {
     switch (type) {

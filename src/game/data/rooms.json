@@ -1006,7 +1006,7 @@
           "description": "A printed demolition timeline pinned to the wall. Day 1 — Final inspection. Day 2 — Utilities disconnected. Day 3 — Demolition begins, east wing. Today is circled: Day 1. Two days. That's all this theater has left. Two days to solve a century-old murder and a brand-new poisoning. No pressure, Drew."
         },
         {
-          "id": "mo_teacup",
+          "id": "mo_teacup_analysis",
           "x": 780,
           "y": 420,
           "width": 50,
@@ -1271,7 +1271,7 @@
           "description": "Old set pieces stacked against the walls — a castle turret, a forest, a drawing room. Decades of stories piled up like cordwood. One flat makes me pause: it's from The Crimson Veil. A painted parlor with a table set for tea. And there, on the painted table — a goblet. The goblet. Seeing it painted so casually on a set piece, knowing what it actually did... it's chilling."
         },
         {
-          "id": "bm_passage_entrance",
+          "id": "bm_passage_inspect",
           "x": 550,
           "y": 250,
           "width": 80,
