@@ -61,14 +61,25 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
 // ─── Layout Constants ───────────────────────────────────────────────────────
 const PORTRAIT_W = 320;
 const PORTRAIT_H = 400;
-const BOX_H = 400;
+const BOX_H = 340;
 const BOX_BOTTOM_MARGIN = 48;
 const TEXT_SIZE = '32px';
 const SPEAKER_SIZE = '36px';
-const CHOICE_H = 84;
+const CHOICE_H = 110;
 const CHOICE_FONT = '26px';
 const TYPEWRITER_SPEED = 28; // ms per character
 const ANIM_DURATION = 400; // ms for box entrance/exit
+
+// Gold border insets as fractions of the displayed asset size.
+// Measured from the art deco ornament edges in each PNG, NOT the PNG dimensions.
+// These define where usable content space begins inside each asset's gold borders.
+const DLG_BOX_INSET_X = 0.065; // dialogue-box.png: ~6.5% from each side (corner ornaments)
+const DLG_BOX_INSET_Y = 0.14;  // dialogue-box.png: ~14% from top/bottom (gold lines)
+const NP_INSET_X = 0.11;       // nameplate.png: ~11% from each side
+const NP_INSET_Y = 0.16;       // nameplate.png: ~16% from top/bottom
+const CHOICE_INSET_X = 0.04;   // choice-btn.png: ~4% from each side
+const CHOICE_INSET_TOP = 0.20; // choice-btn.png: ~20% from top (crown ornament)
+const CHOICE_INSET_BOT = 0.11; // choice-btn.png: ~11% from bottom
 
 export class DialogueSystem {
   private static instance: DialogueSystem;
@@ -190,89 +201,83 @@ export class DialogueSystem {
     const FRAME_BORDER = 30; // approx border thickness of the frame asset
     const portraitAreaW = hasPortrait ? PORTRAIT_W + 48 : 0;
 
-    // Text area to the right of portrait
-    const textAreaLeft = boxLeft + portraitAreaW + 24;
-    const textAreaW = boxW - portraitAreaW - 48;
-
     // ══════════════════════════════════════════════════════════════════════════
     // LAYER ORDER (back → front):
-    //   1. bgGfx        – dark box fill
-    //   2. topBanner     – art deco border strip (top)
-    //   3. bottomBanner  – art deco border strip (bottom)
-    //   4. hitArea       – invisible click-to-advance (BEFORE interactive UI)
-    //   5. dialogueText  – typewriter text
-    //   6. continueArrow – bounce indicator
-    //   7. skipBtn       – must be ABOVE hitArea to receive clicks
-    //   8. portraitGroup – portrait + ornate frame (floats above box)
-    //   9. nameplate     – speaker name background
-    //  10. speakerText   – speaker name label
+    //   1. dlgBoxImage   – single art deco frame stretched to full box size
+    //   2. hitArea       – invisible click-to-advance (BEFORE interactive UI)
+    //   3. dialogueText  – typewriter text (inside gold borders)
+    //   4. continueArrow – bounce indicator (inside bottom gold border)
+    //   5. skipBtn       – ABOVE hitArea so it stays clickable
+    //   6. portraitGroup – portrait + ornate frame (overlaps above box)
+    //   7. nameplate     – speaker name background
+    //   8. speakerText   – speaker name label
     // ══════════════════════════════════════════════════════════════════════════
 
-    // ── 1. Dialogue box background fill ──
-    const bgGfx = this.scene.add.graphics();
-    bgGfx.fillStyle(0x0e0c14, 0.94);
-    bgGfx.fillRoundedRect(boxLeft, boxTop, boxW, BOX_H, 8);
-    this.container.add(bgGfx);
+    // ── Inner content bounds (inside the gold borders of dialogue-box.png) ──
+    const borderX = Math.round(boxW * DLG_BOX_INSET_X);  // ~109px at 1680
+    const borderY = Math.round(BOX_H * DLG_BOX_INSET_Y); // ~48px at 340
+    const innerLeft = boxLeft + borderX;
+    const innerRight = boxLeft + boxW - borderX;
+    const innerTop = boxTop + borderY;
+    const innerBottom = boxTop + BOX_H - borderY;
 
-    // ── 2–3. Art deco ornate border strips ──
-    const BANNER_H = 52;
+    // ── 1. Single art deco dialogue box frame ──
     if (this.scene.textures.exists('dlg_box')) {
-      const topBanner = this.scene.add.image(width / 2, boxTop + BANNER_H / 2, 'dlg_box');
-      topBanner.setDisplaySize(boxW, BANNER_H);
-      this.container.add(topBanner);
-
-      const bottomBanner = this.scene.add.image(width / 2, boxTop + BOX_H - BANNER_H / 2, 'dlg_box');
-      bottomBanner.setDisplaySize(boxW, BANNER_H);
-      bottomBanner.setFlipY(true);
-      bottomBanner.setAlpha(0.6);
-      this.container.add(bottomBanner);
+      const dlgBoxImage = this.scene.add.image(width / 2, boxTop + BOX_H / 2, 'dlg_box');
+      dlgBoxImage.setDisplaySize(boxW, BOX_H);
+      this.container.add(dlgBoxImage);
     } else {
-      // Procedural gold border fallback
-      const borderGfx = this.scene.add.graphics();
-      borderGfx.lineStyle(3, Colors.gold, 0.6);
-      borderGfx.strokeRoundedRect(boxLeft, boxTop, boxW, BOX_H, 8);
-      borderGfx.lineStyle(1.5, Colors.gold, 0.15);
-      borderGfx.strokeRoundedRect(boxLeft + 10, boxTop + 10, boxW - 20, BOX_H - 20, 4);
-      this.container.add(borderGfx);
+      // Procedural fallback: dark panel with gold border
+      const gfx = this.scene.add.graphics();
+      gfx.fillStyle(0x0e0c14, 0.95);
+      gfx.fillRoundedRect(boxLeft, boxTop, boxW, BOX_H, 8);
+      gfx.lineStyle(3, Colors.gold, 0.6);
+      gfx.strokeRoundedRect(boxLeft, boxTop, boxW, BOX_H, 8);
+      gfx.lineStyle(1.5, Colors.gold, 0.15);
+      gfx.strokeRoundedRect(boxLeft + 10, boxTop + 10, boxW - 20, BOX_H - 20, 4);
+      this.container.add(gfx);
     }
 
-    // ── 4. Click-to-advance hit area (added BEFORE skip/arrow so they stay clickable) ──
+    // ── 2. Click-to-advance hit area (BEFORE skip/arrow so they stay clickable) ──
     const hitArea = this.scene.add.rectangle(
       width / 2, boxCenterY, boxW, BOX_H, 0x000000, 0
     );
     hitArea.setInteractive({ cursor: POINTER_CURSOR });
     hitArea.on('pointerdown', () => this.advance());
     this.container.add(hitArea);
-    // Also clicking the dim overlay advances
     overlay.on('pointerdown', () => this.advance());
 
-    // ── 5. Dialogue text (typewriter reveal) ──
-    const textInset = BANNER_H + 12; // clear the ornate border + breathing room
-    const textY = boxTop + textInset;
-    const textMaxH = BOX_H - textInset * 2;
-    this.dialogueTextObj = this.scene.add.text(textAreaLeft, textY, '', {
+    // ── 3. Dialogue text (inside the gold borders, right of portrait) ──
+    // Text left edge: either past the portrait or at the inner gold border
+    const textLeft = hasPortrait
+      ? boxLeft + portraitAreaW + 24
+      : innerLeft + 8;
+    const textRight = innerRight - 8;
+    const textAreaWInner = textRight - textLeft;
+    const textY = innerTop + 4;
+    const textMaxH = innerBottom - innerTop - 8;
+
+    this.dialogueTextObj = this.scene.add.text(textLeft, textY, '', {
       fontFamily: FONT,
       fontSize: TEXT_SIZE,
       color: TextColors.light,
-      wordWrap: { width: textAreaW },
+      wordWrap: { width: textAreaWInner },
       lineSpacing: 8,
     });
-    // Clip text that overflows the box interior
     const textMask = this.scene.make.graphics({});
-    textMask.fillRect(textAreaLeft - 6, textY - 3, textAreaW + 12, textMaxH + 6);
+    textMask.fillRect(textLeft - 4, textY - 2, textAreaWInner + 8, textMaxH + 4);
     this.dialogueTextObj.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, textMask));
     this.container.add(this.dialogueTextObj);
 
-    // Start typewriter
     this.fullLineText = line.text;
     this.startTypewriter();
 
-    // ── 6. Continue indicator (inside bottom border area) ──
-    const continueY = boxTop + BOX_H - BANNER_H / 2;
-    const continueX = boxLeft + boxW - 42;
+    // ── 4. Continue arrow (inside the bottom gold border strip) ──
+    const continueY = boxTop + BOX_H - Math.round(borderY * 0.5);
+    const continueX = innerRight;
     if (this.scene.textures.exists('dlg_continue_arrow')) {
       const arrow = this.scene.add.image(continueX, continueY, 'dlg_continue_arrow');
-      arrow.setDisplaySize(36, 36);
+      arrow.setDisplaySize(28, 28);
       this.scene.tweens.add({
         targets: arrow,
         y: { from: continueY - 3, to: continueY + 3 },
@@ -282,7 +287,7 @@ export class DialogueSystem {
       this.container.add(arrow);
     } else {
       const arrow = this.scene.add.text(continueX, continueY, '▶', {
-        fontFamily: FONT, fontSize: '24px', color: TextColors.goldDim,
+        fontFamily: FONT, fontSize: '22px', color: TextColors.goldDim,
       }).setOrigin(0.5);
       this.scene.tweens.add({
         targets: arrow,
@@ -293,12 +298,12 @@ export class DialogueSystem {
       this.container.add(arrow);
     }
 
-    // ── 7. Skip button (inside top border area, ABOVE hitArea) ──
-    const skipX = boxLeft + boxW - 28;
-    const skipY = boxTop + BANNER_H / 2;
+    // ── 5. Skip button (inside the top gold border, ABOVE hitArea) ──
+    const skipX = innerRight;
+    const skipY = boxTop + Math.round(borderY * 0.5);
     const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
       fontFamily: FONT,
-      fontSize: '20px',
+      fontSize: '18px',
       color: TextColors.goldDim,
       letterSpacing: 2,
     }).setOrigin(1, 0.5);
@@ -308,33 +313,33 @@ export class DialogueSystem {
     skipBtn.on('pointerdown', () => this.skipToEnd());
     this.container.add(skipBtn);
 
-    // ── 8. Portrait (overlaps above the box — rendered on top of everything) ──
+    // ── 6. Portrait (overlaps above the box — on top of the dialogue frame) ──
     if (hasPortrait && portraitKey) {
-      const portraitX = boxLeft + 24 + PORTRAIT_W / 2;
+      const portraitX = boxLeft + borderX + PORTRAIT_W / 2 - 12;
       const portraitY = boxTop + BOX_H - PORTRAIT_H / 2 - 8;
 
       const portraitGroup = this.scene.add.container(0, 0);
 
       // Measure frame inner opening
-      let innerW = PORTRAIT_W;
-      let innerH = PORTRAIT_H;
+      let innerFW = PORTRAIT_W;
+      let innerFH = PORTRAIT_H;
       if (this.scene.textures.exists('dlg_portrait_frame')) {
         const frameTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
         const frameRatio = frameTex.width / frameTex.height;
         const frameH = PORTRAIT_H + 24;
         const frameW = frameH * frameRatio;
-        innerW = frameW - FRAME_BORDER * 2;
-        innerH = frameH - FRAME_BORDER * 2;
+        innerFW = frameW - FRAME_BORDER * 2;
+        innerFH = frameH - FRAME_BORDER * 2;
       }
 
       // Portrait image
       const portrait = this.scene.add.image(portraitX, portraitY, portraitKey);
       const texW = portrait.width;
       const texH = portrait.height;
-      const scaleToFill = Math.max(innerW / texW, innerH / texH);
+      const scaleToFill = Math.max(innerFW / texW, innerFH / texH);
       portrait.setScale(scaleToFill);
-      const cropW = Math.round(innerW / scaleToFill);
-      const cropH = Math.round(innerH / scaleToFill);
+      const cropW = Math.round(innerFW / scaleToFill);
+      const cropH = Math.round(innerFH / scaleToFill);
       const cropX = Math.round((texW - cropW) / 2);
       const cropY = Math.round((texH - cropH) / 2);
       portrait.setCrop(cropX, cropY, cropW, cropH);
@@ -361,7 +366,6 @@ export class DialogueSystem {
 
       this.container.add(portraitGroup);
 
-      // Entrance slide-in for new speakers
       if (isNewSpeaker) {
         portraitGroup.setAlpha(0);
         portraitGroup.x = -60;
@@ -373,12 +377,14 @@ export class DialogueSystem {
 
     this.lastSpeaker = line.speaker;
 
-    // ── 9–10. Speaker nameplate (rendered on top of portrait frame) ──
+    // ── 7–8. Speaker nameplate (on top of everything) ──
     const speakerColor = this.getSpeakerColor(line.speaker);
-    const nameplateY = boxTop - 8;
-    const nameplateCenterX = textAreaLeft + textAreaW / 2;
+    const nameplateY = boxTop - 4;
+    const nameplateCenterX = hasPortrait
+      ? textLeft + textAreaWInner / 2
+      : width / 2;
 
-    // Measure text first to size the nameplate
+    // Measure text first to size the nameplate around it
     const speakerText = this.scene.add.text(nameplateCenterX, nameplateY, line.speaker, {
       fontFamily: FONT,
       fontSize: SPEAKER_SIZE,
@@ -387,9 +393,12 @@ export class DialogueSystem {
       shadow: { offsetX: 0, offsetY: 0, color: '#000000', blur: 8, fill: true },
     }).setOrigin(0.5, 0.5);
 
-    const npPadX = 60;
+    // Nameplate sized so text fits within its gold borders
+    const npInnerPadX = 24; // extra breathing room inside the gold border
+    const npTextW = speakerText.width + npInnerPadX * 2;
+    // npW = text width / (1 - 2*inset fraction) so the inner gold area fits the text
+    const npW = Math.max(220, Math.round(npTextW / (1 - NP_INSET_X * 2)));
     const npH = 64;
-    const npW = Math.max(200, speakerText.width + npPadX * 2);
 
     if (this.scene.textures.exists('dlg_nameplate')) {
       const nameplate = this.scene.add.image(nameplateCenterX, nameplateY, 'dlg_nameplate');
@@ -408,7 +417,6 @@ export class DialogueSystem {
       this.container.add(npGfx);
     }
 
-    // Nameplate fade-in on speaker change
     if (isNewSpeaker) {
       speakerText.setAlpha(0);
       this.scene.tweens.add({
@@ -552,11 +560,15 @@ export class DialogueSystem {
       // Dim already-asked choices
       const textColor = !itemAvailable ? '#555555' : alreadyAsked ? '#8a7a5a' : TextColors.gold;
 
-      const text = this.scene!.add.text(width / 2, y, displayText, {
+      // Text positioned inside the gold borders of choice-btn.png
+      // The crown ornament at top takes ~20%, so offset text slightly below center
+      const textInnerW = choiceW * (1 - CHOICE_INSET_X * 2) - 20;
+      const textOffsetY = Math.round(CHOICE_H * (CHOICE_INSET_TOP - CHOICE_INSET_BOT) / 2);
+      const text = this.scene!.add.text(width / 2, y + textOffsetY, displayText, {
         fontFamily: FONT,
         fontSize: CHOICE_FONT,
         color: textColor,
-        wordWrap: { width: choiceW - 60 },
+        wordWrap: { width: textInnerW },
         align: 'center',
       }).setOrigin(0.5);
 
