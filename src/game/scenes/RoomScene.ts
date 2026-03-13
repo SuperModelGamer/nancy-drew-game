@@ -46,7 +46,6 @@ export class RoomScene extends Phaser.Scene {
   private hotspotObjects: Phaser.GameObjects.Container[] = [];
   private tooltipText!: Phaser.GameObjects.Text;
   private descriptionBox: Phaser.GameObjects.Container | null = null;
-  private _descriptionDismiss: (() => void) | null = null;
   private _descriptionDismissKey: ((event: KeyboardEvent) => void) | null = null;
   private usedHotspots: Set<string> = new Set();
   private selectedItemIndicator!: Phaser.GameObjects.Text;
@@ -445,25 +444,19 @@ export class RoomScene extends Phaser.Scene {
       this.descriptionBox.destroy();
       this.descriptionBox = null;
     }
-    if (this._descriptionDismiss) {
-      this.input.off('pointerdown', this._descriptionDismiss);
-      this._descriptionDismiss = null;
-    }
     if (this._descriptionDismissKey) {
       this.input.keyboard!.off('keydown', this._descriptionDismissKey);
       this._descriptionDismissKey = null;
     }
 
-    // Create a centered modal overlay
-    const container = this.add.container(0, 0);
-    container.setDepth(Depths.descriptionBox);
-    this.descriptionBox = container;
+    // Use a standalone full-screen interactive rectangle at a very high depth.
+    // This MUST be a direct scene object (not inside a container) with setInteractive()
+    // so it reliably captures pointer events even when UIScene is layered on top.
+    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
+    overlay.setDepth(Depths.dialogueBox + 50); // above dialogue, below scripted events
+    overlay.setInteractive({ cursor: POINTER_CURSOR });
 
-    // Dark backdrop
-    const backdrop = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
-    container.add(backdrop);
-
-    // Text box in center
+    // Background panel behind text
     const maxTextW = Math.min(width * 0.7, 800);
     const textObj = this.add.text(width / 2, height / 2 - 20, text, {
       fontFamily: FONT,
@@ -474,16 +467,14 @@ export class RoomScene extends Phaser.Scene {
       lineSpacing: 6,
     });
     textObj.setOrigin(0.5);
-    container.add(textObj);
+    textObj.setDepth(Depths.dialogueBox + 53);
 
-    // Background panel behind text
     const padX = 50, padY = 40;
     const bgW = Math.min(textObj.width + padX * 2, width * 0.8);
     const bgH = textObj.height + padY * 2 + 30;
     const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.96);
     bg.setStrokeStyle(1.5, Colors.gold, 0.4);
-    container.sendToBack(backdrop);
-    container.moveTo(bg, 1); // behind text, in front of backdrop
+    bg.setDepth(Depths.dialogueBox + 52);
 
     // "Click anywhere to continue" prompt
     const prompt = this.add.text(width / 2, height / 2 - 20 + bgH / 2 - 18, '— click anywhere to continue —', {
@@ -492,7 +483,7 @@ export class RoomScene extends Phaser.Scene {
       color: TextColors.goldDim,
       fontStyle: 'italic',
     }).setOrigin(0.5);
-    container.add(prompt);
+    prompt.setDepth(Depths.dialogueBox + 53);
 
     // Pulse the prompt
     this.tweens.add({
@@ -504,27 +495,51 @@ export class RoomScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    // Fade in
-    container.setAlpha(0);
-    this.tweens.add({ targets: container, alpha: 1, duration: 200 });
+    // Group all elements for tracking
+    const allElements = [overlay, bg, textObj, prompt];
 
-    // Dismiss handler — use scene-level input to guarantee clicks are caught.
-    // Delay by one frame so the hotspot click that opened this doesn't immediately dismiss it.
+    // Store as a container-like reference for cleanup
+    const container = this.add.container(0, 0);
+    container.setDepth(0); // container itself is invisible; elements have their own depths
+    this.descriptionBox = container;
+    // Store elements on the container so destroy() cleans them up
+    (container as unknown as { _descElements: Phaser.GameObjects.GameObject[] })._descElements = allElements;
+    container.on('destroy', () => {
+      allElements.forEach(el => { if (el.scene) el.destroy(); });
+    });
+
+    // Fade in all elements
+    allElements.forEach(el => (el as Phaser.GameObjects.Components.Alpha).setAlpha(0));
+    this.tweens.add({
+      targets: allElements,
+      alpha: { from: 0, to: 1 },
+      duration: 200,
+    });
+    // Restore specific alphas after fade-in
+    overlay.alpha = 0;
+    this.tweens.add({
+      targets: overlay,
+      alpha: 0.65,
+      duration: 200,
+    });
+
+    // Dismiss handler
     let dismissed = false;
     const dismiss = () => {
       if (dismissed) return;
       dismissed = true;
-      this.input.off('pointerdown', dismiss);
       this.input.keyboard!.off('keydown', dismissKey);
-      this._descriptionDismiss = null;
       this._descriptionDismissKey = null;
       this.tweens.add({
-        targets: container,
+        targets: allElements,
         alpha: 0,
         duration: 200,
         onComplete: () => {
-          container.destroy();
-          this.descriptionBox = null;
+          allElements.forEach(el => { if (el.scene) el.destroy(); });
+          if (this.descriptionBox === container) {
+            container.destroy();
+            this.descriptionBox = null;
+          }
         },
       });
     };
@@ -533,13 +548,12 @@ export class RoomScene extends Phaser.Scene {
         dismiss();
       }
     };
-    // Store refs so we can clean up if a new description opens before this one is dismissed
-    this._descriptionDismiss = dismiss;
     this._descriptionDismissKey = dismissKey;
-    // Wait one frame before arming the dismiss listener so the opening click doesn't close it
-    this.time.delayedCall(50, () => {
+
+    // Arm click dismiss after a short delay so the opening click doesn't immediately close it
+    this.time.delayedCall(100, () => {
       if (!dismissed) {
-        this.input.on('pointerdown', dismiss);
+        overlay.on('pointerdown', dismiss);
         this.input.keyboard!.on('keydown', dismissKey);
       }
     });
@@ -702,7 +716,7 @@ export class RoomScene extends Phaser.Scene {
 
   private showRoomAnnouncement(width: number, height: number, onDismiss?: () => void): void {
     const container = this.add.container(0, 0);
-    container.setDepth(Depths.scriptedEvent - 1); // High z-order, just below scripted events
+    container.setDepth(Depths.scriptedEvent - 1);
 
     // Full-screen dark overlay
     const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
@@ -712,7 +726,7 @@ export class RoomScene extends Phaser.Scene {
     const gfx = this.add.graphics();
     container.add(gfx);
 
-    // Room name — large, centered, gold (positioned below chandelier area)
+    // Room name — large, centered, gold
     const roomName = this.add.text(width / 2, height * 0.45, this.currentRoom.name.toUpperCase(), {
       fontFamily: FONT,
       fontSize: '54px',
@@ -730,13 +744,11 @@ export class RoomScene extends Phaser.Scene {
     }).setOrigin(0.5);
     container.add(roomName);
 
-    // Decorative divider above name
+    // Decorative dividers
     drawDecoDivider(gfx, width / 2, height * 0.45 - 32, width * 0.4, DecoColors.gold, 0.5);
-
-    // Decorative divider below name
     drawDecoDivider(gfx, width / 2, height * 0.45 + 32, width * 0.4, DecoColors.gold, 0.5);
 
-    // Room description — readable size, centered below
+    // Room description
     const desc = this.add.text(width / 2, height * 0.58, this.currentRoom.description, {
       fontFamily: FONT,
       fontSize: '26px',
@@ -767,7 +779,7 @@ export class RoomScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    // Fade in the whole announcement
+    // Fade in
     container.setAlpha(0);
     this.tweens.add({
       targets: container,
@@ -776,7 +788,7 @@ export class RoomScene extends Phaser.Scene {
       ease: 'Power2',
     });
 
-    // Shared dismiss logic — fade out, destroy, then trigger callback
+    // Dismiss logic
     let dismissed = false;
     const dismiss = () => {
       if (dismissed) return;
@@ -794,11 +806,8 @@ export class RoomScene extends Phaser.Scene {
       });
     };
 
-    // Click anywhere to dismiss — use scene-level input to guarantee clicks
-    // are caught regardless of container child ordering issues
     this.input.on('pointerdown', dismiss);
 
-    // Also allow spacebar/enter/escape to dismiss
     const dismissKey = (event: KeyboardEvent) => {
       if (event.code === 'Space' || event.code === 'Enter' || event.code === 'Escape') {
         dismiss();
