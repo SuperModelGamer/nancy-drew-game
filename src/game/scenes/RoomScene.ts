@@ -118,8 +118,8 @@ export class RoomScene extends Phaser.Scene {
     // Auto-save on room entry
     SaveSystem.getInstance().save();
 
-    // Set default magnifying glass cursor
-    this.input.setDefaultCursor(Cursors.default);
+    // Set default magnifying glass cursor (Nancy Drew style — always investigating)
+    this.input.setDefaultCursor(Cursors.inspect);
 
     // Curtain open reveal
     this.playCurtainOpen(() => {
@@ -215,7 +215,7 @@ export class RoomScene extends Phaser.Scene {
 
       const bg = this.add.rectangle(0, 0, w, h, hotspotColor, 0.15);
       bg.setStrokeStyle(1, hotspotColor, 0.4);
-      const hotspotCursor = Cursors[hotspot.type as CursorType] || Cursors.default;
+      const hotspotCursor = Cursors[hotspot.type as CursorType] || Cursors.inspect;
       bg.setInteractive({ cursor: hotspotCursor });
 
       // Label starts hidden, fades in on hover
@@ -249,7 +249,7 @@ export class RoomScene extends Phaser.Scene {
         this.tweens.add({ targets: label, alpha: 1, duration: 200 });
         this.tooltipText.setText(hotspot.label);
         this.tooltipText.setVisible(true);
-        this.input.setDefaultCursor(Cursors[cursorType] || Cursors.default);
+        this.input.setDefaultCursor(Cursors[cursorType] || Cursors.inspect);
       });
 
       bg.on('pointermove', (pointer: Phaser.Input.Pointer) => {
@@ -261,7 +261,7 @@ export class RoomScene extends Phaser.Scene {
         bg.setStrokeStyle(1, hotspotColor, 0.4);
         this.tweens.add({ targets: label, alpha: 0, duration: 200 });
         this.tooltipText.setVisible(false);
-        this.input.setDefaultCursor(Cursors.default);
+        this.input.setDefaultCursor(Cursors.inspect);
       });
 
       // Click/tap handler with sparkle feedback and sound
