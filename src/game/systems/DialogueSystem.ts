@@ -196,24 +196,21 @@ export class DialogueSystem {
 
     // ── Dialogue box background ──
     if (this.scene.textures.exists('dlg_box')) {
-      const tex = this.scene.textures.get('dlg_box').getSourceImage();
-      const assetRatio = tex.width / tex.height;
-
       // Dark fill behind the full dialogue area
       const bgGfx = this.scene.add.graphics();
       bgGfx.fillStyle(0x0e0c14, 0.92);
       bgGfx.fillRoundedRect(boxLeft + 4, boxTop + 4, boxW - 8, BOX_H - 4, 6);
       this.container.add(bgGfx);
 
-      // Art deco banner across the top edge of the box
-      const bannerH = Math.round(boxW / assetRatio);
-      const topBanner = this.scene.add.image(width / 2, boxTop + bannerH / 2, 'dlg_box');
-      topBanner.setDisplaySize(boxW, bannerH);
+      // Art deco border strips — thin, decorative, don't cover the text
+      const BANNER_H = 48;
+      const topBanner = this.scene.add.image(width / 2, boxTop + BANNER_H / 2, 'dlg_box');
+      topBanner.setDisplaySize(boxW, BANNER_H);
       this.container.add(topBanner);
 
       // Bottom banner (flipped)
-      const bottomBanner = this.scene.add.image(width / 2, boxTop + BOX_H - bannerH / 2, 'dlg_box');
-      bottomBanner.setDisplaySize(boxW, bannerH);
+      const bottomBanner = this.scene.add.image(width / 2, boxTop + BOX_H - BANNER_H / 2, 'dlg_box');
+      bottomBanner.setDisplaySize(boxW, BANNER_H);
       bottomBanner.setFlipY(true);
       bottomBanner.setAlpha(0.6);
       this.container.add(bottomBanner);
@@ -334,35 +331,12 @@ export class DialogueSystem {
 
     this.lastSpeaker = line.speaker;
 
-    // ── Speaker nameplate — positioned above the text area ──
+    // ── Speaker nameplate — positioned above the text area, sized to fit name ──
     const speakerColor = this.getSpeakerColor(line.speaker);
     const nameplateY = boxTop - 20;
     const nameplateCenterX = textAreaLeft + textAreaW / 2;
 
-    if (this.scene.textures.exists('dlg_nameplate')) {
-      const npTex = this.scene.textures.get('dlg_nameplate').getSourceImage();
-      const npRatio = npTex.width / npTex.height;
-      const npH = 80;
-      const npW = npH * npRatio;
-      const nameplate = this.scene.add.image(nameplateCenterX, nameplateY, 'dlg_nameplate');
-      nameplate.setDisplaySize(npW, npH);
-      nameplate.setOrigin(0.5);
-      this.container.add(nameplate);
-    } else {
-      // Procedural nameplate
-      const npGfx = this.scene.add.graphics();
-      const npW = 320;
-      const npH = 56;
-      const npX = nameplateCenterX - npW / 2;
-      const npY = nameplateY - npH / 2;
-      npGfx.fillStyle(0x0e0c14, 0.9);
-      npGfx.fillRoundedRect(npX, npY, npW, npH, 4);
-      const speakerHex = parseInt(speakerColor.replace('#', ''), 16);
-      npGfx.lineStyle(2, speakerHex, 0.6);
-      npGfx.strokeRoundedRect(npX, npY, npW, npH, 4);
-      this.container.add(npGfx);
-    }
-
+    // Measure speaker name first so the nameplate can fit it
     const speakerText = this.scene.add.text(nameplateCenterX, nameplateY, line.speaker, {
       fontFamily: FONT,
       fontSize: SPEAKER_SIZE,
@@ -376,6 +350,28 @@ export class DialogueSystem {
         fill: true,
       },
     }).setOrigin(0.5, 0.5);
+
+    const npPadX = 60; // horizontal padding around the name
+    const npH = 64;
+    const npW = Math.max(200, speakerText.width + npPadX * 2);
+
+    if (this.scene.textures.exists('dlg_nameplate')) {
+      const nameplate = this.scene.add.image(nameplateCenterX, nameplateY, 'dlg_nameplate');
+      nameplate.setDisplaySize(npW, npH);
+      nameplate.setOrigin(0.5);
+      this.container.add(nameplate);
+    } else {
+      // Procedural nameplate
+      const npGfx = this.scene.add.graphics();
+      const npX = nameplateCenterX - npW / 2;
+      const npY = nameplateY - npH / 2;
+      npGfx.fillStyle(0x0e0c14, 0.9);
+      npGfx.fillRoundedRect(npX, npY, npW, npH, 4);
+      const speakerHex = parseInt(speakerColor.replace('#', ''), 16);
+      npGfx.lineStyle(2, speakerHex, 0.6);
+      npGfx.strokeRoundedRect(npX, npY, npW, npH, 4);
+      this.container.add(npGfx);
+    }
 
     // Nameplate fade-in on speaker change
     if (isNewSpeaker) {
@@ -392,8 +388,8 @@ export class DialogueSystem {
     this.container.add(speakerText);
 
     // ── Dialogue text (typewriter reveal) ──
-    const textPadTop = 30;
-    const textPadBottom = 44;
+    const textPadTop = 56;   // clear the top art deco banner (48px)
+    const textPadBottom = 56; // clear the bottom art deco banner
     const textY = boxTop + textPadTop;
     const textMaxH = BOX_H - textPadTop - textPadBottom;
     this.dialogueTextObj = this.scene.add.text(textAreaLeft, textY, '', {
