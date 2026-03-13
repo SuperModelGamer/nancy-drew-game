@@ -501,6 +501,10 @@ export class RoomScene extends Phaser.Scene {
     };
     backdrop.on('pointerdown', dismiss);
     bg.on('pointerdown', dismiss);
+    textObj.setInteractive({ useHandCursor: true });
+    textObj.on('pointerdown', dismiss);
+    prompt.setInteractive({ useHandCursor: true });
+    prompt.on('pointerdown', dismiss);
   }
 
   private showPickupToast(label: string): void {
@@ -755,9 +759,16 @@ export class RoomScene extends Phaser.Scene {
       });
     };
 
-    // Click anywhere to dismiss
+    // Click anywhere to dismiss — overlay, text, and prompt all need handlers
+    // because non-interactive children on top of the overlay block pointer events
     overlay.setInteractive({ cursor: POINTER_CURSOR });
     overlay.on('pointerdown', dismiss);
+    roomName.setInteractive({ useHandCursor: true });
+    roomName.on('pointerdown', dismiss);
+    desc.setInteractive({ useHandCursor: true });
+    desc.on('pointerdown', dismiss);
+    prompt.setInteractive({ useHandCursor: true });
+    prompt.on('pointerdown', dismiss);
 
     // Also allow spacebar/enter to dismiss
     const dismissKey = (event: KeyboardEvent) => {
