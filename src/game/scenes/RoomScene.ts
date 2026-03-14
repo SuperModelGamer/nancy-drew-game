@@ -385,6 +385,27 @@ export class RoomScene extends Phaser.Scene {
       label.setOrigin(0.5, 1);
       label.setAlpha(0);
 
+      // Clamp label so it doesn't get cut off at viewport edges
+      const viewW = this.cameras.main.width;
+      const viewH = this.cameras.main.height;
+      const labelW = label.width;
+      const labelH = label.height;
+      const margin = 8;
+      // Left edge: label center (hx + localX) - labelW/2 >= margin
+      // Right edge: label center (hx + localX) + labelW/2 <= viewW - margin
+      let labelLocalX = 0;
+      const leftOverflow = margin - (hx + labelLocalX - labelW / 2);
+      const rightOverflow = (hx + labelLocalX + labelW / 2) - (viewW - margin);
+      if (leftOverflow > 0) labelLocalX += leftOverflow;
+      if (rightOverflow > 0) labelLocalX -= rightOverflow;
+      // Vertical: if label goes above viewport, push it below the hotspot
+      const labelTopWorld = hy + (-(h / 2) - 12) - labelH;
+      if (labelTopWorld < margin) {
+        label.setY(h / 2 + 12);
+        label.setOrigin(0.5, 0);
+      }
+      label.setX(labelLocalX);
+
       container.add([shimmer, bg, label]);
       container.setSize(w, h);
 
