@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { UISounds } from '../utils/sounds';
 
 interface ScriptedStep {
   action: 'fog' | 'spotlight' | 'figure' | 'text' | 'shake' | 'flicker' | 'wait' | 'sound';
@@ -17,6 +18,8 @@ interface ScriptedEvent {
   id: string;
   triggerFlag?: string;
   triggerRoom?: string;
+  /** When true, plays as a cinematic with letterbox bars and subtitle text */
+  cinematic?: boolean;
   steps: ScriptedStep[];
   onComplete?: {
     setFlag?: string;
@@ -29,6 +32,7 @@ const SCRIPTED_EVENTS: ScriptedEvent[] = [
     id: 'ghost_sighting_auditorium',
     triggerRoom: 'auditorium',
     triggerFlag: 'learned_about_margaux',
+    cinematic: true,
     steps: [
       { action: 'flicker', duration: 2000, intensity: 3 },
       { action: 'text', text: 'The lights flicker and dim...', duration: 2000 },
@@ -89,6 +93,11 @@ const SCRIPTED_EVENTS: ScriptedEvent[] = [
   },
 ];
 
+// ─── Letterbox / Cinematic constants ─────────────────────────────────────────
+const LETTERBOX_H = 120;       // height of each black bar
+const LETTERBOX_ENTER_MS = 800;
+const LETTERBOX_EXIT_MS = 600;
+
 export class ScriptedEventScene extends Phaser.Scene {
   private eventData!: ScriptedEvent;
   private container!: Phaser.GameObjects.Container;
@@ -99,6 +108,11 @@ export class ScriptedEventScene extends Phaser.Scene {
   private textContent!: Phaser.GameObjects.Text;
   private speakerText!: Phaser.GameObjects.Text;
   private stepIndex = 0;
+
+  // Cinematic letterbox elements
+  private letterboxTop!: Phaser.GameObjects.Rectangle;
+  private letterboxBottom!: Phaser.GameObjects.Rectangle;
+  private isCinematic = false;
 
   constructor() {
     super({ key: 'ScriptedEventScene' });
@@ -127,6 +141,7 @@ export class ScriptedEventScene extends Phaser.Scene {
     }
     this.eventData = event;
     this.stepIndex = 0;
+    this.isCinematic = !!event.cinematic;
   }
 
   create(): void {
@@ -155,7 +170,69 @@ export class ScriptedEventScene extends Phaser.Scene {
     this.figureGfx.setAlpha(0);
     this.container.add(this.figureGfx);
 
-    // Text box
+    if (this.isCinematic) {
+      this.createCinematicUI(width, height);
+    } else {
+      this.createClassicUI(width, height);
+    }
+
+    // Play ghost drone sound for atmosphere
+    UISounds.ghostDrone();
+
+    if (this.isCinematic) {
+      // Animate letterbox bars in, then start steps
+      this.animateLetterboxIn(() => this.executeStep());
+    } else {
+      this.executeStep();
+    }
+  }
+
+  // ─── Cinematic UI: letterbox bars + centered subtitle ──────────────────────
+
+  private createCinematicUI(width: number, height: number): void {
+    // Subtle dark vignette overlay (not full black — room stays visible)
+    const vignette = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0);
+    this.container.add(vignette);
+    this.tweens.add({ targets: vignette, fillAlpha: 0.35, duration: 1200, ease: 'Sine.easeIn' });
+
+    // Letterbox bars — start offscreen
+    this.letterboxTop = this.add.rectangle(width / 2, -LETTERBOX_H / 2, width, LETTERBOX_H, 0x000000, 1);
+    this.letterboxBottom = this.add.rectangle(width / 2, height + LETTERBOX_H / 2, width, LETTERBOX_H, 0x000000, 1);
+    this.container.add(this.letterboxTop);
+    this.container.add(this.letterboxBottom);
+
+    // Subtitle text — positioned above bottom letterbox bar
+    this.textBox = this.add.container(width / 2, height - LETTERBOX_H - 30);
+    this.textBox.setAlpha(0);
+
+    // Subtle text shadow backdrop (no hard box)
+    const textShadow = this.add.rectangle(0, 0, width * 0.85, 80, 0x000000, 0.5);
+    textShadow.setStrokeStyle(0, 0x000000, 0); // no border — cinematic subtitles
+
+    this.speakerText = this.add.text(0, -28, '', {
+      fontFamily: FONT,
+      fontSize: '18px',
+      color: TextColors.goldDim,
+      fontStyle: 'bold',
+      letterSpacing: 3,
+    }).setOrigin(0.5, 0.5);
+
+    this.textContent = this.add.text(0, 8, '', {
+      fontFamily: FONT,
+      fontSize: '24px',
+      color: '#ffffff',
+      fontStyle: 'italic',
+      wordWrap: { width: width * 0.75 },
+      align: 'center',
+      shadow: { offsetX: 0, offsetY: 2, color: '#000000', blur: 12, fill: true },
+    }).setOrigin(0.5, 0);
+
+    this.textBox.add([textShadow, this.speakerText, this.textContent]);
+    this.container.add(this.textBox);
+  }
+
+  private createClassicUI(width: number, height: number): void {
+    // Text box (classic overlay style)
     this.textBox = this.add.container(width / 2, height - 120);
     this.textBox.setAlpha(0);
 
@@ -180,9 +257,40 @@ export class ScriptedEventScene extends Phaser.Scene {
 
     this.textBox.add([textBg, this.speakerText, this.textContent]);
     this.container.add(this.textBox);
+  }
 
-    // Start stepping through the event
-    this.executeStep();
+  private animateLetterboxIn(onComplete: () => void): void {
+    const { height } = this.cameras.main;
+    this.tweens.add({
+      targets: this.letterboxTop,
+      y: LETTERBOX_H / 2,
+      duration: LETTERBOX_ENTER_MS,
+      ease: 'Power2',
+    });
+    this.tweens.add({
+      targets: this.letterboxBottom,
+      y: height - LETTERBOX_H / 2,
+      duration: LETTERBOX_ENTER_MS,
+      ease: 'Power2',
+      onComplete: () => onComplete(),
+    });
+  }
+
+  private animateLetterboxOut(onComplete: () => void): void {
+    const { height } = this.cameras.main;
+    this.tweens.add({
+      targets: this.letterboxTop,
+      y: -LETTERBOX_H / 2,
+      duration: LETTERBOX_EXIT_MS,
+      ease: 'Power2',
+    });
+    this.tweens.add({
+      targets: this.letterboxBottom,
+      y: height + LETTERBOX_H / 2,
+      duration: LETTERBOX_EXIT_MS,
+      ease: 'Power2',
+      onComplete: () => onComplete(),
+    });
   }
 
   private createGhostFigure(): Phaser.GameObjects.Container {
@@ -267,14 +375,15 @@ export class ScriptedEventScene extends Phaser.Scene {
         break;
 
       case 'text':
-        this.speakerText.setText(step.speaker || '');
+        this.speakerText.setText(step.speaker ? step.speaker.toUpperCase() : '');
         this.textContent.setText(step.text || '');
         this.tweens.add({
           targets: this.textBox,
           alpha: 1,
-          duration: 300,
-          hold: duration - 600,
+          duration: this.isCinematic ? 500 : 300,
+          hold: duration - (this.isCinematic ? 1000 : 600),
           yoyo: true,
+          ease: this.isCinematic ? 'Sine.easeInOut' : 'Linear',
           onComplete: () => this.nextStep(),
         });
         break;
@@ -342,14 +451,33 @@ export class ScriptedEventScene extends Phaser.Scene {
       }
     }
 
-    // Fade out and close
-    this.tweens.add({
-      targets: this.container,
-      alpha: 0,
-      duration: 800,
-      onComplete: () => {
-        this.scene.stop();
-      },
-    });
+    if (this.isCinematic) {
+      // Cinematic exit: fade subtitle, slide letterbox bars out, then close
+      this.tweens.add({
+        targets: this.textBox,
+        alpha: 0,
+        duration: 400,
+      });
+      this.time.delayedCall(300, () => {
+        this.animateLetterboxOut(() => {
+          this.tweens.add({
+            targets: this.container,
+            alpha: 0,
+            duration: 400,
+            onComplete: () => this.scene.stop(),
+          });
+        });
+      });
+    } else {
+      // Classic exit
+      this.tweens.add({
+        targets: this.container,
+        alpha: 0,
+        duration: 800,
+        onComplete: () => {
+          this.scene.stop();
+        },
+      });
+    }
   }
 }

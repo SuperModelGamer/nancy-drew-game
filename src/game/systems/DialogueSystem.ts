@@ -62,7 +62,7 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
 // ─── Layout Constants ───────────────────────────────────────────────────────
 const BOX_H = 340;
 const BOX_BOTTOM_MARGIN = 110;  // raised higher to make room for nameplate below portrait
-const TEXT_SIZE = '32px';
+const TEXT_SIZE = '24px';
 const SPEAKER_SIZE = '36px';
 const CHOICE_H = 110;
 const CHOICE_FONT = '26px';
@@ -76,7 +76,7 @@ const NAMEPLATE_GAP = 8;   // gap between portrait bottom and nameplate
 // Measured from the innermost gold ornament edges, not the PNG bounds.
 // The dialogue-box corner star ornaments extend well inward from each side.
 const DLG_BOX_INSET_X = 0.155; // dialogue-box.png: corner ornaments
-const DLG_BOX_INSET_Y = 0.22;  // dialogue-box.png: top/bottom gold lines (generous)
+const DLG_BOX_INSET_Y = 0.17;  // dialogue-box.png: top/bottom gold lines
 const NP_INSET_X = 0.11;       // nameplate.png: corner ornaments
 const CHOICE_INSET_X = 0.04;   // choice-btn.png: side ornaments
 const CHOICE_INSET_TOP = 0.20; // choice-btn.png: crown ornament at top
@@ -298,7 +298,7 @@ export class DialogueSystem {
       fontSize: TEXT_SIZE,
       color: TextColors.light,
       wordWrap: { width: textW },
-      lineSpacing: 8,
+      lineSpacing: 4,
     });
     // Destroy previous mask if re-rendering
     if (this.textMaskGfx) { this.textMaskGfx.destroy(); this.textMaskGfx = null; }
@@ -473,6 +473,10 @@ export class DialogueSystem {
         charIndex++;
         if (this.dialogueTextObj) {
           this.dialogueTextObj.setText(this.fullLineText.substring(0, charIndex));
+          // Play soft tick on non-space characters for typewriter feel
+          if (this.fullLineText[charIndex - 1] !== ' ' && charIndex % 3 === 0) {
+            UISounds.dialogueTick();
+          }
         }
         if (charIndex >= this.fullLineText.length) {
           this.isTyping = false;
