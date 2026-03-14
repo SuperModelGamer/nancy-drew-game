@@ -146,6 +146,10 @@ export class DialogueSystem {
       const line = node.lines[this.currentLineIndex];
       this.renderLine(line);
     } else if (node.choices && node.choices.length > 0) {
+      // Fire triggerEvent after all lines are shown, even if choices follow
+      if (node.triggerEvent) {
+        this.triggerEvent(node.triggerEvent);
+      }
       this.renderChoices(node.choices);
     } else {
       if (node.triggerEvent) {

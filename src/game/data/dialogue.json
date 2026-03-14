@@ -5,6 +5,7 @@
       "nodes": [
         {
           "id": "start",
+          "triggerEvent": "vivian_intro",
           "lines": [
             { "speaker": "Vivian", "text": "Nancy Drew? Oh, mon Dieu, thank heavens. I wasn't sure anyone would come." },
             { "speaker": "Nancy", "text": "Ms. Delacroix? You called about a poisoning — and a ghost?" },
@@ -208,6 +209,7 @@
       "nodes": [
         {
           "id": "start",
+          "triggerEvent": "edwin_auditorium",
           "lines": [
             { "speaker": "Edwin", "text": "Ah — you must be the detective Vivian called. Edwin Hale. Theater historian, Emerson College adjunct, author of — well, three books on New England theater history, if we're keeping track. Please, sit anywhere. The whole auditorium's empty, as usual." },
             { "speaker": "Nancy", "text": "Nancy Drew. How long have you been studying the Monarch?" },
@@ -375,6 +377,7 @@
       "nodes": [
         {
           "id": "start",
+          "triggerEvent": "stella_backstage",
           "lines": [
             { "speaker": "Stella", "text": "Detective? Great. Fantastic. Another person poking around my backstage. I'm Stella Morrow — stage manager. Or I was, until Ashworth decided this place was worth more as a pile of expensive rubble." },
             { "speaker": "Nancy", "text": "You don't seem happy about the investigation." },
@@ -617,6 +620,7 @@
       "nodes": [
         {
           "id": "start",
+          "triggerEvent": "diego_booth",
           "lines": [
             { "speaker": "Diego", "text": "Oh! Whoa — sorry, didn't hear you come up. I was in the zone. You know how it is — 'the pen is the tongue of the mind,' as Cervantes said. Diego Reyes. I'm renting the projection booth as a writing studio." },
             { "speaker": "Nancy", "text": "Nancy Drew. I'm investigating the poisoning — and the ghost." },
@@ -727,6 +731,7 @@
       "nodes": [
         {
           "id": "start",
+          "triggerEvent": "ashworth_office",
           "lines": [
             { "speaker": "Ashworth", "text": "Oh, wonderful. Another vulture. What do you want? I'm on a deadline — literally." },
             { "speaker": "Nancy", "text": "Nancy Drew. I'm here to find out who poisoned you, Mr. Ashworth." },
