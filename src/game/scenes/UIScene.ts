@@ -79,6 +79,10 @@ export class UIScene extends Phaser.Scene {
   private journalPage = 0;
   private journalBookLayout = { panelW: 0, panelX: 0, contentTop: 0, contentBottom: 0 };
 
+  // ── Settings panel state ──
+  private settingsOpen = false;
+  private settingsContainer!: Phaser.GameObjects.Container;
+
   constructor() {
     super({ key: 'UIScene' });
   }
@@ -200,6 +204,10 @@ export class UIScene extends Phaser.Scene {
     this.journalContainer = this.createJournalPanel();
     this.journalContainer.setVisible(false);
 
+    // ─── Settings panel (hidden by default) ───
+    this.settingsContainer = this.createSettingsPanel();
+    this.settingsContainer.setVisible(false);
+
     // Listen for inventory changes — update both evidence panel and right panel stats
     const onInventoryChange = () => {
       if (this.evidenceOpen) this.refreshInventoryGrid();
@@ -232,6 +240,7 @@ export class UIScene extends Phaser.Scene {
     gearBtn.setInteractive({ cursor: POINTER_CURSOR, hitArea: new Phaser.Geom.Rectangle(-8, -8, 52, 52), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
     gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));
     gearBtn.on('pointerout', () => gearBtn.setColor(TextColors.mutedBlue));
+    gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
 
     // ── Room name ──
     this.borderRoomNameText = this.add.text(contentX, y + 8, '', {
@@ -979,5 +988,200 @@ export class UIScene extends Phaser.Scene {
       nextBtn.on('pointerdown', () => { this.journalPage++; this.refreshJournalContent(); });
       this.journalContent.add(nextBtn);
     }
+  }
+
+  // ─── Settings Panel ──────────────────────────────────────────────────────────
+
+  private toggleSettings(): void {
+    if (this.settingsOpen) {
+      this.closeSettings();
+    } else {
+      if (this.evidenceOpen) this.closeEvidence();
+      if (this.journalOpen) this.closeJournal();
+      this.openSettings();
+    }
+  }
+
+  private openSettings(): void {
+    this.settingsOpen = true;
+    UISounds.panelOpen();
+    this.refreshSettingsContent();
+    this.tweens.killTweensOf(this.settingsContainer);
+    this.settingsContainer.setVisible(true);
+    this.settingsContainer.setAlpha(0);
+    this.tweens.add({ targets: this.settingsContainer, alpha: 1, duration: 200 });
+  }
+
+  private closeSettings(): void {
+    this.settingsOpen = false;
+    this.tweens.killTweensOf(this.settingsContainer);
+    this.tweens.add({
+      targets: this.settingsContainer, alpha: 0, duration: 200,
+      onComplete: () => { if (!this.settingsOpen) this.settingsContainer.setVisible(false); },
+    });
+  }
+
+  private settingsContent!: Phaser.GameObjects.Container;
+  private settingsBookLayout = { panelW: 0, panelX: 0, contentTop: 0, contentBottom: 0, paperLeft: 0, paperW: 0 };
+
+  private createSettingsPanel(): Phaser.GameObjects.Container {
+    const container = this.add.container(0, 0);
+    container.setDepth(Depths.journalPanel + 5);
+
+    const layout = this.drawBookPanel(container, 'SETTINGS', () => this.closeSettings());
+    this.settingsBookLayout = {
+      panelW: layout.paperW,
+      panelX: layout.panelX,
+      contentTop: layout.contentTop,
+      contentBottom: layout.contentBottom,
+      paperLeft: layout.paperLeft,
+      paperW: layout.paperW,
+    };
+
+    this.settingsContent = this.add.container(0, 0);
+    container.add(this.settingsContent);
+
+    return container;
+  }
+
+  private refreshSettingsContent(): void {
+    this.settingsContent.removeAll(true);
+
+    const { panelX, paperLeft, paperW, contentTop, contentBottom } = this.settingsBookLayout;
+    const cx = panelX;
+    const contentLeft = paperLeft + 40;
+    const contentRight = paperLeft + paperW - 40;
+    const usableW = contentRight - contentLeft;
+    let y = contentTop + 30;
+
+    // ── Sound Volume ──
+    this.settingsContent.add(this.add.text(cx, y, 'SOUND VOLUME', {
+      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontStyle: 'bold', letterSpacing: 4,
+    }).setOrigin(0.5, 0));
+    y += 40;
+
+    const sliderW = Math.min(usableW - 60, 400);
+    const sliderX = cx - sliderW / 2;
+    const sliderH = 8;
+    const currentVol = UISounds.getVolume();
+
+    // Track background
+    const trackBg = this.add.rectangle(cx, y, sliderW, sliderH, 0x3a2a1a, 0.3);
+    trackBg.setStrokeStyle(1, 0x5a4a3a, 0.3);
+    this.settingsContent.add(trackBg);
+
+    // Fill
+    const fillW = sliderW * currentVol;
+    const fill = this.add.rectangle(sliderX + fillW / 2, y, fillW, sliderH, TAB_GOLD, 0.6);
+    this.settingsContent.add(fill);
+
+    // Thumb
+    const thumbX = sliderX + sliderW * currentVol;
+    const thumb = this.add.circle(thumbX, y, 14, TAB_GOLD, 0.9);
+    thumb.setStrokeStyle(2, 0x3a2a1a, 0.4);
+    this.settingsContent.add(thumb);
+
+    // Volume percentage label
+    const volLabel = this.add.text(cx, y + 28, `${Math.round(currentVol * 100)}%`, {
+      fontFamily: FONT, fontSize: '22px', color: TAB_GOLD_STR, fontStyle: 'bold',
+    }).setOrigin(0.5, 0);
+    this.settingsContent.add(volLabel);
+
+    // Interactive slider zone
+    const sliderZone = this.add.rectangle(cx, y, sliderW + 28, 44, 0x000000, 0);
+    sliderZone.setInteractive({ draggable: false, cursor: POINTER_CURSOR });
+    this.settingsContent.add(sliderZone);
+
+    const updateSlider = (pointerX: number) => {
+      const pct = Phaser.Math.Clamp((pointerX - sliderX) / sliderW, 0, 1);
+      UISounds.setVolume(pct);
+      fill.setDisplaySize(sliderW * pct, sliderH);
+      fill.setPosition(sliderX + (sliderW * pct) / 2, y);
+      thumb.setPosition(sliderX + sliderW * pct, y);
+      volLabel.setText(`${Math.round(pct * 100)}%`);
+    };
+
+    let dragging = false;
+    sliderZone.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      dragging = true;
+      updateSlider(pointer.x);
+      UISounds.click();
+    });
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (dragging) updateSlider(pointer.x);
+    });
+    this.input.on('pointerup', () => { dragging = false; });
+
+    y += 80;
+
+    // ── Divider ──
+    const divGfx = this.add.graphics();
+    divGfx.lineStyle(1, 0x5a4a3a, 0.2);
+    divGfx.lineBetween(cx - sliderW / 2, y, cx + sliderW / 2, y);
+    this.settingsContent.add(divGfx);
+    y += 30;
+
+    // ── Clear Save Data ──
+    this.settingsContent.add(this.add.text(cx, y, 'SAVE DATA', {
+      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontStyle: 'bold', letterSpacing: 4,
+    }).setOrigin(0.5, 0));
+    y += 40;
+
+    const clearBtnW = 220;
+    const clearBtnH = 48;
+    const clearBg = this.add.rectangle(cx, y + clearBtnH / 2, clearBtnW, clearBtnH, 0x3a1a1a, 0.3);
+    clearBg.setStrokeStyle(1.5, Colors.danger, 0.4);
+    clearBg.setInteractive({ cursor: POINTER_CURSOR });
+    this.settingsContent.add(clearBg);
+
+    const clearText = this.add.text(cx, y + clearBtnH / 2, 'Clear Save', {
+      fontFamily: FONT, fontSize: '20px', color: TextColors.error, fontStyle: 'bold',
+    }).setOrigin(0.5);
+    this.settingsContent.add(clearText);
+
+    let confirmPending = false;
+    clearBg.on('pointerover', () => {
+      if (!confirmPending) {
+        clearBg.setFillStyle(0x5a1a1a, 0.5);
+        clearBg.setStrokeStyle(1.5, Colors.danger, 0.7);
+      }
+    });
+    clearBg.on('pointerout', () => {
+      if (!confirmPending) {
+        clearBg.setFillStyle(0x3a1a1a, 0.3);
+        clearBg.setStrokeStyle(1.5, Colors.danger, 0.4);
+        clearText.setText('Clear Save');
+      }
+    });
+    clearBg.on('pointerdown', () => {
+      if (!confirmPending) {
+        confirmPending = true;
+        clearText.setText('Are you sure?');
+        clearBg.setFillStyle(Colors.danger, 0.5);
+        clearBg.setStrokeStyle(2, Colors.error, 0.8);
+      } else {
+        // Confirmed — delete save and restart
+        SaveSystem.getInstance().deleteSave();
+        window.location.reload();
+      }
+    });
+
+    y += clearBtnH + 50;
+
+    // ── Divider ──
+    const divGfx2 = this.add.graphics();
+    divGfx2.lineStyle(1, 0x5a4a3a, 0.2);
+    divGfx2.lineBetween(cx - sliderW / 2, y, cx + sliderW / 2, y);
+    this.settingsContent.add(divGfx2);
+    y += 30;
+
+    // ── Credits / About ──
+    this.settingsContent.add(this.add.text(cx, y,
+      'Nancy Drew: The Last Curtain Call\nA mystery by @supermodelgamer', {
+        fontFamily: FONT, fontSize: '17px', color: '#6a5a4a',
+        fontStyle: 'italic', align: 'center', lineSpacing: 6,
+      }).setOrigin(0.5, 0));
   }
 }
