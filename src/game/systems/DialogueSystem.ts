@@ -328,11 +328,12 @@ export class DialogueSystem {
     const skipX = innerRight;
     const skipY = boxTop + borderY / 2;
     const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
-      fontFamily: FONT, fontSize: '13px', color: TextColors.goldDim, letterSpacing: 2,
+      fontFamily: FONT, fontSize: '13px', color: '#1a1a1a', letterSpacing: 2,
+      shadow: { offsetX: 0, offsetY: 0, color: '#000000', blur: 4, fill: true },
     }).setOrigin(1, 0.5);
     skipBtn.setInteractive({ cursor: POINTER_CURSOR });
-    skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.gold));
-    skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.goldDim));
+    skipBtn.on('pointerover', () => skipBtn.setColor('#333333'));
+    skipBtn.on('pointerout', () => skipBtn.setColor('#1a1a1a'));
     skipBtn.on('pointerdown', () => this.skipToEnd());
     this.container.add(skipBtn);
 
