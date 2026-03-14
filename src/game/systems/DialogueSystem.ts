@@ -94,7 +94,7 @@ const TYPEWRITER_SPEED_DEFAULT = 28; // ms per character (fallback)
 const ANIM_DURATION = 400; // ms for box entrance/exit
 const PORTRAIT_GAP = 16;   // gap between portrait frame and dialogue box
 const PORTRAIT_H = 360;    // fixed portrait frame height (independent of box height)
-const FRAME_BORDER = 44;   // portrait frame gold border thickness (px at display size)
+const FRAME_BORDER = 24;   // portrait frame gold border thickness (px at display size)
 
 // Gold border insets — fractions of the DISPLAYED asset size.
 // Both dialogue-box.png and nameplate.png have thin symmetric gold border
@@ -130,6 +130,8 @@ export class DialogueSystem {
   private lastPortraitKey: string | null = null;
   // Whether current dialogue has ANY speaker with a portrait (for stable layout)
   private dialogueHasPortraits = false;
+  // Whether the portrait has already been shown (slide-in only on first appearance)
+  private portraitShownThisDialogue = false;
 
   static getInstance(): DialogueSystem {
     if (!DialogueSystem.instance) {
@@ -266,8 +268,8 @@ export class DialogueSystem {
     const dlgBoxLeft = reservePortraitSpace ? totalLeft + pfDisplayW + PORTRAIT_GAP : totalLeft;
 
     // ── Measure text to determine content-aware box height ──
-    const textPadX = 14;
-    const textPadY = 10;
+    const textPadX = 22;
+    const textPadY = 16;
     const borderXPx = Math.round(dlgBoxW * DLG_BOX_INSET_X);
     const measuredTextW = dlgBoxW - borderXPx * 2 - textPadX * 2;
     const measureText = this.scene.add.text(0, 0, line.text, {
@@ -427,14 +429,22 @@ export class DialogueSystem {
       portraitGroup.add(portrait);
       this.container.add(portraitGroup);
 
-      if (isNewSpeaker && !isDimmed) {
+      if (!this.portraitShownThisDialogue && !isDimmed) {
+        // First appearance — slide in from the left
+        this.portraitShownThisDialogue = true;
         portraitGroup.setAlpha(0);
         portraitGroup.x = -60;
         this.scene.tweens.add({
           targets: portraitGroup, x: 0, alpha: 1, duration: 350, ease: 'Power2',
         });
+      } else if (isNewSpeaker && !isDimmed) {
+        // Returning NPC speaker — just fade back to full brightness
+        portraitGroup.setAlpha(0.5);
+        this.scene.tweens.add({
+          targets: portraitGroup, alpha: 1, duration: 250, ease: 'Sine.easeOut',
+        });
       } else if (isNewSpeaker && isDimmed) {
-        // Subtle fade to dimmed state when Nancy takes over
+        // Nancy speaking — fade to dimmed state
         portraitGroup.setAlpha(0.8);
         this.scene.tweens.add({
           targets: portraitGroup, alpha: 0.5, duration: 300, ease: 'Sine.easeOut',
@@ -892,6 +902,7 @@ export class DialogueSystem {
     this.lastSpeaker = '';
     this.lastPortraitKey = null;
     this.dialogueHasPortraits = false;
+    this.portraitShownThisDialogue = false;
 
     // Exit animation: fade out and slide down
     if (this.container && this.scene) {
