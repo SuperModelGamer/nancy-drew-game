@@ -253,6 +253,7 @@ export class RoomScene extends Phaser.Scene {
     { roomId: 'backstage', itemId: 'blueprints', hint: 'These blueprints show hidden passages throughout the theater. Stella knows this building — she might recognize them.' },
     { roomId: 'projection_booth', itemId: 'annotated_script', flag: 'script_decoded', hint: 'I decoded the cipher — G-O-B-L-E-T. Diego will want to hear about this.' },
     { roomId: 'managers_office', itemId: 'ashworth_files', hint: 'These insurance documents show the demolition is worth $2.3 million. Time to confront Ashworth about his real motive.' },
+    { roomId: 'basement', itemId: 'blueprints', hint: 'Edwin\'s annotations on these blueprints show a passage network beneath the stage. There should be an entrance down here somewhere.' },
   ];
 
   private checkItemContextHints(): void {

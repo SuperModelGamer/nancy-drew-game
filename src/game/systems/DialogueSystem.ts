@@ -57,6 +57,7 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
   called_dad: 'Called Dad. He said antimony poisoning cases from the 1920s were often ruled accidental. The police may not have investigated Margaux\'s death properly.',
   called_historical_society: 'The Historical Society confirmed the Monarch is eligible for landmark status — which would block Ashworth\'s demolition. Someone doesn\'t want that to happen.',
   called_ned: 'Called Ned. He told me to be careful — old buildings fall apart at the worst moments. He\'s right, but I can\'t stop now.',
+  passage_mapped: 'Mapped the hidden passage network — a route from the basement to the dressing room, completely concealed behind the walls. Edwin could move through the building unseen, staging ghost appearances from any angle.',
 };
 
 // Forward-looking "Nancy's thinking" hints — added AFTER the event entry to guide the player
@@ -78,6 +79,7 @@ const EVENT_THINKING_HINTS: Record<string, string> = {
   catwalk_access: 'Thinking: Stella unlocked the catwalk ladder. Edwin spends time up there — I should check it for clues about the ghost staging.',
   cipher_discussed: 'Thinking: G-O-B-L-E-T. The goblet was the murder weapon in 1928. Someone coded a confession into the script margins almost a century ago.',
   edwin_personal_revealed: 'Thinking: Edwin\'s been carrying his grandfather\'s promise for decades. He has the knowledge and the motive to stage a ghost. I need proof — the basement is the key.',
+  passage_mapped: 'Thinking: The hidden passage connects the basement to the dressing room. Edwin could move through the building unseen — that\'s how he staged everything. Now I need to confront him with the evidence.',
 };
 
 // ─── Layout Constants ───────────────────────────────────────────────────────
