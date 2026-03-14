@@ -362,9 +362,7 @@ export class RoomScene extends Phaser.Scene {
       const bg = this.add.rectangle(0, 0, w, h, 0x000000, 0);
       bg.setInteractive(new Phaser.Geom.Rectangle(0, 0, w, h), Phaser.Geom.Rectangle.Contains);
 
-      // Subtle shimmer edge that appears on hover (initially invisible)
-      const shimmer = this.add.rectangle(0, 0, w + 4, h + 4, 0x000000, 0);
-      shimmer.setStrokeStyle(1.5, Colors.gold, 0);
+      // Subtle glow effect on hover (no visible box outline)
 
       // Label: larger, high-contrast, with glow — hidden until hover
       const label = this.add.text(0, -(h / 2) - 12, hotspot.label, {
@@ -407,7 +405,7 @@ export class RoomScene extends Phaser.Scene {
       }
       label.setX(labelLocalX);
 
-      container.add([shimmer, bg, label]);
+      container.add([bg, label]);
       container.setSize(w, h);
 
       // Get cursor for this hotspot type
@@ -415,15 +413,11 @@ export class RoomScene extends Phaser.Scene {
 
       // Hover: change cursor by type, show label, subtle gold edge shimmer
       bg.on('pointerover', () => {
-        // Show shimmer edge
-        shimmer.setStrokeStyle(1.5, Colors.gold, 0.35);
         this.tweens.add({ targets: label, alpha: 1, duration: 180 });
-        // Always show the hotspot-type cursor (talk bubble, grab hand, etc.)
         this.input.setDefaultCursor(hoverCursor);
       });
 
       bg.on('pointerout', () => {
-        shimmer.setStrokeStyle(1.5, Colors.gold, 0);
         this.tweens.add({ targets: label, alpha: 0, duration: 180 });
         // Restore default cursor (spyglass if exploring, or equipped item)
         const equippedCursor = this.getEquippedItemCursor();
@@ -446,6 +440,16 @@ export class RoomScene extends Phaser.Scene {
     if (!match) return false;
     const requiredChapter = parseInt(match[1], 10);
     return SaveSystem.getInstance().getChapter() >= requiredChapter;
+  }
+
+  private hideAllHotspotLabels(): void {
+    for (const container of this.hotspotObjects) {
+      container.each((child: Phaser.GameObjects.GameObject) => {
+        if (child instanceof Phaser.GameObjects.Text) {
+          (child as Phaser.GameObjects.Text).setAlpha(0);
+        }
+      });
+    }
   }
 
   private dismissDescriptionBox(): void {
@@ -532,6 +536,8 @@ export class RoomScene extends Phaser.Scene {
 
       case 'talk':
         if (hotspot.dialogueId) {
+          // Hide all hotspot labels so they don't show through the dialogue overlay
+          this.hideAllHotspotLabels();
           const dialogue = DialogueSystem.getInstance();
           dialogue.startDialogue(hotspot.dialogueId, this);
         }
