@@ -135,6 +135,8 @@ export class DialogueSystem {
   private dialogueHasPortraits = false;
   // Whether the portrait has already been shown (slide-in only on first appearance)
   private portraitShownThisDialogue = false;
+  // Nodes visited during current dialogue — choices leading here are hidden
+  private visitedNodes: Set<string> = new Set();
 
   static getInstance(): DialogueSystem {
     if (!DialogueSystem.instance) {
@@ -201,6 +203,9 @@ export class DialogueSystem {
       this.endDialogue();
       return;
     }
+
+    // Track this node as visited so choices leading here are hidden on return
+    this.visitedNodes.add(node.id);
 
     if (this.currentLineIndex < node.lines.length) {
       const line = node.lines[this.currentLineIndex];
@@ -603,8 +608,9 @@ export class DialogueSystem {
       if (choice.requiredFlag) {
         if (!save.getFlag(choice.requiredFlag) && !this.triggeredEvents.has(choice.requiredFlag)) return false;
       }
-      // Hide choices whose destination node has already been triggered
-      // (e.g. phone calls that loop back to the menu — no need to re-call)
+      // Hide choices whose destination node has already been visited this dialogue
+      if (choice.nextNode && this.visitedNodes.has(choice.nextNode)) return false;
+      // Also hide if destination node's triggerEvent has fired (persists across sessions)
       if (choice.nextNode && this.currentDialogue) {
         const destNode = this.currentDialogue.nodes.find(n => n.id === choice.nextNode);
         if (destNode?.triggerEvent) {
@@ -885,6 +891,7 @@ export class DialogueSystem {
     this.lastPortraitKey = null;
     this.dialogueHasPortraits = false;
     this.portraitShownThisDialogue = false;
+    this.visitedNodes.clear();
 
     // Exit animation: fade out and slide down
     if (this.container && this.scene) {
