@@ -402,8 +402,7 @@
           "label": "Stella Morrow",
           "type": "talk",
           "dialogueId": "stella_backstage",
-          "showWhen": "vivian_intro",
-          "hideWhen": "basement_key_location"
+          "showWhen": "vivian_intro"
         },
         {
           "id": "bs_notice_board",
@@ -417,8 +416,8 @@
         },
         {
           "id": "bs_effects_manual",
-          "x": 117,
-          "y": 655,
+          "x": 1013,
+          "y": 222,
           "width": 201,
           "height": 67,
           "label": "Effects Manual",
@@ -428,8 +427,8 @@
         },
         {
           "id": "bs_prop_table",
-          "x": 311,
-          "y": 858,
+          "x": 412,
+          "y": 519,
           "width": 120,
           "height": 80,
           "label": "Prop Table",
@@ -438,8 +437,8 @@
         },
         {
           "id": "bs_costume_rack",
-          "x": 291,
-          "y": 597,
+          "x": 236,
+          "y": 604,
           "width": 110,
           "height": 130,
           "label": "Bust & Props",
@@ -448,8 +447,8 @@
         },
         {
           "id": "bs_rigging_ropes",
-          "x": 157,
-          "y": 316,
+          "x": 164,
+          "y": 365,
           "width": 250,
           "height": 166,
           "label": "Rigging Ropes",
@@ -470,8 +469,8 @@
         },
         {
           "id": "bs_lighting_panel",
-          "x": 511,
-          "y": 486,
+          "x": 525,
+          "y": 493,
           "width": 80,
           "height": 80,
           "label": "Lighting Panel",
@@ -493,10 +492,10 @@
         },
         {
           "id": "bs_paint_cans",
-          "x": 983,
-          "y": 238,
-          "width": 80,
-          "height": 60,
+          "x": 423,
+          "y": 909,
+          "width": 207,
+          "height": 221,
           "label": "Paint Corner",
           "type": "inspect",
           "description": "Old scenic paint cans — mostly dried solid. But one can of luminous white is freshly opened. I know this stuff. It glows under UV light. Classic theater trick for making things — or people — glow in the dark. Perfect for making a ghost visible on a pitch-black stage."
