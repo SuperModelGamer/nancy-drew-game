@@ -97,9 +97,14 @@ export class RoomScene extends Phaser.Scene {
     const gameW = vf.viewportW;   // actual pixel width of the game area
     const gameH = vf.viewportH;   // actual pixel height of the game area
 
-    // Hotspots and room data are authored in 1920×1080 space — compute scale factors
-    this.scaleX = gameW / 1920;
-    this.scaleY = gameH / 1080;
+    // Hotspots and room data are authored in 1920×1080 design space.
+    // Use uniform (cover) scaling so hotspots align with the cover-scaled background.
+    const coverScale = Math.max(gameW / 1920, gameH / 1080);
+    this.scaleX = coverScale;
+    this.scaleY = coverScale;
+    // Offset to center the design space within the viewport (matches bg centering)
+    this.bgOffsetX = (gameW - 1920 * coverScale) / 2;
+    this.bgOffsetY = (gameH - 1080 * coverScale) / 2;
 
     // Room background — cover the viewport while preserving aspect ratio
     const bgKey = `bg_${this.currentRoom.id}`;
@@ -230,9 +235,11 @@ export class RoomScene extends Phaser.Scene {
     }
   }
 
-  // Scale factor from the original 1920×1080 coordinate space to the actual viewport
+  // Uniform cover scale + offset from 1920×1080 design space to viewport
   private scaleX = 1;
   private scaleY = 1;
+  private bgOffsetX = 0;
+  private bgOffsetY = 0;
 
   private createHotspots(): void {
     this.hotspotObjects.forEach(h => h.destroy());
@@ -264,9 +271,9 @@ export class RoomScene extends Phaser.Scene {
         continue;
       }
 
-      // Scale from 1920×1080 design coordinates to actual viewport
-      const hx = hotspot.x * this.scaleX;
-      const hy = hotspot.y * this.scaleY;
+      // Scale from 1920×1080 design coordinates to actual viewport (uniform cover scale)
+      const hx = hotspot.x * this.scaleX + this.bgOffsetX;
+      const hy = hotspot.y * this.scaleY + this.bgOffsetY;
       const container = this.add.container(hx, hy);
 
       // Hotspot clickable area - minimum 48px for mobile tap targets
