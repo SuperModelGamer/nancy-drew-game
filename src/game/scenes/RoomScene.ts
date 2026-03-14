@@ -59,10 +59,12 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private redirectingToCinematic = false;
+  private cameFromCinematic = false;
 
   init(data: { roomId?: string; skipCinematic?: boolean }): void {
     const roomId = data.roomId || 'lobby';
     this.redirectingToCinematic = false;
+    this.cameFromCinematic = !!data.skipCinematic;
 
     // Check for a cinematic that should play before entering this room
     if (!data.skipCinematic) {
@@ -99,11 +101,14 @@ export class RoomScene extends Phaser.Scene {
     this.scaleX = gameW / 1920;
     this.scaleY = gameH / 1080;
 
-    // Room background — fill the entire game viewport edge-to-edge
+    // Room background — cover the viewport while preserving aspect ratio
     const bgKey = `bg_${this.currentRoom.id}`;
     if (this.textures.exists(bgKey)) {
       const bg = this.add.image(gameW / 2, gameH / 2, bgKey);
-      bg.setDisplaySize(gameW, gameH);
+      const scaleX = gameW / bg.width;
+      const scaleY = gameH / bg.height;
+      const coverScale = Math.max(scaleX, scaleY);
+      bg.setScale(coverScale);
     } else {
       drawRoomBackground(this, this.currentRoom.id);
     }
@@ -162,10 +167,15 @@ export class RoomScene extends Phaser.Scene {
       this.glowCursor = cursor;
     });
 
-    // Curtain open reveal
-    this.playCurtainOpen(() => {
+    // Skip the curtain animation if we just came from a cinematic cutscene
+    if (this.cameFromCinematic) {
+      this.input.setDefaultCursor(this.getExploreCursor());
       this.checkScriptedEvents();
-    });
+    } else {
+      this.playCurtainOpen(() => {
+        this.checkScriptedEvents();
+      });
+    }
 
     // Start room-specific ambient audio
     const ambientAudio = AmbientAudioSystem.getInstance();

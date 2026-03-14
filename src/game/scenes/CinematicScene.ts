@@ -32,7 +32,7 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
   {
     id: 'ghost_sighting_auditorium',
     triggerRoom: 'auditorium',
-    triggerFlag: 'learned_about_margaux',
+    triggerFlag: '',
     slides: [
       // Slide 1: Eerie auditorium, lights dimming
       {
@@ -147,7 +147,7 @@ export function getCinematicForRoom(roomId: string): CinematicEvent | null {
   const save = SaveSystem.getInstance();
   for (const event of CINEMATIC_EVENTS) {
     if (event.triggerRoom !== roomId) continue;
-    if (!save.getFlag(event.triggerFlag)) continue;
+    if (event.triggerFlag && !save.getFlag(event.triggerFlag)) continue;
     const seenFlag = `seen_event_${event.id}`;
     if (save.getFlag(seenFlag)) continue;
     return event;
@@ -208,7 +208,7 @@ export class CinematicScene extends BaseSlideScene {
   }
 
   protected onTransitionComplete(): void {
-    this.scene.start('RoomScene', { roomId: this.targetRoom });
+    this.scene.start('RoomScene', { roomId: this.targetRoom, skipCinematic: true });
   }
 
   private completeEvent(): void {
