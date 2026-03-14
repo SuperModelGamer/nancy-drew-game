@@ -1,80 +1,65 @@
-# Dialogue Pacing & Progression Overhaul — COMPLETED
+# Suspect Dossier UI Redesign
 
-## Problems Identified
+## Problems
 
-### 1. Talk hotspots never disappear
-No `hideWhen` support exists in RoomScene. Once a character is accessible, they're clickable forever — even after all meaningful dialogue is exhausted. Revisit variants loop infinitely.
+1. **Poor text contrast** — Light text on dark navy backgrounds is hard to read, especially the italic Nancy's Thoughts and muted "Undiscovered" placeholders
+2. **Font sizes too small** — 21px body text on 1920x1080 is undersized for a detective game where reading is the primary activity
+3. **Navy-on-navy kills contrast** — Card backgrounds (0x0e0d16) on panel background (navyMid) are nearly indistinguishable
+4. **Case file feel is missing** — Classic Nancy Drew suspects screens look like actual paper dossiers/case files, not dark tech UIs
+5. **Cramped layout** — Facts and thoughts compete for space in the right column with small margins
+6. **Suspect tabs are small** — Hard to distinguish at 81px tall with 21px names
 
-### 2. Revisit variants break progressive choice gating
-Edwin's main dialogue has flag-gated choices (grandfather: `learned_about_hale_family`, props: `learned_about_missing_props`). But once `edwin_auditorium` fires, the revisit variant takes over — which does NOT include those gated choices. So the player can never access them after the first conversation. Same issue with Stella's gated choices (threatening note, lockbox, crimson veil context).
+## Design Direction
 
-### 3. No pacing between characters
-Vivian, Edwin, and Stella are all talkable from the very first minute with no story gate. The player can dump 114 lines of dialogue in one sitting before exploring anything.
-
-### 4. Phone remains clickable after all calls made
-No mechanism to hide the phone after completing all available conversations.
-
----
+Switch from dark navy tech panel → **warm paper dossier / case file aesthetic** that matches the game's 1920s theater theme. Think manila folder, aged paper, typed/handwritten notes.
 
 ## Implementation Plan
 
-### Step 1: Add `hideWhen` support to RoomScene
-- Add `hideWhen?: string` to the Hotspot interface
-- In `createHotspots()`, add a check: if `hideWhen` is set and the flag/event is active, skip the hotspot (mirror the existing `showWhen` logic but inverted)
+### Step 1: Paper dossier backgrounds
+- **Main panel**: Replace navy fill with warm paper/parchment color (`0xF0E6CC` cream, matching the existing `BOOK_PAPER` constant used elsewhere)
+- **Detail cards**: Use slightly darker parchment (`0xE8DCC0`) instead of `0x0e0d16`
+- **Header bar**: Keep dark navy for contrast, but make it narrower
 
-### Step 2: Add gated choices to revisit dialogues
-The key bug: progressively-gated choices only exist in the original dialogue but the revisit dialogue replaces it entirely. Fix by copying the gated choice branches into the revisit start nodes:
+### Step 2: Increase font sizes for readability
+- Facts text: 21px → 26px
+- Nancy's Thoughts: 19px → 24px
+- Name: 30px → 36px
+- Role: 21px → 24px
+- Info chips: 21px → 24px
+- Section headers (KNOWN FACTS, NANCY'S THOUGHTS): 21px → 24px
+- Tab names: 21px → 24px
 
-**`edwin_auditorium_revisit`** — add to start choices:
-- "Your grandfather was James Hale" (requiredFlag: `learned_about_hale_family`) → copy `grandfather` node
-- "Stella says props have been going missing" (requiredFlag: `learned_about_missing_props`) → copy `edwin_on_props` node
-- "I found Margaux's diary" (requiredItem: `margaux_diary`) → copy `diary_reaction` node
-- "The effects manual describes systems that could fake all of that" (requiredItem: `effects_manual`) → copy `effects_challenge` node
+### Step 3: Fix text colors for paper background
+- Facts text: Change from light (#e0d5c0) → dark ink (#2a1a0a, matching `BOOK_INK`)
+- Nancy's Thoughts: Change from #a0b4c4 → dark blue-gray (#3a4a5a)
+- Section headers: Keep gold but darken slightly for paper contrast
+- Undiscovered placeholders: Medium gray (#8a7a6a) instead of near-invisible muted
+- Bullets: Dark ink instead of suspect color for readability
 
-**`stella_backstage_revisit`** — add to start choices:
-- "I found your note" (requiredFlag: `saw_threatening_note`) → copy `confronted_note` + `stella_reveals_edwin` nodes
-- "Edwin told me about The Crimson Veil" (requiredFlag: `learned_about_crimson_veil`) → copy `stella_on_ghost` node
-- "I found your lockbox" (requiredItem: `stella_records`) → copy `lockbox_confronted` + `stella_reveals_edwin` nodes
+### Step 4: Improve suspect tabs
+- Increase tab height: 81px → 100px
+- Increase name font: 21px → 24px
+- Increase portrait icon: 54px → 64px
+- Stronger selected state: thicker border, brighter accent
 
-### Step 3: Add showWhen/hideWhen to talk hotspots in rooms.json
+### Step 5: Better layout spacing
+- Increase fact row min height: 54px → 60px
+- Increase padding between sections: 36px → 48px
+- Add more breathing room around Nancy's Thoughts quote
+- Increase progress bar size and label
 
-**Vivian (Lobby):**
-- No showWhen (available from start, she's the first contact)
-- hideWhen: `vivian_intro` → disappears after intro conversation
-- She reappears through item-triggered dialogues (vivian_diary, vivian_locket)
-
-**Edwin (Auditorium):**
-- showWhen: `vivian_intro` → only appears after meeting Vivian (she introduces him)
-- hideWhen: `edwin_personal_revealed` → disappears after grandfather revelation
-
-**Stella (Backstage):**
-- showWhen: `vivian_intro` → only appears after meeting Vivian
-- hideWhen: `basement_key_location` → disappears after revealing basement key location
-
-**Diego (Projection Booth):**
-- Already gated behind chapter_2 room access
-- hideWhen: `cipher_discussed` → disappears after cipher solved
-
-**Ashworth (Manager's Office):**
-- Already gated behind chapter_2 room access
-- hideWhen: `ashworth_motive_revealed` → disappears after insurance confrontation
-
-**Edwin (Basement):**
-- Already gated behind chapter_4 room access
-- No hideWhen (final confrontation — game ends after)
-
-**Phone (Lobby):**
-- No showWhen (always available)
-- hideWhen: `called_ned` → disappears after last progressively-gated call is available and made (Ned requires `heard_basement_noises`, so by the time Ned is called, all other calls are accessible)
-
-### Step 4: Gate some revisit content behind story milestones
-In revisit dialogues, add `requiredFlag` to some choices that reference events the player may not have experienced yet. This prevents characters from referencing things out of order.
+### Step 6: Visual polish
+- Add subtle paper texture effect (light noise/grain via alpha rectangles)
+- Gold dividers between sections (thicker, more visible)
+- Stronger card borders for left/right columns
+- Discovery progress: larger bar, bolder text
 
 ---
 
-## Execution Order — ALL COMPLETE
-1. ~~Add `hideWhen` to Hotspot interface and RoomScene filtering logic~~ ✓
-2. ~~Update rooms.json with showWhen/hideWhen on all talk hotspots~~ ✓
-3. ~~Add gated choices + nodes to edwin_auditorium_revisit~~ ✓
-4. ~~Add gated choices + nodes to stella_backstage_revisit~~ ✓
-5. ~~Test and commit~~ ✓
+## Execution Order
+1. Change backgrounds to paper/parchment palette
+2. Update all text colors for dark-on-light contrast
+3. Increase all font sizes
+4. Resize tabs and improve selected state
+5. Adjust spacing and padding
+6. Polish dividers and visual accents

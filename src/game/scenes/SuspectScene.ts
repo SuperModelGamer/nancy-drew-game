@@ -142,6 +142,20 @@ const SUSPECTS: SuspectProfile[] = [
   },
 ];
 
+// Paper dossier color palette
+const PaperColors = {
+  parchment: 0xF0E6CC,       // warm cream paper background
+  parchmentDark: 0xE8DCC0,   // slightly darker for cards
+  parchmentMid: 0xEBE0C8,    // mid-tone for alternating rows
+  headerNavy: 0x0c1525,      // dark header bar
+  ink: '#2a1a0a',             // dark ink for body text
+  inkLight: '#3a2a1a',       // slightly lighter ink
+  thoughtBlue: '#3a4a5a',    // dark blue-gray for Nancy's thoughts
+  undiscovered: '#8a7a6a',   // medium gray for undiscovered placeholders
+  sectionHeader: '#7a6a3a',  // darkened gold for section headers on paper
+  progressTrack: 0xD8CCB0,   // subtle track on paper
+};
+
 // Toolbar height matching UIScene
 const TOOLBAR_H = 112;
 const BOTTOM_MARGIN = 12;
@@ -165,35 +179,46 @@ export class SuspectScene extends Phaser.Scene {
     this.container.setDepth(Depths.suspectContent);
 
     // ─── Main panel ───
-    // Leave 52px for toolbar + 8px padding at bottom, 8px at top
     const panelW = Math.min(1650, width - 60);
     const panelH = height - TOOLBAR_H - BOTTOM_MARGIN - 24;
     const panelX = width / 2;
     const panelY = panelH / 2 + 12;
 
-    // Background — art deco framed dossier
+    // Background — art deco framed dossier with paper fill
     const panelLeft = panelX - panelW / 2;
     const panelTop = panelY - panelH / 2;
     const decoFrame = drawArtDecoFrame(this, panelLeft, panelTop, panelW, panelH, {
       color: DecoColors.gold,
-      alpha: 0.4,
+      alpha: 0.5,
       cornerSize: 32,
       doubleBorder: true,
-      fillColor: DecoColors.navyMid,
+      fillColor: PaperColors.parchment,
       fillAlpha: 0.97,
     });
     this.container.add(decoFrame);
 
+    // Subtle paper texture — scattered small alpha rects for grain effect
+    const texGfx = this.add.graphics();
+    for (let i = 0; i < 80; i++) {
+      const tx = panelLeft + 10 + Math.random() * (panelW - 20);
+      const ty = panelTop + 10 + Math.random() * (panelH - 20);
+      const tw = 2 + Math.random() * 6;
+      const th = 2 + Math.random() * 4;
+      texGfx.fillStyle(0x8B7355, 0.03 + Math.random() * 0.04);
+      texGfx.fillRect(tx, ty, tw, th);
+    }
+    this.container.add(texGfx);
+
     // ─── Header bar ───
-    const headerH = 72;
+    const headerH = 64;
     const headerY = panelY - panelH / 2 + headerH / 2;
 
-    const headerBg = this.add.rectangle(panelX, headerY, panelW - 12, headerH, DecoColors.navy, 1);
+    const headerBg = this.add.rectangle(panelX, headerY, panelW - 12, headerH, PaperColors.headerNavy, 1);
     this.container.add(headerBg);
 
     // Header bottom border
     const headerLine = this.add.graphics();
-    headerLine.lineStyle(1, DecoColors.gold, 0.3);
+    headerLine.lineStyle(2, DecoColors.gold, 0.5);
     headerLine.lineBetween(panelLeft + 4, panelTop + headerH, panelLeft + panelW - 4, panelTop + headerH);
     this.container.add(headerLine);
 
@@ -208,7 +233,7 @@ export class SuspectScene extends Phaser.Scene {
 
     // Decorative divider flanking title
     const divGfxHeader = this.add.graphics();
-    drawDecoDivider(divGfxHeader, panelX, headerY, panelW * 0.6, DecoColors.gold, 0.25);
+    drawDecoDivider(divGfxHeader, panelX, headerY, panelW * 0.6, DecoColors.gold, 0.3);
     this.container.add(divGfxHeader);
 
     // Close button
@@ -216,8 +241,9 @@ export class SuspectScene extends Phaser.Scene {
     closeBtn.setDepth(Depths.suspectContent);
 
     // ─── Suspect tabs (horizontal strip below header) ───
-    const tabStripY = headerY + headerH / 2 + 60;
+    const tabStripY = headerY + headerH / 2 + 68;
     const tabW = 285;
+    const tabH = 100;
     const tabGap = 18;
     const totalTabsW = SUSPECTS.length * tabW + (SUSPECTS.length - 1) * tabGap;
     const tabStartX = panelX - totalTabsW / 2 + tabW / 2;
@@ -239,61 +265,63 @@ export class SuspectScene extends Phaser.Scene {
       const met = isMet(suspect);
       const colorHex = `#${suspect.color.toString(16).padStart(6, '0')}`;
 
-      // Tab card
-      const tabBg = this.add.rectangle(tx, tabStripY, tabW, 81,
-        isSelected ? 0x1e1d2e : 0x15141e, isSelected ? 1 : 0.85);
-      tabBg.setStrokeStyle(isSelected ? 2 : 1,
-        met ? suspect.color : 0x3a3a4a,
-        isSelected ? 0.7 : 0.2);
+      // Tab card — parchment-colored on paper
+      const tabBg = this.add.rectangle(tx, tabStripY, tabW, tabH,
+        isSelected ? PaperColors.parchmentDark : PaperColors.parchmentMid,
+        isSelected ? 1 : 0.9);
+      tabBg.setStrokeStyle(isSelected ? 3 : 1,
+        met ? suspect.color : 0x8a7a6a,
+        isSelected ? 0.8 : 0.3);
 
       // Bottom accent bar when selected
       if (isSelected) {
-        const accent = this.add.rectangle(tx, tabStripY + 40 - 3, tabW, 4, suspect.color, 0.8);
+        const accent = this.add.rectangle(tx, tabStripY + tabH / 2 - 3, tabW, 5, suspect.color, 0.9);
         this.container.add(accent);
       }
 
-      // Small portrait / lock icon
-      const portraitX = tx - tabW / 2 + 36;
+      // Portrait icon
+      const portraitX = tx - tabW / 2 + 40;
+      const portraitSize = 64;
       if (met) {
         const portraitKey = `portrait_${suspect.id}`;
         if (this.textures.exists(portraitKey)) {
           const portrait = this.add.image(portraitX, tabStripY, portraitKey);
-          portrait.setDisplaySize(54, 54);
+          portrait.setDisplaySize(portraitSize, portraitSize);
           const maskGfx = this.make.graphics({});
-          maskGfx.fillCircle(portraitX, tabStripY, 27);
+          maskGfx.fillCircle(portraitX, tabStripY, portraitSize / 2);
           portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
           this.container.add(portrait);
         } else {
-          const circle = this.add.ellipse(portraitX, tabStripY, 54, 54, suspect.color, 0.15);
+          const circle = this.add.ellipse(portraitX, tabStripY, portraitSize, portraitSize, suspect.color, 0.15);
           const letter = this.add.text(portraitX, tabStripY, suspect.icon, {
-            fontFamily: FONT, fontSize: '27px', color: colorHex, fontStyle: 'bold',
+            fontFamily: FONT, fontSize: '30px', color: colorHex, fontStyle: 'bold',
           }).setOrigin(0.5);
           this.container.add([circle, letter]);
         }
         tabBg.setInteractive({ cursor: POINTER_CURSOR });
       } else {
         // Locked silhouette
-        const circle = this.add.ellipse(portraitX, tabStripY, 54, 54, 0x3a3a4a, 0.15);
+        const circle = this.add.ellipse(portraitX, tabStripY, portraitSize, portraitSize, 0x8a7a6a, 0.15);
         const lock = this.add.text(portraitX, tabStripY, '🔒', {
-          fontSize: '24px',
+          fontSize: '28px',
         }).setOrigin(0.5);
         this.container.add([circle, lock]);
       }
 
       // Name / ???
       const firstName = met ? suspect.name.split(' ')[0] : '???';
-      const nameText = this.add.text(tx + 2, tabStripY - 10, firstName, {
+      const nameText = this.add.text(tx + 4, tabStripY - 12, firstName, {
         fontFamily: FONT,
-        fontSize: isSelected ? '22px' : '21px',
-        color: met ? (isSelected ? TextColors.light : TextColors.goldDim) : TextColors.hidden,
+        fontSize: '24px',
+        color: met ? (isSelected ? PaperColors.ink : '#4a3a2a') : PaperColors.undiscovered,
         fontStyle: isSelected ? 'bold' : 'normal',
       }).setOrigin(0.5, 0.5);
 
       // Role / Unknown
-      const roleText = this.add.text(tx + 2, tabStripY + 15, met ? suspect.role : 'Unknown', {
+      const roleText = this.add.text(tx + 4, tabStripY + 18, met ? suspect.role : 'Unknown', {
         fontFamily: FONT,
-        fontSize: '15px',
-        color: met ? (isSelected ? colorHex : TextColors.muted) : TextColors.hidden,
+        fontSize: '17px',
+        color: met ? (isSelected ? '#5a4a3a' : '#7a6a5a') : PaperColors.undiscovered,
         fontStyle: 'italic',
       }).setOrigin(0.5, 0.5);
 
@@ -305,16 +333,16 @@ export class SuspectScene extends Phaser.Scene {
           this.scene.restart();
         });
         tabBg.on('pointerover', () => {
-          if (i !== this.selectedIndex) tabBg.setFillStyle(0x1e1d2e, 0.9);
+          if (i !== this.selectedIndex) tabBg.setFillStyle(PaperColors.parchmentDark, 0.95);
         });
         tabBg.on('pointerout', () => {
-          if (i !== this.selectedIndex) tabBg.setFillStyle(0x15141e, 0.85);
+          if (i !== this.selectedIndex) tabBg.setFillStyle(PaperColors.parchmentMid, 0.9);
         });
       }
     });
 
     // ─── Detail area (below tabs) ───
-    const detailTop = tabStripY + 63;
+    const detailTop = tabStripY + tabH / 2 + 18;
     const detailBottom = panelY + panelH / 2 - 21;
     const detailH = detailBottom - detailTop;
     const detailW = panelW - 90;
@@ -326,7 +354,7 @@ export class SuspectScene extends Phaser.Scene {
     } else {
       // No suspects met yet — show placeholder
       const placeholder = this.add.text(detailCenterX, detailCenterY, 'Talk to people in the theater\nto learn about suspects.', {
-        fontFamily: FONT, fontSize: '24px', color: TextColors.muted,
+        fontFamily: FONT, fontSize: '26px', color: PaperColors.undiscovered,
         fontStyle: 'italic', align: 'center', lineSpacing: 8,
       }).setOrigin(0.5);
       this.container.add(placeholder);
@@ -349,11 +377,11 @@ export class SuspectScene extends Phaser.Scene {
     const leftW = 420;
     const leftX = cx - dw / 2;
 
-    // Portrait card background
+    // Portrait card background — darker parchment card
     const cardH = Math.min(dh - 15, 720);
     const cardY = cy;
-    const cardBg = this.add.rectangle(leftX + leftW / 2, cardY, leftW, cardH, 0x0e0d16, 0.7);
-    cardBg.setStrokeStyle(1, suspect.color, 0.2);
+    const cardBg = this.add.rectangle(leftX + leftW / 2, cardY, leftW, cardH, PaperColors.parchmentDark, 0.8);
+    cardBg.setStrokeStyle(2, DecoColors.gold, 0.3);
     this.container.add(cardBg);
 
     // Large portrait
@@ -395,33 +423,33 @@ export class SuspectScene extends Phaser.Scene {
     const nameY = portraitY + portraitSize / 2 + 30;
     this.container.add(this.add.text(portraitX, nameY, suspect.name, {
       fontFamily: FONT,
-      fontSize: '30px',
-      color: colorHex,
+      fontSize: '36px',
+      color: PaperColors.ink,
       fontStyle: 'bold',
       align: 'center',
     }).setOrigin(0.5));
 
     // Role
-    this.container.add(this.add.text(portraitX, nameY + 39, suspect.role, {
+    this.container.add(this.add.text(portraitX, nameY + 45, suspect.role, {
       fontFamily: FONT,
-      fontSize: '21px',
-      color: TextColors.light,
+      fontSize: '24px',
+      color: '#5a4a3a',
       fontStyle: 'italic',
     }).setOrigin(0.5));
 
     // Info chips
-    const chipStartY = nameY + 84;
+    const chipStartY = nameY + 96;
     const chips = [
       { label: `Age: ${suspect.age}`, icon: '◈' },
       { label: suspect.location, icon: '◉' },
     ];
     chips.forEach((chip, i) => {
-      const chipY = chipStartY + i * 45;
-      const chipBg = this.add.rectangle(portraitX, chipY, 300, 36, suspect.color, 0.08);
-      chipBg.setStrokeStyle(1, suspect.color, 0.2);
+      const chipY = chipStartY + i * 50;
+      const chipBg = this.add.rectangle(portraitX, chipY, 300, 40, suspect.color, 0.1);
+      chipBg.setStrokeStyle(1, suspect.color, 0.25);
       this.container.add(chipBg);
       const chipLabel = this.add.text(portraitX, chipY, `${chip.icon}  ${chip.label}`, {
-        fontFamily: FONT, fontSize: '21px', color: TextColors.goldDim,
+        fontFamily: FONT, fontSize: '24px', color: PaperColors.inkLight,
       }).setOrigin(0.5);
       this.container.add(chipLabel);
     });
@@ -432,24 +460,25 @@ export class SuspectScene extends Phaser.Scene {
     ).length;
     const total = suspect.facts.length;
 
-    const progressY = chipStartY + 120;
+    const progressY = chipStartY + 130;
     const progressW = 300;
-    const progressH = 7;
+    const progressH = 10;
 
-    const trackBg = this.add.rectangle(portraitX, progressY, progressW, progressH, 0x1a1a2e, 1);
+    const trackBg = this.add.rectangle(portraitX, progressY, progressW, progressH, PaperColors.progressTrack, 1);
+    trackBg.setStrokeStyle(1, DecoColors.goldDim, 0.3);
     this.container.add(trackBg);
 
     const pct = discovered / total;
     if (pct > 0) {
       const fill = this.add.rectangle(
         portraitX - progressW / 2 + (progressW * pct) / 2, progressY,
-        progressW * pct, progressH, suspect.color, 0.7
+        progressW * pct, progressH, suspect.color, 0.8
       );
       this.container.add(fill);
     }
 
-    this.container.add(this.add.text(portraitX, progressY + 21, `${discovered} / ${total} facts discovered`, {
-      fontFamily: FONT, fontSize: '20px', color: TextColors.muted, fontStyle: 'italic',
+    this.container.add(this.add.text(portraitX, progressY + 24, `${discovered} / ${total} facts discovered`, {
+      fontFamily: FONT, fontSize: '22px', color: '#6a5a4a', fontStyle: 'italic',
     }).setOrigin(0.5));
 
     // ── Right column: Known Facts ──
@@ -457,29 +486,29 @@ export class SuspectScene extends Phaser.Scene {
     const rightW = dw - leftW - 36;
     const rightCx = rightX + rightW / 2;
 
-    // Facts panel background
+    // Facts panel background — darker parchment card
     const factsPanelH = cardH;
-    const factsBg = this.add.rectangle(rightCx, cy, rightW, factsPanelH, 0x0e0d16, 0.5);
-    factsBg.setStrokeStyle(1, suspect.color, 0.12);
+    const factsBg = this.add.rectangle(rightCx, cy, rightW, factsPanelH, PaperColors.parchmentDark, 0.6);
+    factsBg.setStrokeStyle(2, DecoColors.gold, 0.3);
     this.container.add(factsBg);
 
     // Section header
     const factsHeaderY = cy - factsPanelH / 2 + 36;
     this.container.add(this.add.text(rightX + 30, factsHeaderY, 'KNOWN FACTS', {
       fontFamily: FONT,
-      fontSize: '21px',
-      color: TextColors.gold,
+      fontSize: '24px',
+      color: PaperColors.sectionHeader,
       fontStyle: 'bold',
       letterSpacing: 5,
     }));
 
-    // Divider under header (art deco)
+    // Divider under header (art deco) — thicker, more visible gold
     const divGfx = this.add.graphics();
-    drawDecoDivider(divGfx, rightCx, factsHeaderY + 33, rightW - 60, DecoColors.gold, 0.25);
+    drawDecoDivider(divGfx, rightCx, factsHeaderY + 36, rightW - 60, DecoColors.gold, 0.4);
     this.container.add(divGfx);
 
     // Facts list
-    let y = factsHeaderY + 60;
+    let y = factsHeaderY + 66;
     const factMaxW = rightW - 90;
 
     suspect.facts.forEach((fact, idx) => {
@@ -489,30 +518,30 @@ export class SuspectScene extends Phaser.Scene {
 
       // Alternating subtle row tint
       if (idx % 2 === 0) {
-        const rowBg = this.add.rectangle(rightCx, y + 15, rightW - 30, 54, suspect.color, 0.03);
+        const rowBg = this.add.rectangle(rightCx, y + 18, rightW - 30, 60, 0x8B7355, 0.06);
         this.container.add(rowBg);
       }
 
-      // Bullet
+      // Bullet — dark ink for readability
       const bullet = unlocked ? '◆' : '◇';
-      const bulletColor = unlocked ? colorHex : TextColors.hidden;
+      const bulletColor = unlocked ? PaperColors.ink : PaperColors.undiscovered;
       this.container.add(this.add.text(rightX + 36, y, bullet, {
-        fontFamily: FONT, fontSize: '21px', color: bulletColor,
+        fontFamily: FONT, fontSize: '26px', color: bulletColor,
       }));
 
       // Fact text
       const displayText = unlocked ? fact.text : '— Undiscovered —';
-      const factText = this.add.text(rightX + 69, y, displayText, {
+      const factText = this.add.text(rightX + 72, y, displayText, {
         fontFamily: FONT,
-        fontSize: '21px',
-        color: unlocked ? TextColors.light : TextColors.hidden,
+        fontSize: '26px',
+        color: unlocked ? PaperColors.ink : PaperColors.undiscovered,
         fontStyle: unlocked ? 'normal' : 'italic',
         wordWrap: { width: factMaxW },
-        lineSpacing: 3,
+        lineSpacing: 4,
       });
       this.container.add(factText);
 
-      y += Math.max(factText.height + 21, 54);
+      y += Math.max(factText.height + 24, 60);
     });
 
     // ── Nancy's Inner Monologue ──
@@ -521,51 +550,51 @@ export class SuspectScene extends Phaser.Scene {
     );
 
     if (unlockedThoughts.length > 0) {
-      y += 12;
+      y += 18;
 
-      // Divider
+      // Divider — thicker gold
       const thoughtDivGfx = this.add.graphics();
-      drawDecoDivider(thoughtDivGfx, rightCx, y, rightW - 90, suspect.color, 0.2);
+      drawDecoDivider(thoughtDivGfx, rightCx, y, rightW - 90, DecoColors.gold, 0.35);
       this.container.add(thoughtDivGfx);
-      y += 24;
+      y += 30;
 
       // Section header
       this.container.add(this.add.text(rightX + 30, y, 'NANCY\'S THOUGHTS', {
         fontFamily: FONT,
-        fontSize: '18px',
-        color: TextColors.goldDim,
+        fontSize: '24px',
+        color: PaperColors.sectionHeader,
         fontStyle: 'bold italic',
         letterSpacing: 4,
       }));
-      y += 36;
+      y += 48;
 
       // Show the most recent unlocked thought (last in array = most progression)
       const latestThought = unlockedThoughts[unlockedThoughts.length - 1];
       const thoughtText = this.add.text(rightX + 36, y, latestThought.text, {
         fontFamily: FONT,
-        fontSize: '19px',
-        color: '#a0b4c4',
+        fontSize: '24px',
+        color: PaperColors.thoughtBlue,
         fontStyle: 'italic',
         wordWrap: { width: factMaxW },
-        lineSpacing: 5,
+        lineSpacing: 6,
       });
       this.container.add(thoughtText);
-      y += thoughtText.height + 12;
+      y += thoughtText.height + 16;
 
-      // If there are earlier thoughts, show them dimmer
+      // If there are earlier thoughts, show them slightly lighter
       if (unlockedThoughts.length > 1) {
         for (let ti = unlockedThoughts.length - 2; ti >= 0; ti--) {
           const olderThought = unlockedThoughts[ti];
           const olderText = this.add.text(rightX + 36, y, olderThought.text, {
             fontFamily: FONT,
-            fontSize: '17px',
-            color: TextColors.muted,
+            fontSize: '21px',
+            color: '#5a6a7a',
             fontStyle: 'italic',
             wordWrap: { width: factMaxW },
-            lineSpacing: 4,
+            lineSpacing: 5,
           });
           this.container.add(olderText);
-          y += olderText.height + 10;
+          y += olderText.height + 12;
         }
       }
     }
