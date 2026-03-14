@@ -125,6 +125,8 @@ export class DialogueSystem {
 
   // Track current speaker for entrance animations
   private lastSpeaker = '';
+  // Last NPC portrait key — shown dimmed when Nancy speaks
+  private lastPortraitKey: string | null = null;
   // Whether current dialogue has ANY speaker with a portrait (for stable layout)
   private dialogueHasPortraits = false;
 
@@ -379,8 +381,13 @@ export class DialogueSystem {
       this.container.add(arrow);
     }
 
-    // ── 6–7. Portrait frame BESIDE the dialogue box (frame behind, portrait on top) ──
-    if (hasPortrait && portraitKey) {
+    // ── 6–7. Portrait frame BESIDE the dialogue box ──
+    // Show the NPC portrait when they speak (full brightness).
+    // When Nancy speaks, dim the last NPC portrait to keep the frame filled.
+    const showPortraitKey = hasPortrait ? portraitKey : this.lastPortraitKey;
+    const isDimmed = !hasPortrait && showPortraitKey !== null; // Nancy speaking → dim NPC
+
+    if (reservePortraitSpace && showPortraitKey && this.scene.textures.exists(showPortraitKey)) {
       const pfCenterX = totalLeft + pfDisplayW / 2;
       const pfCenterY = boxTop + boxH - pfDisplayH / 2; // bottom-aligned with dialogue box
 
@@ -404,7 +411,7 @@ export class DialogueSystem {
       // Portrait image ON TOP of frame — fills the inner opening
       const innerFW = pfDisplayW - FRAME_BORDER * 2;
       const innerFH = pfDisplayH - FRAME_BORDER * 2;
-      const portrait = this.scene.add.image(pfCenterX, pfCenterY, portraitKey);
+      const portrait = this.scene.add.image(pfCenterX, pfCenterY, showPortraitKey);
       const texW = portrait.width;
       const texH = portrait.height;
       const scaleToFill = Math.max(innerFW / texW, innerFH / texH);
@@ -414,19 +421,35 @@ export class DialogueSystem {
       const cropX = Math.round((texW - cropW) / 2);
       const cropY = Math.round((texH - cropH) / 2);
       portrait.setCrop(cropX, cropY, cropW, cropH);
-      portraitGroup.add(portrait);
 
+      // Dim portrait when Nancy is speaking
+      if (isDimmed) {
+        portrait.setTint(0x888888);
+        portraitGroup.setAlpha(0.5);
+      }
+
+      portraitGroup.add(portrait);
       this.container.add(portraitGroup);
 
-      if (isNewSpeaker) {
+      if (isNewSpeaker && !isDimmed) {
         portraitGroup.setAlpha(0);
         portraitGroup.x = -60;
         this.scene.tweens.add({
           targets: portraitGroup, x: 0, alpha: 1, duration: 350, ease: 'Power2',
         });
+      } else if (isNewSpeaker && isDimmed) {
+        // Subtle fade to dimmed state when Nancy takes over
+        portraitGroup.setAlpha(0.8);
+        this.scene.tweens.add({
+          targets: portraitGroup, alpha: 0.5, duration: 300, ease: 'Sine.easeOut',
+        });
       }
     }
 
+    // Track the last NPC portrait for dimming when Nancy speaks
+    if (hasPortrait && portraitKey) {
+      this.lastPortraitKey = portraitKey;
+    }
     this.lastSpeaker = line.speaker;
 
     // ── 8–9. Speaker nameplate (overlaid on portrait bottom, or centered above dialogue) ──
@@ -871,6 +894,7 @@ export class DialogueSystem {
     this.active = false;
     this.currentDialogue = null;
     this.lastSpeaker = '';
+    this.lastPortraitKey = null;
     this.dialogueHasPortraits = false;
 
     // Exit animation: fade out and slide down
