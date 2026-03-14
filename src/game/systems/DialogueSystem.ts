@@ -83,7 +83,7 @@ const EVENT_THINKING_HINTS: Record<string, string> = {
 };
 
 // ─── Layout Constants ───────────────────────────────────────────────────────
-const MIN_BOX_H = 160;   // minimum box height (short lines like "...")
+const MIN_BOX_H = 260;   // minimum box height — keeps dialogue box substantial
 const MAX_BOX_H = 340;   // maximum box height (long paragraphs)
 const BOX_BOTTOM_MARGIN = 140;  // keeps box + portrait above the viewfinder frame border
 const TEXT_SIZE = '26px';
