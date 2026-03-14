@@ -22,6 +22,10 @@ function getCtx(): AudioContext | null {
       return null;
     }
   }
+  // Resume suspended context (browsers require user gesture)
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
   return audioCtx;
 }
 

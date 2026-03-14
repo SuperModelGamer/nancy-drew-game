@@ -173,8 +173,8 @@ export class AmbientAudioSystem {
     const masterVol = UISounds.getVolume();
 
     // Start primary loop
-    if (config.primary && this.scene.sound.get(config.primary) || this.scene.cache.audio.exists(config.primary!)) {
-      this.startLoop(config.primary!, (config.primaryVol ?? 0.3) * masterVol);
+    if (config.primary && (this.scene.sound.get(config.primary) || this.scene.cache.audio.exists(config.primary))) {
+      this.startLoop(config.primary, (config.primaryVol ?? 0.3) * masterVol);
     }
 
     // Start secondary loop
@@ -252,6 +252,10 @@ export class AmbientAudioSystem {
   private getAudioCtx(): AudioContext | null {
     if (!this.audioCtx) {
       try { this.audioCtx = new AudioContext(); } catch { return null; }
+    }
+    // Resume suspended context (browsers require user gesture)
+    if (this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume();
     }
     return this.audioCtx;
   }
