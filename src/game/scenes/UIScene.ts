@@ -247,7 +247,7 @@ export class UIScene extends Phaser.Scene {
 
     // ─── Layout: vertically center content within panel ───
     // Total content height estimate for balanced spacing
-    const totalContentH = 520; // approximate height of all elements
+    const totalContentH = 620; // approximate height of all elements
     let y = fTop + Math.max(pad, (panelH - totalContentH) / 2);
 
     // ── Chapter indicator ──
@@ -255,7 +255,7 @@ export class UIScene extends Phaser.Scene {
       fontFamily: FONT, fontSize: '10px', color: TextColors.mutedBlue,
       letterSpacing: 4, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 18;
+    y += 22;
 
     // ── Room name ──
     this.borderRoomNameText = this.add.text(contentX, y, '', {
@@ -263,80 +263,80 @@ export class UIScene extends Phaser.Scene {
       fontStyle: 'bold', align: 'center', letterSpacing: 2,
       wordWrap: { width: rpW - pad * 2 },
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 44;
+    y += 48;
 
     // ── Art deco divider ──
     drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2, DecoColors.gold, 0.3);
-    y += 22;
+    y += 28;
 
     // ── ITEMS (per-room) ──
     this.add.text(contentX, y, 'ITEMS', {
       fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue,
       letterSpacing: 4, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 20;
+    y += 22;
 
     this.borderItemCountText = this.add.text(contentX, y, '', {
       fontFamily: FONT, fontSize: '30px', color: '#c9a84c',
       fontStyle: 'bold', align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 44;
+    y += 50;
 
     // ── Clues in this room (gold) ──
     this.add.text(contentX, y, 'CLUES IN ROOM', {
       fontFamily: FONT, fontSize: '10px', color: '#c9a84c',
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 18;
+    y += 22;
 
     this.borderRoomClueCountText = this.add.text(contentX, y, '', {
       fontFamily: FONT, fontSize: '26px', color: '#c9a84c',
       fontStyle: 'bold', align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 40;
+    y += 46;
 
     // ── Thin gold line ──
     decoGfx.lineStyle(1, DecoColors.gold, 0.15);
     decoGfx.lineBetween(rpX + pad + 16, y, rpX + rpW - pad - 16, y);
-    y += 16;
+    y += 22;
 
     // ── Items total (white) ──
     this.add.text(contentX, y, 'ITEMS TOTAL', {
       fontFamily: FONT, fontSize: '10px', color: '#ffffff',
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 18;
+    y += 22;
 
     this.borderTotalItemCountText = this.add.text(contentX, y, '', {
       fontFamily: FONT, fontSize: '22px', color: '#ffffff',
       align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 36;
+    y += 42;
 
     // ── Thin gold line ──
     decoGfx.lineStyle(1, DecoColors.gold, 0.15);
     decoGfx.lineBetween(rpX + pad + 16, y, rpX + rpW - pad - 16, y);
-    y += 16;
+    y += 22;
 
     // ── CLUES (global) ──
     this.add.text(contentX, y, 'CLUES', {
       fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue,
       letterSpacing: 4, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 20;
+    y += 24;
 
     this.borderClueCountText = this.add.text(contentX, y, '', {
       fontFamily: FONT, fontSize: '26px', color: '#7a8a9a',
       align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 40;
+    y += 46;
 
     // ── Progress bar ──
     this.add.text(contentX, y, 'PROGRESS', {
       fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 16;
+    y += 20;
 
     const barW = rpW - pad * 2 - 20;
     const barH = 6;
@@ -354,16 +354,16 @@ export class UIScene extends Phaser.Scene {
     this.borderProgressBar.setData('barW', barW);
     this.borderProgressBar.setData('barH', barH);
 
-    y += barH + 6;
+    y += barH + 8;
     this.borderProgressPct = this.add.text(contentX, y, '', {
       fontFamily: FONT, fontSize: '10px', color: TextColors.goldDim,
       align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 24;
+    y += 28;
 
     // ── Art deco divider before gear ──
     drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2 - 10, DecoColors.gold, 0.2);
-    y += 22;
+    y += 26;
 
     // ── Settings gear (enlarged, below counters) ──
     const gearBtn = this.add.text(contentX, y, '⚙', {
