@@ -110,7 +110,17 @@ export class DialogueSystem {
 
   startDialogue(dialogueId: string, scene: Phaser.Scene): void {
     const dialogues = dialogueData.dialogues as Dialogue[];
-    const dialogue = dialogues.find(d => d.id === dialogueId);
+
+    // If this dialogue was already completed, check for a revisit variant
+    let effectiveId = dialogueId;
+    if (this.triggeredEvents.has(dialogueId) || SaveSystem.getInstance().getFlag(dialogueId)) {
+      const revisitId = `${dialogueId}_revisit`;
+      if (dialogues.find(d => d.id === revisitId)) {
+        effectiveId = revisitId;
+      }
+    }
+
+    const dialogue = dialogues.find(d => d.id === effectiveId);
     if (!dialogue) return;
 
     this.currentDialogue = dialogue;
