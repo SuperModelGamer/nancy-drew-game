@@ -15,6 +15,7 @@ import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 import { UISounds } from '../utils/sounds';
 import { AmbientAudioSystem } from '../systems/AmbientAudioSystem';
+import { playCurtainClose } from '../utils/transitions';
 import { getCinematicForRoom } from './CinematicScene';
 
 interface Hotspot {
@@ -57,14 +58,18 @@ export class RoomScene extends Phaser.Scene {
     super({ key: 'RoomScene' });
   }
 
+  private redirectingToCinematic = false;
+
   init(data: { roomId?: string; skipCinematic?: boolean }): void {
     const roomId = data.roomId || 'lobby';
+    this.redirectingToCinematic = false;
 
     // Check for a cinematic that should play before entering this room
     if (!data.skipCinematic) {
       const cinematic = getCinematicForRoom(roomId);
       if (cinematic) {
-        // Redirect to CinematicScene — it will transition to this room when done
+        // Flag prevents create() from running room setup on a missing currentRoom
+        this.redirectingToCinematic = true;
         this.scene.start('CinematicScene', {
           cinematicId: cinematic.id,
           targetRoom: roomId,
@@ -79,6 +84,7 @@ export class RoomScene extends Phaser.Scene {
   }
 
   create(): void {
+    if (this.redirectingToCinematic) return;
     // Set up the camera viewport to exactly fill the game area inside the UI frame.
     // No zoom — the viewport dimensions ARE the game world dimensions.
     const vf = computeViewfinderLayout(1920, 1080);
@@ -739,34 +745,6 @@ export class RoomScene extends Phaser.Scene {
     });
   }
 
-  private playCurtainClose(onComplete: () => void): void {
-    const { width, height } = this.cameras.main.worldView;
-    const curtainColor = 0x4a0a0a;
-
-    const left = this.add.rectangle(-width / 4, height / 2, width / 2, height, curtainColor, 1);
-    const right = this.add.rectangle(width + width / 4, height / 2, width / 2, height, curtainColor, 1);
-    left.setDepth(Depths.scriptedEvent + 10);
-    right.setDepth(Depths.scriptedEvent + 10);
-
-    const fringeL = this.add.rectangle(-width / 4 + width / 4, height / 2, 3, height, Colors.gold, 0.6);
-    const fringeR = this.add.rectangle(width + width / 4 - width / 4, height / 2, 3, height, Colors.gold, 0.6);
-    fringeL.setDepth(Depths.scriptedEvent + 11);
-    fringeR.setDepth(Depths.scriptedEvent + 11);
-
-    this.tweens.add({
-      targets: [left, fringeL],
-      x: `+=${width / 4}`,
-      duration: 500,
-      ease: 'Power2',
-    });
-    this.tweens.add({
-      targets: [right, fringeR],
-      x: `-=${width / 4}`,
-      duration: 500,
-      ease: 'Power2',
-      onComplete: () => onComplete(),
-    });
-  }
 
   private showRoomAnnouncement(width: number, height: number, onDismiss?: () => void): void {
     const container = this.add.container(0, 0);
@@ -857,7 +835,7 @@ export class RoomScene extends Phaser.Scene {
     UISounds.doorTransition();
     SaveSystem.getInstance().setCurrentRoom(roomId);
     SaveSystem.getInstance().save();
-    this.playCurtainClose(() => {
+    playCurtainClose(this, () => {
       this.scene.restart({ roomId });
     });
   }

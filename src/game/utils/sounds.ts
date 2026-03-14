@@ -58,7 +58,13 @@ function playTone(
   gain.connect(ctx.destination);
   osc.start(ctx.currentTime);
   osc.stop(ctx.currentTime + duration);
+
+  // Deterministic cleanup — disconnect nodes when oscillator finishes
+  osc.onended = () => { osc.disconnect(); gain.disconnect(); };
 }
+
+/** Cached noise buffers keyed by sample count to avoid repeated allocation. */
+const noiseBufferCache = new Map<number, AudioBuffer>();
 
 /** Play noise burst (for impacts, rustles, whisper textures). */
 function playNoise(duration: number, volume = 0.1, bandpass?: { freq: number; Q: number }): void {
@@ -67,11 +73,17 @@ function playNoise(duration: number, volume = 0.1, bandpass?: { freq: number; Q:
   if (!ctx) return;
 
   const effectiveVol = volume * masterVolume;
-  const bufferSize = ctx.sampleRate * duration;
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-    data[i] = Math.random() * 2 - 1;
+  const bufferSize = Math.round(ctx.sampleRate * duration);
+
+  // Reuse cached noise buffer for same size — noise is noise
+  let buffer = noiseBufferCache.get(bufferSize);
+  if (!buffer) {
+    buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    noiseBufferCache.set(bufferSize, buffer);
   }
 
   const source = ctx.createBufferSource();
@@ -88,8 +100,11 @@ function playNoise(duration: number, volume = 0.1, bandpass?: { freq: number; Q:
     filter.Q.value = bandpass.Q;
     source.connect(filter);
     filter.connect(gain);
+    // Deterministic cleanup
+    source.onended = () => { source.disconnect(); filter.disconnect(); gain.disconnect(); };
   } else {
     source.connect(gain);
+    source.onended = () => { source.disconnect(); gain.disconnect(); };
   }
 
   gain.connect(ctx.destination);

@@ -16,8 +16,9 @@
 
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
-import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { Colors, TextColors, FONT } from '../utils/constants';
 import { UISounds } from '../utils/sounds';
+import { playCurtainClose } from '../utils/transitions';
 import { POINTER_CURSOR } from '../utils/cursors';
 
 // ─── Slide types (mirrors IntroScene) ────────────────────────────────────────
@@ -113,7 +114,7 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
         ],
         audio: [
           { key: 'proc:eerieWhistle', delay: 500 },
-          { key: 'cine_whisper', delay: 1500, volume: 0.15 },
+          { key: 'sfx_ghost_whisper', delay: 1500, volume: 0.15 },
         ],
       },
       // Slide 3: Ghost face reveal
@@ -234,6 +235,7 @@ export class CinematicScene extends Phaser.Scene {
     this.currentBg = null;
     this.ghostOverlay = null;
     this.activeSounds = [];
+    this.eventCompleted = false;
   }
 
   create(): void {
@@ -693,12 +695,18 @@ export class CinematicScene extends Phaser.Scene {
 
   private skipToRoom(): void {
     this.canSkip = false;
+    this.abortSlide = true;
+    this.time.removeAllEvents();
     this.stopAllSounds();
-    this.completeEvent();
     this.transitionToRoom();
   }
 
+  private eventCompleted = false;
+
   private completeEvent(): void {
+    if (this.eventCompleted) return;
+    this.eventCompleted = true;
+
     const save = SaveSystem.getInstance();
     save.setFlag(`seen_event_${this.cinematicData.id}`, true);
     if (this.cinematicData.onComplete) {
@@ -737,34 +745,11 @@ export class CinematicScene extends Phaser.Scene {
         targets: flash, fillAlpha: 0.15, duration: 200, yoyo: true,
         onComplete: () => {
           UISounds.doorTransition();
-          this.playCurtainClose(() => {
+          playCurtainClose(this, () => {
             this.scene.start('RoomScene', { roomId: this.targetRoom });
           });
         },
       });
-    });
-  }
-
-  private playCurtainClose(onComplete: () => void): void {
-    const { width, height } = this.cameras.main;
-    const curtainColor = 0x4a0a0a;
-
-    const left = this.add.rectangle(-width / 4, height / 2, width / 2, height, curtainColor, 1);
-    const right = this.add.rectangle(width + width / 4, height / 2, width / 2, height, curtainColor, 1);
-    left.setDepth(Depths.scriptedEvent + 10);
-    right.setDepth(Depths.scriptedEvent + 10);
-
-    const fringeL = this.add.rectangle(-width / 4 + width / 4, height / 2, 3, height, Colors.gold, 0.6);
-    const fringeR = this.add.rectangle(width + width / 4 - width / 4, height / 2, 3, height, Colors.gold, 0.6);
-    fringeL.setDepth(Depths.scriptedEvent + 11);
-    fringeR.setDepth(Depths.scriptedEvent + 11);
-
-    this.tweens.add({
-      targets: [left, fringeL], x: `+=${width / 4}`, duration: 500, ease: 'Power2',
-    });
-    this.tweens.add({
-      targets: [right, fringeR], x: `-=${width / 4}`, duration: 500, ease: 'Power2',
-      onComplete: () => onComplete(),
     });
   }
 }

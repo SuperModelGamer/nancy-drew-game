@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
-import { Colors, TextColors, FONT, Depths } from '../utils/constants';
+import { Colors, TextColors, FONT } from '../utils/constants';
 import { UISounds } from '../utils/sounds';
+import { playCurtainClose } from '../utils/transitions';
 import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
 
 // ─── Slide Configuration ────────────────────────────────────────────────────
@@ -880,7 +881,7 @@ export class IntroScene extends Phaser.Scene {
         yoyo: true,
         onComplete: () => {
           UISounds.doorTransition();
-          this.playCurtainClose(() => {
+          playCurtainClose(this, () => {
             this.scene.start('RoomScene', { roomId: 'lobby' });
             this.scene.launch('UIScene');
           });
@@ -889,33 +890,4 @@ export class IntroScene extends Phaser.Scene {
     });
   }
 
-  private playCurtainClose(onComplete: () => void): void {
-    const { width, height } = this.cameras.main;
-    const curtainColor = 0x4a0a0a; // deep crimson
-
-    const left = this.add.rectangle(-width / 4, height / 2, width / 2, height, curtainColor, 1);
-    const right = this.add.rectangle(width + width / 4, height / 2, width / 2, height, curtainColor, 1);
-    left.setDepth(Depths.scriptedEvent + 10);
-    right.setDepth(Depths.scriptedEvent + 10);
-
-    // Gold fringe at inner edges
-    const fringeL = this.add.rectangle(-width / 4 + width / 4, height / 2, 3, height, Colors.gold, 0.6);
-    const fringeR = this.add.rectangle(width + width / 4 - width / 4, height / 2, 3, height, Colors.gold, 0.6);
-    fringeL.setDepth(Depths.scriptedEvent + 11);
-    fringeR.setDepth(Depths.scriptedEvent + 11);
-
-    this.tweens.add({
-      targets: [left, fringeL],
-      x: `+=${width / 4}`,
-      duration: 500,
-      ease: 'Power2',
-    });
-    this.tweens.add({
-      targets: [right, fringeR],
-      x: `-=${width / 4}`,
-      duration: 500,
-      ease: 'Power2',
-      onComplete: () => onComplete(),
-    });
-  }
 }

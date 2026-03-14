@@ -131,7 +131,6 @@ export class BootScene extends Phaser.Scene {
       music_intro: ['audio/music_intro.mp3', 'audio/music_intro.ogg'],
       // Cinematic-specific audio
       cine_ambient_ghost: ['assets/audio/creepy_ambient.mp3'],
-      cine_whisper: ['assets/audio/ghost_whisper.wav'],
     };
     for (const [key, paths] of Object.entries(introAudio)) {
       this.load.audio(key, paths);
