@@ -125,6 +125,8 @@ export class DialogueSystem {
 
   // Track current speaker for entrance animations
   private lastSpeaker = '';
+  // Whether current dialogue has ANY speaker with a portrait (for stable layout)
+  private dialogueHasPortraits = false;
 
   static getInstance(): DialogueSystem {
     if (!DialogueSystem.instance) {
@@ -163,6 +165,12 @@ export class DialogueSystem {
     this.active = true;
     this.scene = scene;
     this.lastSpeaker = '';
+
+    // Pre-scan: does ANY speaker in this dialogue have a portrait?
+    // Used to keep layout stable (always reserve portrait space if so)
+    this.dialogueHasPortraits = dialogue.nodes.some(node =>
+      node.lines.some(l => this.getSpeakerPortraitKey(l.speaker) !== null)
+    );
 
     this.showDialogueUI();
     this.showCurrentLine();
@@ -235,10 +243,13 @@ export class DialogueSystem {
     // ── Portrait detection ──
     const portraitKey = this.getSpeakerPortraitKey(line.speaker);
     const hasPortrait = portraitKey !== null && this.scene.textures.exists(portraitKey);
+    // Reserve portrait space if ANY speaker in this dialogue has a portrait,
+    // even on lines from speakers without one (keeps layout stable)
+    const reservePortraitSpace = this.dialogueHasPortraits;
 
     // ── Determine portrait frame dimensions (sits BESIDE the dialogue box) ──
     let pfRatio = 0.72; // fallback aspect ratio
-    if (hasPortrait && this.scene.textures.exists('dlg_portrait_frame')) {
+    if (this.scene.textures.exists('dlg_portrait_frame')) {
       const pfTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
       pfRatio = pfTex.width / pfTex.height;
     }
@@ -246,11 +257,11 @@ export class DialogueSystem {
     // ── Horizontal layout: [portrait frame] [gap] [dialogue box] ──
     const totalW = Math.min(1680, width * 0.88);
     const totalLeft = (width - totalW) / 2;
-    // Estimate portrait width at max box height for stable horizontal layout
+    // Use max box height for portrait width estimate to keep layout stable
     const pfEstH = MAX_BOX_H + 40;
-    const pfEstW = hasPortrait ? Math.round(pfEstH * pfRatio) : 0;
-    const dlgBoxW = hasPortrait ? totalW - pfEstW - PORTRAIT_GAP : totalW;
-    const dlgBoxLeft = hasPortrait ? totalLeft + pfEstW + PORTRAIT_GAP : totalLeft;
+    const pfEstW = reservePortraitSpace ? Math.round(pfEstH * pfRatio) : 0;
+    const dlgBoxW = reservePortraitSpace ? totalW - pfEstW - PORTRAIT_GAP : totalW;
+    const dlgBoxLeft = reservePortraitSpace ? totalLeft + pfEstW + PORTRAIT_GAP : totalLeft;
 
     // ── Measure text to determine content-aware box height ──
     const textPadX = 14;
@@ -860,6 +871,7 @@ export class DialogueSystem {
     this.active = false;
     this.currentDialogue = null;
     this.lastSpeaker = '';
+    this.dialogueHasPortraits = false;
 
     // Exit animation: fade out and slide down
     if (this.container && this.scene) {
