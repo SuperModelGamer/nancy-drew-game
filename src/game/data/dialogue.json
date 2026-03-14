@@ -1051,12 +1051,12 @@
             {
               "text": "Call Bess and George.",
               "nextNode": "bess_george",
-              "requiredFlag": "diego_booth"
+              "requiredFlag": "learned_about_cecilia"
             },
             {
               "text": "Call Dad.",
               "nextNode": "carson",
-              "requiredFlag": "learned_about_ashworth"
+              "requiredFlag": "learned_about_cecilia"
             },
             {
               "text": "Look up the local Historical Society.",
