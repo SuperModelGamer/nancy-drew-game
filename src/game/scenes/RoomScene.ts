@@ -99,11 +99,14 @@ export class RoomScene extends Phaser.Scene {
     this.scaleX = gameW / 1920;
     this.scaleY = gameH / 1080;
 
-    // Room background — fill the entire game viewport edge-to-edge
+    // Room background — cover the viewport while preserving aspect ratio
     const bgKey = `bg_${this.currentRoom.id}`;
     if (this.textures.exists(bgKey)) {
       const bg = this.add.image(gameW / 2, gameH / 2, bgKey);
-      bg.setDisplaySize(gameW, gameH);
+      const scaleX = gameW / bg.width;
+      const scaleY = gameH / bg.height;
+      const coverScale = Math.max(scaleX, scaleY);
+      bg.setScale(coverScale);
     } else {
       drawRoomBackground(this, this.currentRoom.id);
     }
