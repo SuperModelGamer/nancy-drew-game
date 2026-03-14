@@ -93,9 +93,9 @@
         {
           "id": "lobby_vivian",
           "x": 734,
-          "y": 651,
-          "width": 103,
-          "height": 331,
+          "y": 664,
+          "width": 109,
+          "height": 418,
           "label": "Vivian Delacroix",
           "type": "talk",
           "dialogueId": "vivian_intro",
