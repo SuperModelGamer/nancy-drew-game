@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import roomsData from '../data/rooms.json';
-import { FONT } from '../utils/constants';
+import { FONT, computeViewfinderLayout } from '../utils/constants';
 import { POINTER_CURSOR } from '../utils/cursors';
 
 interface HotspotData {
@@ -48,6 +48,10 @@ export class HotspotEditorScene extends Phaser.Scene {
   private currentRoomIndex = 0;
   private resizeMode = false;
   private modeIndicator!: Phaser.GameObjects.Text;
+  // Viewport transform: maps 1920×1080 design coords to canvas coords
+  private vpX = 0;
+  private vpY = 0;
+  private vpScale = 1;
 
   constructor() {
     super({ key: 'HotspotEditorScene' });
@@ -63,6 +67,14 @@ export class HotspotEditorScene extends Phaser.Scene {
 
   create(): void {
     const { width, height } = this.cameras.main;
+
+    // Compute the same viewport transform used by RoomScene so editor hotspots
+    // visually align with the in-game background and hotspot positions.
+    const vf = computeViewfinderLayout(1920, 1080);
+    const coverScale = Math.max(vf.viewportW / 1920, vf.viewportH / 1080);
+    this.vpX = vf.viewportX + (vf.viewportW - 1920 * coverScale) / 2;
+    this.vpY = vf.viewportY + (vf.viewportH - 1080 * coverScale) / 2;
+    this.vpScale = coverScale;
 
     // Semi-transparent backdrop to dim the game
     const backdrop = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.3);
@@ -138,15 +150,16 @@ export class HotspotEditorScene extends Phaser.Scene {
     this.input.keyboard!.on('keydown-LEFT', () => this.switchRoom(-1));
     this.input.keyboard!.on('keydown-RIGHT', () => this.switchRoom(1));
 
-    // Global pointer events for drag
+    // Global pointer events for drag (pointer coords are in canvas space,
+    // convert back to design space for storage)
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
       if (!this.isDragging || !this.selectedHotspot) return;
 
       if (this.isResizing) {
         this.handleResize(pointer);
       } else {
-        this.selectedHotspot.x = Math.round(pointer.x - this.dragOffsetX);
-        this.selectedHotspot.y = Math.round(pointer.y - this.dragOffsetY);
+        this.selectedHotspot.x = Math.round(this.toDesignX(pointer.x - this.dragOffsetX));
+        this.selectedHotspot.y = Math.round(this.toDesignY(pointer.y - this.dragOffsetY));
       }
       this.updateHotspotVisual(this.selectedHotspot);
     });
@@ -186,14 +199,20 @@ export class HotspotEditorScene extends Phaser.Scene {
     };
     const color = typeColors[hotspot.type] || 0xffffff;
 
+    // Transform design-space coords to canvas coords (matching in-game viewport)
+    const cx = this.toCanvasX(hotspot.x);
+    const cy = this.toCanvasY(hotspot.y);
+    const cw = this.toCanvasSize(w);
+    const ch = this.toCanvasSize(h);
+
     // Hotspot rectangle
-    const rect = this.add.rectangle(hotspot.x, hotspot.y, w, h, color, 0.25);
+    const rect = this.add.rectangle(cx, cy, cw, ch, color, 0.25);
     rect.setStrokeStyle(2, color, 0.9);
     rect.setDepth(910);
     rect.setInteractive({ cursor: POINTER_CURSOR, draggable: false });
 
     // Label above
-    const label = this.add.text(hotspot.x, hotspot.y - h / 2 - 12, hotspot.label, {
+    const label = this.add.text(cx, cy - ch / 2 - 12, hotspot.label, {
       fontFamily: 'monospace',
       fontSize: '10px',
       color: '#ffffff',
@@ -201,8 +220,8 @@ export class HotspotEditorScene extends Phaser.Scene {
       padding: { x: 3, y: 1 },
     }).setOrigin(0.5, 1).setDepth(920);
 
-    // Coordinates below
-    const coords = this.add.text(hotspot.x, hotspot.y + h / 2 + 3, `${hotspot.x},${hotspot.y} ${w}×${h}`, {
+    // Coordinates below (show design-space values)
+    const coords = this.add.text(cx, cy + ch / 2 + 3, `${hotspot.x},${hotspot.y} ${w}×${h}`, {
       fontFamily: 'monospace',
       fontSize: '9px',
       color: '#aaffaa',
@@ -225,8 +244,9 @@ export class HotspotEditorScene extends Phaser.Scene {
         this.resizeEdge = 'corner';
       } else {
         this.isResizing = false;
-        this.dragOffsetX = pointer.x - hotspot.x;
-        this.dragOffsetY = pointer.y - hotspot.y;
+        // Offset in canvas space between pointer and hotspot's canvas position
+        this.dragOffsetX = pointer.x - this.toCanvasX(hotspot.x);
+        this.dragOffsetY = pointer.y - this.toCanvasY(hotspot.y);
       }
     });
 
@@ -237,11 +257,15 @@ export class HotspotEditorScene extends Phaser.Scene {
     if (!this.selectedHotspot) return;
     const hs = this.selectedHotspot;
 
+    // Convert pointer canvas coords to design space for resize calculation
+    const designPtrX = this.toDesignX(pointer.x);
+    const designPtrY = this.toDesignY(pointer.y);
+
     if (this.resizeEdge === 'right' || this.resizeEdge === 'corner') {
-      hs.width = Math.max(30, Math.round((pointer.x - hs.x) * 2));
+      hs.width = Math.max(30, Math.round((designPtrX - hs.x) * 2));
     }
     if (this.resizeEdge === 'bottom' || this.resizeEdge === 'corner') {
-      hs.height = Math.max(30, Math.round((pointer.y - hs.y) * 2));
+      hs.height = Math.max(30, Math.round((designPtrY - hs.y) * 2));
     }
   }
 
@@ -251,14 +275,18 @@ export class HotspotEditorScene extends Phaser.Scene {
 
     const w = Math.max(hotspot.width, 30);
     const h = Math.max(hotspot.height, 30);
+    const cx = this.toCanvasX(hotspot.x);
+    const cy = this.toCanvasY(hotspot.y);
+    const cw = this.toCanvasSize(w);
+    const ch = this.toCanvasSize(h);
 
-    entry.rect.setPosition(hotspot.x, hotspot.y);
-    entry.rect.setSize(w, h);
+    entry.rect.setPosition(cx, cy);
+    entry.rect.setSize(cw, ch);
     // Phaser rectangles need geom update after setSize
     entry.rect.setInteractive();
 
-    entry.label.setPosition(hotspot.x, hotspot.y - h / 2 - 12);
-    entry.coords.setPosition(hotspot.x, hotspot.y + h / 2 + 3);
+    entry.label.setPosition(cx, cy - ch / 2 - 12);
+    entry.coords.setPosition(cx, cy + ch / 2 + 3);
     entry.coords.setText(`${hotspot.x},${hotspot.y} ${w}×${h}`);
   }
 
@@ -384,6 +412,31 @@ export class HotspotEditorScene extends Phaser.Scene {
       duration: 500,
       onComplete: () => toast.destroy(),
     });
+  }
+
+  /** Convert design-space x to canvas x */
+  private toCanvasX(designX: number): number {
+    return this.vpX + designX * this.vpScale;
+  }
+
+  /** Convert design-space y to canvas y */
+  private toCanvasY(designY: number): number {
+    return this.vpY + designY * this.vpScale;
+  }
+
+  /** Convert canvas x to design-space x */
+  private toDesignX(canvasX: number): number {
+    return (canvasX - this.vpX) / this.vpScale;
+  }
+
+  /** Convert canvas y to design-space y */
+  private toDesignY(canvasY: number): number {
+    return (canvasY - this.vpY) / this.vpScale;
+  }
+
+  /** Convert design-space dimension to canvas pixels */
+  private toCanvasSize(designSize: number): number {
+    return designSize * this.vpScale;
   }
 
   private closeEditor(): void {
