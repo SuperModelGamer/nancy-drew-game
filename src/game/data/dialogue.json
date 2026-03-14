@@ -1050,7 +1050,8 @@
           "choices": [
             {
               "text": "Call Bess and George.",
-              "nextNode": "bess_george"
+              "nextNode": "bess_george",
+              "requiredFlag": "diego_booth"
             },
             {
               "text": "Call Dad.",
