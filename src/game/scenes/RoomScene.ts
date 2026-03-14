@@ -118,6 +118,11 @@ export class RoomScene extends Phaser.Scene {
       drawRoomBackground(this, this.currentRoom.id);
     }
 
+    // Ensure UIScene always renders above the room
+    if (this.scene.isActive('UIScene')) {
+      this.scene.bringToTop('UIScene');
+    }
+
     // Ambient atmosphere particles
     addAmbientParticles(this, this.currentRoom.id);
 

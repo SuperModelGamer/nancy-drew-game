@@ -218,6 +218,7 @@ export class CinematicScene extends BaseSlideScene {
     if (this.scene.manager.getScene('UIScene')) {
       this.scene.setVisible(true, 'UIScene');
       this.scene.setActive(true, 'UIScene');
+      this.scene.bringToTop('UIScene');
     }
     this.scene.start('RoomScene', { roomId: this.targetRoom, skipCinematic: true });
   }
