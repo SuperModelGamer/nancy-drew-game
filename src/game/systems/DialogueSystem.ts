@@ -95,12 +95,12 @@ const PORTRAIT_GAP = 16;   // gap between portrait frame and dialogue box
 const FRAME_BORDER = 44;   // portrait frame gold border thickness (px at display size)
 
 // Gold border insets — fractions of the DISPLAYED asset size.
-// Measured from the innermost gold ornament edges, not the PNG bounds.
-// The dialogue-box corner star ornaments extend well inward from each side.
-const DLG_BOX_INSET_X = 0.18;   // dialogue-box.png: corner ornaments
-const DLG_BOX_INSET_TOP = 0.14; // dialogue-box.png: top gold line (thinner)
-const DLG_BOX_INSET_BOT = 0.22; // dialogue-box.png: bottom gold line (thicker ornament)
-const NP_INSET_X = 0.11;       // nameplate.png: corner ornaments
+// Both dialogue-box.png and nameplate.png have thin symmetric gold border
+// lines with four-pointed star ornaments at each corner.
+const DLG_BOX_INSET_X = 0.12;   // dialogue-box.png: corner star tips
+const DLG_BOX_INSET_Y = 0.08;   // dialogue-box.png: top/bottom gold lines (thin, symmetric)
+const NP_INSET_X = 0.11;        // nameplate.png: corner ornaments
+const NP_INSET_Y = 0.12;        // nameplate.png: top/bottom gold lines
 const CHOICE_INSET_X = 0.04;   // choice-btn.png: side ornaments
 const CHOICE_INSET_TOP = 0.20; // choice-btn.png: crown ornament at top
 const CHOICE_INSET_BOT = 0.11; // choice-btn.png: bottom border
@@ -260,12 +260,11 @@ export class DialogueSystem {
 
     // ── Inner content bounds inside the dialogue box gold borders ──
     const borderX = Math.round(dlgBoxW * DLG_BOX_INSET_X);
-    const borderTop = Math.round(BOX_H * DLG_BOX_INSET_TOP);
-    const borderBot = Math.round(BOX_H * DLG_BOX_INSET_BOT);
+    const borderY = Math.round(BOX_H * DLG_BOX_INSET_Y);
     const innerLeft = dlgBoxLeft + borderX;
     const innerRight = dlgBoxLeft + dlgBoxW - borderX;
-    const innerTop = boxTop + borderTop;
-    const innerBottom = boxTop + BOX_H - borderBot;
+    const innerTop = boxTop + borderY;
+    const innerBottom = boxTop + BOX_H - borderY;
 
     // ══════════════════════════════════════════════════════════════════════════
     // LAYER ORDER (back → front):
@@ -305,27 +304,26 @@ export class DialogueSystem {
     this.container.add(hitArea);
     overlay.on('pointerdown', () => this.advance());
 
-    // ── 3. Skip button (top-right of inner area — gets its own reserved row) ──
-    const skipRowH = 22; // height reserved for the skip label
-    const skipX = innerRight - 4;
-    const skipY = innerTop + 2;
+    // ── 3. Skip button (tucked into top-right border area, not inside content) ──
+    const skipX = innerRight;
+    const skipY = boxTop + borderY / 2;
     const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
-      fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim, letterSpacing: 2,
-    }).setOrigin(1, 0);
+      fontFamily: FONT, fontSize: '13px', color: TextColors.goldDim, letterSpacing: 2,
+    }).setOrigin(1, 0.5);
     skipBtn.setInteractive({ cursor: POINTER_CURSOR });
     skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.gold));
     skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.goldDim));
     skipBtn.on('pointerdown', () => this.skipToEnd());
     this.container.add(skipBtn);
 
-    // ── 4. Dialogue text (top-left aligned below skip row, inside gold borders) ──
-    const textPadX = 8;
-    const textPadTop = 6; // breathing room below skip row
+    // ── 4. Dialogue text (top-left aligned, full inner area) ──
+    const textPadX = 12;
+    const textPadY = 8;
     const textLeft = innerLeft + textPadX;
     const textRight = innerRight - textPadX;
     const textW = textRight - textLeft;
-    const textTop = innerTop + skipRowH + textPadTop;
-    const textH = innerBottom - textTop;
+    const textTop = innerTop + textPadY;
+    const textH = innerBottom - innerTop - textPadY * 2;
 
     this.dialogueTextObj = this.scene.add.text(textLeft, textTop, '', {
       fontFamily: FONT,
@@ -429,11 +427,8 @@ export class DialogueSystem {
 
     // Size nameplate so text fits inside its gold borders
     const npInnerPad = 24;
-    // The nameplate asset has a heavier top ornament (crown/flourish);
-    // nudge text down so it sits at the visual center of the inner area.
-    const npTextOffsetY = 5;
 
-    const speakerText = this.scene.add.text(nameplateCenterX, nameplateY + npTextOffsetY, line.speaker, {
+    const speakerText = this.scene.add.text(nameplateCenterX, nameplateY, line.speaker, {
       fontFamily: FONT,
       fontSize: SPEAKER_SIZE,
       color: speakerColor,
@@ -441,21 +436,25 @@ export class DialogueSystem {
       shadow: { offsetX: 0, offsetY: 0, color: '#000000', blur: 8, fill: true },
     }).setOrigin(0.5, 0.5);
 
+    // Scale nameplate height to fit text inside the gold border insets
+    const npTextH = speakerText.height;
+    const npInnerH = npTextH + 12; // text + small vertical padding
+    const npHFinal = Math.max(npH, Math.round(npInnerH / (1 - NP_INSET_Y * 2)));
     const npTextW = speakerText.width + npInnerPad * 2;
     const npW = Math.max(220, Math.round(npTextW / (1 - NP_INSET_X * 2)));
 
     if (this.scene.textures.exists('dlg_nameplate')) {
       const nameplate = this.scene.add.image(nameplateCenterX, nameplateY, 'dlg_nameplate');
-      nameplate.setDisplaySize(npW, npH);
+      nameplate.setDisplaySize(npW, npHFinal);
       nameplate.setOrigin(0.5);
       this.container.add(nameplate);
     } else {
       const npGfx = this.scene.add.graphics();
       npGfx.fillStyle(0x0e0c14, 0.9);
-      npGfx.fillRoundedRect(nameplateCenterX - npW / 2, nameplateY - npH / 2, npW, npH, 4);
+      npGfx.fillRoundedRect(nameplateCenterX - npW / 2, nameplateY - npHFinal / 2, npW, npHFinal, 4);
       const speakerHex = parseInt(speakerColor.replace('#', ''), 16);
       npGfx.lineStyle(2, speakerHex, 0.6);
-      npGfx.strokeRoundedRect(nameplateCenterX - npW / 2, nameplateY - npH / 2, npW, npH, 4);
+      npGfx.strokeRoundedRect(nameplateCenterX - npW / 2, nameplateY - npHFinal / 2, npW, npHFinal, 4);
       this.container.add(npGfx);
     }
 
@@ -463,7 +462,7 @@ export class DialogueSystem {
       speakerText.setAlpha(0);
       this.scene.tweens.add({
         targets: speakerText, alpha: 1,
-        y: { from: nameplateY + npTextOffsetY + 8, to: nameplateY + npTextOffsetY },
+        y: { from: nameplateY + 8, to: nameplateY },
         duration: 300, delay: 50, ease: 'Power2',
       });
     }
