@@ -180,6 +180,12 @@ export class CinematicScene extends BaseSlideScene {
 
   create(): void {
     if (!this.cinematicData) return;
+    // Hide the UI frame so the cinematic fills the full screen
+    if (this.scene.isActive('UIScene')) {
+      this.scene.setVisible(false, 'UIScene');
+      this.scene.setActive(false, 'UIScene');
+      this.scene.sendToBack('UIScene');
+    }
     super.create();
   }
 
@@ -208,6 +214,11 @@ export class CinematicScene extends BaseSlideScene {
   }
 
   protected onTransitionComplete(): void {
+    // Restore UIScene before returning to the room
+    if (this.scene.manager.getScene('UIScene')) {
+      this.scene.setVisible(true, 'UIScene');
+      this.scene.setActive(true, 'UIScene');
+    }
     this.scene.start('RoomScene', { roomId: this.targetRoom, skipCinematic: true });
   }
 
