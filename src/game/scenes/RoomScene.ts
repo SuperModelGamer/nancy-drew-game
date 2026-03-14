@@ -445,13 +445,14 @@ export class RoomScene extends Phaser.Scene {
       // Some puzzle hotspots require a specific item (e.g., magnifying glass)
       if (hotspot.requiredItem) {
         if (selectedItem === hotspot.requiredItem || inv.hasItem(hotspot.requiredItem)) {
-          // Show the description first, then open puzzle
+          // Show the description first, then open puzzle only after player dismisses it
           if (hotspot.description) {
-            this.showDescription(hotspot.description);
-          }
-          this.time.delayedCall(hotspot.description ? 1500 : 0, () => {
+            this.showDescription(hotspot.description, () => {
+              this.openPuzzle(hotspot.puzzleId!);
+            });
+          } else {
             this.openPuzzle(hotspot.puzzleId!);
-          });
+          }
         } else {
           this.showDescription('You need something specific to examine this more closely.');
         }
@@ -532,7 +533,7 @@ export class RoomScene extends Phaser.Scene {
     }
   }
 
-  private showDescription(text: string): void {
+  private showDescription(text: string, onDismiss?: () => void): void {
     const { width, height } = this.cameras.main.worldView;
 
     // Destroy previous description box and clean up its listeners
@@ -601,6 +602,7 @@ export class RoomScene extends Phaser.Scene {
           container.destroy();
           this._descriptionClickZone = null;
           this.descriptionBox = null;
+          if (onDismiss) onDismiss();
         },
       });
     };
