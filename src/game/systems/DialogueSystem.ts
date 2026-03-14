@@ -83,9 +83,10 @@ const EVENT_THINKING_HINTS: Record<string, string> = {
 };
 
 // ─── Layout Constants ───────────────────────────────────────────────────────
-const BOX_H = 300;
+const MIN_BOX_H = 160;   // minimum box height (short lines like "...")
+const MAX_BOX_H = 340;   // maximum box height (long paragraphs)
 const BOX_BOTTOM_MARGIN = 140;  // keeps box + portrait above the viewfinder frame border
-const TEXT_SIZE = '24px';
+const TEXT_SIZE = '26px';
 const SPEAKER_SIZE = '28px';
 const CHOICE_H = 110;
 const CHOICE_FONT = '26px';
@@ -235,76 +236,81 @@ export class DialogueSystem {
     const portraitKey = this.getSpeakerPortraitKey(line.speaker);
     const hasPortrait = portraitKey !== null && this.scene.textures.exists(portraitKey);
 
-    // ── Portrait frame dimensions (sits BESIDE the dialogue box, not overlapping) ──
-    let pfDisplayW = 0;
-    let pfDisplayH = 0;
-    if (hasPortrait) {
-      if (this.scene.textures.exists('dlg_portrait_frame')) {
-        const pfTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
-        const pfRatio = pfTex.width / pfTex.height;
-        pfDisplayH = BOX_H + 40; // extends slightly above the dialogue box
-        pfDisplayW = Math.round(pfDisplayH * pfRatio);
-      } else {
-        pfDisplayW = 240;
-        pfDisplayH = BOX_H + 40;
-      }
+    // ── Determine portrait frame dimensions (sits BESIDE the dialogue box) ──
+    let pfRatio = 0.72; // fallback aspect ratio
+    if (hasPortrait && this.scene.textures.exists('dlg_portrait_frame')) {
+      const pfTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
+      pfRatio = pfTex.width / pfTex.height;
     }
 
-    // ── Layout: [portrait frame] [gap] [dialogue box] — all bottom-aligned ──
+    // ── Horizontal layout: [portrait frame] [gap] [dialogue box] ──
     const totalW = Math.min(1680, width * 0.88);
     const totalLeft = (width - totalW) / 2;
-    const dlgBoxW = hasPortrait ? totalW - pfDisplayW - PORTRAIT_GAP : totalW;
-    const dlgBoxLeft = hasPortrait ? totalLeft + pfDisplayW + PORTRAIT_GAP : totalLeft;
-    const boxTop = height - BOX_H - BOX_BOTTOM_MARGIN;
-    const boxCenterY = boxTop + BOX_H / 2;
+    // Estimate portrait width at max box height for stable horizontal layout
+    const pfEstH = MAX_BOX_H + 40;
+    const pfEstW = hasPortrait ? Math.round(pfEstH * pfRatio) : 0;
+    const dlgBoxW = hasPortrait ? totalW - pfEstW - PORTRAIT_GAP : totalW;
+    const dlgBoxLeft = hasPortrait ? totalLeft + pfEstW + PORTRAIT_GAP : totalLeft;
 
-    // ── Inner content bounds inside the dialogue box gold borders ──
-    const borderX = Math.round(dlgBoxW * DLG_BOX_INSET_X);
-    const borderY = Math.round(BOX_H * DLG_BOX_INSET_Y);
-    const innerLeft = dlgBoxLeft + borderX;
-    const innerRight = dlgBoxLeft + dlgBoxW - borderX;
+    // ── Measure text to determine content-aware box height ──
+    const textPadX = 14;
+    const textPadY = 10;
+    const borderXPx = Math.round(dlgBoxW * DLG_BOX_INSET_X);
+    const measuredTextW = dlgBoxW - borderXPx * 2 - textPadX * 2;
+    const measureText = this.scene.add.text(0, 0, line.text, {
+      fontFamily: FONT, fontSize: TEXT_SIZE, wordWrap: { width: measuredTextW }, lineSpacing: 8,
+    });
+    const measuredTextH = measureText.height;
+    measureText.destroy();
+
+    // Content-aware box height: text + padding + border insets
+    const borderYFrac = DLG_BOX_INSET_Y;
+    const neededInner = measuredTextH + textPadY * 2;
+    const neededBox = Math.round(neededInner / (1 - borderYFrac * 2));
+    const boxH = Phaser.Math.Clamp(neededBox, MIN_BOX_H, MAX_BOX_H);
+
+    // ── Vertical positioning (anchored to bottom margin) ──
+    const boxTop = height - boxH - BOX_BOTTOM_MARGIN;
+    const boxCenterY = boxTop + boxH / 2;
+    const borderY = Math.round(boxH * DLG_BOX_INSET_Y);
+    const innerLeft = dlgBoxLeft + borderXPx;
+    const innerRight = dlgBoxLeft + dlgBoxW - borderXPx;
     const innerTop = boxTop + borderY;
-    const innerBottom = boxTop + BOX_H - borderY;
+    const innerBottom = boxTop + boxH - borderY;
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // LAYER ORDER (back → front):
-    //   1. dlgBoxImage   – art deco frame for the dialogue area
-    //   2. hitArea       – click-to-advance (BEFORE interactive elements)
-    //   3. dialogueText  – typewriter text inside gold borders
-    //   4. continueArrow – inside bottom border
-    //   5. skipBtn       – inside top-right border, ABOVE hitArea
-    //   6. portraitFrame – ornate frame (BEHIND portrait image)
-    //   7. portraitImage – character portrait (ON TOP of frame)
-    //   8. nameplate     – speaker name bg
-    //   9. speakerText   – speaker name
-    // ══════════════════════════════════════════════════════════════════════════
+    // ── Portrait frame sized to match this box ──
+    let pfDisplayW = pfEstW;
+    let pfDisplayH = hasPortrait ? boxH + 40 : 0;
+    if (hasPortrait) {
+      pfDisplayW = Math.round(pfDisplayH * pfRatio);
+    }
 
-    // ── 1. Single dialogue box frame ──
+    // ── 1. Dialogue box frame ──
     if (this.scene.textures.exists('dlg_box')) {
       const dlgBox = this.scene.add.image(
-        dlgBoxLeft + dlgBoxW / 2, boxTop + BOX_H / 2, 'dlg_box'
+        dlgBoxLeft + dlgBoxW / 2, boxTop + boxH / 2, 'dlg_box'
       );
-      dlgBox.setDisplaySize(dlgBoxW, BOX_H);
+      dlgBox.setDisplaySize(dlgBoxW, boxH);
       this.container.add(dlgBox);
     } else {
       const gfx = this.scene.add.graphics();
       gfx.fillStyle(0x0e0c14, 0.95);
-      gfx.fillRoundedRect(dlgBoxLeft, boxTop, dlgBoxW, BOX_H, 8);
+      gfx.fillRoundedRect(dlgBoxLeft, boxTop, dlgBoxW, boxH, 8);
       gfx.lineStyle(3, Colors.gold, 0.6);
-      gfx.strokeRoundedRect(dlgBoxLeft, boxTop, dlgBoxW, BOX_H, 8);
+      gfx.strokeRoundedRect(dlgBoxLeft, boxTop, dlgBoxW, boxH, 8);
       this.container.add(gfx);
     }
 
-    // ── 2. Click-to-advance (BEFORE skip so skip stays clickable) ──
+    // ── 2. Click-to-advance ──
     const hitArea = this.scene.add.rectangle(
-      dlgBoxLeft + dlgBoxW / 2, boxCenterY, dlgBoxW, BOX_H, 0x000000, 0
+      dlgBoxLeft + dlgBoxW / 2, boxCenterY, dlgBoxW, boxH, 0x000000, 0
     );
     hitArea.setInteractive({ cursor: POINTER_CURSOR });
     hitArea.on('pointerdown', () => this.advance());
     this.container.add(hitArea);
     overlay.on('pointerdown', () => this.advance());
 
-    // ── 3. Skip button (tucked into top-right border area, not inside content) ──
+    // ── 3. Skip button (in top-right border area) ──
     const skipX = innerRight;
     const skipY = boxTop + borderY / 2;
     const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
@@ -317,8 +323,6 @@ export class DialogueSystem {
     this.container.add(skipBtn);
 
     // ── 4. Dialogue text (top-left aligned, full inner area) ──
-    const textPadX = 12;
-    const textPadY = 8;
     const textLeft = innerLeft + textPadX;
     const textRight = innerRight - textPadX;
     const textW = textRight - textLeft;
@@ -330,7 +334,7 @@ export class DialogueSystem {
       fontSize: TEXT_SIZE,
       color: TextColors.light,
       wordWrap: { width: textW },
-      lineSpacing: 6,
+      lineSpacing: 8,
     }).setOrigin(0, 0);
     // Destroy previous mask if re-rendering
     if (this.textMaskGfx) { this.textMaskGfx.destroy(); this.textMaskGfx = null; }
@@ -342,8 +346,8 @@ export class DialogueSystem {
     this.fullLineText = line.text;
     this.startTypewriter();
 
-    // ── 5. Continue arrow (inside bottom gold border area) ──
-    const continueY = innerBottom + Math.round((boxTop + BOX_H - innerBottom) / 2);
+    // ── 5. Continue arrow (inside bottom border area) ──
+    const continueY = innerBottom + Math.round((boxTop + boxH - innerBottom) / 2);
     const continueX = innerRight - 4;
     if (this.scene.textures.exists('dlg_continue_arrow')) {
       const arrow = this.scene.add.image(continueX, continueY, 'dlg_continue_arrow');
@@ -367,7 +371,7 @@ export class DialogueSystem {
     // ── 6–7. Portrait frame BESIDE the dialogue box (frame behind, portrait on top) ──
     if (hasPortrait && portraitKey) {
       const pfCenterX = totalLeft + pfDisplayW / 2;
-      const pfCenterY = boxTop + BOX_H - pfDisplayH / 2; // bottom-aligned with dialogue box
+      const pfCenterY = boxTop + boxH - pfDisplayH / 2; // bottom-aligned with dialogue box
 
       const portraitGroup = this.scene.add.container(0, 0);
 
@@ -416,7 +420,7 @@ export class DialogueSystem {
 
     // ── 8–9. Speaker nameplate (overlaid on portrait bottom, or centered above dialogue) ──
     const speakerColor = this.getSpeakerColor(line.speaker);
-    const boxBottom = boxTop + BOX_H;
+    const boxBottom = boxTop + boxH;
     const npH = 56;
     const nameplateCenterX = hasPortrait
       ? totalLeft + pfDisplayW / 2           // centered under portrait
