@@ -97,8 +97,9 @@ const FRAME_BORDER = 44;   // portrait frame gold border thickness (px at displa
 // Gold border insets — fractions of the DISPLAYED asset size.
 // Measured from the innermost gold ornament edges, not the PNG bounds.
 // The dialogue-box corner star ornaments extend well inward from each side.
-const DLG_BOX_INSET_X = 0.18;  // dialogue-box.png: corner ornaments
-const DLG_BOX_INSET_Y = 0.21;  // dialogue-box.png: top/bottom gold lines
+const DLG_BOX_INSET_X = 0.18;   // dialogue-box.png: corner ornaments
+const DLG_BOX_INSET_TOP = 0.14; // dialogue-box.png: top gold line (thinner)
+const DLG_BOX_INSET_BOT = 0.22; // dialogue-box.png: bottom gold line (thicker ornament)
 const NP_INSET_X = 0.11;       // nameplate.png: corner ornaments
 const CHOICE_INSET_X = 0.04;   // choice-btn.png: side ornaments
 const CHOICE_INSET_TOP = 0.20; // choice-btn.png: crown ornament at top
@@ -259,11 +260,12 @@ export class DialogueSystem {
 
     // ── Inner content bounds inside the dialogue box gold borders ──
     const borderX = Math.round(dlgBoxW * DLG_BOX_INSET_X);
-    const borderY = Math.round(BOX_H * DLG_BOX_INSET_Y);
+    const borderTop = Math.round(BOX_H * DLG_BOX_INSET_TOP);
+    const borderBot = Math.round(BOX_H * DLG_BOX_INSET_BOT);
     const innerLeft = dlgBoxLeft + borderX;
     const innerRight = dlgBoxLeft + dlgBoxW - borderX;
-    const innerTop = boxTop + borderY;
-    const innerBottom = boxTop + BOX_H - borderY;
+    const innerTop = boxTop + borderTop;
+    const innerBottom = boxTop + BOX_H - borderBot;
 
     // ══════════════════════════════════════════════════════════════════════════
     // LAYER ORDER (back → front):
