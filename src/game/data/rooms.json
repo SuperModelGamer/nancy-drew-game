@@ -364,6 +364,7 @@
           "height": 167,
           "label": "Crumpled Paper",
           "type": "inspect",
+          "setsFlag": "saw_threatening_note",
           "description": "A crumpled note on the stage floor. I smooth it out: 'I know what you've been doing in the basement. Stop now or I go to the police. — S.M.' S.M. — Stella Morrow. So Stella knows about the basement activity. She's been watching whoever is down there. But she didn't go to the police, and she didn't tell me. Why protect someone she's threatening?"
         }
       ]

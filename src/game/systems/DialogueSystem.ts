@@ -204,6 +204,9 @@ export class DialogueSystem {
       return;
     }
 
+    // Check if we've already seen this node before marking it visited
+    const alreadySeenNode = this.visitedNodes.has(node.id);
+
     // Track this node as visited so choices leading here are hidden on return
     this.visitedNodes.add(node.id);
     // Also persist across sessions so choices don't reappear on revisit
@@ -215,7 +218,13 @@ export class DialogueSystem {
       }
     }
 
-    if (this.currentLineIndex < node.lines.length) {
+    // If returning to a hub node we've already seen, skip its intro lines and go straight to choices
+    if (alreadySeenNode && this.currentLineIndex === 0 && node.choices && node.choices.length > 0) {
+      if (node.triggerEvent) {
+        this.triggerEvent(node.triggerEvent);
+      }
+      this.renderChoices(node.choices);
+    } else if (this.currentLineIndex < node.lines.length) {
       const line = node.lines[this.currentLineIndex];
       this.renderLine(line);
     } else if (node.choices && node.choices.length > 0) {
@@ -612,7 +621,14 @@ export class DialogueSystem {
     this.container.add(overlay);
 
     // Categorize choices: consumed (hide), gated (show locked), available (show normally)
+    // Exit choices (farewell nodes) are never consumed — always available as escape
+    const isExitChoice = (choice: DialogueChoice): boolean => {
+      return choice.nextNode === 'farewell';
+    };
+
     const isConsumed = (choice: DialogueChoice): boolean => {
+      // Exit choices are never consumed
+      if (isExitChoice(choice)) return false;
       // Already visited this session
       if (choice.nextNode && this.visitedNodes.has(choice.nextNode)) return true;
       // Persisted from previous sessions
@@ -635,11 +651,20 @@ export class DialogueSystem {
       return !save.getFlag(choice.requiredFlag) && !this.triggeredEvents.has(choice.requiredFlag);
     };
 
+    const isGatedByItem = (choice: DialogueChoice): boolean => {
+      if (!choice.requiredItem) return false;
+      return !inventory.hasItem(choice.requiredItem);
+    };
+
+    const isLocked = (choice: DialogueChoice): boolean => {
+      return isGatedByFlag(choice) || isGatedByItem(choice);
+    };
+
     // Filter out consumed choices, keep gated ones visible but locked
     const displayChoices = choices.filter(choice => !isConsumed(choice));
 
-    // If no available (non-gated) choices remain, end the dialogue
-    const availableChoices = displayChoices.filter(choice => !isGatedByFlag(choice));
+    // If only locked/gated choices remain (no freely available ones), end dialogue
+    const availableChoices = displayChoices.filter(choice => !isLocked(choice));
     if (availableChoices.length === 0) {
       this.endDialogue();
       return;
@@ -661,15 +686,15 @@ export class DialogueSystem {
     }).setOrigin(0.5);
     this.container.add(header);
 
-    // Format flag name into readable evidence hint (e.g. "saw_threatening_note" → "Saw Threatening Note")
-    const formatFlagName = (flag: string): string => {
-      return flag.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    // Format flag/item names into readable evidence hints
+    const formatName = (id: string): string => {
+      return id.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
     };
 
     displayChoices.forEach((choice, i) => {
       const gatedByFlag = isGatedByFlag(choice);
-      const itemAvailable = !choice.requiredItem || inventory.hasItem(choice.requiredItem);
-      const isLocked = gatedByFlag || !itemAvailable;
+      const gatedByItem = isGatedByItem(choice);
+      const locked = gatedByFlag || gatedByItem;
       const y = startY + i * (CHOICE_H + 15) + CHOICE_H / 2;
 
       // Choice button
@@ -681,21 +706,22 @@ export class DialogueSystem {
       } else {
         btn = this.scene!.add.rectangle(width / 2, y, choiceW, CHOICE_H, 0x0e0c14, 0.92);
         (btn as Phaser.GameObjects.Rectangle).setStrokeStyle(
-          1.5, !isLocked ? Colors.gold : 0x444444, !isLocked ? 0.5 : 0.3
+          1.5, !locked ? Colors.gold : 0x444444, !locked ? 0.5 : 0.3
         );
       }
 
-      // Gated choices: show evidence requirement, not the dialogue text (avoid spoilers)
+      // Locked choices: show what evidence is needed, not the spoiler dialogue text
       let displayText: string;
       if (gatedByFlag) {
-        displayText = `🔒  Requires: ${formatFlagName(choice.requiredFlag!)}`;
-      } else if (choice.requiredItem && !itemAvailable) {
-        displayText = `🔒  ${choice.text} (requires evidence)`;
+        displayText = `Requires: ${formatName(choice.requiredFlag!)}`;
+      } else if (gatedByItem) {
+        displayText = `Requires evidence: ${formatName(choice.requiredItem!)}`;
       } else {
         displayText = choice.text;
       }
 
-      const textColor = isLocked ? '#555555' : TextColors.gold;
+      // Locked text uses a visible but muted color (not near-invisible)
+      const textColor = locked ? '#8a7a5a' : TextColors.gold;
 
       // Text positioned inside the gold borders of choice-btn.png
       // The crown ornament at top takes ~20%, so offset text slightly below center
@@ -709,7 +735,16 @@ export class DialogueSystem {
         align: 'center',
       }).setOrigin(0.5);
 
-      if (!isLocked) {
+      // Add lock icon for locked choices
+      if (locked) {
+        const lockIcon = this.scene!.add.text(
+          width / 2 - textInnerW / 2 - 15, y + textOffsetY, '🔒',
+          { fontSize: '20px' }
+        ).setOrigin(0.5);
+        this.container!.add(lockIcon);
+      }
+
+      if (!locked) {
         btn.setInteractive({ cursor: POINTER_CURSOR });
 
         // Store the base scales set by setDisplaySize so hover tweens are relative
@@ -795,12 +830,13 @@ export class DialogueSystem {
 
       this.container!.add([btn, text]);
 
-      // Staggered entrance animation
+      // Staggered entrance animation (locked choices are dimmed)
+      const targetAlpha = locked ? 0.5 : 1;
       btn.setAlpha(0);
       text.setAlpha(0);
       this.scene!.tweens.add({
         targets: btn,
-        alpha: 1,
+        alpha: targetAlpha,
         y: { from: y + 22, to: y },
         duration: 300,
         delay: i * 80,
@@ -808,7 +844,7 @@ export class DialogueSystem {
       });
       this.scene!.tweens.add({
         targets: text,
-        alpha: 1,
+        alpha: targetAlpha,
         y: { from: y + 22, to: y },
         duration: 300,
         delay: i * 80,
