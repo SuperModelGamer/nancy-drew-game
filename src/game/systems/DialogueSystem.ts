@@ -83,26 +83,29 @@ const EVENT_THINKING_HINTS: Record<string, string> = {
 };
 
 // ─── Layout Constants ───────────────────────────────────────────────────────
-const MIN_BOX_H = 260;   // minimum box height — keeps dialogue box substantial
-const MAX_BOX_H = 340;   // maximum box height (long paragraphs)
+// Sized for classic Nancy Drew proportions: large portrait, substantial
+// dialogue box, readable text. Portrait occupies ~40% of screen height.
+const MIN_BOX_H = 280;   // minimum box height — keeps dialogue box substantial
+const MAX_BOX_H = 380;   // maximum box height (long paragraphs)
 const BOX_BOTTOM_MARGIN = 140;  // keeps box + portrait above the viewfinder frame border
-const TEXT_SIZE = '26px';
-const SPEAKER_SIZE = '28px';
+const TEXT_SIZE = '28px';
+const SPEAKER_SIZE = '32px';
 const CHOICE_H = 110;
 const CHOICE_FONT = '26px';
 const TYPEWRITER_SPEED_DEFAULT = 28; // ms per character (fallback)
 const ANIM_DURATION = 400; // ms for box entrance/exit
-const PORTRAIT_GAP = 16;   // gap between portrait frame and dialogue box
-const PORTRAIT_H = 360;    // fixed portrait frame height (independent of box height)
-const FRAME_BORDER = 24;   // portrait frame gold border thickness (px at display size)
+const PORTRAIT_GAP = 20;   // gap between portrait frame and dialogue box
+const PORTRAIT_H = 440;    // fixed portrait frame height — large and prominent like classic ND
+const FRAME_BORDER = 18;   // portrait frame gold border thickness (matches ~18px asset border)
 
 // Gold border insets — fractions of the DISPLAYED asset size.
 // Both dialogue-box.png and nameplate.png have thin symmetric gold border
 // lines with four-pointed star ornaments at each corner.
 const DLG_BOX_INSET_X = 0.12;   // dialogue-box.png: corner star tips
-const DLG_BOX_INSET_Y = 0.08;   // dialogue-box.png: top/bottom gold lines (thin, symmetric)
+const DLG_BOX_INSET_Y = 0.14;   // dialogue-box.png: gold border + parallel accent lines
 const NP_INSET_X = 0.11;        // nameplate.png: corner ornaments
-const NP_INSET_Y = 0.12;        // nameplate.png: top/bottom gold lines
+const NP_INSET_Y = 0.18;        // nameplate.png: gold borders (bottom is thicker)
+const NP_TEXT_OFFSET_Y = -3;     // nudge nameplate text up — bottom border is heavier than top
 const CHOICE_INSET_X = 0.04;   // choice-btn.png: side ornaments
 const CHOICE_INSET_TOP = 0.20; // choice-btn.png: crown ornament at top
 const CHOICE_INSET_BOT = 0.11; // choice-btn.png: bottom border
@@ -472,7 +475,7 @@ export class DialogueSystem {
     // Size nameplate so text fits inside its gold borders
     const npInnerPad = 24;
 
-    const speakerText = this.scene.add.text(nameplateCenterX, nameplateY, line.speaker, {
+    const speakerText = this.scene.add.text(nameplateCenterX, nameplateY + NP_TEXT_OFFSET_Y, line.speaker, {
       fontFamily: FONT,
       fontSize: SPEAKER_SIZE,
       color: speakerColor,
@@ -506,7 +509,7 @@ export class DialogueSystem {
       speakerText.setAlpha(0);
       this.scene.tweens.add({
         targets: speakerText, alpha: 1,
-        y: { from: nameplateY + 8, to: nameplateY },
+        y: { from: nameplateY + NP_TEXT_OFFSET_Y + 8, to: nameplateY + NP_TEXT_OFFSET_Y },
         duration: 300, delay: 50, ease: 'Power2',
       });
     }
