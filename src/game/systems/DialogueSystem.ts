@@ -4,6 +4,7 @@ import { InventorySystem } from './InventorySystem';
 import { SaveSystem } from './SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { HAND_CURSOR, POINTER_CURSOR } from '../utils/cursors';
+import { UISounds } from '../utils/sounds';
 
 interface DialogueLine {
   speaker: string;
@@ -65,7 +66,7 @@ const TEXT_SIZE = '32px';
 const SPEAKER_SIZE = '36px';
 const CHOICE_H = 110;
 const CHOICE_FONT = '26px';
-const TYPEWRITER_SPEED = 28; // ms per character
+const TYPEWRITER_SPEED_DEFAULT = 28; // ms per character (fallback)
 const ANIM_DURATION = 400; // ms for box entrance/exit
 const PORTRAIT_GAP = 16;   // gap between portrait frame and dialogue box
 const FRAME_BORDER = 44;   // portrait frame gold border thickness (px at display size)
@@ -453,11 +454,20 @@ export class DialogueSystem {
   private startTypewriter(): void {
     if (!this.scene || !this.dialogueTextObj) return;
 
+    const speed = UISounds.getTextSpeedMs();
+
+    // Instant mode — show full text immediately
+    if (speed <= 0) {
+      this.dialogueTextObj.setText(this.fullLineText);
+      this.isTyping = false;
+      return;
+    }
+
     this.isTyping = true;
     let charIndex = 0;
 
     this.typewriterTimer = this.scene.time.addEvent({
-      delay: TYPEWRITER_SPEED,
+      delay: speed,
       repeat: this.fullLineText.length - 1,
       callback: () => {
         charIndex++;

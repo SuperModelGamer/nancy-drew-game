@@ -6,6 +6,14 @@ let audioCtx: AudioContext | null = null;
 /** Master volume multiplier (0 = muted, 1 = full). Persisted in localStorage. */
 let masterVolume = parseFloat(localStorage.getItem('nd_master_volume') ?? '0.8');
 
+/** Text speed: ms per character for typewriter effect. Lower = faster. */
+export type TextSpeedPreset = 'slow' | 'normal' | 'fast' | 'instant';
+const TEXT_SPEED_MAP: Record<TextSpeedPreset, number> = { slow: 45, normal: 28, fast: 12, instant: 0 };
+let textSpeedPreset: TextSpeedPreset = (localStorage.getItem('nd_text_speed') as TextSpeedPreset) || 'normal';
+
+/** Whether ambient particles are enabled. */
+let particlesEnabled = localStorage.getItem('nd_particles') !== 'off';
+
 function getCtx(): AudioContext | null {
   if (!audioCtx) {
     try {
@@ -56,6 +64,21 @@ export const UISounds = {
   setVolume(v: number): void {
     masterVolume = Math.max(0, Math.min(1, v));
     localStorage.setItem('nd_master_volume', masterVolume.toString());
+  },
+
+  /** Text speed preset. Persisted to localStorage. */
+  getTextSpeed(): TextSpeedPreset { return textSpeedPreset; },
+  getTextSpeedMs(): number { return TEXT_SPEED_MAP[textSpeedPreset]; },
+  setTextSpeed(preset: TextSpeedPreset): void {
+    textSpeedPreset = preset;
+    localStorage.setItem('nd_text_speed', preset);
+  },
+
+  /** Ambient particles toggle. Persisted to localStorage. */
+  getParticlesEnabled(): boolean { return particlesEnabled; },
+  setParticlesEnabled(on: boolean): void {
+    particlesEnabled = on;
+    localStorage.setItem('nd_particles', on ? 'on' : 'off');
   },
 
   // Soft click for button presses and hotspot interaction
