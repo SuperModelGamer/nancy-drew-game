@@ -85,8 +85,8 @@ const EVENT_THINKING_HINTS: Record<string, string> = {
 // ─── Layout Constants ───────────────────────────────────────────────────────
 const BOX_H = 300;
 const BOX_BOTTOM_MARGIN = 140;  // keeps box + portrait above the viewfinder frame border
-const TEXT_SIZE = '22px';
-const SPEAKER_SIZE = '32px';
+const TEXT_SIZE = '24px';
+const SPEAKER_SIZE = '28px';
 const CHOICE_H = 110;
 const CHOICE_FONT = '26px';
 const TYPEWRITER_SPEED_DEFAULT = 28; // ms per character (fallback)
@@ -318,22 +318,22 @@ export class DialogueSystem {
     skipBtn.on('pointerdown', () => this.skipToEnd());
     this.container.add(skipBtn);
 
-    // ── 4. Dialogue text (vertically centered below skip row, inside gold borders) ──
+    // ── 4. Dialogue text (top-left aligned below skip row, inside gold borders) ──
     const textPadX = 8;
+    const textPadTop = 6; // breathing room below skip row
     const textLeft = innerLeft + textPadX;
     const textRight = innerRight - textPadX;
     const textW = textRight - textLeft;
-    const textTop = innerTop + skipRowH;
+    const textTop = innerTop + skipRowH + textPadTop;
     const textH = innerBottom - textTop;
-    const textCenterY = textTop + textH / 2;
 
-    this.dialogueTextObj = this.scene.add.text(textLeft, textCenterY, '', {
+    this.dialogueTextObj = this.scene.add.text(textLeft, textTop, '', {
       fontFamily: FONT,
       fontSize: TEXT_SIZE,
       color: TextColors.light,
       wordWrap: { width: textW },
-      lineSpacing: 4,
-    }).setOrigin(0, 0.5);
+      lineSpacing: 6,
+    }).setOrigin(0, 0);
     // Destroy previous mask if re-rendering
     if (this.textMaskGfx) { this.textMaskGfx.destroy(); this.textMaskGfx = null; }
     this.textMaskGfx = this.scene.make.graphics({});
@@ -429,9 +429,9 @@ export class DialogueSystem {
 
     // Size nameplate so text fits inside its gold borders
     const npInnerPad = 24;
-    // The nameplate asset has a slightly heavier top ornament; nudge text
-    // down by a couple of pixels so it sits at the visual center.
-    const npTextOffsetY = 2;
+    // The nameplate asset has a heavier top ornament (crown/flourish);
+    // nudge text down so it sits at the visual center of the inner area.
+    const npTextOffsetY = 5;
 
     const speakerText = this.scene.add.text(nameplateCenterX, nameplateY + npTextOffsetY, line.speaker, {
       fontFamily: FONT,
