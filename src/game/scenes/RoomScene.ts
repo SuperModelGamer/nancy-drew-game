@@ -63,6 +63,13 @@ export class RoomScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Reset camera to full game dimensions before reading width/height.
+    // scene.restart() preserves the previous viewport, so without this
+    // the second room visit would read the viewport size (1908×928) instead
+    // of the native game size (1920×1080).
+    this.cameras.main.setViewport(0, 0, 1920, 1080);
+    this.cameras.main.setZoom(1);
+
     const { width, height } = this.cameras.main;
 
     // The game world is the native art resolution: 1920 × 1080 (16:9).
