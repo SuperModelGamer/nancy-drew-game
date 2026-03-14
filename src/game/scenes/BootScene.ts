@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { Colors, TextColors, FONT } from '../utils/constants';
 import { generateItemIcons } from '../utils/item-icons';
+import { getAmbientAudioManifest } from '../systems/AmbientAudioSystem';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -126,6 +127,11 @@ export class BootScene extends Phaser.Scene {
       this.load.audio(key, [`audio/${key}.mp3`, `audio/${key}.ogg`]);
     }
 
+    // Load ambient audio for room soundscapes (optional — procedural fallback exists)
+    for (const { key, path } of getAmbientAudioManifest()) {
+      this.load.audio(key, [path]);
+    }
+
     // Load dialogue UI assets (optional — procedural fallbacks exist)
     const dlgAssets: Record<string, string> = {
       dlg_box: 'dialogue-box',
@@ -142,6 +148,7 @@ export class BootScene extends Phaser.Scene {
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       if (file.key.startsWith('intro_') || file.key.startsWith('sfx_') ||
           file.key.startsWith('ambient_') || file.key.startsWith('music_') ||
+          file.key.startsWith('amb_') ||
           file.key.startsWith('ui_') || file.key.startsWith('dlg_')) {
         // Silently ignore — intro works without these assets
         return;
