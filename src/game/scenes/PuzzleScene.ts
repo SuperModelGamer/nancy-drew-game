@@ -1018,13 +1018,21 @@ export class PuzzleScene extends Phaser.Scene {
 
       const originalX = startXPos;
       const originalY = frameY;
+      let grabOffsetX = 0;
+      let grabOffsetY = 0;
 
-      frameBg.on('drag', (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-        // Convert drag coords relative to panel
-        container.setPosition(dragX - this.panel.x, dragY - this.panel.y);
+      frameBg.on('drag', (pointer: Phaser.Input.Pointer) => {
+        // Use raw pointer position, subtract grab offset and panel origin to get panel-local coords
+        container.setPosition(
+          pointer.x - grabOffsetX - this.panel.x,
+          pointer.y - grabOffsetY - this.panel.y
+        );
       });
 
-      frameBg.on('dragstart', () => {
+      frameBg.on('dragstart', (pointer: Phaser.Input.Pointer) => {
+        // Record offset between pointer and container's world position
+        grabOffsetX = pointer.x - (this.panel.x + container.x);
+        grabOffsetY = pointer.y - (this.panel.y + container.y);
         container.setDepth(10);
         this.tweens.add({ targets: container, scaleX: 1.05, scaleY: 1.05, duration: 100 });
 
