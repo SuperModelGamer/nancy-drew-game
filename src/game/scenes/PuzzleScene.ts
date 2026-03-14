@@ -1021,7 +1021,7 @@ export class PuzzleScene extends Phaser.Scene {
 
       frameBg.on('drag', (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
         // Convert drag coords relative to panel
-        container.setPosition(dragX - this.panel.x + startXPos, dragY - this.panel.y + frameY);
+        container.setPosition(dragX - this.panel.x, dragY - this.panel.y);
       });
 
       frameBg.on('dragstart', () => {
@@ -1048,7 +1048,7 @@ export class PuzzleScene extends Phaser.Scene {
           if (this.filmSlots[s] !== null) continue;
           const slotX = slotsStartX + s * (slotW + 10);
           const dist = Math.abs(container.x - slotX) + Math.abs(container.y - slotY);
-          if (dist < 120) {
+          if (dist < 150) {
             // Snap to slot
             this.filmSlots[s] = frame.id;
             this.tweens.add({
