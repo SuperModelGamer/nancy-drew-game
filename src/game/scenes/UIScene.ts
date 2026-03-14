@@ -112,9 +112,9 @@ export class UIScene extends Phaser.Scene {
     frameBg.lineStyle(1, DecoColors.gold, 0.3);
     frameBg.strokeRect(5, 5, width - 10, height - BOTTOM_MARGIN - 9);
 
-    // Inner frame line (game viewport boundary)
+    // Inner frame line (game viewport boundary — uses renderedW, not full viewport)
     frameBg.lineStyle(2, DecoColors.gold, 0.5);
-    frameBg.strokeRect(fLeft, fTop, vf.viewportW, vf.viewportH);
+    frameBg.strokeRect(fLeft, fTop, vf.renderedW, vf.viewportH);
 
     // Vertical separator between viewport and right panel
     frameBg.lineStyle(1.5, DecoColors.gold, 0.35);
@@ -126,8 +126,8 @@ export class UIScene extends Phaser.Scene {
     drawCornerOrnament(frameBg, 6, height - BOTTOM_MARGIN - 6, 24, 'bl', DecoColors.gold, 0.45);
     drawCornerOrnament(frameBg, width - 6, height - BOTTOM_MARGIN - 6, 24, 'br', DecoColors.gold, 0.45);
 
-    // Top border ornament centered over viewport
-    const vpCenterX = fLeft + vf.viewportW / 2;
+    // Top border ornament centered over rendered game area
+    const vpCenterX = fLeft + vf.renderedW / 2;
     const topDiamond = 6;
     frameBg.fillStyle(DecoColors.gold, 0.5);
     frameBg.fillPoints([
@@ -142,10 +142,10 @@ export class UIScene extends Phaser.Scene {
     // ─── Right info panel content ───
     this.createRightInfoPanel(rpX, rpW, rpCx, fTop, toolbarTop);
 
-    // ─── Toolbar buttons (centered under viewport area) ───
-    const toolbarCenterX = fLeft + vf.viewportW / 2;
+    // ─── Toolbar buttons (centered under the rendered game image) ───
+    const toolbarCenterX = fLeft + vf.renderedW / 2;
     const buttonY = toolbarTop + TOOLBAR_H / 2;
-    const btnSpacing = vf.viewportW / 5; // spread across viewport width
+    const btnSpacing = vf.renderedW / 5; // spread across rendered game width
 
     const buttons = [
       { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: toolbarCenterX - btnSpacing * 1.5, action: () => this.toggleEvidence() },
@@ -225,13 +225,13 @@ export class UIScene extends Phaser.Scene {
     const pad = 18;
     let y = fTop + pad;
 
-    // ── Settings gear (top of panel) ──
-    const gearBtn = this.add.text(rpX + rpW - pad - 4, y + 2, '⚙', {
-      fontSize: '24px', color: '#5a5a6a',
+    // ── Settings gear (top-right of panel, larger) ──
+    const gearBtn = this.add.text(rpX + rpW - pad, y, '⚙', {
+      fontSize: '36px', color: TextColors.mutedBlue,
     }).setOrigin(1, 0).setDepth(Depths.tooltip);
-    gearBtn.setInteractive({ cursor: POINTER_CURSOR });
-    gearBtn.on('pointerover', () => gearBtn.setColor('#c9a84c'));
-    gearBtn.on('pointerout', () => gearBtn.setColor('#5a5a6a'));
+    gearBtn.setInteractive({ cursor: POINTER_CURSOR, hitArea: new Phaser.Geom.Rectangle(-8, -8, 52, 52), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
+    gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));
+    gearBtn.on('pointerout', () => gearBtn.setColor(TextColors.mutedBlue));
 
     // ── Room name ──
     this.borderRoomNameText = this.add.text(contentX, y + 8, '', {
@@ -595,6 +595,7 @@ export class UIScene extends Phaser.Scene {
   private refreshInventoryGrid(): void {
     if (this._refreshingGrid) return;
     this._refreshingGrid = true;
+    try {
 
     this.itemsGrid.removeAll(true);
 
@@ -704,7 +705,9 @@ export class UIScene extends Phaser.Scene {
     // Update discovery counters
     this.updateDiscoveryCounters();
 
-    this._refreshingGrid = false;
+    } finally {
+      this._refreshingGrid = false;
+    }
   }
 
   private updateDiscoveryCounters(): void {

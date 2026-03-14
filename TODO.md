@@ -1,9 +1,9 @@
 # TODO
 
 ## MVP — COMPLETE
-- [x] Project scaffolding (Phaser + TypeScript + Vite)
+- [x] Project scaffolding (Phaser 3 + TypeScript + Vite)
 - [x] Title screen with Continue / New Investigation
-- [x] All 8 rooms defined with hotspots (95+ total, 12+ per room)
+- [x] All 8 rooms defined with hotspots (124 total, 11-18 per room)
 - [x] Inventory system with select/use/describe
 - [x] Dialogue system with branching, requiredItem, requiredFlag, triggerEvent
 - [x] Save/load system with auto-save on room transitions
@@ -29,7 +29,7 @@
 - [x] Auto-save + Continue button on TitleScene
 
 ## Tier 2 — COMPLETE
-- [x] Suspect/character screen (profiles, known facts, dialogue history)
+- [x] Suspect/character screen (profiles, known facts, Nancy's thoughts)
 - [x] Multi-room navigation map (theater floorplan for fast travel)
 - [x] Hotspot highlight animations (subtle gold glow pulse)
 - [x] Ending epilogue screens (full-screen narrative + credits per ending)
@@ -39,15 +39,26 @@
 - [x] Chapter transition screens (Night 1 / Day 2 / Night 2)
 - [x] Dialogue skip/fast-forward button
 
-## Tier 3 — Polish & Assets
-- [ ] Room background art (illustrated, 8 rooms)
-- [ ] Character portraits for dialogue panels
-- [ ] Audio ambience and UI sound effects
+## Tier 3 — Polish & Assets (IN PROGRESS)
+- [x] Room background art (illustrated, all 8 rooms)
+- [x] Character portraits for dialogue panels (all 5 suspects)
+- [x] Item icons (21 illustrated PNG assets)
+- [x] Custom cursors (gold art deco pointer, spyglass, grab, door, chat, lock, hand)
+- [x] Viewfinder frame UI (art deco borders, right info panel with room stats)
+- [x] Item cursor system (equip item → cursor becomes that item's icon)
+- [x] Used item tracking + USED badge in evidence panel
+- [x] Item lore text in evidence detail panel
+- [x] Per-room item counter + global clue counter in right panel
+- [x] Nancy's inner monologue on suspect profiles (progressive unlock)
+- [x] Suspect reveal on first dialogue (triggerEvent on intro nodes)
+- [ ] Audio ambience and UI sound effects (UISounds stubs exist, no audio files)
 - [ ] Mobile touch testing and tap target tuning
+- [ ] Hotspot placement tuning (lobby hotspots need repositioning for new viewport)
 
 ## Tier 4 — Stretch
 - [ ] Multiple save slots
-- [ ] Settings menu (audio, text speed)
+- [ ] Settings menu (audio volume, text speed) — gear button exists but not wired
 - [ ] Achievement/discovery tracking
-- [ ] Second playthrough variations
+- [ ] Second playthrough variations (new dialogue on replay)
+- [ ] Repeat-visit dialogue for NPCs (currently limited after initial tree)
 - [ ] Wrap for mobile app if needed

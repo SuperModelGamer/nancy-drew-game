@@ -146,6 +146,10 @@ export class DialogueSystem {
       const line = node.lines[this.currentLineIndex];
       this.renderLine(line);
     } else if (node.choices && node.choices.length > 0) {
+      // Fire triggerEvent after all lines are shown, even if choices follow
+      if (node.triggerEvent) {
+        this.triggerEvent(node.triggerEvent);
+      }
       this.renderChoices(node.choices);
     } else {
       if (node.triggerEvent) {
@@ -769,6 +773,7 @@ export class DialogueSystem {
   }
 
   private triggerEvent(eventId: string): void {
+    if (this.triggeredEvents.has(eventId)) return; // already fired this session
     this.triggeredEvents.add(eventId);
     const save = SaveSystem.getInstance();
     save.setFlag(eventId, true);
