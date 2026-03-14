@@ -248,7 +248,8 @@
           "height": 393,
           "label": "Edwin Hale",
           "type": "talk",
-          "dialogueId": "edwin_auditorium"
+          "dialogueId": "edwin_auditorium",
+          "showWhen": "vivian_intro"
         },
         {
           "id": "aud_orchestra_pit",
@@ -397,7 +398,8 @@
           "height": 120,
           "label": "Stella Morrow",
           "type": "talk",
-          "dialogueId": "stella_backstage"
+          "dialogueId": "stella_backstage",
+          "showWhen": "vivian_intro"
         },
         {
           "id": "bs_notice_board",
