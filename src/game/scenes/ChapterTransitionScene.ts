@@ -56,6 +56,12 @@ export class ChapterTransitionScene extends Phaser.Scene {
       return;
     }
 
+    // Hide the UI frame so the chapter transition fills the full screen
+    if (this.scene.isActive('UIScene')) {
+      this.scene.setVisible(false, 'UIScene');
+      this.scene.setActive(false, 'UIScene');
+    }
+
     // Full black background
     this.add.rectangle(width / 2, height / 2, width, height, 0x000000);
 
@@ -210,6 +216,11 @@ export class ChapterTransitionScene extends Phaser.Scene {
       alpha: 0,
       duration: 800,
       onComplete: () => {
+        // Restore UIScene before stopping
+        if (this.scene.manager.getScene('UIScene')) {
+          this.scene.setVisible(true, 'UIScene');
+          this.scene.setActive(true, 'UIScene');
+        }
         this.scene.stop();
       },
     });
