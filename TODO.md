@@ -51,6 +51,19 @@
 - [x] Per-room item counter + global clue counter in right panel
 - [x] Nancy's inner monologue on suspect profiles (progressive unlock)
 - [x] Suspect reveal on first dialogue (triggerEvent on intro nodes)
+- [x] Dialogue UI overhaul — decorative gold frames (portrait frame, dialogue box, nameplate, choice buttons)
+- [x] Content-aware dialogue box sizing (measures text, clamps between min/max height)
+- [x] Large NPC portraits in dialogue (classic Nancy Drew proportions, ~40% screen height)
+- [x] Nancy first-person style — no portrait, dimmed NPC portrait when Nancy speaks
+- [x] Typewriter text effect with click-to-complete
+- [x] Three-tier dialogue routing (base → revisit → done variants per NPC)
+- [x] Gated choices in revisit dialogues (requiredFlag/requiredItem carry into revisits)
+- [x] Player guidance — thinking journal hints after key events (18 hints)
+- [x] Player guidance — item context hints on room entry (9 room+item combos)
+- [x] Player guidance — map pulse indicators on rooms with available objectives
+- [x] Player guidance — secret passage hint in basement
+- [x] hideWhen support for room hotspots (inverse of showWhen)
+- [x] showWhen/hideWhen on talk hotspots for dialogue pacing (NPCs appear/disappear based on story progress)
 - [ ] Audio ambience and UI sound effects (UISounds stubs exist, no audio files)
 - [ ] Mobile touch testing and tap target tuning
 - [ ] Hotspot placement tuning (lobby hotspots need repositioning for new viewport)
@@ -60,5 +73,4 @@
 - [ ] Settings menu (audio volume, text speed) — gear button exists but not wired
 - [ ] Achievement/discovery tracking
 - [ ] Second playthrough variations (new dialogue on replay)
-- [ ] Repeat-visit dialogue for NPCs (currently limited after initial tree)
 - [ ] Wrap for mobile app if needed

@@ -1,4 +1,4 @@
-# Dialogue Pacing & Progression Overhaul
+# Dialogue Pacing & Progression Overhaul — COMPLETED
 
 ## Problems Identified
 
@@ -72,9 +72,9 @@ In revisit dialogues, add `requiredFlag` to some choices that reference events t
 
 ---
 
-## Execution Order
-1. Add `hideWhen` to Hotspot interface and RoomScene filtering logic
-2. Update rooms.json with showWhen/hideWhen on all talk hotspots
-3. Add gated choices + nodes to edwin_auditorium_revisit
-4. Add gated choices + nodes to stella_backstage_revisit
-5. Test and commit
+## Execution Order — ALL COMPLETE
+1. ~~Add `hideWhen` to Hotspot interface and RoomScene filtering logic~~ ✓
+2. ~~Update rooms.json with showWhen/hideWhen on all talk hotspots~~ ✓
+3. ~~Add gated choices + nodes to edwin_auditorium_revisit~~ ✓
+4. ~~Add gated choices + nodes to stella_backstage_revisit~~ ✓
+5. ~~Test and commit~~ ✓

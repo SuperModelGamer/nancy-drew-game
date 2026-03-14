@@ -249,14 +249,20 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 ## 7. DIALOGUE SYSTEM
 
 ### Design Rules
-- Dialogue appears in a bottom panel (not a popup that blocks the room)
-- Speaker name in gold, text in cream
-- Player choices shown as tappable buttons (minimum 48px tall)
+- Dialogue appears in a bottom panel with decorative gold art deco frames (not a popup that blocks the room)
+- Large NPC portrait (440px, ~40% screen height) displayed beside the dialogue box in an ornate gold frame
+- Nancy is never shown (first-person style) — when Nancy speaks, the NPC portrait dims to 50% opacity
+- Speaker name in character-specific color on a gold nameplate, text in cream
+- Content-aware box sizing: text is measured, box height clamped between 280–380px
+- Typewriter text effect with per-character tick sound; click to complete instantly
+- Player choices shown as decorative gold-framed buttons (minimum 48px tall)
 - Tap anywhere on the dialogue box or "Continue" to advance non-choice lines
 - Choices can be gated by: inventory items, flags, or previously triggered events
-- Greyed-out choices show what you *could* ask if you had the right evidence
-- Key conversations add journal entries automatically
-- Dialogue is skippable (fast-forward button)
+- Already-asked choices are dimmed with a checkmark and sorted to the bottom
+- Key conversations add journal entries and thinking hints automatically
+- Dialogue is skippable (skip button in top-right border area)
+- Three-tier routing: base dialogue → revisit variant (with gated choices) → done variant (brief dismissal)
+- NPCs appear/disappear from rooms based on story progress (showWhen/hideWhen on talk hotspots)
 
 ### Dialogue Data Structure (dialogue.json)
 
@@ -446,16 +452,27 @@ Audio is **not required for MVP** but the system should support it from the star
 | 26 | Dialogue skip/fast-forward button (skip to choices or end of node) | Done |
 | 27 | EvidenceBoardScene routed from RoomScene (evidence_board puzzle → dedicated scene) | Done |
 | 28 | ChapterSystem returns new chapter number, RoomScene launches transition on advance | Done |
+| 29 | Dialogue UI overhaul — decorative gold frames (portrait frame, dialogue box, nameplate, choice buttons) | Done |
+| 30 | Content-aware dialogue box sizing (text measurement → clamped box height 280–380px) | Done |
+| 31 | Large NPC portraits in dialogue (classic Nancy Drew proportions, 440px tall, ~40% screen height) | Done |
+| 32 | Nancy first-person style — no portrait shown, dimmed NPC portrait when Nancy speaks | Done |
+| 33 | Typewriter text effect with click-to-complete and per-character tick sound | Done |
+| 34 | Three-tier dialogue routing: base → revisit → done variants per NPC | Done |
+| 35 | Gated choices in revisit dialogues (requiredFlag/requiredItem carry into revisit nodes) | Done |
+| 36 | Player guidance — thinking journal hints after 18 key story events | Done |
+| 37 | Player guidance — item context hints on room entry (9 room+item combos, thought bubble UI) | Done |
+| 38 | Player guidance — map pulse indicators on rooms with available objectives | Done |
+| 39 | Player guidance — secret passage guidance in basement | Done |
+| 40 | hideWhen support for room hotspots (inverse of showWhen, hides hotspot when flag is set) | Done |
+| 41 | showWhen/hideWhen on talk hotspots — NPCs appear/disappear based on story progress | Done |
 
 ### What Needs Building (in priority order)
 
 | # | Task | Scope | Depends on |
 |---|------|-------|------------|
-| 1 | **Room background art** | Illustrated backgrounds for all 8 rooms | Asset pipeline |
-| 2 | **Character portraits** | Portrait art for dialogue panels | Asset pipeline |
-| 3 | **Audio integration** | Ambience + UI sounds | Phaser audio |
-| 4 | **Mobile touch testing** | Tap target tuning, responsive layout QA | Everything |
-| 5 | **Polish pass** | Animations, transitions, edge cases | Everything |
+| 1 | **Audio integration** | Ambience + UI sounds (UISounds stubs exist) | Phaser audio |
+| 2 | **Mobile touch testing** | Tap target tuning, responsive layout QA | Everything |
+| 3 | **Hotspot placement tuning** | Lobby hotspots need repositioning for viewfinder viewport | Art assets |
 
 ---
 

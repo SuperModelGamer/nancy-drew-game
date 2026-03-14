@@ -328,11 +328,12 @@ export class DialogueSystem {
     const skipX = innerRight;
     const skipY = boxTop + borderY / 2;
     const skipBtn = this.scene.add.text(skipX, skipY, 'SKIP ▸▸', {
-      fontFamily: FONT, fontSize: '13px', color: TextColors.goldDim, letterSpacing: 2,
+      fontFamily: FONT, fontSize: '13px', color: '#1a1a1a', letterSpacing: 2,
+      shadow: { offsetX: 0, offsetY: 0, color: '#000000', blur: 4, fill: true },
     }).setOrigin(1, 0.5);
     skipBtn.setInteractive({ cursor: POINTER_CURSOR });
-    skipBtn.on('pointerover', () => skipBtn.setColor(TextColors.gold));
-    skipBtn.on('pointerout', () => skipBtn.setColor(TextColors.goldDim));
+    skipBtn.on('pointerover', () => skipBtn.setColor('#333333'));
+    skipBtn.on('pointerout', () => skipBtn.setColor('#1a1a1a'));
     skipBtn.on('pointerdown', () => this.skipToEnd());
     this.container.add(skipBtn);
 
@@ -597,10 +598,22 @@ export class DialogueSystem {
     overlay.setInteractive();
     this.container.add(overlay);
 
-    // Filter choices
+    // Filter choices: hide if requiredFlag not met, or if already completed
     const visibleChoices = choices.filter(choice => {
       if (choice.requiredFlag) {
-        return save.getFlag(choice.requiredFlag) || this.triggeredEvents.has(choice.requiredFlag);
+        if (!save.getFlag(choice.requiredFlag) && !this.triggeredEvents.has(choice.requiredFlag)) return false;
+      }
+      // Hide choices whose destination node has already been triggered
+      // (e.g. phone calls that loop back to the menu — no need to re-call)
+      if (choice.nextNode && this.currentDialogue) {
+        const destNode = this.currentDialogue.nodes.find(n => n.id === choice.nextNode);
+        if (destNode?.triggerEvent) {
+          if (this.triggeredEvents.has(destNode.triggerEvent) || save.getFlag(destNode.triggerEvent)) return false;
+        }
+      }
+      // Also hide if the choice's own triggerEvent has fired
+      if (choice.triggerEvent) {
+        if (this.triggeredEvents.has(choice.triggerEvent) || save.getFlag(choice.triggerEvent)) return false;
       }
       return true;
     });
@@ -608,29 +621,7 @@ export class DialogueSystem {
     // Layout — centered on screen
     const choiceW = Math.min(1200, width * 0.65);
 
-    // Helper: check if a choice (or its destination node) has already been triggered
-    const isChoiceAsked = (choice: DialogueChoice): boolean => {
-      // Check the choice's own triggerEvent
-      if (choice.triggerEvent) {
-        if (this.triggeredEvents.has(choice.triggerEvent) || save.getFlag(choice.triggerEvent)) return true;
-      }
-      // Also check the destination node's triggerEvent (e.g. phone call nodes)
-      if (choice.nextNode && this.currentDialogue) {
-        const destNode = this.currentDialogue.nodes.find(n => n.id === choice.nextNode);
-        if (destNode?.triggerEvent) {
-          if (this.triggeredEvents.has(destNode.triggerEvent) || save.getFlag(destNode.triggerEvent)) return true;
-        }
-      }
-      return false;
-    };
-
-    // Sort: unasked questions first, already-asked (dimmed) at the bottom
-    const sortedChoices = [...visibleChoices].sort((a, b) => {
-      const aAsked = isChoiceAsked(a);
-      const bAsked = isChoiceAsked(b);
-      if (aAsked === bAsked) return 0;
-      return aAsked ? 1 : -1;
-    });
+    const sortedChoices = visibleChoices;
 
     const totalH = sortedChoices.length * (CHOICE_H + 15) - 15;
     const startY = height * 0.5 - totalH / 2;
@@ -647,7 +638,6 @@ export class DialogueSystem {
 
     sortedChoices.forEach((choice, i) => {
       const itemAvailable = !choice.requiredItem || inventory.hasItem(choice.requiredItem);
-      const alreadyAsked = isChoiceAsked(choice);
       const y = startY + i * (CHOICE_H + 15) + CHOICE_H / 2;
 
       // Choice button
@@ -668,12 +658,9 @@ export class DialogueSystem {
       let displayText = choice.text;
       if (choice.requiredItem && !itemAvailable) {
         displayText += ' (requires evidence)';
-      } else if (alreadyAsked) {
-        displayText = '✓  ' + displayText;
       }
 
-      // Dim already-asked choices
-      const textColor = !itemAvailable ? '#555555' : alreadyAsked ? '#8a7a5a' : TextColors.gold;
+      const textColor = !itemAvailable ? '#555555' : TextColors.gold;
 
       // Text positioned inside the gold borders of choice-btn.png
       // The crown ornament at top takes ~20%, so offset text slightly below center
@@ -686,12 +673,6 @@ export class DialogueSystem {
         wordWrap: { width: textInnerW },
         align: 'center',
       }).setOrigin(0.5);
-
-      // Dim the button for already-asked choices
-      if (alreadyAsked) {
-        btn.setAlpha(0.5);
-        text.setAlpha(0.7);
-      }
 
       if (itemAvailable) {
         btn.setInteractive({ cursor: POINTER_CURSOR });
@@ -780,13 +761,11 @@ export class DialogueSystem {
       this.container!.add([btn, text]);
 
       // Staggered entrance animation
-      const targetBtnAlpha = alreadyAsked ? 0.5 : 1;
-      const targetTextAlpha = alreadyAsked ? 0.7 : 1;
       btn.setAlpha(0);
       text.setAlpha(0);
       this.scene!.tweens.add({
         targets: btn,
-        alpha: targetBtnAlpha,
+        alpha: 1,
         y: { from: y + 22, to: y },
         duration: 300,
         delay: i * 80,
@@ -794,7 +773,7 @@ export class DialogueSystem {
       });
       this.scene!.tweens.add({
         targets: text,
-        alpha: targetTextAlpha,
+        alpha: 1,
         y: { from: y + 22, to: y },
         duration: 300,
         delay: i * 80,
