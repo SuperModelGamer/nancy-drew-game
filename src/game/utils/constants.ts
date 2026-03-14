@@ -132,12 +132,18 @@ export function computeViewfinderLayout(canvasW: number, canvasH: number) {
   const renderedW = Math.ceil(canvasW * zoom);         // game width at this zoom
   const rightPanelW = canvasW - FRAME_LEFT - renderedW; // all extra goes right
 
+  // The viewport spans the FULL width from FRAME_LEFT to the right edge.
+  // The camera at `zoom` renders the 1920px world as `renderedW` px on the left.
+  // The remaining space to the right is empty and covered by UIScene's panel.
+  const fullViewportW = canvasW - FRAME_LEFT;
+
   return {
     zoom,
     viewportX: FRAME_LEFT,
     viewportY: FRAME_TOP,
-    viewportW: renderedW,
+    viewportW: fullViewportW,             // full width — no clipping
     viewportH: availH,
+    renderedW,                            // actual rendered game width in px
     leftMargin: FRAME_LEFT,
     rightPanelX: FRAME_LEFT + renderedW,  // where the right panel starts
     rightPanelW,
