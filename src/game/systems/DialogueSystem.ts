@@ -773,6 +773,7 @@ export class DialogueSystem {
   }
 
   private triggerEvent(eventId: string): void {
+    if (this.triggeredEvents.has(eventId)) return; // already fired this session
     this.triggeredEvents.add(eventId);
     const save = SaveSystem.getInstance();
     save.setFlag(eventId, true);

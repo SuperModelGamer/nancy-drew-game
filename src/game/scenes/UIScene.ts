@@ -227,11 +227,11 @@ export class UIScene extends Phaser.Scene {
 
     // ── Settings gear (top-right of panel, larger) ──
     const gearBtn = this.add.text(rpX + rpW - pad, y, '⚙', {
-      fontSize: '36px', color: '#5a5a6a',
+      fontSize: '36px', color: TextColors.mutedBlue,
     }).setOrigin(1, 0).setDepth(Depths.tooltip);
     gearBtn.setInteractive({ cursor: POINTER_CURSOR, hitArea: new Phaser.Geom.Rectangle(-8, -8, 52, 52), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
-    gearBtn.on('pointerover', () => gearBtn.setColor('#c9a84c'));
-    gearBtn.on('pointerout', () => gearBtn.setColor('#5a5a6a'));
+    gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));
+    gearBtn.on('pointerout', () => gearBtn.setColor(TextColors.mutedBlue));
 
     // ── Room name ──
     this.borderRoomNameText = this.add.text(contentX, y + 8, '', {
@@ -595,6 +595,7 @@ export class UIScene extends Phaser.Scene {
   private refreshInventoryGrid(): void {
     if (this._refreshingGrid) return;
     this._refreshingGrid = true;
+    try {
 
     this.itemsGrid.removeAll(true);
 
@@ -704,7 +705,9 @@ export class UIScene extends Phaser.Scene {
     // Update discovery counters
     this.updateDiscoveryCounters();
 
-    this._refreshingGrid = false;
+    } finally {
+      this._refreshingGrid = false;
+    }
   }
 
   private updateDiscoveryCounters(): void {
