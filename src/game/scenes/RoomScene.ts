@@ -15,6 +15,7 @@ import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 import { UISounds } from '../utils/sounds';
 import { AmbientAudioSystem } from '../systems/AmbientAudioSystem';
+import { getCinematicForRoom } from './CinematicScene';
 
 interface Hotspot {
   id: string;
@@ -56,8 +57,22 @@ export class RoomScene extends Phaser.Scene {
     super({ key: 'RoomScene' });
   }
 
-  init(data: { roomId?: string }): void {
+  init(data: { roomId?: string; skipCinematic?: boolean }): void {
     const roomId = data.roomId || 'lobby';
+
+    // Check for a cinematic that should play before entering this room
+    if (!data.skipCinematic) {
+      const cinematic = getCinematicForRoom(roomId);
+      if (cinematic) {
+        // Redirect to CinematicScene — it will transition to this room when done
+        this.scene.start('CinematicScene', {
+          cinematicId: cinematic.id,
+          targetRoom: roomId,
+        });
+        return;
+      }
+    }
+
     const rooms = roomsData.rooms as RoomData[];
     this.currentRoom = rooms.find(r => r.id === roomId) || rooms[0];
     SaveSystem.getInstance().setCurrentRoom(roomId);

@@ -144,13 +144,24 @@ export class BootScene extends Phaser.Scene {
       this.load.image(key, `assets/ui/dialogue/${filename}.png`);
     }
 
-    // Suppress load errors for optional intro assets (images + audio)
+    // Load cinematic slide backgrounds (optional — cinematics degrade gracefully without images)
+    const cinematicImages: Record<string, string> = {
+      cine_ghost_fog: 'ghost-fog',
+      cine_ghost_figure: 'ghost-figure',
+      cine_ghost_face: 'ghost-face',
+      cine_ghost_empty: 'ghost-empty-stage',
+    };
+    for (const [key, filename] of Object.entries(cinematicImages)) {
+      this.load.image(key, `assets/cinematics/${filename}.png`);
+    }
+
+    // Suppress load errors for optional intro/cinematic assets (images + audio)
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       if (file.key.startsWith('intro_') || file.key.startsWith('sfx_') ||
           file.key.startsWith('ambient_') || file.key.startsWith('music_') ||
-          file.key.startsWith('amb_') ||
+          file.key.startsWith('amb_') || file.key.startsWith('cine_') ||
           file.key.startsWith('ui_') || file.key.startsWith('dlg_')) {
-        // Silently ignore — intro works without these assets
+        // Silently ignore — scenes work without these assets
         return;
       }
     });
