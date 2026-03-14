@@ -63,31 +63,25 @@ export class RoomScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Reset camera to full game dimensions before reading width/height.
-    // scene.restart() preserves the previous viewport, so without this
-    // the second room visit would read the viewport size (1908×928) instead
-    // of the native game size (1920×1080).
-    this.cameras.main.setViewport(0, 0, 1920, 1080);
-    this.cameras.main.setZoom(1);
-
-    const { width, height } = this.cameras.main;
-
-    // The game world is the native art resolution: 1920 × 1080 (16:9).
-    // We uniformly scale it down to fit above the toolbar, preserving aspect ratio.
-    // The leftover space becomes the thick viewfinder borders drawn by UIScene.
-    const gameW = width;   // 1920
-    const gameH = height;  // 1080 — FULL native resolution
-    const vf = computeViewfinderLayout(width, height);
+    // Set up the camera viewport to exactly fill the game area inside the UI frame.
+    // No zoom — the viewport dimensions ARE the game world dimensions.
+    const vf = computeViewfinderLayout(1920, 1080);
     this.cameras.main.setViewport(vf.viewportX, vf.viewportY, vf.viewportW, vf.viewportH);
-    this.cameras.main.setZoom(vf.zoom);
-    // Camera scroll stays at (0,0) so world (0,0) maps to viewport top-left
+    this.cameras.main.setZoom(1);
+    this.cameras.main.setScroll(0, 0);
 
-    // Room background - use real image if available, fall back to procedural art
-    // Display at full 1920×1080 (native art) — uniform zoom handles the scaling
+    const gameW = vf.viewportW;   // actual pixel width of the game area
+    const gameH = vf.viewportH;   // actual pixel height of the game area
+
+    // Hotspots and room data are authored in 1920×1080 space — compute scale factors
+    this.scaleX = gameW / 1920;
+    this.scaleY = gameH / 1080;
+
+    // Room background — fill the entire game viewport edge-to-edge
     const bgKey = `bg_${this.currentRoom.id}`;
     if (this.textures.exists(bgKey)) {
       const bg = this.add.image(gameW / 2, gameH / 2, bgKey);
-      bg.setDisplaySize(gameW, gameH); // 1920×1080 — no aspect ratio distortion
+      bg.setDisplaySize(gameW, gameH);
     } else {
       drawRoomBackground(this, this.currentRoom.id);
     }
@@ -199,6 +193,10 @@ export class RoomScene extends Phaser.Scene {
     }
   }
 
+  // Scale factor from the original 1920×1080 coordinate space to the actual viewport
+  private scaleX = 1;
+  private scaleY = 1;
+
   private createHotspots(): void {
     this.hotspotObjects.forEach(h => h.destroy());
     this.hotspotObjects = [];
@@ -229,11 +227,14 @@ export class RoomScene extends Phaser.Scene {
         continue;
       }
 
-      const container = this.add.container(hotspot.x, hotspot.y);
+      // Scale from 1920×1080 design coordinates to actual viewport
+      const hx = hotspot.x * this.scaleX;
+      const hy = hotspot.y * this.scaleY;
+      const container = this.add.container(hx, hy);
 
       // Hotspot clickable area - minimum 48px for mobile tap targets
-      const w = Math.max(hotspot.width, 48);
-      const h = Math.max(hotspot.height, 48);
+      const w = Math.max(hotspot.width * this.scaleX, 48);
+      const h = Math.max(hotspot.height * this.scaleY, 48);
 
       // Nancy Drew style: invisible hitbox, no colored overlay
       const bg = this.add.rectangle(0, 0, w, h, 0x000000, 0);
@@ -289,7 +290,7 @@ export class RoomScene extends Phaser.Scene {
       // Click/tap handler with sparkle feedback and sound
       bg.on('pointerdown', () => {
         UISounds.click();
-        this.playClickSparkle(hotspot.x, hotspot.y, Colors.gold);
+        this.playClickSparkle(hx, hy, Colors.gold);
         this.handleHotspot(hotspot);
       });
 
