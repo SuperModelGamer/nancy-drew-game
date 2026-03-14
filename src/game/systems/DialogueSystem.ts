@@ -206,6 +206,14 @@ export class DialogueSystem {
 
     // Track this node as visited so choices leading here are hidden on return
     this.visitedNodes.add(node.id);
+    // Also persist across sessions so choices don't reappear on revisit
+    // Skip hub nodes (like "start") that the player loops back to for more choices
+    if (this.currentDialogue && node.id !== 'start') {
+      const persistKey = `visited_${this.currentDialogue.id}_${node.id}`;
+      if (!this.triggeredEvents.has(persistKey)) {
+        this.triggeredEvents.add(persistKey);
+      }
+    }
 
     if (this.currentLineIndex < node.lines.length) {
       const line = node.lines[this.currentLineIndex];
@@ -603,33 +611,44 @@ export class DialogueSystem {
     overlay.setInteractive();
     this.container.add(overlay);
 
-    // Filter choices: hide if requiredFlag not met, or if already completed
-    const visibleChoices = choices.filter(choice => {
-      if (choice.requiredFlag) {
-        if (!save.getFlag(choice.requiredFlag) && !this.triggeredEvents.has(choice.requiredFlag)) return false;
-      }
-      // Hide choices whose destination node has already been visited this dialogue
-      if (choice.nextNode && this.visitedNodes.has(choice.nextNode)) return false;
-      // Also hide if destination node's triggerEvent has fired (persists across sessions)
+    // Categorize choices: consumed (hide), gated (show locked), available (show normally)
+    const isConsumed = (choice: DialogueChoice): boolean => {
+      // Already visited this session
+      if (choice.nextNode && this.visitedNodes.has(choice.nextNode)) return true;
+      // Persisted from previous sessions
       if (choice.nextNode && this.currentDialogue) {
+        const persistKey = `visited_${this.currentDialogue.id}_${choice.nextNode}`;
+        if (this.triggeredEvents.has(persistKey)) return true;
         const destNode = this.currentDialogue.nodes.find(n => n.id === choice.nextNode);
         if (destNode?.triggerEvent) {
-          if (this.triggeredEvents.has(destNode.triggerEvent) || save.getFlag(destNode.triggerEvent)) return false;
+          if (this.triggeredEvents.has(destNode.triggerEvent) || save.getFlag(destNode.triggerEvent)) return true;
         }
       }
-      // Also hide if the choice's own triggerEvent has fired
       if (choice.triggerEvent) {
-        if (this.triggeredEvents.has(choice.triggerEvent) || save.getFlag(choice.triggerEvent)) return false;
+        if (this.triggeredEvents.has(choice.triggerEvent) || save.getFlag(choice.triggerEvent)) return true;
       }
-      return true;
-    });
+      return false;
+    };
+
+    const isGatedByFlag = (choice: DialogueChoice): boolean => {
+      if (!choice.requiredFlag) return false;
+      return !save.getFlag(choice.requiredFlag) && !this.triggeredEvents.has(choice.requiredFlag);
+    };
+
+    // Filter out consumed choices, keep gated ones visible but locked
+    const displayChoices = choices.filter(choice => !isConsumed(choice));
+
+    // If no available (non-gated) choices remain, end the dialogue
+    const availableChoices = displayChoices.filter(choice => !isGatedByFlag(choice));
+    if (availableChoices.length === 0) {
+      this.endDialogue();
+      return;
+    }
 
     // Layout — centered on screen
     const choiceW = Math.min(1200, width * 0.65);
 
-    const sortedChoices = visibleChoices;
-
-    const totalH = sortedChoices.length * (CHOICE_H + 15) - 15;
+    const totalH = displayChoices.length * (CHOICE_H + 15) - 15;
     const startY = height * 0.5 - totalH / 2;
 
     // Header text — must be in the container so it's cleaned up on next render
@@ -642,8 +661,15 @@ export class DialogueSystem {
     }).setOrigin(0.5);
     this.container.add(header);
 
-    sortedChoices.forEach((choice, i) => {
+    // Format flag name into readable evidence hint (e.g. "saw_threatening_note" → "Saw Threatening Note")
+    const formatFlagName = (flag: string): string => {
+      return flag.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    };
+
+    displayChoices.forEach((choice, i) => {
+      const gatedByFlag = isGatedByFlag(choice);
       const itemAvailable = !choice.requiredItem || inventory.hasItem(choice.requiredItem);
+      const isLocked = gatedByFlag || !itemAvailable;
       const y = startY + i * (CHOICE_H + 15) + CHOICE_H / 2;
 
       // Choice button
@@ -651,22 +677,25 @@ export class DialogueSystem {
 
       if (this.scene!.textures.exists('dlg_choice_btn')) {
         btn = this.scene!.add.image(width / 2, y, 'dlg_choice_btn');
-        // Stretch to full choice width so text always fits
         (btn as Phaser.GameObjects.Image).setDisplaySize(choiceW, CHOICE_H);
       } else {
-        // Procedural fallback
         btn = this.scene!.add.rectangle(width / 2, y, choiceW, CHOICE_H, 0x0e0c14, 0.92);
         (btn as Phaser.GameObjects.Rectangle).setStrokeStyle(
-          1.5, itemAvailable ? Colors.gold : 0x444444, itemAvailable ? 0.5 : 0.3
+          1.5, !isLocked ? Colors.gold : 0x444444, !isLocked ? 0.5 : 0.3
         );
       }
 
-      let displayText = choice.text;
-      if (choice.requiredItem && !itemAvailable) {
-        displayText += ' (requires evidence)';
+      // Gated choices: show evidence requirement, not the dialogue text (avoid spoilers)
+      let displayText: string;
+      if (gatedByFlag) {
+        displayText = `🔒  Requires: ${formatFlagName(choice.requiredFlag!)}`;
+      } else if (choice.requiredItem && !itemAvailable) {
+        displayText = `🔒  ${choice.text} (requires evidence)`;
+      } else {
+        displayText = choice.text;
       }
 
-      const textColor = !itemAvailable ? '#555555' : TextColors.gold;
+      const textColor = isLocked ? '#555555' : TextColors.gold;
 
       // Text positioned inside the gold borders of choice-btn.png
       // The crown ornament at top takes ~20%, so offset text slightly below center
@@ -680,7 +709,7 @@ export class DialogueSystem {
         align: 'center',
       }).setOrigin(0.5);
 
-      if (itemAvailable) {
+      if (!isLocked) {
         btn.setInteractive({ cursor: POINTER_CURSOR });
 
         // Store the base scales set by setDisplaySize so hover tweens are relative
