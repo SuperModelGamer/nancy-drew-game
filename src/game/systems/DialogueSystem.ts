@@ -660,12 +660,11 @@ export class DialogueSystem {
       return isGatedByFlag(choice) || isGatedByItem(choice);
     };
 
-    // Filter out consumed choices, keep gated ones visible but locked
-    const displayChoices = choices.filter(choice => !isConsumed(choice));
+    // Filter out consumed choices AND locked/gated choices (hidden until unlocked)
+    const displayChoices = choices.filter(choice => !isConsumed(choice) && !isLocked(choice));
 
-    // If only locked/gated choices remain (no freely available ones), end dialogue
-    const availableChoices = displayChoices.filter(choice => !isLocked(choice));
-    if (availableChoices.length === 0) {
+    // If no choices remain, end dialogue
+    if (displayChoices.length === 0) {
       this.endDialogue();
       return;
     }
