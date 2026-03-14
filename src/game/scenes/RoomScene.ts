@@ -740,91 +740,112 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private showRoomAnnouncement(width: number, height: number, onDismiss?: () => void): void {
+    // ── Full-screen dark overlay (matches showDescription) ──
+    const clickZone = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
+    clickZone.setDepth(Depths.descriptionBox);
+    clickZone.setInteractive();
+
+    // ── Visual panel container (on top of overlay) ──
     const container = this.add.container(0, 0);
-    container.setDepth(Depths.scriptedEvent - 1); // High z-order, just below scripted events
+    container.setDepth(Depths.descriptionBox + 1);
 
-    // Full-screen dark overlay
-    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
-    container.add(overlay);
-
-    // Decorative elements
-    const gfx = this.add.graphics();
-    container.add(gfx);
-
-    // Room name — large, centered, gold (positioned below chandelier area)
-    const roomName = this.add.text(width / 2, height * 0.45, this.currentRoom.name.toUpperCase(), {
+    // Room name text
+    const roomName = this.add.text(width / 2, 0, this.currentRoom.name.toUpperCase(), {
       fontFamily: FONT,
-      fontSize: '54px',
+      fontSize: '44px',
       color: DecoTextColors.goldBright,
       fontStyle: 'bold',
       letterSpacing: 6,
       align: 'center',
       shadow: {
         offsetX: 0,
-        offsetY: 0,
-        color: '#c9a84c',
-        blur: 10,
+        offsetY: 2,
+        color: '#000000',
+        blur: 8,
         fill: true,
       },
     }).setOrigin(0.5);
-    container.add(roomName);
 
-    // Decorative divider above name
-    drawDecoDivider(gfx, width / 2, height * 0.45 - 32, width * 0.4, DecoColors.gold, 0.5);
-
-    // Decorative divider below name
-    drawDecoDivider(gfx, width / 2, height * 0.45 + 32, width * 0.4, DecoColors.gold, 0.5);
-
-    // Room description — readable size, centered below
-    const desc = this.add.text(width / 2, height * 0.58, this.currentRoom.description, {
+    // Room description text
+    const maxTextW = Math.min(width * 0.6, 750);
+    const desc = this.add.text(width / 2, 0, this.currentRoom.description, {
       fontFamily: FONT,
-      fontSize: '26px',
-      color: DecoTextColors.cream,
+      fontSize: '24px',
+      color: TextColors.light,
       fontStyle: 'italic',
-      wordWrap: { width: width * 0.65 },
+      wordWrap: { width: maxTextW },
       align: 'center',
-      lineSpacing: 6,
+      lineSpacing: 8,
     }).setOrigin(0.5);
-    container.add(desc);
 
-    // Fade in the whole announcement
+    // Layout: figure out total content height, then center vertically
+    const gapNameDesc = 36;  // gap between name and description
+    const dividerSpace = 16; // space for the decorative dividers
+    const totalContentH = roomName.height + dividerSpace + gapNameDesc + desc.height;
+    const centerY = height / 2;
+    const contentTop = centerY - totalContentH / 2;
+
+    roomName.setY(contentTop + roomName.height / 2);
+    desc.setY(contentTop + roomName.height + dividerSpace + gapNameDesc + desc.height / 2);
+
+    // Decorative divider between name and description
+    const gfx = this.add.graphics();
+    const dividerY = contentTop + roomName.height + dividerSpace / 2 + 4;
+    drawDecoDivider(gfx, width / 2, dividerY, Math.min(width * 0.35, 500), DecoColors.gold, 0.5);
+
+    // Background panel behind content (matching showDescription style)
+    const padX = 60, padY = 50;
+    const panelW = Math.min(Math.max(roomName.width, desc.width) + padX * 2, width * 0.8);
+    const panelH = totalContentH + padY * 2;
+    const bg = this.add.rectangle(width / 2, centerY, panelW, panelH, 0x0a0a12, 0.96);
+    bg.setStrokeStyle(1.5, Colors.gold, 0.4);
+
+    // "Click to continue" hint
+    const hint = this.add.text(width / 2, centerY + panelH / 2 - 22, 'Click to continue', {
+      fontFamily: FONT,
+      fontSize: '16px',
+      color: TextColors.goldDim,
+      align: 'center',
+    }).setOrigin(0.5);
+
+    container.add([bg, gfx, roomName, desc, hint]); // bg first (behind)
+
+    // Fade in both layers together
+    clickZone.setAlpha(0);
     container.setAlpha(0);
-    this.tweens.add({
-      targets: container,
-      alpha: 1,
-      duration: 400,
-      ease: 'Power2',
-    });
+    this.tweens.add({ targets: [clickZone, container], alpha: 1, duration: 400, ease: 'Power2' });
 
-    // Shared dismiss logic — fade out, destroy, then trigger callback
+    // ── Dismiss logic ──
     let dismissed = false;
     const dismiss = () => {
       if (dismissed) return;
       dismissed = true;
-      this.input.off('pointerdown', dismiss);
       this.input.keyboard!.off('keydown', dismissKey);
       this.tweens.add({
-        targets: container,
+        targets: [clickZone, container],
         alpha: 0,
         duration: 300,
         onComplete: () => {
+          clickZone.destroy();
           container.destroy();
           if (onDismiss) onDismiss();
         },
       });
     };
 
-    // Click anywhere to dismiss — use scene-level input to guarantee clicks
-    // are caught regardless of container child ordering issues
-    this.input.on('pointerdown', dismiss);
-
-    // Also allow spacebar/enter/escape to dismiss
     const dismissKey = (event: KeyboardEvent) => {
       if (event.code === 'Space' || event.code === 'Enter' || event.code === 'Escape') {
         dismiss();
       }
     };
-    this.input.keyboard!.on('keydown', dismissKey);
+
+    // Arm dismiss after short delay so the click that triggered navigation doesn't close it
+    this.time.delayedCall(150, () => {
+      if (!dismissed) {
+        clickZone.on('pointerdown', dismiss);
+        this.input.keyboard!.on('keydown', dismissKey);
+      }
+    });
   }
 
   private navigateToRoom(roomId: string): void {
