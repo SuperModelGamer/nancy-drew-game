@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
+import { DialogueSystem } from '../systems/DialogueSystem';
 import roomsData from '../data/rooms.json';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths, computeViewfinderLayout } from '../utils/constants';
@@ -384,13 +385,26 @@ export class UIScene extends Phaser.Scene {
     this.updateRightPanelStats();
   }
 
+  /** Check whether a hotspot's showWhen condition is currently met. */
+  private isHotspotAvailable(showWhen: string | undefined): boolean {
+    if (!showWhen) return true;
+    const save = SaveSystem.getInstance();
+    if (save.getFlag(showWhen)) return true;
+    try { if (DialogueSystem.getInstance().hasTriggeredEvent(showWhen)) return true; } catch { /* dialogue not ready */ }
+    if (showWhen.startsWith('chapter_')) {
+      const m = showWhen.match(/^chapter_(\d+)$/);
+      if (m) return (save.getChapter?.() ?? 1) >= parseInt(m[1], 10);
+    }
+    return false;
+  }
+
   private updateRightPanelStats(): void {
     if (!this.borderItemCountText) return;
 
     const save = SaveSystem.getInstance();
     const inventory = InventorySystem.getInstance();
     const currentRoomId = save.getCurrentRoom();
-    const rooms = roomsData.rooms as { id: string; name: string; hotspots: { id: string; type: string; itemId?: string }[] }[];
+    const rooms = roomsData.rooms as { id: string; name: string; hotspots: { id: string; type: string; itemId?: string; showWhen?: string }[] }[];
     const currentRoom = rooms.find(r => r.id === currentRoomId);
 
     // Chapter
@@ -406,22 +420,24 @@ export class UIScene extends Phaser.Scene {
       this.borderRoomNameText.setText(shortName);
     }
 
-    // Per-room item counter
+    // Per-room item counter (only hotspots available at current story progression)
     let roomPickupTotal = 0;
     let roomPickupFound = 0;
     if (currentRoom) {
-      const roomPickups = currentRoom.hotspots.filter(hs => hs.type === 'pickup' && hs.itemId);
+      const roomPickups = currentRoom.hotspots.filter(
+        hs => hs.type === 'pickup' && hs.itemId && this.isHotspotAvailable(hs.showWhen),
+      );
       roomPickupTotal = roomPickups.length;
       roomPickupFound = roomPickups.filter(hs => inventory.hasItem(hs.itemId!) || inventory.isUsed(hs.itemId!)).length;
       this.borderItemCountText.setText(`${roomPickupFound} / ${roomPickupTotal}`);
     }
 
-    // Per-room clue counter (inspect + pickup + locked hotspots in current room)
+    // Per-room clue counter (only available inspect + pickup + locked hotspots)
     let roomClueTotal = 0;
     let roomClueFound = 0;
     if (currentRoom) {
       for (const hs of currentRoom.hotspots) {
-        if (hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked') {
+        if ((hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked') && this.isHotspotAvailable(hs.showWhen)) {
           roomClueTotal++;
           if (save.getFlag('used_hotspot_' + hs.id)) roomClueFound++;
         }
@@ -431,7 +447,7 @@ export class UIScene extends Phaser.Scene {
       this.borderRoomClueCountText.setText(`${roomClueFound} / ${roomClueTotal}`);
     }
 
-    // Total items across all rooms
+    // Total items across all rooms (all items regardless of progression)
     let totalItemsAll = 0;
     let foundItemsAll = 0;
     for (const room of rooms) {
@@ -446,7 +462,7 @@ export class UIScene extends Phaser.Scene {
       this.borderTotalItemCountText.setText(`${foundItemsAll} / ${totalItemsAll}`);
     }
 
-    // Global clue counter
+    // Global clue counter (all clues regardless of progression)
     let totalClues = 0;
     let foundClues = 0;
     for (const room of rooms) {
@@ -1256,6 +1272,127 @@ export class UIScene extends Phaser.Scene {
     divGfx.lineStyle(1, 0x5a4a3a, 0.2);
     divGfx.lineBetween(cx - sliderW / 2, y, cx + sliderW / 2, y);
     this.settingsContent.add(divGfx);
+    y += 30;
+
+    // ── Text Speed ──
+    this.settingsContent.add(this.add.text(cx, y, 'TEXT SPEED', {
+      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontStyle: 'bold', letterSpacing: 4,
+    }).setOrigin(0.5, 0));
+    y += 40;
+
+    const speedPresets: Array<{ label: string; value: 'slow' | 'normal' | 'fast' | 'instant' }> = [
+      { label: 'Slow', value: 'slow' },
+      { label: 'Normal', value: 'normal' },
+      { label: 'Fast', value: 'fast' },
+      { label: 'Instant', value: 'instant' },
+    ];
+    const btnW = 100;
+    const btnH = 38;
+    const btnGap = 12;
+    const totalBtnsW = speedPresets.length * btnW + (speedPresets.length - 1) * btnGap;
+    let bx = cx - totalBtnsW / 2 + btnW / 2;
+    const currentSpeed = UISounds.getTextSpeed();
+
+    for (const preset of speedPresets) {
+      const isActive = preset.value === currentSpeed;
+      const bg = this.add.rectangle(bx, y + btnH / 2, btnW, btnH,
+        isActive ? TAB_GOLD : 0x3a2a1a, isActive ? 0.7 : 0.2);
+      bg.setStrokeStyle(1.5, TAB_GOLD, isActive ? 0.8 : 0.3);
+      bg.setInteractive({ cursor: POINTER_CURSOR });
+      this.settingsContent.add(bg);
+
+      const txt = this.add.text(bx, y + btnH / 2, preset.label, {
+        fontFamily: FONT, fontSize: '16px',
+        color: isActive ? '#2a1a0a' : TAB_GOLD_STR,
+        fontStyle: isActive ? 'bold' : 'normal',
+      }).setOrigin(0.5);
+      this.settingsContent.add(txt);
+
+      bg.on('pointerdown', () => {
+        UISounds.setTextSpeed(preset.value);
+        UISounds.click();
+        this.refreshSettingsContent();
+      });
+      bg.on('pointerover', () => { if (preset.value !== UISounds.getTextSpeed()) bg.setFillStyle(0x3a2a1a, 0.4); });
+      bg.on('pointerout', () => { if (preset.value !== UISounds.getTextSpeed()) bg.setFillStyle(0x3a2a1a, 0.2); });
+
+      bx += btnW + btnGap;
+    }
+    y += btnH + 40;
+
+    // ── Divider ──
+    const divGfx1b = this.add.graphics();
+    divGfx1b.lineStyle(1, 0x5a4a3a, 0.2);
+    divGfx1b.lineBetween(cx - sliderW / 2, y, cx + sliderW / 2, y);
+    this.settingsContent.add(divGfx1b);
+    y += 30;
+
+    // ── Toggles Row: Particles & Fullscreen ──
+    this.settingsContent.add(this.add.text(cx, y, 'DISPLAY', {
+      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontStyle: 'bold', letterSpacing: 4,
+    }).setOrigin(0.5, 0));
+    y += 40;
+
+    const toggles: Array<{ label: string; active: boolean; onToggle: () => void }> = [
+      {
+        label: 'Particles',
+        active: UISounds.getParticlesEnabled(),
+        onToggle: () => {
+          UISounds.setParticlesEnabled(!UISounds.getParticlesEnabled());
+          this.refreshSettingsContent();
+        },
+      },
+      {
+        label: 'Fullscreen',
+        active: !!document.fullscreenElement,
+        onToggle: () => {
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+          } else {
+            document.documentElement.requestFullscreen().catch(() => {});
+          }
+          this.time.delayedCall(200, () => this.refreshSettingsContent());
+        },
+      },
+    ];
+
+    const toggleW = 160;
+    const toggleH = 38;
+    const toggleGap = 24;
+    const totalTogglesW = toggles.length * toggleW + (toggles.length - 1) * toggleGap;
+    let tx = cx - totalTogglesW / 2 + toggleW / 2;
+
+    for (const toggle of toggles) {
+      const isOn = toggle.active;
+      const tbg = this.add.rectangle(tx, y + toggleH / 2, toggleW, toggleH,
+        isOn ? TAB_GOLD : 0x3a2a1a, isOn ? 0.7 : 0.2);
+      tbg.setStrokeStyle(1.5, TAB_GOLD, isOn ? 0.8 : 0.3);
+      tbg.setInteractive({ cursor: POINTER_CURSOR });
+      this.settingsContent.add(tbg);
+
+      const stateLabel = isOn ? 'ON' : 'OFF';
+      const ttxt = this.add.text(tx, y + toggleH / 2, `${toggle.label}: ${stateLabel}`, {
+        fontFamily: FONT, fontSize: '15px',
+        color: isOn ? '#2a1a0a' : TAB_GOLD_STR,
+        fontStyle: isOn ? 'bold' : 'normal',
+      }).setOrigin(0.5);
+      this.settingsContent.add(ttxt);
+
+      tbg.on('pointerdown', () => { UISounds.click(); toggle.onToggle(); });
+      tbg.on('pointerover', () => tbg.setFillStyle(isOn ? TAB_GOLD : 0x3a2a1a, isOn ? 0.85 : 0.4));
+      tbg.on('pointerout', () => tbg.setFillStyle(isOn ? TAB_GOLD : 0x3a2a1a, isOn ? 0.7 : 0.2));
+
+      tx += toggleW + toggleGap;
+    }
+    y += toggleH + 40;
+
+    // ── Divider ──
+    const divGfx1c = this.add.graphics();
+    divGfx1c.lineStyle(1, 0x5a4a3a, 0.2);
+    divGfx1c.lineBetween(cx - sliderW / 2, y, cx + sliderW / 2, y);
+    this.settingsContent.add(divGfx1c);
     y += 30;
 
     // ── Clear Save Data ──

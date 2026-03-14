@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
+import { UISounds } from './sounds';
 
 // Ambient particle effects per room for atmosphere
 
 export function addAmbientParticles(scene: Phaser.Scene, roomId: string): void {
+  if (!UISounds.getParticlesEnabled()) return;
   const { width, height } = scene.cameras.main;
 
   switch (roomId) {

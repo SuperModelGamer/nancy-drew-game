@@ -14,6 +14,7 @@ import { Cursors, createGlowSpyglass, createItemCursor } from '../utils/cursors'
 import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 import { UISounds } from '../utils/sounds';
+import { AmbientAudioSystem } from '../systems/AmbientAudioSystem';
 
 interface Hotspot {
   id: string;
@@ -144,6 +145,11 @@ export class RoomScene extends Phaser.Scene {
     this.playCurtainOpen(() => {
       this.checkScriptedEvents();
     });
+
+    // Start room-specific ambient audio
+    const ambientAudio = AmbientAudioSystem.getInstance();
+    ambientAudio.setScene(this);
+    ambientAudio.enterRoom(this.currentRoom.id);
 
     // Hotspot editor toggle (Shift+Q)
     this.input.keyboard!.on('keydown-Q', (event: KeyboardEvent) => {
