@@ -344,7 +344,7 @@
           "label": "Stairs Up",
           "type": "navigate",
           "targetRoom": "projection_booth",
-          "showWhen": "chapter_2"
+          "showWhen": "stella_backstage"
         },
         {
           "id": "aud_back_lobby",
