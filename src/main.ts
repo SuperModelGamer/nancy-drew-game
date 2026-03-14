@@ -17,7 +17,7 @@ import { HotspotEditorScene } from './game/scenes/HotspotEditorScene';
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'game-container',
-  backgroundColor: '#0a0a0f',
+  backgroundColor: '#0c1525',
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.NO_CENTER,
