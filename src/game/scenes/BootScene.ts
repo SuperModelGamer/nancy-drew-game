@@ -117,14 +117,24 @@ export class BootScene extends Phaser.Scene {
       this.load.image(key, `assets/intro/${key}.png`);
     }
 
-    // Load intro audio (gracefully skipped if files don't exist)
-    const introAudio = [
-      'ambient_theater', 'sfx_goblet', 'sfx_thud',
-      'sfx_ghost_whisper', 'sfx_phone_ring', 'sfx_door_creak',
-      'sfx_heartbeat', 'music_intro',
-    ];
-    for (const key of introAudio) {
-      this.load.audio(key, [`audio/${key}.mp3`, `audio/${key}.ogg`]);
+    // Load intro/cinematic audio — remap existing ambient files to SFX keys where possible
+    // Files that don't exist are silently suppressed by the loaderror handler below
+    const introAudio: Record<string, string[]> = {
+      ambient_theater: ['assets/audio/ambient_horror.ogg'],
+      sfx_ghost_whisper: ['assets/audio/ghost_whisper.wav'],
+      sfx_door_creak: ['assets/audio/wood_creak.ogg'],
+      // These use procedural fallbacks from UISounds but attempt file load too
+      sfx_goblet: ['audio/sfx_goblet.mp3', 'audio/sfx_goblet.ogg'],
+      sfx_thud: ['audio/sfx_thud.mp3', 'audio/sfx_thud.ogg'],
+      sfx_phone_ring: ['audio/sfx_phone_ring.mp3', 'audio/sfx_phone_ring.ogg'],
+      sfx_heartbeat: ['audio/sfx_heartbeat.mp3', 'audio/sfx_heartbeat.ogg'],
+      music_intro: ['audio/music_intro.mp3', 'audio/music_intro.ogg'],
+      // Cinematic-specific audio
+      cine_ambient_ghost: ['assets/audio/creepy_ambient.mp3'],
+      cine_whisper: ['assets/audio/ghost_whisper.wav'],
+    };
+    for (const [key, paths] of Object.entries(introAudio)) {
+      this.load.audio(key, paths);
     }
 
     // Load ambient audio for room soundscapes (optional — procedural fallback exists)

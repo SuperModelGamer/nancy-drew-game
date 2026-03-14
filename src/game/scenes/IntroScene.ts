@@ -464,24 +464,40 @@ export class IntroScene extends Phaser.Scene {
 
   // ─── Audio System ───────────────────────────────────────────────────────
 
+  /** Procedural fallbacks for intro audio keys that may not have files */
+  private static readonly PROC_FALLBACKS: Record<string, () => void> = {
+    sfx_goblet: () => UISounds.gobletClink(),
+    sfx_thud: () => UISounds.bodyThud(),
+    sfx_ghost_whisper: () => UISounds.ghostWhisper(),
+    sfx_phone_ring: () => UISounds.phoneRing(),
+    sfx_door_creak: () => UISounds.doorCreak(),
+    sfx_heartbeat: () => UISounds.heartbeat(),
+    ambient_theater: () => UISounds.theaterDrone(),
+  };
+
   private triggerAudio(slide: IntroSlide): void {
     if (!slide.audio) return;
 
     for (const cue of slide.audio) {
-      // Only play if the audio key is loaded
-      if (!this.cache.audio.exists(cue.key)) continue;
-
       const delay = cue.delay ?? 0;
 
       this.time.delayedCall(delay, () => {
         if (this.abortSlide) return;
 
-        const sound = this.sound.add(cue.key, {
-          volume: cue.volume ?? 0.3,
-          loop: cue.loop ?? false,
-        });
-        sound.play();
-        this.activeSounds.push(sound);
+        // Try loaded Phaser audio first
+        if (this.cache.audio.exists(cue.key)) {
+          const sound = this.sound.add(cue.key, {
+            volume: cue.volume ?? 0.3,
+            loop: cue.loop ?? false,
+          });
+          sound.play();
+          this.activeSounds.push(sound);
+          return;
+        }
+
+        // Fall back to procedural sound
+        const fallback = IntroScene.PROC_FALLBACKS[cue.key];
+        if (fallback) fallback();
       });
     }
   }

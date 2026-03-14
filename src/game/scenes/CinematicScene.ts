@@ -35,6 +35,14 @@ interface CinematicEffect {
   duration?: number;
 }
 
+interface AudioCue {
+  /** Phaser audio key (loaded file) or 'proc:methodName' for procedural UISounds */
+  key: string;
+  delay?: number;
+  volume?: number;
+  loop?: boolean;
+}
+
 interface CinematicSlide {
   lines: string[];
   effect?: 'typewriter' | 'fade' | 'dramatic';
@@ -45,6 +53,7 @@ interface CinematicSlide {
   camera?: CameraMotion;
   fogIntensity?: number;
   effects?: CinematicEffect[];
+  audio?: AudioCue[];
 }
 
 // ─── Cinematic event definitions ─────────────────────────────────────────────
@@ -82,6 +91,10 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
         effects: [
           { type: 'ghostFlicker', delay: 500, duration: 4000 },
         ],
+        audio: [
+          { key: 'cine_ambient_ghost', volume: 0.25, loop: true },
+          { key: 'proc:ghostDroneLong', delay: 300 },
+        ],
       },
       // Slide 2: Ghost figure appears on stage
       {
@@ -97,6 +110,10 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
         fogIntensity: 0.15,
         effects: [
           { type: 'ghostFlicker', delay: 200, duration: 5000 },
+        ],
+        audio: [
+          { key: 'proc:eerieWhistle', delay: 500 },
+          { key: 'cine_whisper', delay: 1500, volume: 0.15 },
         ],
       },
       // Slide 3: Ghost face reveal
@@ -114,6 +131,13 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
         camera: { scaleFrom: 1.05, scaleTo: 1.15, panY: 3 },
         effects: [
           { type: 'heartbeat', delay: 0, duration: 4000 },
+        ],
+        audio: [
+          { key: 'proc:heartbeat', delay: 0 },
+          { key: 'proc:heartbeat', delay: 1000 },
+          { key: 'proc:heartbeat', delay: 2000 },
+          { key: 'proc:heartbeat', delay: 3000 },
+          { key: 'proc:ghostWhisper', delay: 1200 },
         ],
       },
       // Slide 4: Ghost vanishes
@@ -133,6 +157,9 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
           { type: 'flashWhite', delay: 0, duration: 500 },
           { type: 'screenShake', delay: 0, duration: 400 },
         ],
+        audio: [
+          { key: 'proc:lightSurge', delay: 0 },
+        ],
       },
       // Slide 5: Aftermath
       {
@@ -143,6 +170,9 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
         effect: 'dramatic',
         pauseAfter: 2500,
         fogIntensity: 0.06,
+        audio: [
+          { key: 'proc:shimmer', delay: 500 },
+        ],
       },
     ],
     onComplete: {
@@ -181,6 +211,7 @@ export class CinematicScene extends Phaser.Scene {
   private currentBg: Phaser.GameObjects.Image | null = null;
   private bgDarken!: Phaser.GameObjects.Rectangle;
   private ghostOverlay: Phaser.GameObjects.Rectangle | null = null;
+  private activeSounds: Phaser.Sound.BaseSound[] = [];
 
   constructor() {
     super({ key: 'CinematicScene' });
@@ -202,6 +233,7 @@ export class CinematicScene extends Phaser.Scene {
     this.currentTexts = [];
     this.currentBg = null;
     this.ghostOverlay = null;
+    this.activeSounds = [];
   }
 
   create(): void {
@@ -315,6 +347,9 @@ export class CinematicScene extends Phaser.Scene {
       this.tweens.add({ targets: this.fogOverlay, fillAlpha: slide.fogIntensity, duration: 1500 });
     }
 
+    // Audio
+    this.triggerAudio(slide);
+
     // Effects
     this.triggerEffects(slide);
 
@@ -385,6 +420,61 @@ export class CinematicScene extends Phaser.Scene {
     }
 
     this.currentBg = bg;
+  }
+
+  // ─── Audio ────────────────────────────────────────────────────────────────
+
+  /** Map of procedural sound method names to UISounds functions */
+  private static readonly PROC_SOUNDS: Record<string, () => void> = {
+    ghostDrone: () => UISounds.ghostDrone(),
+    ghostDroneLong: () => UISounds.ghostDroneLong(),
+    ghostWhisper: () => UISounds.ghostWhisper(),
+    eerieWhistle: () => UISounds.eerieWhistle(),
+    heartbeat: () => UISounds.heartbeat(),
+    lightSurge: () => UISounds.lightSurge(),
+    shimmer: () => UISounds.shimmer(),
+    gobletClink: () => UISounds.gobletClink(),
+    bodyThud: () => UISounds.bodyThud(),
+    phoneRing: () => UISounds.phoneRing(),
+    doorCreak: () => UISounds.doorCreak(),
+    theaterDrone: () => UISounds.theaterDrone(),
+  };
+
+  private triggerAudio(slide: CinematicSlide): void {
+    if (!slide.audio) return;
+
+    for (const cue of slide.audio) {
+      const delay = cue.delay ?? 0;
+
+      this.time.delayedCall(delay, () => {
+        if (this.abortSlide) return;
+
+        // Procedural sound: key starts with 'proc:'
+        if (cue.key.startsWith('proc:')) {
+          const method = cue.key.substring(5);
+          const fn = CinematicScene.PROC_SOUNDS[method];
+          if (fn) fn();
+          return;
+        }
+
+        // Phaser loaded audio
+        if (!this.cache.audio.exists(cue.key)) return;
+        const sound = this.sound.add(cue.key, {
+          volume: cue.volume ?? 0.3,
+          loop: cue.loop ?? false,
+        });
+        sound.play();
+        this.activeSounds.push(sound);
+      });
+    }
+  }
+
+  private stopAllSounds(): void {
+    for (const s of this.activeSounds) {
+      if (s.isPlaying) s.stop();
+      s.destroy();
+    }
+    this.activeSounds = [];
   }
 
   // ─── Effects ──────────────────────────────────────────────────────────────
@@ -603,6 +693,7 @@ export class CinematicScene extends Phaser.Scene {
 
   private skipToRoom(): void {
     this.canSkip = false;
+    this.stopAllSounds();
     this.completeEvent();
     this.transitionToRoom();
   }
@@ -623,6 +714,7 @@ export class CinematicScene extends Phaser.Scene {
   private transitionToRoom(): void {
     this.canSkip = false;
     this.input.removeAllListeners();
+    this.stopAllSounds();
     this.completeEvent();
 
     const { width, height } = this.cameras.main;
