@@ -203,7 +203,7 @@
         {
           "id": "aud_curtain",
           "x": 750,
-          "y": 226,
+          "y": 310,
           "width": 400,
           "height": 120,
           "label": "Crimson Curtain",
@@ -306,8 +306,8 @@
         },
         {
           "id": "aud_backstage_door",
-          "x": 336,
-          "y": 451,
+          "x": 249,
+          "y": 515,
           "width": 134,
           "height": 230,
           "label": "Backstage Door",
@@ -316,8 +316,8 @@
         },
         {
           "id": "aud_exit_signs",
-          "x": 76,
-          "y": 409,
+          "x": 74,
+          "y": 467,
           "width": 150,
           "height": 216,
           "label": "Side Exit",
