@@ -490,43 +490,51 @@ export class RoomScene extends Phaser.Scene {
     this.dismissDescriptionBox();
 
     // ── Full-screen click catcher ──
-    // This is a scene-level rectangle (NOT inside a container) so Phaser
-    // processes its hit-testing directly, avoiding container input quirks.
-    const clickZone = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
+    const clickZone = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
     clickZone.setDepth(Depths.descriptionBox);
     clickZone.setInteractive();
     this._descriptionClickZone = clickZone;
 
-    // Visual container for the text panel (sits on top of the click zone)
+    // Visual container (sits on top of the overlay)
     const container = this.add.container(0, 0);
     container.setDepth(Depths.descriptionBox + 1);
     this.descriptionBox = container;
 
-    // Text box in center
-    const maxTextW = Math.min(width * 0.7, 800);
-    const textObj = this.add.text(width / 2, height / 2 - 20, text, {
+    const gfx = this.add.graphics();
+    container.add(gfx);
+
+    // Decorative divider above text
+    drawDecoDivider(gfx, width / 2, height * 0.45 - 20, width * 0.35, DecoColors.gold, 0.5);
+
+    // Description text — centered, cream/light italic with glow shadow
+    const maxTextW = Math.min(width * 0.65, 800);
+    const textObj = this.add.text(width / 2, height * 0.5, text, {
       fontFamily: FONT,
       fontSize: '26px',
-      color: TextColors.light,
+      color: DecoTextColors.cream,
+      fontStyle: 'italic',
       align: 'center',
       wordWrap: { width: maxTextW },
       lineSpacing: 6,
+      shadow: {
+        offsetX: 0,
+        offsetY: 0,
+        color: '#000000',
+        blur: 8,
+        fill: true,
+      },
     });
     textObj.setOrigin(0.5);
+    container.add(textObj);
 
-    // Background panel behind text
-    const padX = 50, padY = 40;
-    const bgW = Math.min(textObj.width + padX * 2, width * 0.8);
-    const bgH = textObj.height + padY * 2;
-    const bg = this.add.rectangle(width / 2, height / 2 - 20, bgW, bgH, 0x0a0a12, 0.96);
-    bg.setStrokeStyle(1.5, Colors.gold, 0.4);
+    // Decorative divider below text
+    const dividerBelowY = textObj.y + textObj.height / 2 + 20;
+    drawDecoDivider(gfx, width / 2, dividerBelowY, width * 0.35, DecoColors.gold, 0.5);
 
-    container.add([bg, textObj]); // bg first (behind), text on top
-
-    // Fade in both layers together
+    // Fade in
     clickZone.setAlpha(0);
     container.setAlpha(0);
-    this.tweens.add({ targets: [clickZone, container], alpha: 1, duration: 200 });
+    this.tweens.add({ targets: [clickZone, container], alpha: 1, duration: 400, ease: 'Power2' });
 
     // Dismiss handler
     let dismissed = false;
@@ -538,7 +546,7 @@ export class RoomScene extends Phaser.Scene {
       this.tweens.add({
         targets: [clickZone, container],
         alpha: 0,
-        duration: 200,
+        duration: 300,
         onComplete: () => {
           clickZone.destroy();
           container.destroy();
@@ -740,112 +748,88 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private showRoomAnnouncement(width: number, height: number, onDismiss?: () => void): void {
-    // ── Full-screen dark overlay (matches showDescription) ──
-    const clickZone = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
-    clickZone.setDepth(Depths.descriptionBox);
-    clickZone.setInteractive();
-
-    // ── Visual panel container (on top of overlay) ──
     const container = this.add.container(0, 0);
-    container.setDepth(Depths.descriptionBox + 1);
+    container.setDepth(Depths.scriptedEvent - 1);
 
-    // Room name text
-    const roomName = this.add.text(width / 2, 0, this.currentRoom.name.toUpperCase(), {
+    // Full-screen dark overlay
+    const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
+    container.add(overlay);
+
+    // Decorative elements
+    const gfx = this.add.graphics();
+    container.add(gfx);
+
+    // Room name — large, centered, gold
+    const roomName = this.add.text(width / 2, height * 0.45, this.currentRoom.name.toUpperCase(), {
       fontFamily: FONT,
-      fontSize: '44px',
+      fontSize: '54px',
       color: DecoTextColors.goldBright,
       fontStyle: 'bold',
       letterSpacing: 6,
       align: 'center',
       shadow: {
         offsetX: 0,
-        offsetY: 2,
-        color: '#000000',
-        blur: 8,
+        offsetY: 0,
+        color: '#c9a84c',
+        blur: 10,
         fill: true,
       },
     }).setOrigin(0.5);
+    container.add(roomName);
 
-    // Room description text
-    const maxTextW = Math.min(width * 0.6, 750);
-    const desc = this.add.text(width / 2, 0, this.currentRoom.description, {
+    // Decorative divider above name
+    drawDecoDivider(gfx, width / 2, height * 0.45 - 32, width * 0.4, DecoColors.gold, 0.5);
+
+    // Decorative divider below name
+    drawDecoDivider(gfx, width / 2, height * 0.45 + 32, width * 0.4, DecoColors.gold, 0.5);
+
+    // Room description — readable size, centered below
+    const desc = this.add.text(width / 2, height * 0.58, this.currentRoom.description, {
       fontFamily: FONT,
-      fontSize: '24px',
-      color: TextColors.light,
+      fontSize: '26px',
+      color: DecoTextColors.cream,
       fontStyle: 'italic',
-      wordWrap: { width: maxTextW },
+      wordWrap: { width: width * 0.65 },
       align: 'center',
-      lineSpacing: 8,
+      lineSpacing: 6,
     }).setOrigin(0.5);
+    container.add(desc);
 
-    // Layout: figure out total content height, then center vertically
-    const gapNameDesc = 36;  // gap between name and description
-    const dividerSpace = 16; // space for the decorative dividers
-    const totalContentH = roomName.height + dividerSpace + gapNameDesc + desc.height;
-    const centerY = height / 2;
-    const contentTop = centerY - totalContentH / 2;
-
-    roomName.setY(contentTop + roomName.height / 2);
-    desc.setY(contentTop + roomName.height + dividerSpace + gapNameDesc + desc.height / 2);
-
-    // Decorative divider between name and description
-    const gfx = this.add.graphics();
-    const dividerY = contentTop + roomName.height + dividerSpace / 2 + 4;
-    drawDecoDivider(gfx, width / 2, dividerY, Math.min(width * 0.35, 500), DecoColors.gold, 0.5);
-
-    // Background panel behind content (matching showDescription style)
-    const padX = 60, padY = 50;
-    const panelW = Math.min(Math.max(roomName.width, desc.width) + padX * 2, width * 0.8);
-    const panelH = totalContentH + padY * 2;
-    const bg = this.add.rectangle(width / 2, centerY, panelW, panelH, 0x0a0a12, 0.96);
-    bg.setStrokeStyle(1.5, Colors.gold, 0.4);
-
-    // "Click to continue" hint
-    const hint = this.add.text(width / 2, centerY + panelH / 2 - 22, 'Click to continue', {
-      fontFamily: FONT,
-      fontSize: '16px',
-      color: TextColors.goldDim,
-      align: 'center',
-    }).setOrigin(0.5);
-
-    container.add([bg, gfx, roomName, desc, hint]); // bg first (behind)
-
-    // Fade in both layers together
-    clickZone.setAlpha(0);
+    // Fade in
     container.setAlpha(0);
-    this.tweens.add({ targets: [clickZone, container], alpha: 1, duration: 400, ease: 'Power2' });
+    this.tweens.add({
+      targets: container,
+      alpha: 1,
+      duration: 400,
+      ease: 'Power2',
+    });
 
-    // ── Dismiss logic ──
+    // Dismiss logic
     let dismissed = false;
     const dismiss = () => {
       if (dismissed) return;
       dismissed = true;
+      this.input.off('pointerdown', dismiss);
       this.input.keyboard!.off('keydown', dismissKey);
       this.tweens.add({
-        targets: [clickZone, container],
+        targets: container,
         alpha: 0,
         duration: 300,
         onComplete: () => {
-          clickZone.destroy();
           container.destroy();
           if (onDismiss) onDismiss();
         },
       });
     };
 
+    this.input.on('pointerdown', dismiss);
+
     const dismissKey = (event: KeyboardEvent) => {
       if (event.code === 'Space' || event.code === 'Enter' || event.code === 'Escape') {
         dismiss();
       }
     };
-
-    // Arm dismiss after short delay so the click that triggered navigation doesn't close it
-    this.time.delayedCall(150, () => {
-      if (!dismissed) {
-        clickZone.on('pointerdown', dismiss);
-        this.input.keyboard!.on('keydown', dismissKey);
-      }
-    });
+    this.input.keyboard!.on('keydown', dismissKey);
   }
 
   private navigateToRoom(roomId: string): void {
