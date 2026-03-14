@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
+import { DialogueSystem } from '../systems/DialogueSystem';
 import roomsData from '../data/rooms.json';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths, computeViewfinderLayout } from '../utils/constants';
@@ -384,13 +385,26 @@ export class UIScene extends Phaser.Scene {
     this.updateRightPanelStats();
   }
 
+  /** Check whether a hotspot's showWhen condition is currently met. */
+  private isHotspotAvailable(showWhen: string | undefined): boolean {
+    if (!showWhen) return true;
+    const save = SaveSystem.getInstance();
+    if (save.getFlag(showWhen)) return true;
+    try { if (DialogueSystem.getInstance().hasTriggeredEvent(showWhen)) return true; } catch { /* dialogue not ready */ }
+    if (showWhen.startsWith('chapter_')) {
+      const m = showWhen.match(/^chapter_(\d+)$/);
+      if (m) return (save.getChapter?.() ?? 1) >= parseInt(m[1], 10);
+    }
+    return false;
+  }
+
   private updateRightPanelStats(): void {
     if (!this.borderItemCountText) return;
 
     const save = SaveSystem.getInstance();
     const inventory = InventorySystem.getInstance();
     const currentRoomId = save.getCurrentRoom();
-    const rooms = roomsData.rooms as { id: string; name: string; hotspots: { id: string; type: string; itemId?: string }[] }[];
+    const rooms = roomsData.rooms as { id: string; name: string; hotspots: { id: string; type: string; itemId?: string; showWhen?: string }[] }[];
     const currentRoom = rooms.find(r => r.id === currentRoomId);
 
     // Chapter
@@ -406,22 +420,24 @@ export class UIScene extends Phaser.Scene {
       this.borderRoomNameText.setText(shortName);
     }
 
-    // Per-room item counter
+    // Per-room item counter (only hotspots available at current story progression)
     let roomPickupTotal = 0;
     let roomPickupFound = 0;
     if (currentRoom) {
-      const roomPickups = currentRoom.hotspots.filter(hs => hs.type === 'pickup' && hs.itemId);
+      const roomPickups = currentRoom.hotspots.filter(
+        hs => hs.type === 'pickup' && hs.itemId && this.isHotspotAvailable(hs.showWhen),
+      );
       roomPickupTotal = roomPickups.length;
       roomPickupFound = roomPickups.filter(hs => inventory.hasItem(hs.itemId!) || inventory.isUsed(hs.itemId!)).length;
       this.borderItemCountText.setText(`${roomPickupFound} / ${roomPickupTotal}`);
     }
 
-    // Per-room clue counter (inspect + pickup + locked hotspots in current room)
+    // Per-room clue counter (only available inspect + pickup + locked hotspots)
     let roomClueTotal = 0;
     let roomClueFound = 0;
     if (currentRoom) {
       for (const hs of currentRoom.hotspots) {
-        if (hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked') {
+        if ((hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked') && this.isHotspotAvailable(hs.showWhen)) {
           roomClueTotal++;
           if (save.getFlag('used_hotspot_' + hs.id)) roomClueFound++;
         }
@@ -431,7 +447,7 @@ export class UIScene extends Phaser.Scene {
       this.borderRoomClueCountText.setText(`${roomClueFound} / ${roomClueTotal}`);
     }
 
-    // Total items across all rooms
+    // Total items across all rooms (all items regardless of progression)
     let totalItemsAll = 0;
     let foundItemsAll = 0;
     for (const room of rooms) {
@@ -446,7 +462,7 @@ export class UIScene extends Phaser.Scene {
       this.borderTotalItemCountText.setText(`${foundItemsAll} / ${totalItemsAll}`);
     }
 
-    // Global clue counter
+    // Global clue counter (all clues regardless of progression)
     let totalClues = 0;
     let foundClues = 0;
     for (const room of rooms) {
