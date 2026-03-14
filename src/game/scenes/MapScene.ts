@@ -3,6 +3,7 @@ import { SaveSystem } from '../systems/SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { Cursors, POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
+import { UISounds } from '../utils/sounds';
 
 /**
  * Room definition with hand-placed positions reflecting the Monarch Theatre's
@@ -470,11 +471,42 @@ export class MapScene extends Phaser.Scene {
   }
 
   private navigateToRoom(roomId: string): void {
+    UISounds.doorTransition();
     this.scene.stop();
-    const roomScene = this.scene.get('RoomScene') as Phaser.Scene;
-    roomScene.cameras.main.fadeOut(400, 0, 0, 0);
-    roomScene.time.delayedCall(400, () => {
+    const roomScene = this.scene.get('RoomScene') as RoomSceneRef;
+    this.playCurtainCloseOnRoom(roomScene, () => {
       roomScene.scene.restart({ roomId });
     });
   }
+
+  private playCurtainCloseOnRoom(target: Phaser.Scene, onComplete: () => void): void {
+    const { width, height } = target.cameras.main.worldView;
+    const curtainColor = 0x4a0a0a;
+
+    const left = target.add.rectangle(-width / 4, height / 2, width / 2, height, curtainColor, 1);
+    const right = target.add.rectangle(width + width / 4, height / 2, width / 2, height, curtainColor, 1);
+    left.setDepth(Depths.scriptedEvent + 10);
+    right.setDepth(Depths.scriptedEvent + 10);
+
+    const fringeL = target.add.rectangle(-width / 4 + width / 4, height / 2, 3, height, Colors.gold, 0.6);
+    const fringeR = target.add.rectangle(width + width / 4 - width / 4, height / 2, 3, height, Colors.gold, 0.6);
+    fringeL.setDepth(Depths.scriptedEvent + 11);
+    fringeR.setDepth(Depths.scriptedEvent + 11);
+
+    target.tweens.add({
+      targets: [left, fringeL],
+      x: `+=${width / 4}`,
+      duration: 500,
+      ease: 'Power2',
+    });
+    target.tweens.add({
+      targets: [right, fringeR],
+      x: `-=${width / 4}`,
+      duration: 500,
+      ease: 'Power2',
+      onComplete: () => onComplete(),
+    });
+  }
 }
+
+type RoomSceneRef = Phaser.Scene;
