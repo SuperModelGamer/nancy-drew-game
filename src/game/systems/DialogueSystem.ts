@@ -57,6 +57,29 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
   called_dad: 'Called Dad. He said antimony poisoning cases from the 1920s were often ruled accidental. The police may not have investigated Margaux\'s death properly.',
   called_historical_society: 'The Historical Society confirmed the Monarch is eligible for landmark status — which would block Ashworth\'s demolition. Someone doesn\'t want that to happen.',
   called_ned: 'Called Ned. He told me to be careful — old buildings fall apart at the worst moments. He\'s right, but I can\'t stop now.',
+  passage_mapped: 'Mapped the hidden passage network — a route from the basement to the dressing room, completely concealed behind the walls. Edwin could move through the building unseen, staging ghost appearances from any angle.',
+};
+
+// Forward-looking "Nancy's thinking" hints — added AFTER the event entry to guide the player
+const EVENT_THINKING_HINTS: Record<string, string> = {
+  vivian_intro: 'Thinking: Vivian mentioned Edwin in the auditorium and Stella backstage. I should talk to both of them — and check the concierge desk for that master key.',
+  learned_about_margaux: 'Thinking: Margaux died from poison in a prop goblet during The Crimson Veil. I should ask Edwin about the play — he\'s the theater historian.',
+  learned_about_ashworth: 'Thinking: Everyone has a motive to stop the demolition. I should talk to the others before confronting Ashworth.',
+  learned_about_crimson_veil: 'Thinking: The Crimson Veil\'s final act mirrors Margaux\'s death. Stella would know how the stage effects work — she manages everything backstage.',
+  learned_about_cecilia: 'Thinking: Cecilia Drake was the understudy who took over after Margaux died. I should ask Edwin about her — he\'s researched the 1928 case for years.',
+  learned_about_hale_family: 'Thinking: Edwin\'s grandfather was Margaux\'s lover. That\'s why he\'s so obsessed with this theater. I should confront Edwin about the Hale connection.',
+  effects_manual_location: 'Thinking: There\'s an effects manual backstage that explains the theater\'s hidden mechanisms. I should find it — it could explain how the ghost is being staged.',
+  annotated_script_found: 'Thinking: The circled letters in the script margins might spell something. I should study them carefully — or ask Diego, he noticed them first.',
+  heard_basement_noises: 'Thinking: Mechanical sounds from under the stage at night. Someone is operating the old theater systems. I need to find a way into that basement.',
+  learned_about_missing_props: 'Thinking: Props going missing — is it theft, or is someone trying to cover their tracks? I should look for evidence of where they went.',
+  stella_confession: 'Thinking: Stella says Edwin has been in the basement. The key is behind the backstage lighting panel. I need to find it.',
+  basement_key_location: 'Thinking: The basement key is behind the lighting panel backstage. Once I have it, I can finally see what Edwin\'s been doing down there.',
+  called_dad: 'Thinking: Dad said proving a historical crime triggers emergency heritage review. If I can prove Margaux was murdered, I might be able to save the theater. I should call the Historical Society.',
+  ashworth_motive_revealed: 'Thinking: $2.3 million in demolition insurance. Ashworth has the biggest financial motive of anyone. But would he poison himself as a cover?',
+  catwalk_access: 'Thinking: Stella unlocked the catwalk ladder. Edwin spends time up there — I should check it for clues about the ghost staging.',
+  cipher_discussed: 'Thinking: G-O-B-L-E-T. The goblet was the murder weapon in 1928. Someone coded a confession into the script margins almost a century ago.',
+  edwin_personal_revealed: 'Thinking: Edwin\'s been carrying his grandfather\'s promise for decades. He has the knowledge and the motive to stage a ghost. I need proof — the basement is the key.',
+  passage_mapped: 'Thinking: The hidden passage connects the basement to the dressing room. Edwin could move through the building unseen — that\'s how he staged everything. Now I need to confront him with the evidence.',
 };
 
 // ─── Layout Constants ───────────────────────────────────────────────────────
@@ -112,11 +135,20 @@ export class DialogueSystem {
   startDialogue(dialogueId: string, scene: Phaser.Scene): void {
     const dialogues = dialogueData.dialogues as Dialogue[];
 
-    // If this dialogue was already completed, check for a revisit variant
+    // Three-tier dialogue routing: base → revisit → done
+    // 1. If character arc is complete, use _done variant (brief dismissal)
+    // 2. If base dialogue was completed, use _revisit variant (with gated choices)
+    // 3. Otherwise, use base dialogue (first conversation)
     let effectiveId = dialogueId;
     if (this.triggeredEvents.has(dialogueId) || SaveSystem.getInstance().getFlag(dialogueId)) {
+      const doneId = `${dialogueId}_done`;
       const revisitId = `${dialogueId}_revisit`;
-      if (dialogues.find(d => d.id === revisitId)) {
+      const doneDialogue = dialogues.find(d => d.id === doneId);
+
+      // Check if the _done variant exists and its gate condition is met
+      if (doneDialogue && this.isDoneConditionMet(doneId)) {
+        effectiveId = doneId;
+      } else if (dialogues.find(d => d.id === revisitId)) {
         effectiveId = revisitId;
       }
     }
@@ -285,21 +317,22 @@ export class DialogueSystem {
     skipBtn.on('pointerdown', () => this.skipToEnd());
     this.container.add(skipBtn);
 
-    // ── 4. Dialogue text (vertically centered in full inner area; skip overlays top-right) ──
+    // ── 4. Dialogue text (vertically centered below skip row, inside gold borders) ──
     const textPadX = 8;
     const textLeft = innerLeft + textPadX;
     const textRight = innerRight - textPadX;
     const textW = textRight - textLeft;
-    const textTop = innerTop;
+    const textTop = innerTop + skipRowH;
     const textH = innerBottom - textTop;
+    const textCenterY = textTop + textH / 2;
 
-    this.dialogueTextObj = this.scene.add.text(textLeft, textTop, '', {
+    this.dialogueTextObj = this.scene.add.text(textLeft, textCenterY, '', {
       fontFamily: FONT,
       fontSize: TEXT_SIZE,
       color: TextColors.light,
       wordWrap: { width: textW },
       lineSpacing: 4,
-    });
+    }).setOrigin(0, 0.5);
     // Destroy previous mask if re-rendering
     if (this.textMaskGfx) { this.textMaskGfx.destroy(); this.textMaskGfx = null; }
     this.textMaskGfx = this.scene.make.graphics({});
@@ -429,7 +462,7 @@ export class DialogueSystem {
       speakerText.setAlpha(0);
       this.scene.tweens.add({
         targets: speakerText, alpha: 1,
-        y: { from: nameplateY + 8, to: nameplateY },
+        y: { from: nameplateY + npTextOffsetY + 8, to: nameplateY + npTextOffsetY },
         duration: 300, delay: 50, ease: 'Power2',
       });
     }
@@ -672,7 +705,7 @@ export class DialogueSystem {
           } else {
             btn.clearTint();
           }
-          text.setColor(TextColors.gold);
+          text.setColor(textColor);
         });
 
         // Press: push animation then select
@@ -805,6 +838,10 @@ export class DialogueSystem {
     if (journalEntry) {
       save.addJournalEntry(journalEntry);
     }
+    const thinkingHint = EVENT_THINKING_HINTS[eventId];
+    if (thinkingHint) {
+      save.addJournalEntry(thinkingHint);
+    }
   }
 
   private endDialogue(): void {
@@ -851,6 +888,23 @@ export class DialogueSystem {
       this.container = null;
     }
     this.dialogueTextObj = null;
+  }
+
+  // Maps _done dialogue IDs to the flag that indicates the character's arc is complete.
+  // When this flag is set, the brief dismissal dialogue plays instead of the full revisit.
+  private static DONE_CONDITIONS: Record<string, string> = {
+    'vivian_intro_done': 'vivian_intro',           // Done after first conversation (item-triggered dialogues handle the rest)
+    'edwin_auditorium_done': 'edwin_personal_revealed', // Done after grandfather revelation
+    'stella_backstage_done': 'basement_key_location',   // Done after revealing basement key
+    'diego_booth_done': 'cipher_discussed',              // Done after cipher solved
+    'ashworth_office_done': 'ashworth_motive_revealed',  // Done after insurance confrontation
+    'phone_calls_done': 'called_ned',                    // Done after last gated call made
+  };
+
+  private isDoneConditionMet(doneId: string): boolean {
+    const flag = DialogueSystem.DONE_CONDITIONS[doneId];
+    if (!flag) return false;
+    return this.triggeredEvents.has(flag) || !!SaveSystem.getInstance().getFlag(flag);
   }
 
   hasTriggeredEvent(eventId: string): boolean {

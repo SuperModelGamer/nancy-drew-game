@@ -1,71 +1,80 @@
-# Nancy Drew UI & Reward Improvements Plan
+# Dialogue Pacing & Progression Overhaul
 
-## 1. Add "Puzzles Solved" stat to sidebar
-**File:** `UIScene.ts` — `createRightInfoPanel()` and `updateRightPanelStats()`
-**Also:** `PuzzleSystem.ts` — add `getSolvedCount()` and `getTotalCount()` methods
+## Problems Identified
 
-- Add a `PUZZLES` label + `"X / Y"` counter between the existing CLUES counter and the PROGRESS bar
-- Wire it to PuzzleSystem which already tracks `solvedPuzzles` Set internally but doesn't expose counts
-- Update the progress bar calculation to factor in puzzles too
+### 1. Talk hotspots never disappear
+No `hideWhen` support exists in RoomScene. Once a character is accessible, they're clickable forever — even after all meaningful dialogue is exhausted. Revisit variants loop infinitely.
 
----
+### 2. Revisit variants break progressive choice gating
+Edwin's main dialogue has flag-gated choices (grandfather: `learned_about_hale_family`, props: `learned_about_missing_props`). But once `edwin_auditorium` fires, the revisit variant takes over — which does NOT include those gated choices. So the player can never access them after the first conversation. Same issue with Stella's gated choices (threatening note, lockbox, crimson veil context).
 
-## 2. Add vanity reward items for flag-only puzzles
-**File:** `items.json` — add new lore items
-**File:** `puzzles.json` — change `unlocks` to point to new item IDs
+### 3. No pacing between characters
+Vivian, Edwin, and Stella are all talkable from the very first minute with no story gate. The player can dump 114 lines of dialogue in one sitting before exploring anything.
 
-Currently 5 puzzles only grant flags with no tangible reward:
-| Puzzle | Current unlock (flag) | New reward item |
-|--------|----------------------|-----------------|
-| script_cipher | `script_decoded` | `decoded_script_page` — "A page of decoded script revealing Margaux's final monologue" |
-| film_puzzle | `film_decoded` | `film_strip_evidence` — "A strip of film showing the poisoning sequence frame by frame" |
-| mirror_puzzle | `margaux_accusation` | `cracked_compact_mirror` — "Margaux's compact mirror, cracked the night she died" |
-| passage_navigation | `passage_mapped` | `passage_map` — "A hand-drawn map of the theater's hidden passages" |
-| tea_analysis | `poison_identified` | `toxicology_report` — "A chemical analysis identifying the poison as belladonna extract" |
-
-Each item gets lore text and `isKeyItem: false` (vanity/evidence). The old flag names become the item IDs so existing `showWhen` conditions still work — OR we keep the flags AND grant items (dual reward). **Approach:** Keep original flags as-is (for gate logic), and add a *separate* `"reward"` field to puzzles.json that grants the vanity item on solve. This avoids breaking any existing `showWhen` conditions.
+### 4. Phone remains clickable after all calls made
+No mechanism to hide the phone after completing all available conversations.
 
 ---
 
-## 3. Keep keys in inventory after use (dimmed, not removed)
-**File:** `RoomScene.ts` — lines ~467-482 (item-on-hotspot consumption)
-**File:** `UIScene.ts` — evidence panel rendering (item card styling)
+## Implementation Plan
 
-Currently: `inv.removeItem(hotspot.requiredItem)` deletes keys when used on navigation hotspots.
+### Step 1: Add `hideWhen` support to RoomScene
+- Add `hideWhen?: string` to the Hotspot interface
+- In `createHotspots()`, add a check: if `hideWhen` is set and the flag/event is active, skip the hotspot (mirror the existing `showWhen` logic but inverted)
 
-**Change:** Remove the `removeItem()` call. The item is already `markUsed()` on the line above, so it stays in inventory but is flagged as used. Then in the Evidence panel item grid, render used items with reduced opacity (~0.45 alpha) and a subtle "USED" badge (this badge already exists in the detail panel but not consistently on grid cards).
+### Step 2: Add gated choices to revisit dialogues
+The key bug: progressively-gated choices only exist in the original dialogue but the revisit dialogue replaces it entirely. Fix by copying the gated choice branches into the revisit start nodes:
 
----
+**`edwin_auditorium_revisit`** — add to start choices:
+- "Your grandfather was James Hale" (requiredFlag: `learned_about_hale_family`) → copy `grandfather` node
+- "Stella says props have been going missing" (requiredFlag: `learned_about_missing_props`) → copy `edwin_on_props` node
+- "I found Margaux's diary" (requiredItem: `margaux_diary`) → copy `diary_reaction` node
+- "The effects manual describes systems that could fake all of that" (requiredItem: `effects_manual`) → copy `effects_challenge` node
 
-## 4. Larger, more readable fonts in Evidence / Journal / Items panels
-**File:** `UIScene.ts` — panel rendering sections
+**`stella_backstage_revisit`** — add to start choices:
+- "I found your note" (requiredFlag: `saw_threatening_note`) → copy `confronted_note` + `stella_reveals_edwin` nodes
+- "Edwin told me about The Crimson Veil" (requiredFlag: `learned_about_crimson_veil`) → copy `stella_on_ghost` node
+- "I found your lockbox" (requiredItem: `stella_records`) → copy `lockbox_confronted` + `stella_reveals_edwin` nodes
 
-**Current state:** Uses `'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif` at sizes like 17-22px.
+### Step 3: Add showWhen/hideWhen to talk hotspots in rooms.json
 
-**Changes:**
-- Switch `JOURNAL_FONT` to `'Poppins', 'Nunito', sans-serif'` or a warm handwriting-style like `'Patrick Hand', 'Caveat', cursive` — load via Google Fonts in `index.html`
-- **Evidence item names:** 17px → 22px
-- **Evidence descriptions:** 21px → 26px
-- **Evidence lore text:** 18px → 22px
-- **Journal entry text:** 22px → 28px
-- **Journal page/nav text:** 18px → 22px
-- **KEY EVIDENCE badge:** 15px → 18px
-- Keep sidebar stats fonts as-is (they're sized correctly for that narrow panel)
+**Vivian (Lobby):**
+- No showWhen (available from start, she's the first contact)
+- hideWhen: `vivian_intro` → disappears after intro conversation
+- She reappears through item-triggered dialogues (vivian_diary, vivian_locket)
 
----
+**Edwin (Auditorium):**
+- showWhen: `vivian_intro` → only appears after meeting Vivian (she introduces him)
+- hideWhen: `edwin_personal_revealed` → disappears after grandfather revelation
 
-## 5. Journal: use more of the page before paginating
-**File:** `UIScene.ts` — journal panel rendering (~lines 1028-1143)
+**Stella (Backstage):**
+- showWhen: `vivian_intro` → only appears after meeting Vivian
+- hideWhen: `basement_key_location` → disappears after revealing basement key location
 
-**Current:** `JOURNAL_ENTRIES_PER_PAGE = 5` — only 5 entries per page regardless of available space, leaving the bottom half of the page empty.
+**Diego (Projection Booth):**
+- Already gated behind chapter_2 room access
+- hideWhen: `cipher_discussed` → disappears after cipher solved
 
-**Change:** Calculate entries per page dynamically based on available content height. Each entry is roughly ~45-55px tall (with the larger font). Measure `contentBottom - contentTop` and divide by estimated entry height to fit as many entries as the page allows. Fall back to a minimum of 5. This should roughly double the entries shown per page on most screens.
+**Ashworth (Manager's Office):**
+- Already gated behind chapter_2 room access
+- hideWhen: `ashworth_motive_revealed` → disappears after insurance confrontation
+
+**Edwin (Basement):**
+- Already gated behind chapter_4 room access
+- No hideWhen (final confrontation — game ends after)
+
+**Phone (Lobby):**
+- No showWhen (always available)
+- hideWhen: `called_ned` → disappears after last progressively-gated call is available and made (Ned requires `heard_basement_noises`, so by the time Ned is called, all other calls are accessible)
+
+### Step 4: Gate some revisit content behind story milestones
+In revisit dialogues, add `requiredFlag` to some choices that reference events the player may not have experienced yet. This prevents characters from referencing things out of order.
 
 ---
 
 ## Execution Order
-1. **Fonts** (4) — load Google Font, update JOURNAL_FONT and sizes
-2. **Journal layout** (5) — dynamic entries per page
-3. **Keep keys** (3) — remove `removeItem()`, add dimmed styling
-4. **Puzzle stats** (1) — expose counts, add sidebar display
-5. **Vanity rewards** (2) — add items, add `reward` field to puzzles, grant on solve
+1. Add `hideWhen` to Hotspot interface and RoomScene filtering logic
+2. Update rooms.json with showWhen/hideWhen on all talk hotspots
+3. Add gated choices + nodes to edwin_auditorium_revisit
+4. Add gated choices + nodes to stella_backstage_revisit
+5. Test and commit

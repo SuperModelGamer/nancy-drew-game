@@ -1239,6 +1239,26 @@
           ],
           "choices": [
             {
+              "text": "Your grandfather was James Hale — Margaux's lover.",
+              "nextNode": "grandfather",
+              "requiredFlag": "learned_about_hale_family"
+            },
+            {
+              "text": "I found Margaux's diary. She knew she was being poisoned.",
+              "nextNode": "diary_reaction",
+              "requiredItem": "margaux_diary"
+            },
+            {
+              "text": "Stella says props have been going missing. Do you know anything about that?",
+              "nextNode": "edwin_on_props",
+              "requiredFlag": "learned_about_missing_props"
+            },
+            {
+              "text": "The effects manual describes systems that could fake all of that.",
+              "nextNode": "effects_challenge",
+              "requiredItem": "effects_manual"
+            },
+            {
               "text": "What are you working on?",
               "nextNode": "his_work"
             },
@@ -1255,6 +1275,56 @@
               "nextNode": "farewell"
             }
           ]
+        },
+        {
+          "id": "grandfather",
+          "lines": [
+            { "speaker": "Edwin", "text": "...Who told you — how did you—" },
+            { "speaker": "Nancy", "text": "Vivian. She recognized the name." },
+            { "speaker": "Edwin", "text": "I... yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux... they were..." },
+            { "speaker": "Edwin", "text": "He never got over her death. Forty-three years, Nancy. He spent forty-three years insisting it wasn't an accident. Nobody believed him. He died in 1971 — March 14th — still fighting. Still writing letters to the police department." },
+            { "speaker": "Edwin", "text": "I promised him I'd find the truth. I was twelve years old and I promised. That's why I'm here. That's why I've always been here." },
+            { "speaker": "Nancy", "text": "That's a heavy promise to carry for fifteen years." },
+            { "speaker": "Edwin", "text": "Some promises are worth the weight." }
+          ],
+          "nextNode": "farewell",
+          "triggerEvent": "edwin_personal_revealed"
+        },
+        {
+          "id": "diary_reaction",
+          "lines": [
+            { "speaker": "Edwin", "text": "You found her — wait. You found her diary? Where? In the dressing room?" },
+            { "speaker": "Edwin", "text": "...May I see it? Please. I've been looking for primary sources — firsthand accounts — about Margaux for fifteen years. This is... this is unprecedented." },
+            { "speaker": "Nancy", "text": "She writes about feeling sick after tea, about a metallic taste. And she suspected someone specific." },
+            { "speaker": "Edwin", "text": "Then she knew. She knew, and nobody listened. The police, the theater owners — they all called it an accident because it was easier." },
+            { "speaker": "Edwin", "text": "That diary could be the evidence we need. Don't lose it, Nancy." }
+          ],
+          "nextNode": "farewell",
+          "triggerEvent": "showed_edwin_diary"
+        },
+        {
+          "id": "edwin_on_props",
+          "lines": [
+            { "speaker": "Edwin", "text": "Missing props? That's... concerning. Some of those pieces are historically significant — the Tiffany lamps alone date to 1923, and the candelabra is original to the opening gala." },
+            { "speaker": "Nancy", "text": "Stella seems worried about it." },
+            { "speaker": "Edwin", "text": "Stella has her — well, she has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are the real mystery. The props are a — a separate matter entirely. A distraction." },
+            { "speaker": "Nancy", "text": "You seem very sure they're separate. How would you know that unless you knew what was actually going on?" },
+            { "speaker": "Edwin", "text": "I — that's not what I — I'm a historian, Nancy. I know how to sort through noise to find the signal. That's literally my job. I'm not hiding anything, if that's what you're implying. I'm trying to help you prioritize." },
+            { "speaker": "Nancy", "text": "I didn't say you were hiding anything." },
+            { "speaker": "Edwin", "text": "No. No, you didn't. I just — forget I said that. The answer to this mystery is on the stage, not on a prop shelf. I'd stake my reputation on it. What's left of it." }
+          ],
+          "nextNode": "farewell"
+        },
+        {
+          "id": "effects_challenge",
+          "lines": [
+            { "speaker": "Edwin", "text": "You've read the — you've actually read the effects manual? The whole thing? That's... thorough." },
+            { "speaker": "Edwin", "text": "Yes, theoretically, someone could use the old systems to stage a convincing ghost. Fog machines, the trapdoor — which is a Graves & Sons counterweight model, very reliable — proper lighting. It would be — it would be quite an undertaking." },
+            { "speaker": "Edwin", "text": "But they'd need extensive knowledge of the building. Months of preparation. They'd need to have — to have practiced. Extensively. Not that I've thought about it in detail. I'm just — speaking generally. As a historian." },
+            { "speaker": "Nancy", "text": "Like saving the theater from demolition?" },
+            { "speaker": "Edwin", "text": "...That would certainly be a reason. Hypothetically speaking. But you'd want to — I mean, a person would want to look at all the suspects before jumping to conclusions. That's just good detective work, isn't it?" }
+          ],
+          "nextNode": "farewell"
         },
         {
           "id": "his_work",
@@ -1312,6 +1382,21 @@
           ],
           "choices": [
             {
+              "text": "I found your note to the basement intruder — 'Stop now or I go to the police.'",
+              "nextNode": "confronted_note",
+              "requiredFlag": "saw_threatening_note"
+            },
+            {
+              "text": "Edwin told me about The Crimson Veil — could someone fake a ghost using the old systems?",
+              "nextNode": "stella_on_ghost",
+              "requiredFlag": "learned_about_crimson_veil"
+            },
+            {
+              "text": "I found your lockbox. $4,200 in sold props — is that for your mother's medical bills?",
+              "nextNode": "lockbox_confronted",
+              "requiredItem": "stella_records"
+            },
+            {
               "text": "You seem stressed.",
               "nextNode": "stressed"
             },
@@ -1328,6 +1413,69 @@
               "nextNode": "farewell"
             }
           ]
+        },
+        {
+          "id": "confronted_note",
+          "lines": [
+            { "speaker": "Stella", "text": "Where did you find that? That was — I put that under —" },
+            { "speaker": "Nancy", "text": "On the stage floor. 'Stop now or I go to the police — S.M.' You wrote it." },
+            { "speaker": "Stella", "text": "It could be anyone's initials. Sandra Mitchell, Steve — no. Fine. I wrote it. Three days ago. Slipped it under the basement door. Whoever's down there never responded." },
+            { "speaker": "Nancy", "text": "You know who's in the basement." },
+            { "speaker": "Stella", "text": "I don't — I'm not sure. I have suspicions. But I need to know something first. Are you going to report what I've done? The props?" },
+            { "speaker": "Nancy", "text": "I'm interested in the truth, Stella. All of it." },
+            { "speaker": "Stella", "text": "The truth. Right. Because that always works out so well for the person telling it." }
+          ],
+          "choices": [
+            {
+              "text": "Tell me who's in the basement and I'll focus on the poisoning.",
+              "nextNode": "stella_reveals_edwin",
+              "triggerEvent": "stella_confession"
+            },
+            {
+              "text": "Let's talk about something else.",
+              "nextNode": "start"
+            }
+          ]
+        },
+        {
+          "id": "stella_on_ghost",
+          "lines": [
+            { "speaker": "Stella", "text": "Edwin told you about The Crimson Veil? Of course he did. You can't say hello to that man without getting a forty-minute lecture on 1928." },
+            { "speaker": "Stella", "text": "Could someone fake a ghost? Yes. Easily. I could do it in my sleep. The fog machines still work. The trapdoor is original and functional. The lighting board on the catwalk can create any effect you want." },
+            { "speaker": "Nancy", "text": "You sound like you've thought about it." },
+            { "speaker": "Stella", "text": "I'm a stage manager. It's literally my job to know how everything in this building works. I've been doing this for eight years — I could run a haunting with my eyes closed. But if you're asking whether I staged a ghost — no. God, no. I have enough problems without adding 'theatrical necromancy' to my résumé." },
+            { "speaker": "Nancy", "text": "Who else would know the systems well enough?" },
+            { "speaker": "Stella", "text": "Edwin. Full stop. He knows this building better than I do, and I hate admitting that. Fifteen years of studying every passage, every mechanism, every hidden corner. If anyone could make a convincing ghost... look, just — talk to Edwin." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "effects_manual_location"
+        },
+        {
+          "id": "lockbox_confronted",
+          "lines": [
+            { "speaker": "Stella", "text": "You opened my — that was locked. How did you even — you know what, it doesn't matter." },
+            { "speaker": "Stella", "text": "I didn't do anything wrong. I didn't —" },
+            { "speaker": "Stella", "text": "..." },
+            { "speaker": "Stella", "text": "Fine. Yes. My mother has stage four lymphoma. The bills are — you want a number? $47,000 and counting. So yes. I sold some props. Props that were going to be smashed into dust in three days anyway. At least this way someone — at least my mom gets something out of this disaster." },
+            { "speaker": "Nancy", "text": "I'm not here about the props, Stella. I'm here about the poisoning." },
+            { "speaker": "Stella", "text": "Then why are you opening my lockbox? Why are you digging through my —" },
+            { "speaker": "Stella", "text": "No. You know what. Fine. You want the truth? I know who's been in the basement. I've known for weeks. I wrote him a note. He ignored it." },
+            { "speaker": "Nancy", "text": "Who?" },
+            { "speaker": "Stella", "text": "Edwin. It's always been Edwin." }
+          ],
+          "nextNode": "stella_reveals_edwin",
+          "triggerEvent": "stella_confession"
+        },
+        {
+          "id": "stella_reveals_edwin",
+          "lines": [
+            { "speaker": "Stella", "text": "I've seen him going down there at night. I know the sounds — the trapdoor mechanism, the fog machine warming up. He's been staging the ghost." },
+            { "speaker": "Stella", "text": "I didn't tell anyone because... honestly? I wanted the theater saved too. If a ghost story kept the demolition from happening, I wasn't going to stop it." },
+            { "speaker": "Stella", "text": "But then Ashworth got poisoned, and I realized Edwin had gone too far. I left him that note. He never responded." },
+            { "speaker": "Nancy", "text": "Where's the basement key?" },
+            { "speaker": "Stella", "text": "Behind the lighting panel. Edwin thinks he's the only one who knows, but I've been stage manager here for eight years. I know every hiding spot in this building." }
+          ],
+          "triggerEvent": "basement_key_location"
         },
         {
           "id": "stressed",
@@ -1512,6 +1660,78 @@
           "id": "farewell",
           "lines": [
             { "speaker": "Ashworth", "text": "Finally. Go. Investigate. Find whoever poisoned me so I can sue them. And close the door on your way out — there's a draft from the hallway that's been bothering me for forty-five minutes and I refuse to get up because my legs still feel like they're made of pudding." }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "vivian_intro_done",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Vivian", "text": "Nancy, ma chère. You have that look again — the furrow. Go, go. The theater will keep its secrets whether I'm talking or not. I'll be here, as always." },
+            { "speaker": "Vivian", "text": "And remember — crackers in the concession stand. Only slightly stale." }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "edwin_auditorium_done",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Edwin", "text": "I've told you everything I know, Nancy. Everything I'm — well. Everything I can. If you need architectural details or historical records, I'm your man. Otherwise, I should get back to my notes. Chapter twelve won't revise itself." },
+            { "speaker": "Edwin", "text": "You have a look in your eye that suggests you already know more than I'd like. That's... unsettling. In a professional sense." }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stella_backstage_done",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Stella", "text": "Drew. I've told you everything. I've told you more than everything. I've told you things I haven't told my therapist, and she charges $200 an hour." },
+            { "speaker": "Stella", "text": "Go solve the mystery. I've got a fly system to rebalance and approximately zero patience left for questions." }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "diego_booth_done",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Diego", "text": "Nancy! I'd love to chat but I'm in a really good writing flow right now. The words are just — *chef's kiss* — they're happening. If I stop now, I'll lose the thread and spend three hours staring at a blinking cursor." },
+            { "speaker": "Diego", "text": "But hey — when you solve this whole thing? I want details. For the play. Strictly for artistic purposes." }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ashworth_office_done",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Ashworth", "text": "We're done, Drew. I've answered your questions. I've shown you my office. I've been more cooperative than any man who was recently poisoned should have to be." },
+            { "speaker": "Ashworth", "text": "The demolition is in seventy-two hours. Either find the poisoner by then or get out of my way. Preferably both." }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phone_calls_done",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Nancy", "text": "I pick up the receiver and listen. Just a dial tone. I've called everyone I can think of — Bess, George, Dad, Ned, even the Historical Society. Time to put down the phone and put the pieces together myself." }
           ]
         }
       ]

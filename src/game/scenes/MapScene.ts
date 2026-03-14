@@ -69,6 +69,27 @@ const FLOOR_LABELS: { label: string; fy: number }[] = [
 
 const MEDALLION_SIZE = 165;
 
+/**
+ * Rooms pulse on the map when new dialogue/content has unlocked but
+ * hasn't been completed yet.  Each entry says:
+ *   - `requires` (optional): flag that must be set for content to be available
+ *   - `doneFlag`: flag whose presence means the content has been completed
+ *
+ * A room pulses when requires is met (or absent) AND doneFlag is NOT set.
+ */
+const ROOM_PULSE_CONDITIONS: { roomId: string; requires?: string; doneFlag: string }[] = [
+  // Vivian is available from the start; pulse until her intro is done
+  { roomId: 'lobby', doneFlag: 'vivian_intro' },
+  // Edwin & Stella unlock after meeting Vivian
+  { roomId: 'auditorium', requires: 'vivian_intro', doneFlag: 'edwin_personal_revealed' },
+  { roomId: 'backstage', requires: 'vivian_intro', doneFlag: 'basement_key_location' },
+  // Projection booth & office are chapter-gated but pulse once accessible
+  { roomId: 'projection_booth', doneFlag: 'cipher_discussed' },
+  { roomId: 'managers_office', doneFlag: 'ashworth_motive_revealed' },
+  // Basement pulses when player has blueprints but hasn't mapped the passage
+  { roomId: 'basement', requires: 'used_hotspot_mo_blueprints_pickup', doneFlag: 'passage_mapped' },
+];
+
 export class MapScene extends Phaser.Scene {
   private currentRoom = '';
 
@@ -235,6 +256,33 @@ export class MapScene extends Phaser.Scene {
               repeat: -1,
               ease: 'Sine.easeInOut',
             });
+          }
+
+          // "New content" pulse — subtle gold ring for rooms with unlocked but unseen dialogue
+          if (!isCurrentRoom && !isLocked) {
+            const hasNewContent = ROOM_PULSE_CONDITIONS.some(cond => {
+              if (cond.roomId !== room.id) return false;
+              if (cond.requires && !save.getFlag(cond.requires)) return false;
+              return !save.getFlag(cond.doneFlag);
+            });
+
+            if (hasNewContent) {
+              const pulseRing = this.add.graphics();
+              pulseRing.lineStyle(3, Colors.gold, 0.4);
+              pulseRing.strokeCircle(0, circleOffsetY, circleRadius + 8);
+              container.addAt(pulseRing, 0);
+
+              this.tweens.add({
+                targets: pulseRing,
+                alpha: { from: 0.15, to: 0.6 },
+                scaleX: { from: 0.95, to: 1.05 },
+                scaleY: { from: 0.95, to: 1.05 },
+                duration: 1500,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut',
+              });
+            }
           }
 
           // Hit area
