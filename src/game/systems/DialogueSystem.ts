@@ -83,23 +83,22 @@ const EVENT_THINKING_HINTS: Record<string, string> = {
 };
 
 // ─── Layout Constants ───────────────────────────────────────────────────────
-const BOX_H = 340;
-const BOX_BOTTOM_MARGIN = 110;  // raised higher to make room for nameplate below portrait
-const TEXT_SIZE = '24px';
-const SPEAKER_SIZE = '36px';
+const BOX_H = 300;
+const BOX_BOTTOM_MARGIN = 140;  // keeps box + portrait above the viewfinder frame border
+const TEXT_SIZE = '22px';
+const SPEAKER_SIZE = '32px';
 const CHOICE_H = 110;
 const CHOICE_FONT = '26px';
 const TYPEWRITER_SPEED_DEFAULT = 28; // ms per character (fallback)
 const ANIM_DURATION = 400; // ms for box entrance/exit
 const PORTRAIT_GAP = 16;   // gap between portrait frame and dialogue box
 const FRAME_BORDER = 44;   // portrait frame gold border thickness (px at display size)
-const NAMEPLATE_GAP = 8;   // gap between portrait bottom and nameplate
 
 // Gold border insets — fractions of the DISPLAYED asset size.
 // Measured from the innermost gold ornament edges, not the PNG bounds.
 // The dialogue-box corner star ornaments extend well inward from each side.
-const DLG_BOX_INSET_X = 0.155; // dialogue-box.png: corner ornaments
-const DLG_BOX_INSET_Y = 0.17;  // dialogue-box.png: top/bottom gold lines
+const DLG_BOX_INSET_X = 0.18;  // dialogue-box.png: corner ornaments
+const DLG_BOX_INSET_Y = 0.21;  // dialogue-box.png: top/bottom gold lines
 const NP_INSET_X = 0.11;       // nameplate.png: corner ornaments
 const CHOICE_INSET_X = 0.04;   // choice-btn.png: side ornaments
 const CHOICE_INSET_TOP = 0.20; // choice-btn.png: crown ornament at top
@@ -242,11 +241,11 @@ export class DialogueSystem {
       if (this.scene.textures.exists('dlg_portrait_frame')) {
         const pfTex = this.scene.textures.get('dlg_portrait_frame').getSourceImage();
         const pfRatio = pfTex.width / pfTex.height;
-        pfDisplayH = BOX_H + 80; // extends above the dialogue box
+        pfDisplayH = BOX_H + 40; // extends slightly above the dialogue box
         pfDisplayW = Math.round(pfDisplayH * pfRatio);
       } else {
-        pfDisplayW = 280;
-        pfDisplayH = BOX_H + 80;
+        pfDisplayW = 240;
+        pfDisplayH = BOX_H + 40;
       }
     }
 
@@ -415,15 +414,15 @@ export class DialogueSystem {
 
     this.lastSpeaker = line.speaker;
 
-    // ── 8–9. Speaker nameplate (below portrait if present, else centered above dialogue) ──
+    // ── 8–9. Speaker nameplate (overlaid on portrait bottom, or centered above dialogue) ──
     const speakerColor = this.getSpeakerColor(line.speaker);
     const boxBottom = boxTop + BOX_H;
-    const npH = 64;
+    const npH = 56;
     const nameplateCenterX = hasPortrait
       ? totalLeft + pfDisplayW / 2           // centered under portrait
       : dlgBoxLeft + dlgBoxW / 2;            // centered above dialogue box
     const nameplateY = hasPortrait
-      ? boxBottom + NAMEPLATE_GAP + npH / 2  // below portrait/dialogue bottom
+      ? boxBottom - npH / 2 + 4              // overlaid on portrait's bottom edge
       : boxTop - 4;                          // above dialogue box (no portrait)
 
     // Size nameplate so text fits inside its gold borders
