@@ -7,7 +7,7 @@ import { Colors, TextColors, FONT, Depths, computeViewfinderLayout } from '../ut
 import { POINTER_CURSOR } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
-import { drawChevronTab, drawCornerOrnament, DecoColors } from '../utils/art-deco';
+import { drawChevronTab, drawCornerOrnament, drawDecoDivider, drawSunburst, drawGeoBorder, DecoColors } from '../utils/art-deco';
 
 // Height of the bottom toolbar strip (buttons + chapter label)
 const TOOLBAR_H = 112;
@@ -224,6 +224,11 @@ export class UIScene extends Phaser.Scene {
   private borderItemCountText!: Phaser.GameObjects.Text;
   private borderClueCountText!: Phaser.GameObjects.Text;
   private borderRoomNameText!: Phaser.GameObjects.Text;
+  private borderRoomClueCountText!: Phaser.GameObjects.Text;
+  private borderTotalItemCountText!: Phaser.GameObjects.Text;
+  private borderProgressBar!: Phaser.GameObjects.Graphics;
+  private borderProgressPct!: Phaser.GameObjects.Text;
+  private borderChapterText!: Phaser.GameObjects.Text;
 
   private createRightInfoPanel(
     rpX: number, rpW: number, rpCx: number, fTop: number, toolbarTop: number,
@@ -231,76 +236,150 @@ export class UIScene extends Phaser.Scene {
     const panelH = toolbarTop - fTop;
     const contentX = rpCx;
     const pad = 18;
-    let y = fTop + pad;
+    const decoGfx = this.add.graphics().setDepth(Depths.tooltip);
 
-    // ── Settings gear (top-right of panel, larger) ──
-    const gearBtn = this.add.text(rpX + rpW - pad, y, '⚙', {
-      fontSize: '36px', color: TextColors.mutedBlue,
-    }).setOrigin(1, 0).setDepth(Depths.tooltip);
-    gearBtn.setInteractive({ cursor: POINTER_CURSOR, hitArea: new Phaser.Geom.Rectangle(-8, -8, 52, 52), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
+    // ── Subtle sunburst behind center of panel ──
+    drawSunburst(decoGfx, rpCx, fTop + panelH * 0.35, 110, 16, DecoColors.gold, 0.04);
+
+    // ── Top corner ornaments ──
+    drawCornerOrnament(decoGfx, rpX + 6, fTop + 6, 16, 'tl', DecoColors.gold, 0.2);
+    drawCornerOrnament(decoGfx, rpX + rpW - 6, fTop + 6, 16, 'tr', DecoColors.gold, 0.2);
+
+    // ─── Layout: vertically center content within panel ───
+    // Total content height estimate for balanced spacing
+    const totalContentH = 520; // approximate height of all elements
+    let y = fTop + Math.max(pad, (panelH - totalContentH) / 2);
+
+    // ── Chapter indicator ──
+    this.borderChapterText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '10px', color: TextColors.mutedBlue,
+      letterSpacing: 4, align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 18;
+
+    // ── Room name ──
+    this.borderRoomNameText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '17px', color: '#c9a84c',
+      fontStyle: 'bold', align: 'center', letterSpacing: 2,
+      wordWrap: { width: rpW - pad * 2 },
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 44;
+
+    // ── Art deco divider ──
+    drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2, DecoColors.gold, 0.3);
+    y += 22;
+
+    // ── ITEMS (per-room) ──
+    this.add.text(contentX, y, 'ITEMS', {
+      fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue,
+      letterSpacing: 4, align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 20;
+
+    this.borderItemCountText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '30px', color: '#c9a84c',
+      fontStyle: 'bold', align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 44;
+
+    // ── Clues in this room (gold) ──
+    this.add.text(contentX, y, 'CLUES IN ROOM', {
+      fontFamily: FONT, fontSize: '10px', color: '#c9a84c',
+      letterSpacing: 3, align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 18;
+
+    this.borderRoomClueCountText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '26px', color: '#c9a84c',
+      fontStyle: 'bold', align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 40;
+
+    // ── Thin gold line ──
+    decoGfx.lineStyle(1, DecoColors.gold, 0.15);
+    decoGfx.lineBetween(rpX + pad + 16, y, rpX + rpW - pad - 16, y);
+    y += 16;
+
+    // ── Items total (white) ──
+    this.add.text(contentX, y, 'ITEMS TOTAL', {
+      fontFamily: FONT, fontSize: '10px', color: '#ffffff',
+      letterSpacing: 3, align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 18;
+
+    this.borderTotalItemCountText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '22px', color: '#ffffff',
+      align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 36;
+
+    // ── Thin gold line ──
+    decoGfx.lineStyle(1, DecoColors.gold, 0.15);
+    decoGfx.lineBetween(rpX + pad + 16, y, rpX + rpW - pad - 16, y);
+    y += 16;
+
+    // ── CLUES (global) ──
+    this.add.text(contentX, y, 'CLUES', {
+      fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue,
+      letterSpacing: 4, align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 20;
+
+    this.borderClueCountText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '26px', color: '#7a8a9a',
+      align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 40;
+
+    // ── Progress bar ──
+    this.add.text(contentX, y, 'PROGRESS', {
+      fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+      letterSpacing: 3, align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 16;
+
+    const barW = rpW - pad * 2 - 20;
+    const barH = 6;
+    const barX = rpX + pad + 10;
+    // Bar background
+    decoGfx.fillStyle(0x1a1a2e, 0.8);
+    decoGfx.fillRoundedRect(barX, y, barW, barH, 3);
+    decoGfx.lineStyle(1, DecoColors.gold, 0.2);
+    decoGfx.strokeRoundedRect(barX, y, barW, barH, 3);
+
+    // Progress fill (drawn separately so we can update it)
+    this.borderProgressBar = this.add.graphics().setDepth(Depths.tooltip);
+    this.borderProgressBar.setData('barX', barX);
+    this.borderProgressBar.setData('barY', y);
+    this.borderProgressBar.setData('barW', barW);
+    this.borderProgressBar.setData('barH', barH);
+
+    y += barH + 6;
+    this.borderProgressPct = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '10px', color: TextColors.goldDim,
+      align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 24;
+
+    // ── Art deco divider before gear ──
+    drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2 - 10, DecoColors.gold, 0.2);
+    y += 22;
+
+    // ── Settings gear (enlarged, below counters) ──
+    const gearBtn = this.add.text(contentX, y, '⚙', {
+      fontSize: '48px', color: TextColors.mutedBlue,
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    gearBtn.setInteractive({ cursor: POINTER_CURSOR, hitArea: new Phaser.Geom.Rectangle(-8, -8, 64, 64), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
     gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));
     gearBtn.on('pointerout', () => gearBtn.setColor(TextColors.mutedBlue));
     gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
 
-    // ── Room name ──
-    this.borderRoomNameText = this.add.text(contentX, y + 8, '', {
-      fontFamily: FONT, fontSize: '17px', color: '#c9a84c',
-      fontStyle: 'bold', align: 'center', letterSpacing: 2,
-      wordWrap: { width: rpW - pad * 2 - 36 },
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 48;
+    // ── Bottom corner ornaments ──
+    drawCornerOrnament(decoGfx, rpX + 6, toolbarTop - 6, 16, 'bl', DecoColors.gold, 0.2);
+    drawCornerOrnament(decoGfx, rpX + rpW - 6, toolbarTop - 6, 16, 'br', DecoColors.gold, 0.2);
 
-    // ── Divider ──
-    const divGfx = this.add.graphics().setDepth(Depths.tooltip);
-    divGfx.lineStyle(1, DecoColors.gold, 0.2);
-    divGfx.lineBetween(rpX + pad, y, rpX + rpW - pad, y);
-    y += 18;
-
-    // ── Items found ──
-    const itemLabel = this.add.text(contentX, y, 'ITEMS', {
-      fontFamily: FONT, fontSize: '13px', color: '#5a5a6a',
-      letterSpacing: 3, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 22;
-
-    this.borderItemCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '32px', color: '#c9a84c',
-      fontStyle: 'bold', align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 50;
-
-    // ── Divider ──
-    const divGfx2 = this.add.graphics().setDepth(Depths.tooltip);
-    divGfx2.lineStyle(1, DecoColors.gold, 0.12);
-    divGfx2.lineBetween(rpX + pad + 20, y, rpX + rpW - pad - 20, y);
-    y += 18;
-
-    // ── Clues discovered ──
-    const clueLabel = this.add.text(contentX, y, 'CLUES', {
-      fontFamily: FONT, fontSize: '13px', color: '#5a5a6a',
-      letterSpacing: 3, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 22;
-
-    this.borderClueCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '28px', color: '#7a8a9a',
-      align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-
-    // ── Decorative art deco accent at bottom of panel ──
-    const accentY = toolbarTop - 20;
-    const accentGfx = this.add.graphics().setDepth(Depths.tooltip);
-    const ad = 5;
-    accentGfx.fillStyle(DecoColors.gold, 0.3);
-    accentGfx.fillPoints([
-      new Phaser.Geom.Point(rpCx, accentY - ad),
-      new Phaser.Geom.Point(rpCx + ad, accentY),
-      new Phaser.Geom.Point(rpCx, accentY + ad),
-      new Phaser.Geom.Point(rpCx - ad, accentY),
-    ], true);
-    accentGfx.lineStyle(1, DecoColors.gold, 0.15);
-    accentGfx.lineBetween(rpX + pad, accentY, rpCx - ad - 6, accentY);
-    accentGfx.lineBetween(rpCx + ad + 6, accentY, rpX + rpW - pad, accentY);
+    // ── Zigzag geo border at very bottom ──
+    drawGeoBorder(decoGfx, rpX + pad, toolbarTop - 24, rpW - pad * 2, DecoColors.gold, 0.12, 10, 3);
 
     this.updateRightPanelStats();
   }
@@ -314,19 +393,57 @@ export class UIScene extends Phaser.Scene {
     const rooms = roomsData.rooms as { id: string; name: string; hotspots: { id: string; type: string; itemId?: string }[] }[];
     const currentRoom = rooms.find(r => r.id === currentRoomId);
 
+    // Chapter
+    if (this.borderChapterText) {
+      const chapter = save.getChapter?.() ?? 1;
+      this.borderChapterText.setText(`CHAPTER ${chapter}`);
+    }
+
     // Room name
     if (currentRoom && this.borderRoomNameText) {
-      // Extract short name (e.g. "Grand Lobby" from "The Monarch Theatre — Grand Lobby")
       const parts = currentRoom.name.split('—');
       const shortName = (parts[1] || parts[0]).trim().toUpperCase();
       this.borderRoomNameText.setText(shortName);
     }
 
     // Per-room item counter
+    let roomPickupTotal = 0;
+    let roomPickupFound = 0;
     if (currentRoom) {
       const roomPickups = currentRoom.hotspots.filter(hs => hs.type === 'pickup' && hs.itemId);
-      const foundInRoom = roomPickups.filter(hs => inventory.hasItem(hs.itemId!) || inventory.isUsed(hs.itemId!)).length;
-      this.borderItemCountText.setText(`${foundInRoom} / ${roomPickups.length}`);
+      roomPickupTotal = roomPickups.length;
+      roomPickupFound = roomPickups.filter(hs => inventory.hasItem(hs.itemId!) || inventory.isUsed(hs.itemId!)).length;
+      this.borderItemCountText.setText(`${roomPickupFound} / ${roomPickupTotal}`);
+    }
+
+    // Per-room clue counter (inspect + pickup + locked hotspots in current room)
+    let roomClueTotal = 0;
+    let roomClueFound = 0;
+    if (currentRoom) {
+      for (const hs of currentRoom.hotspots) {
+        if (hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked') {
+          roomClueTotal++;
+          if (save.getFlag('used_hotspot_' + hs.id)) roomClueFound++;
+        }
+      }
+    }
+    if (this.borderRoomClueCountText) {
+      this.borderRoomClueCountText.setText(`${roomClueFound} / ${roomClueTotal}`);
+    }
+
+    // Total items across all rooms
+    let totalItemsAll = 0;
+    let foundItemsAll = 0;
+    for (const room of rooms) {
+      for (const hs of room.hotspots) {
+        if (hs.type === 'pickup' && hs.itemId) {
+          totalItemsAll++;
+          if (inventory.hasItem(hs.itemId!) || inventory.isUsed(hs.itemId!)) foundItemsAll++;
+        }
+      }
+    }
+    if (this.borderTotalItemCountText) {
+      this.borderTotalItemCountText.setText(`${foundItemsAll} / ${totalItemsAll}`);
     }
 
     // Global clue counter
@@ -341,6 +458,25 @@ export class UIScene extends Phaser.Scene {
       }
     }
     this.borderClueCountText.setText(`${foundClues} / ${totalClues}`);
+
+    // Progress bar
+    if (this.borderProgressBar) {
+      const barX = this.borderProgressBar.getData('barX') as number;
+      const barY = this.borderProgressBar.getData('barY') as number;
+      const barW = this.borderProgressBar.getData('barW') as number;
+      const barH = this.borderProgressBar.getData('barH') as number;
+      const pct = totalClues > 0 ? foundClues / totalClues : 0;
+
+      this.borderProgressBar.clear();
+      if (pct > 0) {
+        this.borderProgressBar.fillStyle(DecoColors.gold, 0.7);
+        this.borderProgressBar.fillRoundedRect(barX, barY, Math.max(barH, barW * pct), barH, 3);
+      }
+    }
+    if (this.borderProgressPct) {
+      const pct = totalClues > 0 ? Math.round((foundClues / totalClues) * 100) : 0;
+      this.borderProgressPct.setText(`${pct}%`);
+    }
   }
 
   // ─── Toggle methods ──────────────────────────────────────────────────────────
