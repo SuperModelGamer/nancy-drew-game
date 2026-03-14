@@ -59,6 +59,27 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
   called_ned: 'Called Ned. He told me to be careful — old buildings fall apart at the worst moments. He\'s right, but I can\'t stop now.',
 };
 
+// Forward-looking "Nancy's thinking" hints — added AFTER the event entry to guide the player
+const EVENT_THINKING_HINTS: Record<string, string> = {
+  vivian_intro: 'Thinking: Vivian mentioned Edwin in the auditorium and Stella backstage. I should talk to both of them — and check the concierge desk for that master key.',
+  learned_about_margaux: 'Thinking: Margaux died from poison in a prop goblet during The Crimson Veil. I should ask Edwin about the play — he\'s the theater historian.',
+  learned_about_ashworth: 'Thinking: Everyone has a motive to stop the demolition. I should talk to the others before confronting Ashworth.',
+  learned_about_crimson_veil: 'Thinking: The Crimson Veil\'s final act mirrors Margaux\'s death. Stella would know how the stage effects work — she manages everything backstage.',
+  learned_about_cecilia: 'Thinking: Cecilia Drake was the understudy who took over after Margaux died. I should ask Edwin about her — he\'s researched the 1928 case for years.',
+  learned_about_hale_family: 'Thinking: Edwin\'s grandfather was Margaux\'s lover. That\'s why he\'s so obsessed with this theater. I should confront Edwin about the Hale connection.',
+  effects_manual_location: 'Thinking: There\'s an effects manual backstage that explains the theater\'s hidden mechanisms. I should find it — it could explain how the ghost is being staged.',
+  annotated_script_found: 'Thinking: The circled letters in the script margins might spell something. I should study them carefully — or ask Diego, he noticed them first.',
+  heard_basement_noises: 'Thinking: Mechanical sounds from under the stage at night. Someone is operating the old theater systems. I need to find a way into that basement.',
+  learned_about_missing_props: 'Thinking: Props going missing — is it theft, or is someone trying to cover their tracks? I should look for evidence of where they went.',
+  stella_confession: 'Thinking: Stella says Edwin has been in the basement. The key is behind the backstage lighting panel. I need to find it.',
+  basement_key_location: 'Thinking: The basement key is behind the lighting panel backstage. Once I have it, I can finally see what Edwin\'s been doing down there.',
+  called_dad: 'Thinking: Dad said proving a historical crime triggers emergency heritage review. If I can prove Margaux was murdered, I might be able to save the theater. I should call the Historical Society.',
+  ashworth_motive_revealed: 'Thinking: $2.3 million in demolition insurance. Ashworth has the biggest financial motive of anyone. But would he poison himself as a cover?',
+  catwalk_access: 'Thinking: Stella unlocked the catwalk ladder. Edwin spends time up there — I should check it for clues about the ghost staging.',
+  cipher_discussed: 'Thinking: G-O-B-L-E-T. The goblet was the murder weapon in 1928. Someone coded a confession into the script margins almost a century ago.',
+  edwin_personal_revealed: 'Thinking: Edwin\'s been carrying his grandfather\'s promise for decades. He has the knowledge and the motive to stage a ghost. I need proof — the basement is the key.',
+};
+
 // ─── Layout Constants ───────────────────────────────────────────────────────
 const BOX_H = 340;
 const BOX_BOTTOM_MARGIN = 110;  // raised higher to make room for nameplate below portrait
@@ -814,6 +835,10 @@ export class DialogueSystem {
     const journalEntry = EVENT_JOURNAL_ENTRIES[eventId];
     if (journalEntry) {
       save.addJournalEntry(journalEntry);
+    }
+    const thinkingHint = EVENT_THINKING_HINTS[eventId];
+    if (thinkingHint) {
+      save.addJournalEntry(thinkingHint);
     }
   }
 

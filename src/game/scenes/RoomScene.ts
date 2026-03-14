@@ -181,9 +181,11 @@ export class RoomScene extends Phaser.Scene {
     if (this.cameFromCinematic) {
       this.input.setDefaultCursor(this.getExploreCursor());
       this.checkScriptedEvents();
+      this.checkItemContextHints();
     } else {
       this.playCurtainOpen(() => {
         this.checkScriptedEvents();
+        this.checkItemContextHints();
       });
     }
 
@@ -238,6 +240,75 @@ export class RoomScene extends Phaser.Scene {
         this.scene.launch('ScriptedEventScene', { eventId: event.id });
       });
     }
+  }
+
+  // Item-to-character context hints: when the player enters a room with a character
+  // and has a relevant item in inventory, show a brief Nancy thought bubble.
+  private static ITEM_CONTEXT_HINTS: { roomId: string; itemId: string; flag?: string; hint: string }[] = [
+    { roomId: 'lobby', itemId: 'margaux_diary', hint: 'I have Margaux\'s diary. Vivian would want to see this — she was Margaux\'s goddaughter.' },
+    { roomId: 'lobby', itemId: 'margaux_locket', hint: 'This locket from Margaux\'s trunk... Vivian might recognize the photo inside.' },
+    { roomId: 'auditorium', itemId: 'margaux_diary', hint: 'I should show Edwin this diary. He\'s spent fifteen years researching Margaux — he\'d want to see her own words.' },
+    { roomId: 'auditorium', itemId: 'effects_manual', hint: 'I found the effects manual. Edwin seemed awfully knowledgeable about stage effects — I wonder how he\'d react if I brought it up.' },
+    { roomId: 'backstage', itemId: 'stella_records', hint: 'These lockbox records show $4,200 in prop sales. Stella has some explaining to do.' },
+    { roomId: 'backstage', itemId: 'blueprints', hint: 'These blueprints show hidden passages throughout the theater. Stella knows this building — she might recognize them.' },
+    { roomId: 'projection_booth', itemId: 'annotated_script', flag: 'script_decoded', hint: 'I decoded the cipher — G-O-B-L-E-T. Diego will want to hear about this.' },
+    { roomId: 'managers_office', itemId: 'ashworth_files', hint: 'These insurance documents show the demolition is worth $2.3 million. Time to confront Ashworth about his real motive.' },
+  ];
+
+  private checkItemContextHints(): void {
+    if (DialogueSystem.getInstance().isActive()) return;
+    const inventory = InventorySystem.getInstance();
+    const save = SaveSystem.getInstance();
+
+    for (const ctx of RoomScene.ITEM_CONTEXT_HINTS) {
+      if (ctx.roomId !== this.currentRoom.id) continue;
+      if (!inventory.hasItem(ctx.itemId)) continue;
+      // Don't show hint if already acted on it (flag is set)
+      if (ctx.flag && (save.getFlag(ctx.flag) || DialogueSystem.getInstance().hasTriggeredEvent(ctx.flag))) continue;
+      // Don't show the same hint twice per session
+      const hintFlag = `hint_shown_${ctx.roomId}_${ctx.itemId}`;
+      if (save.getFlag(hintFlag)) continue;
+      save.setFlag(hintFlag, true);
+
+      // Show the hint after a brief delay so it doesn't compete with room announcement
+      this.time.delayedCall(2000, () => {
+        if (!DialogueSystem.getInstance().isActive()) {
+          this.showThoughtBubble(ctx.hint);
+        }
+      });
+      break; // Only show one hint per room entry
+    }
+  }
+
+  private showThoughtBubble(text: string): void {
+    const { width } = this.cameras.main.worldView;
+    const bubbleW = Math.min(700, width * 0.5);
+    const padding = 16;
+
+    const textObj = this.add.text(width / 2, 80, text, {
+      fontFamily: FONT,
+      fontSize: '20px',
+      fontStyle: 'italic',
+      color: TextColors.light,
+      wordWrap: { width: bubbleW - padding * 2 },
+      align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+
+    const bgH = textObj.height + padding * 2;
+    const bg = this.add.rectangle(width / 2, 80 + textObj.height / 2, bubbleW, bgH, 0x0a0a1a, 0.85);
+    bg.setStrokeStyle(1.5, Colors.gold, 0.4);
+    bg.setDepth(Depths.tooltip - 1);
+
+    // Fade in, hold, fade out
+    bg.setAlpha(0);
+    textObj.setAlpha(0);
+    this.tweens.add({ targets: [bg, textObj], alpha: 1, duration: 400 });
+    this.time.delayedCall(5000, () => {
+      this.tweens.add({
+        targets: [bg, textObj], alpha: 0, duration: 600,
+        onComplete: () => { bg.destroy(); textObj.destroy(); },
+      });
+    });
   }
 
   // Uniform cover scale + offset from 1920×1080 design space to viewport
