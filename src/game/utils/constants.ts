@@ -108,40 +108,39 @@ export const Sizes = {
 export const UI_BAR_RESERVED = 124; // TOOLBAR_H (112) + BOTTOM_MARGIN (12)
 
 // ─── Viewfinder Frame Layout ───
-// The game art is natively 1920×1080 (16:9). We uniformly scale it down to fit
-// above the toolbar, preserving aspect ratio. The viewport is pushed to the left
-// with a thin border, and all extra space goes to a thick right info panel.
+// The game fills the area between the frame borders and the right info panel.
+// No camera zoom — the viewport IS the game area and content is placed directly
+// in viewport-pixel coordinates.
 //
 //  ┌──────────────── 1920 ────────────────┐
 //  │ top border (FRAME_TOP)                │
-//  │ ┌thin┌─────────────────┐──right──┐   │
-//  │ │    │  game viewport  │  info   │   │
-//  │ │    │  (uniform zoom) │  panel  │   │
-//  │ │    └─────────────────┘─────────┘   │
+//  │ ┌───┌─────────────────┐──right──┐    │
+//  │ │   │  game viewport  │  info   │    │
+//  │ │   │  (no zoom)      │  panel  │    │
+//  │ │   └─────────────────┘─────────┘    │
 //  │ toolbar (FRAME_BOTTOM)                │
 //  └──────────────────────────────────────┘
 
 export const FRAME_TOP = 28;
 export const FRAME_BOTTOM = 124; // toolbar + margin
 export const FRAME_LEFT = 12;   // thin left border
+export const RIGHT_PANEL_W = 200; // fixed width for the right info panel
 
 /** Compute the viewfinder layout from the canvas dimensions (1920×1080). */
 export function computeViewfinderLayout(canvasW: number, canvasH: number) {
-  const availH = canvasH - FRAME_TOP - FRAME_BOTTOM; // vertical space for game
-  const zoom = availH / canvasH;                      // uniform scale (height-limited)
-  const renderedW = Math.ceil(canvasW * zoom);         // game width at this zoom
-  const rightPanelW = canvasW - FRAME_LEFT - renderedW; // all extra goes right
+  const availH = canvasH - FRAME_TOP - FRAME_BOTTOM;
+  const gameW = canvasW - FRAME_LEFT - RIGHT_PANEL_W;  // game area width in pixels
 
   return {
-    zoom,
+    zoom: 1,                              // no zoom — viewport = game area
     viewportX: FRAME_LEFT,
     viewportY: FRAME_TOP,
-    viewportW: renderedW,                 // exact game width — fills viewport edge-to-edge
-    viewportH: availH,
-    renderedW,                            // actual rendered game width in px
+    viewportW: gameW,                     // exact game area width
+    viewportH: availH,                    // exact game area height
+    renderedW: gameW,
     leftMargin: FRAME_LEFT,
-    rightPanelX: FRAME_LEFT + renderedW,  // where the right panel starts
-    rightPanelW,
+    rightPanelX: FRAME_LEFT + gameW,      // where the right panel starts
+    rightPanelW: RIGHT_PANEL_W,
     topMargin: FRAME_TOP,
     bottomMargin: FRAME_BOTTOM,
   };
