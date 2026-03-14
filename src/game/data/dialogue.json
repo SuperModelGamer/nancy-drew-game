@@ -1151,6 +1151,370 @@
           ]
         }
       ]
+    },
+
+    {
+      "id": "vivian_intro_revisit",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Vivian", "text": "Ah, Nancy. Back again. You have that look — the one my late husband used to get when he was reading the last chapter of a mystery novel. That impatient furrow between the eyebrows." },
+            { "speaker": "Nancy", "text": "I just have a few more questions, Vivian." },
+            { "speaker": "Vivian", "text": "Of course you do. Sit, sit. I was just making tea — oh, don't give me that look, it's chamomile, perfectly safe. I made it myself. Although I suppose that's exactly what a poisoner would say, non?" },
+            { "speaker": "Vivian", "text": "I'm joking, ma chère. Mostly." }
+          ],
+          "choices": [
+            {
+              "text": "How are you holding up?",
+              "nextNode": "holding_up"
+            },
+            {
+              "text": "Tell me more about the theater's history.",
+              "nextNode": "theater_history"
+            },
+            {
+              "text": "Have you noticed anything strange lately?",
+              "nextNode": "strange_things"
+            },
+            {
+              "text": "I should keep investigating.",
+              "nextNode": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "holding_up",
+          "lines": [
+            { "speaker": "Vivian", "text": "How am I holding up? Oh, you know. The building I've lived in for seventy-three years is being demolished. There's a ghost that may or may not be my godmother. A man was poisoned upstairs. And a teenager is my best hope." },
+            { "speaker": "Nancy", "text": "I'm not a teenager anymore, Vivian." },
+            { "speaker": "Vivian", "text": "Everyone under fifty is a teenager to me, darling. It's one of the few privileges of old age — along with saying exactly what you think and pretending you can't hear things you don't want to." },
+            { "speaker": "Vivian", "text": "But truly? I'm frightened. Not of the ghost — I've lived with Margaux's memory my whole life. I'm frightened of what happens when the wrecking ball comes. Where does an old actress go when her stage is gone?" },
+            { "speaker": "Nancy", "text": "We'll figure this out, Vivian. I promise." },
+            { "speaker": "Vivian", "text": "You remind me of her, you know. Margaux. She had that same stubborn certainty. It's either your greatest strength or a terrible liability. I could never decide which it was with her." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "theater_history",
+          "lines": [
+            { "speaker": "Vivian", "text": "The Monarch opened in 1924 — did you know it was almost called 'The Imperial'? But the original owner, Theodore Whitfield, thought that sounded too pretentious. Can you imagine? A man who built a theater with gold leaf ceilings and marble pillars worrying about pretension." },
+            { "speaker": "Vivian", "text": "Opening night was Hamlet. Terrible production, by all accounts. The lead actor forgot the 'To be or not to be' soliloquy and improvised something about the weather. Theodore fired him during intermission." },
+            { "speaker": "Nancy", "text": "That's... quite a debut." },
+            { "speaker": "Vivian", "text": "The theater has always attracted drama, ma chère. Both kinds. You're standing in a building where Sarah Bernhardt once dropped her glass eye into the orchestra pit and made a stagehand fish it out during the second act." },
+            { "speaker": "Vivian", "text": "I miss those days. The theater was alive then. People came here to feel something. Now they stare at their telephones and call it entertainment. Bah." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "strange_things",
+          "lines": [
+            { "speaker": "Vivian", "text": "Strange? Ma chère, I live in a haunted theater where a man was poisoned and a detective is interrogating everyone. You'll have to be more specific about 'strange.'" },
+            { "speaker": "Nancy", "text": "Fair point. Anything out of the ordinary — for you?" },
+            { "speaker": "Vivian", "text": "Hmm. The lights in the auditorium flicker sometimes. Always three times, then they stop. Edwin says it's the wiring. I say wiring doesn't have a sense of rhythm." },
+            { "speaker": "Vivian", "text": "And I keep finding fresh flowers on the stage. White gardenias — Margaux's favorite. Someone is leaving them. Not me. I'm too old to climb those stairs for a bouquet." },
+            { "speaker": "Nancy", "text": "White gardenias. Interesting." },
+            { "speaker": "Vivian", "text": "You detectives and your 'interesting.' My husband used to say that too. Right before he solved something clever. Go on — I can see you thinking." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "farewell",
+          "lines": [
+            { "speaker": "Vivian", "text": "Go, go. Solve the mystery. Save my theater. And Nancy — don't skip meals. You detectives always forget to eat. There are crackers in the concession stand. They're only slightly stale." }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "edwin_auditorium_revisit",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Edwin", "text": "Ms. Drew. You've returned. Excellent. I was just cataloging the acoustic irregularities in rows F through J — there's a dead spot near seat F-7 that I believe was caused by a 1943 renovation, but the documentation is frustratingly vague. Would you like to hear my theory?" },
+            { "speaker": "Nancy", "text": "Maybe later. I had some questions—" },
+            { "speaker": "Edwin", "text": "Of course, of course. Everyone always wants to talk about murder. Nobody wants to discuss acoustic engineering. Story of my life, really." }
+          ],
+          "choices": [
+            {
+              "text": "What are you working on?",
+              "nextNode": "his_work"
+            },
+            {
+              "text": "You seem to know this place better than anyone.",
+              "nextNode": "knowledge"
+            },
+            {
+              "text": "Have you been sleeping here?",
+              "nextNode": "sleeping"
+            },
+            {
+              "text": "I'll let you get back to your research.",
+              "nextNode": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "his_work",
+          "lines": [
+            { "speaker": "Edwin", "text": "I'm working on my fourth book, actually. 'Ghosts of the Footlights: Architecture, Memory, and the Haunted Stage.' The working title. My publisher thinks it's too long. My publisher thinks everything is too long. He wanted my last book to be 200 pages. It was 847." },
+            { "speaker": "Nancy", "text": "That's... thorough." },
+            { "speaker": "Edwin", "text": "Thoroughness is underappreciated, Ms. Drew. Do you know that there are exactly 1,247 rivets in the balcony railing? I counted them. Twice. The second time I got 1,248, which kept me up for three nights until I found the extra one. It was hidden behind a renovation patch from 1956." },
+            { "speaker": "Edwin", "text": "My ex-wife used to say I care more about dead theaters than living people. She wasn't wrong, necessarily. But she was unkind about it." },
+            { "speaker": "Nancy", "text": "I think the theater is lucky to have someone who cares this much." },
+            { "speaker": "Edwin", "text": "That's... thank you. Most people just think I'm peculiar. Which I am. But it's nice to hear the alternative interpretation." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "knowledge",
+          "lines": [
+            { "speaker": "Edwin", "text": "I know things about this building that the blueprints don't. For instance — did you notice the asymmetry in the lobby molding? The east wall has seventeen rosettes. The west wall has sixteen. One was removed in 1931 to patch a bullet hole." },
+            { "speaker": "Nancy", "text": "A bullet hole?" },
+            { "speaker": "Edwin", "text": "A critic shot at the lead actor during a particularly bad production of 'The Tempest.' Missed entirely. Hit the wall. The management decided it was easier to cover it up than explain. Theater people." },
+            { "speaker": "Edwin", "text": "I also know that the basement has a room that doesn't appear on any official plan. I found references to it in the original architect's personal correspondence. He called it 'the confession booth.' I've never found it, though. It haunts me. Figuratively. We already have enough literal haunting." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "sleeping",
+          "lines": [
+            { "speaker": "Edwin", "text": "Sleeping here? I — well. Define 'sleeping.' If you mean 'occasionally dozing in seat G-12 between 2 and 5 AM,' then... perhaps." },
+            { "speaker": "Nancy", "text": "Edwin." },
+            { "speaker": "Edwin", "text": "Fine. Yes. I've been staying late. Very late. The acoustics change at night, you know — the building settles, the wood contracts, and you can hear things you'd never notice during the day. Whispers in the walls. Probably just pipes." },
+            { "speaker": "Edwin", "text": "Probably." },
+            { "speaker": "Nancy", "text": "That's not exactly reassuring." },
+            { "speaker": "Edwin", "text": "I find it comforting, actually. A building that still makes noise is a building that's still alive. It's when the Monarch goes silent that I'll worry. That'll mean Ashworth's won." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "farewell",
+          "lines": [
+            { "speaker": "Edwin", "text": "Right. Back to the rivets. If you need anything, I'll be here. I'm always here. That's either dedication or pathology, depending on who you ask." }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "stella_backstage_revisit",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Stella", "text": "Oh good, you're back. I was getting bored of being suspicious all by myself. Hold this." },
+            { "speaker": "Nancy", "text": "What is—" },
+            { "speaker": "Stella", "text": "It's a sandbag counterweight. Don't drop it unless you want to find out what a broken toe feels like. I'm rebalancing the fly system because apparently nobody else in this building knows how to maintain rigging that's older than their grandparents." },
+            { "speaker": "Stella", "text": "Questions. Go." }
+          ],
+          "choices": [
+            {
+              "text": "You seem stressed.",
+              "nextNode": "stressed"
+            },
+            {
+              "text": "Tell me about working backstage.",
+              "nextNode": "backstage_life"
+            },
+            {
+              "text": "Is there anything else I should know?",
+              "nextNode": "else_to_know"
+            },
+            {
+              "text": "I'll come back later.",
+              "nextNode": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "stressed",
+          "lines": [
+            { "speaker": "Stella", "text": "Stressed? No. This is my relaxed face. My stressed face involves more swearing and fewer sandbags." },
+            { "speaker": "Stella", "text": "You want to know what stress is? Stress is when the lead actress gets food poisoning twenty minutes before curtain and you have to convince the understudy — who has stage fright — that she's 'totally ready' while simultaneously fixing a broken spotlight with a rubber band and a prayer." },
+            { "speaker": "Nancy", "text": "Did that actually happen?" },
+            { "speaker": "Stella", "text": "Twice. Different actresses. Same understudy. She threw up both times. On stage. During the death scene. The audience thought it was method acting. We got a standing ovation." },
+            { "speaker": "Stella", "text": "Point is — a little poisoning and a ghost? That's a Tuesday." },
+            { "speaker": "Nancy", "text": "You have a very unusual definition of 'Tuesday.'" },
+            { "speaker": "Stella", "text": "Welcome to theater, detective." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "backstage_life",
+          "lines": [
+            { "speaker": "Stella", "text": "Backstage is where the real show happens. The audience sees the magic. I see the duct tape holding the magic together." },
+            { "speaker": "Stella", "text": "See that rope over there? That's the main curtain line. Pull it wrong and you drop 300 pounds of velvet on whoever's standing center stage. I've been tempted. More than once. But I'm a professional." },
+            { "speaker": "Nancy", "text": "Who tempted you?" },
+            { "speaker": "Stella", "text": "Oh, every actor who's ever walked through those doors. There was one — Lord, what was his name — he demanded that his dressing room be repainted mid-run because the shade of blue 'conflicted with his aura.' His aura. I repainted it. I used the exact same shade. He said it felt 'much better.' I never told him." },
+            { "speaker": "Stella", "text": "The point is, I know every trick, every trap, every hidden corner of this place. If someone's faking a ghost, they're using my equipment. And that offends me on a professional level." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "else_to_know",
+          "lines": [
+            { "speaker": "Stella", "text": "You want to know something? Fine. Here's something nobody talks about." },
+            { "speaker": "Stella", "text": "Three months ago, before any of this ghost business, I found footprints in the dust backstage. In a section nobody uses — the old prop storage behind the scene dock. Fresh footprints. Size eleven men's shoes. I mentioned it to Ashworth. He told me to 'stop being dramatic.' I'm a stage manager. Being dramatic is literally my job." },
+            { "speaker": "Nancy", "text": "Size eleven. Did you—" },
+            { "speaker": "Stella", "text": "I measured. Of course I measured. I also took a photo, which is on my phone, which I will show you if you ask nicely. I don't do things halfway, Drew. Unlike some people in this building who shall remain nameless but whose initials are R.A." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "farewell",
+          "lines": [
+            { "speaker": "Stella", "text": "Fine. Go detect. Leave the sandbag on the bench. And if you see anyone touching my fly system, you have my permission to yell at them. Loudly." }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "diego_booth_revisit",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Diego", "text": "Nancy! Perfect timing — I need a second opinion. Does this sound too melodramatic? 'The chandelier swayed like a crystal pendulum counting down the hours to murder.' Too much?" },
+            { "speaker": "Nancy", "text": "For real life? Yes. For a play?" },
+            { "speaker": "Diego", "text": "See, that's the problem. I can't tell anymore. I've been living in this theater for three months and reality is getting... blurry. Yesterday I narrated myself making coffee. Out loud. 'He poured the dark liquid with trembling hands, knowing that caffeine was his only ally in this house of shadows.' My roommate back home would stage an intervention." }
+          ],
+          "choices": [
+            {
+              "text": "How's the play coming along?",
+              "nextNode": "the_play"
+            },
+            {
+              "text": "Have you heard anything else at night?",
+              "nextNode": "night_sounds"
+            },
+            {
+              "text": "What do you think about the other people here?",
+              "nextNode": "opinions"
+            },
+            {
+              "text": "I'll let you get back to writing.",
+              "nextNode": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "the_play",
+          "lines": [
+            { "speaker": "Diego", "text": "It's... evolving. I came here to write a comedy about a playwright who moves into an old theater. Then the ghost started showing up and I accidentally switched genres. Now it's a psychological thriller. My agent is going to kill me." },
+            { "speaker": "Diego", "text": "But honestly? The material is incredible. A real ghost — or whatever it is — real suspects, real danger. Chekhov said 'if there's a gun on the wall in act one, it has to go off in act three.' Well, this building has about forty guns on the wall and I'm terrified of act three." },
+            { "speaker": "Nancy", "text": "Maybe don't put real crimes in your play." },
+            { "speaker": "Diego", "text": "Agatha Christie did it. Shakespeare did it. Truman Capote did it and he got invited to all the best parties afterward. I'm just continuing a grand literary tradition of profiting from other people's misery." },
+            { "speaker": "Diego", "text": "That sounded worse out loud than it did in my head. I'm going to write it anyway." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "night_sounds",
+          "lines": [
+            { "speaker": "Diego", "text": "Every. Single. Night. Last night it was Act Three, Scene Two — the part where Margaux's character discovers the poisoned wine. Whoever is doing this has impeccable diction. Like, genuinely better than most actors I've worked with." },
+            { "speaker": "Nancy", "text": "You're critiquing the ghost's acting?" },
+            { "speaker": "Diego", "text": "I can't help it! I'm a playwright! It's like asking a chef not to judge someone's cooking. The phrasing, the breath control — it's almost too good. Real ghosts wouldn't have that kind of vocal discipline. That takes years of training." },
+            { "speaker": "Diego", "text": "Unless ghosts take acting classes in the afterlife. Which, honestly? I'd believe it. Actors never stop performing. Death is just an extended intermission for them." },
+            { "speaker": "Nancy", "text": "That's a pretty good line." },
+            { "speaker": "Diego", "text": "I know. I'm writing it down. Don't tell anyone I got my best material from a detective." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "opinions",
+          "lines": [
+            { "speaker": "Diego", "text": "Oh man. Okay. Off the record? Because if any of them finds out I said this, I'll deny everything." },
+            { "speaker": "Diego", "text": "Vivian is the most elegantly terrifying woman I've ever met. She can insult you in three languages without raising her voice. I once sneezed too loudly and she looked at me like I'd committed a war crime. I love her. She's a character in my play now. I haven't told her." },
+            { "speaker": "Diego", "text": "Edwin is... you know how dogs get when they're obsessed with a squirrel? That focused, single-minded intensity? That's Edwin, except the squirrel is a dead actress and the yard is a ninety-year-old crime scene. He scares me a little, honestly." },
+            { "speaker": "Diego", "text": "Stella is the only competent person in this building and she knows it. She once fixed a broken spotlight with a bobby pin and a piece of chewing gum. I saw her do it. She didn't even look up." },
+            { "speaker": "Diego", "text": "And Ashworth? Ashworth is the kind of villain who doesn't know he's a villain. He genuinely thinks he's the hero of this story. 'I'm bringing progress!' Progress. To a building that's more interesting than anything he'll ever build on top of it." },
+            { "speaker": "Nancy", "text": "You've given this a lot of thought." },
+            { "speaker": "Diego", "text": "Writers observe. It's what we do. Also I have no social life and this is the most exciting thing that's ever happened to me, so." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "farewell",
+          "lines": [
+            { "speaker": "Diego", "text": "Go forth and detect. I'll be here, turning your investigation into a two-act play. Don't worry — I'll change the names. Nancy Drew becomes... Fancy Brew. A coffee-obsessed detective. Totally different character." }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "ashworth_office_revisit",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Ashworth", "text": "You again. Don't you people ever just... go away? I have seventeen missed calls from my lawyer, twelve from my contractor, and one from my mother who apparently saw 'something about a ghost on the internet' and wants to know if I'm eating enough fiber." },
+            { "speaker": "Nancy", "text": "I just need a few more minutes—" },
+            { "speaker": "Ashworth", "text": "Everyone just needs 'a few more minutes.' The Historical Society needed a few more minutes. The building inspector needed a few more minutes. My ex-wife needed a few more minutes to decide if she loved me. She decided no, by the way. Took her nine years of 'a few more minutes.'" }
+          ],
+          "choices": [
+            {
+              "text": "How are you feeling?",
+              "nextNode": "feeling"
+            },
+            {
+              "text": "Why are you really demolishing this place?",
+              "nextNode": "real_reason"
+            },
+            {
+              "text": "Do you have any enemies?",
+              "nextNode": "enemies"
+            },
+            {
+              "text": "I'll leave you to your calls.",
+              "nextNode": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "feeling",
+          "lines": [
+            { "speaker": "Ashworth", "text": "How am I — I was poisoned. How do you think I'm feeling? My head feels like someone filled it with cement. My stomach hasn't forgiven me. And I'm stuck in this office because the hospital discharged me too early because — and I quote — 'the poisoning wasn't severe enough to warrant continued observation.'" },
+            { "speaker": "Ashworth", "text": "Not severe enough. I collapsed in front of three witnesses. My blood pressure was 180 over 'we should probably do something about that.' But sure, not severe enough." },
+            { "speaker": "Nancy", "text": "Someone did try to hurt you, Mr. Ashworth." },
+            { "speaker": "Ashworth", "text": "Hurt me? They tried to kill me! Or — well, the doctors say the dose was 'non-lethal.' As if that's supposed to make me feel better. 'Congratulations, Mr. Ashworth, someone poisoned you just a little bit.' Wonderful. I feel so much better." },
+            { "speaker": "Ashworth", "text": "Do you know what really bothers me? Whoever did it knew exactly how much to use. That's not random. That's someone who wanted me alive but out of commission. Which means this isn't about me. It's about this building. Everything is always about this stupid building." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "real_reason",
+          "lines": [
+            { "speaker": "Ashworth", "text": "Why am I — because it's mine? Because I bought it with my own money? Because the structural report says it needs four million dollars in repairs that nobody is volunteering to pay?" },
+            { "speaker": "Ashworth", "text": "Everyone acts like I'm some monster for wanting to tear down a building. You know what they don't tell you in the brochure? The roof leaks. The foundation has cracks. The electrical system is a fire hazard that would make any inspector weep. The plumbing dates back to an era when 'indoor plumbing' was considered cutting-edge technology." },
+            { "speaker": "Nancy", "text": "That doesn't mean—" },
+            { "speaker": "Ashworth", "text": "I know. I know what it 'means.' It means history. Culture. Heritage. I've heard the speech. Edwin's given it to me forty-seven times. Vivian's given it to me in two languages. I get it. But sentiment doesn't pay for earthquake retrofitting. Nostalgia doesn't fix a gas line from 1924." },
+            { "speaker": "Ashworth", "text": "I'm not the villain here, Drew. I'm just the guy holding the bill." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "enemies",
+          "lines": [
+            { "speaker": "Ashworth", "text": "Enemies? Ha. Take a number. Stand in line." },
+            { "speaker": "Ashworth", "text": "Vivian looks at me like I'm something she found on the bottom of her shoe. Edwin talks about me the way people talk about war criminals. Stella — actually, Stella is professional about it, I'll give her that. She just quietly hates me with impeccable time management." },
+            { "speaker": "Ashworth", "text": "Diego is the only one who doesn't seem to actively despise me, which is probably because he's too busy scribbling in his notebook to notice I exist. I caught him taking notes during my meeting with the contractor. Notes! Like I'm a character in his little play." },
+            { "speaker": "Nancy", "text": "You don't seem very concerned about being surrounded by people who dislike you." },
+            { "speaker": "Ashworth", "text": "I'm a real estate developer, Ms. Drew. If I worried about being liked, I'd have chosen a different career. Maybe something universally beloved, like dentistry or parking enforcement." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "farewell",
+          "lines": [
+            { "speaker": "Ashworth", "text": "Finally. Go. Investigate. Find whoever poisoned me so I can sue them. And close the door on your way out — there's a draft from the hallway that's been bothering me for forty-five minutes and I refuse to get up because my legs still feel like they're made of pudding." }
+          ]
+        }
+      ]
     }
   ]
 }
