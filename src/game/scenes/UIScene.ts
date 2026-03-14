@@ -761,7 +761,10 @@ export class UIScene extends Phaser.Scene {
     this.itemsGrid.removeAll(true);
 
     const inventory = InventorySystem.getInstance();
-    const items = inventory.getItems();
+    // Show all collected items: current inventory + previously used items
+    const currentItems = inventory.getItems();
+    const usedItems = inventory.getUsedItems().filter(id => !currentItems.includes(id));
+    const items = [...currentItems, ...usedItems];
     const selectedItem = inventory.getSelectedItem();
 
     const { leftX, contentTop, contentH, leftW } = this.evidenceLayout;
@@ -894,13 +897,16 @@ export class UIScene extends Phaser.Scene {
       this.hotspotCounterText.setText(`🔍 Clues Discovered: ${discoveredHotspots} / ${totalHotspots}`);
     }
 
-    // Per-room item counter
+    // Per-room clue counter (all interactive hotspot types, consistent with total counter)
     if (currentRoom && this.roomItemCounterText) {
-      const roomPickups = currentRoom.hotspots.filter(hs => hs.type === 'pickup' && hs.itemId);
-      const inventory = InventorySystem.getInstance();
-      const foundInRoom = roomPickups.filter(hs => inventory.hasItem(hs.itemId!) || inventory.isUsed(hs.itemId!)).length;
-      const roomName = currentRoomId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-      this.roomItemCounterText.setText(`📍 ${roomName}: ${foundInRoom} / ${roomPickups.length} items found`);
+      const roomHotspots = currentRoom.hotspots.filter(
+        (hs: { type: string }) => hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked'
+      );
+      const foundInRoom = roomHotspots.filter(
+        (hs: { id: string }) => save.getFlag('used_hotspot_' + hs.id)
+      ).length;
+      const roomName = currentRoomId.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
+      this.roomItemCounterText.setText(`📍 ${roomName}: ${foundInRoom} / ${roomHotspots.length} clues found`);
     }
   }
 

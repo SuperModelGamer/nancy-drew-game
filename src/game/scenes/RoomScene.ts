@@ -581,9 +581,8 @@ export class RoomScene extends Phaser.Scene {
         // Mark item as used and deselect — cursor reverts to magnifying glass
         inv.markUsed(hotspot.requiredItem);
         inv.selectItem(null);
-        // Consume key items that are used to unlock
+        // Keep item in evidence journal but mark as used
         if (hotspot.targetRoom) {
-          inv.removeItem(hotspot.requiredItem);
           this.time.delayedCall(1000, () => {
             this.navigateToRoom(hotspot.targetRoom!);
           });
