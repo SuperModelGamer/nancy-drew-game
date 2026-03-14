@@ -182,7 +182,7 @@
           "id": "aud_stage",
           "x": 666,
           "y": 527,
-          "width": 300,
+          "width": 190,
           "height": 80,
           "label": "The Stage",
           "type": "inspect",
@@ -230,15 +230,15 @@
         },
         {
           "id": "aud_playbill",
-          "x": 348,
+          "x": 396,
           "y": 783,
           "width": 60,
           "height": 50,
           "label": "1928 Playbill",
           "type": "pickup",
-          "description": "Tucked in a seat pocket near the front — a 1928 playbill in perfect condition. The cast page lists Margaux Fontaine as Lady Ashford and Cecilia Drake as understudy. Someone circled Cecilia's name in red ink. The ink is old — this wasn't done recently. Whoever marked this suspected Cecilia decades ago. I should hold onto this.",
           "itemId": "playbill_1928",
-          "onceOnly": true
+          "onceOnly": true,
+          "description": "Tucked in a seat pocket near the front — a 1928 playbill in perfect condition. The cast page lists Margaux Fontaine as Lady Ashford and Cecilia Drake as understudy. Someone circled Cecilia's name in red ink. The ink is old — this wasn't done recently. Whoever marked this suspected Cecilia decades ago. I should hold onto this."
         },
         {
           "id": "aud_edwin",
