@@ -93,9 +93,9 @@ export class MapScene extends Phaser.Scene {
 
     // --- Panel dimensions ---
     const panelW = Math.min(1440, width - 48);
-    const panelH = Math.min(1050, height - 48);
+    const panelH = Math.min(1050, height - 124 - 24);
     const panelX = width / 2;
-    const panelY = height / 2;
+    const panelY = panelH / 2 + 12;
 
     // --- Background ---
     this.drawParchmentBackground(panelX, panelY, panelW, panelH, contentDepth);

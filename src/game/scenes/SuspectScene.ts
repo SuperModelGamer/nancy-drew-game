@@ -143,7 +143,7 @@ const SUSPECTS: SuspectProfile[] = [
 ];
 
 // Toolbar height matching UIScene
-const TOOLBAR_H = 96;
+const TOOLBAR_H = 112;
 const BOTTOM_MARGIN = 12;
 
 export class SuspectScene extends Phaser.Scene {
