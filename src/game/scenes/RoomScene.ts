@@ -59,10 +59,12 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private redirectingToCinematic = false;
+  private cameFromCinematic = false;
 
   init(data: { roomId?: string; skipCinematic?: boolean }): void {
     const roomId = data.roomId || 'lobby';
     this.redirectingToCinematic = false;
+    this.cameFromCinematic = !!data.skipCinematic;
 
     // Check for a cinematic that should play before entering this room
     if (!data.skipCinematic) {
@@ -165,10 +167,15 @@ export class RoomScene extends Phaser.Scene {
       this.glowCursor = cursor;
     });
 
-    // Curtain open reveal
-    this.playCurtainOpen(() => {
+    // Skip the curtain animation if we just came from a cinematic cutscene
+    if (this.cameFromCinematic) {
+      this.input.setDefaultCursor(this.getExploreCursor());
       this.checkScriptedEvents();
-    });
+    } else {
+      this.playCurtainOpen(() => {
+        this.checkScriptedEvents();
+      });
+    }
 
     // Start room-specific ambient audio
     const ambientAudio = AmbientAudioSystem.getInstance();
