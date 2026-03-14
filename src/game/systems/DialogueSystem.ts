@@ -284,12 +284,12 @@ export class DialogueSystem {
     skipBtn.on('pointerdown', () => this.skipToEnd());
     this.container.add(skipBtn);
 
-    // ── 4. Dialogue text (below skip row, vertically balanced within remaining space) ──
+    // ── 4. Dialogue text (vertically centered in full inner area; skip overlays top-right) ──
     const textPadX = 8;
     const textLeft = innerLeft + textPadX;
     const textRight = innerRight - textPadX;
     const textW = textRight - textLeft;
-    const textTop = innerTop + skipRowH;
+    const textTop = innerTop;
     const textH = innerBottom - textTop;
 
     this.dialogueTextObj = this.scene.add.text(textLeft, textTop, '', {
