@@ -83,7 +83,7 @@ const EVENT_THINKING_HINTS: Record<string, string> = {
 };
 
 // ─── Layout Constants ───────────────────────────────────────────────────────
-const MIN_BOX_H = 160;   // minimum box height (short lines like "...")
+const MIN_BOX_H = 260;   // minimum box height — keeps dialogue box substantial
 const MAX_BOX_H = 340;   // maximum box height (long paragraphs)
 const BOX_BOTTOM_MARGIN = 140;  // keeps box + portrait above the viewfinder frame border
 const TEXT_SIZE = '26px';
@@ -93,6 +93,7 @@ const CHOICE_FONT = '26px';
 const TYPEWRITER_SPEED_DEFAULT = 28; // ms per character (fallback)
 const ANIM_DURATION = 400; // ms for box entrance/exit
 const PORTRAIT_GAP = 16;   // gap between portrait frame and dialogue box
+const PORTRAIT_H = 360;    // fixed portrait frame height (independent of box height)
 const FRAME_BORDER = 44;   // portrait frame gold border thickness (px at display size)
 
 // Gold border insets — fractions of the DISPLAYED asset size.
@@ -259,11 +260,10 @@ export class DialogueSystem {
     // ── Horizontal layout: [portrait frame] [gap] [dialogue box] ──
     const totalW = Math.min(1680, width * 0.88);
     const totalLeft = (width - totalW) / 2;
-    // Use max box height for portrait width estimate to keep layout stable
-    const pfEstH = MAX_BOX_H + 40;
-    const pfEstW = reservePortraitSpace ? Math.round(pfEstH * pfRatio) : 0;
-    const dlgBoxW = reservePortraitSpace ? totalW - pfEstW - PORTRAIT_GAP : totalW;
-    const dlgBoxLeft = reservePortraitSpace ? totalLeft + pfEstW + PORTRAIT_GAP : totalLeft;
+    // Portrait is a fixed size — doesn't scale with dynamic box height
+    const pfDisplayW = reservePortraitSpace ? Math.round(PORTRAIT_H * pfRatio) : 0;
+    const dlgBoxW = reservePortraitSpace ? totalW - pfDisplayW - PORTRAIT_GAP : totalW;
+    const dlgBoxLeft = reservePortraitSpace ? totalLeft + pfDisplayW + PORTRAIT_GAP : totalLeft;
 
     // ── Measure text to determine content-aware box height ──
     const textPadX = 14;
@@ -291,12 +291,8 @@ export class DialogueSystem {
     const innerTop = boxTop + borderY;
     const innerBottom = boxTop + boxH - borderY;
 
-    // ── Portrait frame sized to match this box ──
-    let pfDisplayW = pfEstW;
-    let pfDisplayH = hasPortrait ? boxH + 40 : 0;
-    if (hasPortrait) {
-      pfDisplayW = Math.round(pfDisplayH * pfRatio);
-    }
+    // Portrait frame is a fixed size, bottom-aligned with dialogue box
+    const pfDisplayH = reservePortraitSpace ? PORTRAIT_H : 0;
 
     // ── 1. Dialogue box frame ──
     if (this.scene.textures.exists('dlg_box')) {
