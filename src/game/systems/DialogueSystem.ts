@@ -285,21 +285,22 @@ export class DialogueSystem {
     skipBtn.on('pointerdown', () => this.skipToEnd());
     this.container.add(skipBtn);
 
-    // ── 4. Dialogue text (vertically centered in full inner area; skip overlays top-right) ──
+    // ── 4. Dialogue text (vertically centered below skip row, inside gold borders) ──
     const textPadX = 8;
     const textLeft = innerLeft + textPadX;
     const textRight = innerRight - textPadX;
     const textW = textRight - textLeft;
-    const textTop = innerTop;
+    const textTop = innerTop + skipRowH;
     const textH = innerBottom - textTop;
+    const textCenterY = textTop + textH / 2;
 
-    this.dialogueTextObj = this.scene.add.text(textLeft, textTop, '', {
+    this.dialogueTextObj = this.scene.add.text(textLeft, textCenterY, '', {
       fontFamily: FONT,
       fontSize: TEXT_SIZE,
       color: TextColors.light,
       wordWrap: { width: textW },
       lineSpacing: 4,
-    });
+    }).setOrigin(0, 0.5);
     // Destroy previous mask if re-rendering
     if (this.textMaskGfx) { this.textMaskGfx.destroy(); this.textMaskGfx = null; }
     this.textMaskGfx = this.scene.make.graphics({});
@@ -429,7 +430,7 @@ export class DialogueSystem {
       speakerText.setAlpha(0);
       this.scene.tweens.add({
         targets: speakerText, alpha: 1,
-        y: { from: nameplateY + 8, to: nameplateY },
+        y: { from: nameplateY + npTextOffsetY + 8, to: nameplateY + npTextOffsetY },
         duration: 300, delay: 50, ease: 'Power2',
       });
     }
@@ -672,7 +673,7 @@ export class DialogueSystem {
           } else {
             btn.clearTint();
           }
-          text.setColor(TextColors.gold);
+          text.setColor(textColor);
         });
 
         // Press: push animation then select
