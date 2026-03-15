@@ -16,12 +16,20 @@ interface AuthFormElements {
   destroy: () => void;
 }
 
+const LABEL_STYLE = `
+  font-family: Georgia, serif;
+  color: #c9a84c;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+  display: block;
+`;
+
 const INPUT_STYLE = `
   width: 100%;
-  padding: 12px 16px;
-  background: rgba(10, 10, 26, 0.95);
-  border: 1px solid #c9a84c;
-  border-radius: 2px;
+  padding: 14px 16px;
+  background: rgba(8, 7, 20, 0.95);
+  border: 1.5px solid rgba(201, 168, 76, 0.5);
+  border-radius: 1px;
   color: #e0d5c0;
   font-family: Georgia, serif;
   font-size: 16px;
@@ -29,7 +37,7 @@ const INPUT_STYLE = `
   box-sizing: border-box;
 `;
 
-const INPUT_FOCUS_STYLE = `border-color: #e8c55a; box-shadow: 0 0 8px rgba(201, 168, 76, 0.3);`;
+const INPUT_FOCUS_STYLE = `border-color: #e8c55a; box-shadow: 0 0 10px rgba(201, 168, 76, 0.25);`;
 
 function applyFocusListeners(input: HTMLInputElement): void {
   input.addEventListener('focus', () => {
@@ -60,23 +68,62 @@ export function createAuthFormElements(
     z-index: 1000;
     display: flex;
     flex-direction: column;
-    gap: ${12 * scaleY}px;
+    gap: ${6 * scaleY}px;
   `;
 
-  // Email input
+  // Email label
+  const emailLabel = document.createElement('label');
+  emailLabel.textContent = 'Email';
+  emailLabel.style.cssText = LABEL_STYLE;
+  emailLabel.style.fontSize = `${16 * scaleY}px`;
+  wrapper.appendChild(emailLabel);
+
+  // Email input container (for icon overlay)
+  const emailContainer = document.createElement('div');
+  emailContainer.style.cssText = `position: relative; width: 100%;`;
+
   const emailInput = document.createElement('input');
   emailInput.type = 'email';
-  emailInput.placeholder = 'Email address';
+  emailInput.placeholder = '';
   emailInput.autocomplete = 'email';
   emailInput.style.cssText = INPUT_STYLE;
   emailInput.style.fontSize = `${16 * scaleY}px`;
+  emailInput.style.paddingRight = `${44 * scaleX}px`;
   applyFocusListeners(emailInput);
-  wrapper.appendChild(emailInput);
+  emailContainer.appendChild(emailInput);
+
+  // Person icon inside email field
+  const emailIcon = document.createElement('span');
+  emailIcon.textContent = '\u{1F464}';
+  emailIcon.style.cssText = `
+    position: absolute;
+    right: ${12 * scaleX}px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: ${16 * scaleY}px;
+    color: #c9a84c;
+    pointer-events: none;
+    opacity: 0.6;
+  `;
+  emailContainer.appendChild(emailIcon);
+  wrapper.appendChild(emailContainer);
+
+  // Spacer
+  const spacer = document.createElement('div');
+  spacer.style.height = `${8 * scaleY}px`;
+  wrapper.appendChild(spacer);
+
+  // Password label
+  const passwordLabel = document.createElement('label');
+  passwordLabel.textContent = 'Password';
+  passwordLabel.style.cssText = LABEL_STYLE;
+  passwordLabel.style.fontSize = `${16 * scaleY}px`;
+  wrapper.appendChild(passwordLabel);
 
   // Password input
   const passwordInput = document.createElement('input');
   passwordInput.type = 'password';
-  passwordInput.placeholder = 'Password';
+  passwordInput.placeholder = '';
   passwordInput.autocomplete = 'current-password';
   passwordInput.style.cssText = INPUT_STYLE;
   passwordInput.style.fontSize = `${16 * scaleY}px`;
