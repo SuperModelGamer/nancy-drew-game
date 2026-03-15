@@ -490,7 +490,8 @@
             {
               "text": "Tell me who's in the basement and I'll focus on the poisoning.",
               "nextNode": "stella_reveals_edwin",
-              "triggerEvent": "stella_confession"
+              "triggerEvent": "stella_confession",
+              "requiredItem": "stella_records"
             },
             {
               "text": "Let's talk about the effects system first.",
@@ -1430,7 +1431,8 @@
             {
               "text": "Tell me who's in the basement and I'll focus on the poisoning.",
               "nextNode": "stella_reveals_edwin",
-              "triggerEvent": "stella_confession"
+              "triggerEvent": "stella_confession",
+              "requiredItem": "stella_records"
             },
             {
               "text": "Let's talk about something else.",
