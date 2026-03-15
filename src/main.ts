@@ -13,6 +13,7 @@ import { ChapterTransitionScene } from './game/scenes/ChapterTransitionScene';
 import { IntroScene } from './game/scenes/IntroScene';
 import { CinematicScene } from './game/scenes/CinematicScene';
 import { HotspotEditorScene } from './game/scenes/HotspotEditorScene';
+import { AuthManager } from './game/systems/AuthManager';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -38,4 +39,20 @@ const config: Phaser.Types.Core.GameConfig = {
   },
 };
 
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
+
+// Warn guest users that unsaved progress will be lost when leaving the page
+window.addEventListener('beforeunload', (e) => {
+  const auth = AuthManager.getInstance();
+
+  // Only warn if: auth is available, user is NOT signed in, and a game scene is active
+  if (auth.isAvailable() && !auth.isSignedIn()) {
+    const activeScenes = game.scene.getScenes(true);
+    const isPlaying = activeScenes.some(
+      (s: Phaser.Scene) => s.scene.key === 'RoomScene' || s.scene.key === 'PuzzleScene',
+    );
+    if (isPlaying) {
+      e.preventDefault();
+    }
+  }
+});
