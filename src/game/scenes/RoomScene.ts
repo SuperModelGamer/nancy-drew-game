@@ -599,6 +599,12 @@ export class RoomScene extends Phaser.Scene {
 
     // Item-on-hotspot: if player has selected the required item, use it
     if (hotspot.requiredItem) {
+      // Already unlocked on a previous visit — just navigate
+      const alreadyUnlocked = SaveSystem.getInstance().getFlag('used_hotspot_' + hotspot.id);
+      if (alreadyUnlocked && hotspot.targetRoom) {
+        this.navigateToRoom(hotspot.targetRoom);
+        return;
+      }
       if (selectedItem === hotspot.requiredItem) {
         // Use the selected item on this hotspot
         this.showDescription(hotspot.description || 'Unlocked!');
