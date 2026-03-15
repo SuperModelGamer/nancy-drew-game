@@ -151,6 +151,14 @@ export class TitleScene extends Phaser.Scene {
 
     // Fade in
     this.cameras.main.fadeIn(1000, 0, 0, 0);
+
+    // Auto-show auth dialog if not signed in
+    const auth = AuthManager.getInstance();
+    if (auth.isAvailable() && !auth.isSignedIn()) {
+      this.time.delayedCall(1200, () => {
+        this.showAuthDialog(width, height);
+      });
+    }
   }
 
   // ── Auth Dialog — themed welcome gate ──
