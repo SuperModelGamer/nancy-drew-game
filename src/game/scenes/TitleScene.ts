@@ -318,54 +318,19 @@ export class TitleScene extends Phaser.Scene {
       }
     });
 
-    // ── "or" divider ──
-    const orDivGfx = this.add.graphics();
-    orDivGfx.lineStyle(1, Colors.gold, 0.15);
-    orDivGfx.lineBetween(-160, 110, -30, 110);
-    orDivGfx.lineBetween(30, 110, 160, 110);
-    container.add(orDivGfx);
-    const orText = this.add.text(0, 110, 'or', {
-      fontFamily: FONT, fontSize: '15px', color: TextColors.muted, fontStyle: 'italic',
-    }).setOrigin(0.5);
-    container.add(orText);
-
-    // ── Google sign-in button ──
-    const googleBg = this.add.rectangle(0, 150, 380, 52, 0x0e0d1e, 0.9);
-    googleBg.setStrokeStyle(1, 0x6a5a3a, 0.5);
-    googleBg.setInteractive({ cursor: POINTER_CURSOR });
-    const googleText = this.add.text(0, 150, 'Continue with Google', {
-      fontFamily: FONT, fontSize: '18px', color: TextColors.light,
-    }).setOrigin(0.5);
-    container.add([googleBg, googleText]);
-
-    googleBg.on('pointerover', () => {
-      googleBg.setFillStyle(0x1a1a3e, 1);
-      googleBg.setStrokeStyle(1, Colors.gold, 0.6);
-    });
-    googleBg.on('pointerout', () => {
-      googleBg.setFillStyle(0x0e0d1e, 0.9);
-      googleBg.setStrokeStyle(1, 0x6a5a3a, 0.5);
-    });
-    googleBg.on('pointerdown', async () => {
-      const result = await AuthManager.getInstance().signInWithGoogle();
-      if (result.error) {
-        form.errorDiv.textContent = result.error;
-      }
-    });
-
     // ── Bottom divider ──
     const bottomDiv = this.add.graphics();
     bottomDiv.lineStyle(1, Colors.gold, 0.15);
-    bottomDiv.lineBetween(-200, 195, 200, 195);
+    bottomDiv.lineBetween(-200, 120, 200, 120);
     container.add(bottomDiv);
 
     // ── Continue as Guest — de-emphasized ──
-    const guestText = this.add.text(0, 225, 'Continue as Guest', {
+    const guestText = this.add.text(0, 150, 'Continue as Guest', {
       fontFamily: FONT, fontSize: '16px', color: TextColors.muted,
     }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
     container.add(guestText);
 
-    const guestNote = this.add.text(0, 250, 'You can create an account later from Settings', {
+    const guestNote = this.add.text(0, 175, 'You can create an account later from Settings', {
       fontFamily: FONT, fontSize: '13px', color: TextColors.muted, fontStyle: 'italic',
     }).setOrigin(0.5).setAlpha(0.6);
     container.add(guestNote);
