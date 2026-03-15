@@ -448,7 +448,7 @@
           "height": 130,
           "label": "Bust & Props",
           "type": "inspect",
-          "description": "Rows of old costumes — velvet, silk, moth-eaten lace. But one white gown near the back makes the hair on my arms stand up. It's not dusty. The hem is damp. I check the label with slightly unsteady hands: 'Lady Ashford — Act III.' This is Margaux's costume from the night she died. And someone has been wearing it. Recently. The UV-reactive paint from that receipt, the fog machine residue, and now a freshly worn costume — whoever's playing ghost isn't improvising. They've been rehearsing."
+          "description": "Rows of old costumes — velvet, silk, moth-eaten lace. But one white gown near the back makes the hair on my arms stand up. It's not dusty. The hem is damp. I check the label with slightly unsteady hands: 'Lady Ashford — Act III.' This is Margaux's costume from the night she died. And someone has been wearing it. Recently. The fabric has a faint chemical smell and there's fog machine residue along the hem — whoever's playing ghost isn't improvising. They've been rehearsing."
         },
         {
           "id": "bs_rigging_ropes",
@@ -524,7 +524,7 @@
           "label": "Stella's Lockbox",
           "type": "locked",
           "puzzleId": "lockbox_puzzle",
-          "description": "A metal lockbox shoved under Stella's work station. Four-digit combination lock. She doesn't want anyone getting into this. Given what I found on the call board, I have a pretty good idea what's inside. Four digits. Knowing Stella, it's probably something practical — a date, a dollar amount. Something she'd never forget."
+          "description": "A metal lockbox shoved under Stella's work station. Four rotating dials, each engraved with little theatrical symbols — masks, spotlights, curtains, roses, and more. She doesn't want anyone getting into this. I need to find the right combination of symbols. Knowing Stella, the answer is probably somewhere nearby."
         },
         {
           "id": "bs_table_lamp",
