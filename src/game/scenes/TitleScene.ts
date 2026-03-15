@@ -172,13 +172,9 @@ export class TitleScene extends Phaser.Scene {
 
     if (auth.isSignedIn()) {
       const name = auth.getDisplayName();
-      const nameText = this.add.text(-70, 0, name, {
-        fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim,
-      }).setOrigin(1, 0.5);
-      container.add(nameText);
 
       const signOutText = this.add.text(0, 0, 'Sign Out', {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.muted,
+        fontFamily: FONT, fontSize: '16px', color: TextColors.muted,
       }).setOrigin(1, 0.5).setInteractive({ cursor: POINTER_CURSOR });
       signOutText.on('pointerover', () => signOutText.setColor(TextColors.gold));
       signOutText.on('pointerout', () => signOutText.setColor(TextColors.muted));
@@ -188,63 +184,111 @@ export class TitleScene extends Phaser.Scene {
       });
       container.add(signOutText);
 
+      const nameText = this.add.text(-signOutText.width - 16, 0, name, {
+        fontFamily: FONT, fontSize: '17px', color: TextColors.gold,
+      }).setOrigin(1, 0.5);
+      container.add(nameText);
+
       // Cloud icon indicator
-      const cloudText = this.add.text(-70 - nameText.width - 10, 0, '☁', {
-        fontFamily: FONT, fontSize: '16px', color: TextColors.success,
+      const cloudText = this.add.text(-signOutText.width - nameText.width - 26, 0, '☁', {
+        fontFamily: FONT, fontSize: '18px', color: TextColors.success,
       }).setOrigin(1, 0.5);
       container.add(cloudText);
     } else {
-      const signInText = this.add.text(0, 0, 'Sign In for Cloud Saves', {
-        fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim,
+      // Prominent but non-blocking sign-in link
+      const signInText = this.add.text(0, 0, 'Sign In / Register', {
+        fontFamily: FONT, fontSize: '17px', color: TextColors.gold,
       }).setOrigin(1, 0.5).setInteractive({ cursor: POINTER_CURSOR });
-      signInText.on('pointerover', () => signInText.setColor(TextColors.gold));
-      signInText.on('pointerout', () => signInText.setColor(TextColors.goldDim));
+      signInText.on('pointerover', () => signInText.setColor('#e8c55a'));
+      signInText.on('pointerout', () => signInText.setColor(TextColors.gold));
       signInText.on('pointerdown', () => {
-        const { width, height } = this.cameras.main;
-        this.showAuthDialog(width, height);
+        const { width: w, height: h } = this.cameras.main;
+        this.showAuthDialog(w, h);
       });
       container.add(signInText);
     }
   }
 
-  // ── Auth Dialog (Sign In / Register) ──
+  // ── Auth Dialog — themed welcome gate ──
 
   private showAuthDialog(width: number, height: number): void {
     const container = this.add.container(width / 2, height / 2);
     container.setDepth(100);
+    container.setAlpha(0);
 
-    const dimmer = this.add.rectangle(0, 0, width, height, Colors.darkBg, 0.8);
+    // Full-screen dimmer
+    const dimmer = this.add.rectangle(0, 0, width, height, 0x04030a, 0.88);
     dimmer.setInteractive();
     container.add(dimmer);
 
-    const panelW = 520;
-    const panelH = 480;
-    const box = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.97);
-    box.setStrokeStyle(2, Colors.gold, 0.7);
+    // ── Outer frame — double-border "theater program" style ──
+    const panelW = 560;
+    const panelH = 580;
+
+    // Outer decorative border
+    const outerFrame = this.add.graphics();
+    outerFrame.lineStyle(1, Colors.gold, 0.25);
+    outerFrame.strokeRect(-panelW / 2 - 8, -panelH / 2 - 8, panelW + 16, panelH + 16);
+    container.add(outerFrame);
+
+    // Main panel
+    const box = this.add.rectangle(0, 0, panelW, panelH, 0x08071a, 0.97);
+    box.setStrokeStyle(2, Colors.gold, 0.6);
     container.add(box);
 
-    // Title
-    const titleText = this.add.text(0, -200, 'Sign In', {
-      fontFamily: FONT, fontSize: '30px', color: '#e8c55a', fontStyle: 'bold',
+    // ── Corner flourishes ──
+    const cornerGfx = this.add.graphics();
+    cornerGfx.lineStyle(1, Colors.gold, 0.35);
+    const cSize = 20;
+    const cInset = 12;
+    // Top-left
+    cornerGfx.lineBetween(-panelW / 2 + cInset, -panelH / 2 + cInset + cSize, -panelW / 2 + cInset, -panelH / 2 + cInset);
+    cornerGfx.lineBetween(-panelW / 2 + cInset, -panelH / 2 + cInset, -panelW / 2 + cInset + cSize, -panelH / 2 + cInset);
+    // Top-right
+    cornerGfx.lineBetween(panelW / 2 - cInset - cSize, -panelH / 2 + cInset, panelW / 2 - cInset, -panelH / 2 + cInset);
+    cornerGfx.lineBetween(panelW / 2 - cInset, -panelH / 2 + cInset, panelW / 2 - cInset, -panelH / 2 + cInset + cSize);
+    // Bottom-left
+    cornerGfx.lineBetween(-panelW / 2 + cInset, panelH / 2 - cInset, -panelW / 2 + cInset, panelH / 2 - cInset - cSize);
+    cornerGfx.lineBetween(-panelW / 2 + cInset, panelH / 2 - cInset, -panelW / 2 + cInset + cSize, panelH / 2 - cInset);
+    // Bottom-right
+    cornerGfx.lineBetween(panelW / 2 - cInset, panelH / 2 - cInset - cSize, panelW / 2 - cInset, panelH / 2 - cInset);
+    cornerGfx.lineBetween(panelW / 2 - cInset - cSize, panelH / 2 - cInset, panelW / 2 - cInset, panelH / 2 - cInset);
+    container.add(cornerGfx);
+
+    // ── Header — "Case File" style ──
+    const headerLabel = this.add.text(0, -250, '— WELCOME, DETECTIVE —', {
+      fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim, letterSpacing: 4,
+    }).setOrigin(0.5);
+    container.add(headerLabel);
+
+    const titleText = this.add.text(0, -215, 'Sign In to Begin', {
+      fontFamily: FONT, fontSize: '34px', color: '#e8c55a', fontStyle: 'bold',
     }).setOrigin(0.5);
     container.add(titleText);
 
-    // Divider
+    // Subtitle explaining why
+    const subtitleText = this.add.text(0, -178, 'Your investigation progress will be saved to the cloud', {
+      fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim, fontStyle: 'italic',
+    }).setOrigin(0.5);
+    container.add(subtitleText);
+
+    // ── Decorative divider ──
     const divGfx = this.add.graphics();
     divGfx.lineStyle(1, Colors.gold, 0.3);
-    divGfx.lineBetween(-180, -170, 180, -170);
+    divGfx.lineBetween(-200, -155, 200, -155);
+    this.drawDiamond(divGfx, 0, -155, 4, Colors.gold, 0.4);
     container.add(divGfx);
 
-    // Tab toggle: Sign In | Register
-    let mode: 'signin' | 'signup' = 'signin';
+    // ── Tab toggle: Sign In | Register ──
+    let mode: 'signin' | 'signup' = 'signup';
 
-    const signInTab = this.add.text(-80, -145, 'SIGN IN', {
-      fontFamily: FONT, fontSize: '16px', color: TextColors.gold, letterSpacing: 2,
+    const signInTab = this.add.text(-90, -125, 'SIGN IN', {
+      fontFamily: FONT, fontSize: '17px', color: TextColors.muted, letterSpacing: 3,
     }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
     container.add(signInTab);
 
-    const registerTab = this.add.text(80, -145, 'REGISTER', {
-      fontFamily: FONT, fontSize: '16px', color: TextColors.muted, letterSpacing: 2,
+    const registerTab = this.add.text(90, -125, 'REGISTER', {
+      fontFamily: FONT, fontSize: '17px', color: TextColors.gold, letterSpacing: 3,
     }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
     container.add(registerTab);
 
@@ -255,43 +299,48 @@ export class TitleScene extends Phaser.Scene {
       signInTab.setColor(mode === 'signin' ? TextColors.gold : TextColors.muted);
       registerTab.setColor(mode === 'signup' ? TextColors.gold : TextColors.muted);
       tabUnderline.clear();
-      tabUnderline.lineStyle(2, Colors.gold, 0.8);
+      tabUnderline.lineStyle(2, Colors.gold, 0.7);
       if (mode === 'signin') {
-        tabUnderline.lineBetween(-120, -130, -40, -130);
+        tabUnderline.lineBetween(-130, -110, -50, -110);
+        titleText.setText('Welcome Back');
       } else {
-        tabUnderline.lineBetween(35, -130, 125, -130);
+        tabUnderline.lineBetween(45, -110, 135, -110);
+        titleText.setText('Join the Investigation');
       }
-      titleText.setText(mode === 'signin' ? 'Sign In' : 'Register');
+      updateSubmitLabel();
     };
 
     signInTab.on('pointerdown', () => { mode = 'signin'; updateTabs(); });
     registerTab.on('pointerdown', () => { mode = 'signup'; updateTabs(); });
-    updateTabs();
 
-    // DOM form inputs — positioned over the Phaser canvas
+    // ── DOM form inputs ──
     const formX = width / 2;
-    const formY = height / 2 - 80;
-    const formW = 360;
+    const formY = height / 2 - 60;
+    const formW = 380;
     const form = createAuthFormElements(this, formX, formY, formW);
 
-    // Submit button
-    const submitBg = this.add.rectangle(0, 60, 360, 54, Colors.sceneBg, 0.9);
-    submitBg.setStrokeStyle(2, Colors.gold, 0.7);
+    // ── Submit button — prominent, gold-bordered ──
+    const submitBg = this.add.rectangle(0, 65, 380, 58, 0x14132e, 0.95);
+    submitBg.setStrokeStyle(2, Colors.gold, 0.8);
     submitBg.setInteractive({ cursor: POINTER_CURSOR });
-    const submitText = this.add.text(0, 60, 'Sign In', {
-      fontFamily: FONT, fontSize: '20px', color: TextColors.gold,
+    const submitText = this.add.text(0, 65, 'Create Account', {
+      fontFamily: FONT, fontSize: '22px', color: '#e8c55a', fontStyle: 'bold',
     }).setOrigin(0.5);
     container.add([submitBg, submitText]);
 
     const updateSubmitLabel = () => {
       submitText.setText(mode === 'signin' ? 'Sign In' : 'Create Account');
     };
-    signInTab.on('pointerdown', updateSubmitLabel);
-    registerTab.on('pointerdown', updateSubmitLabel);
 
     let submitting = false;
-    submitBg.on('pointerover', () => submitBg.setFillStyle(Colors.hoverBg));
-    submitBg.on('pointerout', () => submitBg.setFillStyle(Colors.sceneBg, 0.9));
+    submitBg.on('pointerover', () => {
+      submitBg.setFillStyle(0x1e1d3e, 1);
+      submitBg.setStrokeStyle(2, Colors.gold, 1);
+    });
+    submitBg.on('pointerout', () => {
+      submitBg.setFillStyle(0x14132e, 0.95);
+      submitBg.setStrokeStyle(2, Colors.gold, 0.8);
+    });
     submitBg.on('pointerdown', async () => {
       if (submitting) return;
       submitting = true;
@@ -317,39 +366,74 @@ export class TitleScene extends Phaser.Scene {
       }
     });
 
-    // Google sign-in button
-    const googleBg = this.add.rectangle(0, 125, 360, 48, 0x1a1a2e, 0.8);
-    googleBg.setStrokeStyle(1, 0x6a5a3a, 0.4);
+    // ── "or" divider ──
+    const orDivGfx = this.add.graphics();
+    orDivGfx.lineStyle(1, Colors.gold, 0.15);
+    orDivGfx.lineBetween(-160, 110, -30, 110);
+    orDivGfx.lineBetween(30, 110, 160, 110);
+    container.add(orDivGfx);
+    const orText = this.add.text(0, 110, 'or', {
+      fontFamily: FONT, fontSize: '15px', color: TextColors.muted, fontStyle: 'italic',
+    }).setOrigin(0.5);
+    container.add(orText);
+
+    // ── Google sign-in button ──
+    const googleBg = this.add.rectangle(0, 150, 380, 52, 0x0e0d1e, 0.9);
+    googleBg.setStrokeStyle(1, 0x6a5a3a, 0.5);
     googleBg.setInteractive({ cursor: POINTER_CURSOR });
-    const googleText = this.add.text(0, 125, 'Continue with Google', {
-      fontFamily: FONT, fontSize: '17px', color: TextColors.light,
+    const googleText = this.add.text(0, 150, 'Continue with Google', {
+      fontFamily: FONT, fontSize: '18px', color: TextColors.light,
     }).setOrigin(0.5);
     container.add([googleBg, googleText]);
 
-    googleBg.on('pointerover', () => googleBg.setFillStyle(Colors.hoverBg));
-    googleBg.on('pointerout', () => googleBg.setFillStyle(0x1a1a2e, 0.8));
+    googleBg.on('pointerover', () => {
+      googleBg.setFillStyle(0x1a1a3e, 1);
+      googleBg.setStrokeStyle(1, Colors.gold, 0.6);
+    });
+    googleBg.on('pointerout', () => {
+      googleBg.setFillStyle(0x0e0d1e, 0.9);
+      googleBg.setStrokeStyle(1, 0x6a5a3a, 0.5);
+    });
     googleBg.on('pointerdown', async () => {
       const result = await AuthManager.getInstance().signInWithGoogle();
       if (result.error) {
         form.errorDiv.textContent = result.error;
       }
-      // Google OAuth redirects, so no explicit success handling needed here
     });
 
-    // Close / Guest button
-    const closeBg = this.add.rectangle(0, 195, 200, 48, Colors.sceneBg, 0.6);
-    closeBg.setStrokeStyle(1, Colors.gold, 0.3);
-    closeBg.setInteractive({ cursor: POINTER_CURSOR });
-    const closeText = this.add.text(0, 195, 'Continue as Guest', {
-      fontFamily: FONT, fontSize: '16px', color: TextColors.goldDim,
-    }).setOrigin(0.5);
-    container.add([closeBg, closeText]);
+    // ── Bottom divider ──
+    const bottomDiv = this.add.graphics();
+    bottomDiv.lineStyle(1, Colors.gold, 0.15);
+    bottomDiv.lineBetween(-200, 195, 200, 195);
+    container.add(bottomDiv);
 
-    closeBg.on('pointerover', () => closeBg.setFillStyle(Colors.hoverBg));
-    closeBg.on('pointerout', () => closeBg.setFillStyle(Colors.sceneBg, 0.6));
-    closeBg.on('pointerdown', () => {
+    // ── Continue as Guest — de-emphasized ──
+    const guestText = this.add.text(0, 225, 'Continue as Guest', {
+      fontFamily: FONT, fontSize: '16px', color: TextColors.muted,
+    }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
+    container.add(guestText);
+
+    const guestNote = this.add.text(0, 250, 'You can create an account later from Settings', {
+      fontFamily: FONT, fontSize: '13px', color: TextColors.muted, fontStyle: 'italic',
+    }).setOrigin(0.5).setAlpha(0.6);
+    container.add(guestNote);
+
+    guestText.on('pointerover', () => guestText.setColor(TextColors.goldDim));
+    guestText.on('pointerout', () => guestText.setColor(TextColors.muted));
+    guestText.on('pointerdown', () => {
       form.destroy();
       container.destroy();
+    });
+
+    // Initialize tabs
+    updateTabs();
+
+    // ── Entrance animation ──
+    this.tweens.add({
+      targets: container,
+      alpha: { from: 0, to: 1 },
+      duration: 500,
+      ease: 'Power2',
     });
   }
 
@@ -785,11 +869,11 @@ export class TitleScene extends Phaser.Scene {
     dimmer.setInteractive();
     container.add(dimmer);
 
-    const box = this.add.rectangle(0, 0, 660, 510, Colors.panelBg, 0.97);
+    const box = this.add.rectangle(0, 0, 660, 580, Colors.panelBg, 0.97);
     box.setStrokeStyle(2, Colors.gold, 0.7);
     container.add(box);
 
-    const titleText = this.add.text(0, -217, 'Settings', {
+    const titleText = this.add.text(0, -250, 'Settings', {
       fontFamily: FONT,
       fontSize: '33px',
       color: '#e8c55a',
@@ -800,10 +884,10 @@ export class TitleScene extends Phaser.Scene {
     // ── Divider under title ──
     const divGfx = this.add.graphics();
     divGfx.lineStyle(1, Colors.gold, 0.3);
-    divGfx.lineBetween(-150, -180, 150, -180);
+    divGfx.lineBetween(-150, -215, 150, -215);
     container.add(divGfx);
 
-    const rowY = (row: number) => -135 + row * 72;
+    const rowY = (row: number) => -170 + row * 72;
 
     // ── 1. Dialogue Speed ──
     // Controls how fast dialogue text types out character by character
@@ -900,18 +984,63 @@ export class TitleScene extends Phaser.Scene {
       });
     }
 
+    // ── 4. Account / Cloud Saves ──
+    {
+      const auth = AuthManager.getInstance();
+      if (auth.isAvailable() && !auth.isSignedIn()) {
+        const label = this.add.text(-255, rowY(3), 'Cloud Saves', {
+          fontFamily: FONT, fontSize: '21px', color: TextColors.light,
+        }).setOrigin(0, 0.5);
+        container.add(label);
+
+        const desc = this.add.text(-255, rowY(3) + 24, 'Sign in to save progress across devices', {
+          fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue,
+        }).setOrigin(0, 0.5);
+        container.add(desc);
+
+        const signInBg = this.add.rectangle(210, rowY(3) + 8, 160, 44, 0x14132e, 0.9);
+        signInBg.setStrokeStyle(1, Colors.gold, 0.6);
+        signInBg.setInteractive({ cursor: POINTER_CURSOR });
+        const signInBtnText = this.add.text(210, rowY(3) + 8, 'Sign In', {
+          fontFamily: FONT, fontSize: '18px', color: TextColors.gold,
+        }).setOrigin(0.5);
+        signInBg.on('pointerover', () => signInBg.setFillStyle(Colors.hoverBg));
+        signInBg.on('pointerout', () => signInBg.setFillStyle(0x14132e, 0.9));
+        signInBg.on('pointerdown', () => {
+          container.destroy();
+          this.showAuthDialog(width, height);
+        });
+        container.add([signInBg, signInBtnText]);
+      } else if (auth.isAvailable() && auth.isSignedIn()) {
+        const label = this.add.text(-255, rowY(3), 'Cloud Saves', {
+          fontFamily: FONT, fontSize: '21px', color: TextColors.light,
+        }).setOrigin(0, 0.5);
+        container.add(label);
+
+        const statusText = this.add.text(210, rowY(3), '☁ Connected', {
+          fontFamily: FONT, fontSize: '18px', color: TextColors.success,
+        }).setOrigin(0.5);
+        container.add(statusText);
+
+        const emailText = this.add.text(-255, rowY(3) + 24, auth.getDisplayName(), {
+          fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue,
+        }).setOrigin(0, 0.5);
+        container.add(emailText);
+      }
+    }
+
     // ── Divider above danger zone ──
     const divGfx2 = this.add.graphics();
     divGfx2.lineStyle(1, Colors.error, 0.2);
-    divGfx2.lineBetween(-150, rowY(3) - 8, 150, rowY(3) - 8);
+    divGfx2.lineBetween(-150, rowY(4) - 8, 150, rowY(4) - 8);
     container.add(divGfx2);
 
     // ── Delete save data ──
     {
-      const deleteBg = this.add.rectangle(0, rowY(3) + 10, 300, 54, 0x1a0a0a, 0.8);
+      const deleteBg = this.add.rectangle(0, rowY(4) + 10, 300, 54, 0x1a0a0a, 0.8);
       deleteBg.setStrokeStyle(1, Colors.error, 0.4);
       deleteBg.setInteractive({ cursor: POINTER_CURSOR });
-      const deleteText = this.add.text(0, rowY(3) + 10, 'Delete Save Data', {
+      const deleteText = this.add.text(0, rowY(4) + 10, 'Delete Save Data', {
         fontFamily: FONT, fontSize: '20px', color: TextColors.error,
       }).setOrigin(0.5);
 
@@ -928,10 +1057,10 @@ export class TitleScene extends Phaser.Scene {
     }
 
     // ── Close button ──
-    const closeBg = this.add.rectangle(0, 210, 180, 60, Colors.sceneBg, 0.9);
+    const closeBg = this.add.rectangle(0, 250, 180, 60, Colors.sceneBg, 0.9);
     closeBg.setStrokeStyle(1, Colors.gold, 0.5);
     closeBg.setInteractive({ cursor: POINTER_CURSOR });
-    const closeText = this.add.text(0, 210, 'Close', {
+    const closeText = this.add.text(0, 250, 'Close', {
       fontFamily: FONT, fontSize: '22px', color: TextColors.gold,
     }).setOrigin(0.5);
     closeBg.on('pointerover', () => closeBg.setFillStyle(Colors.hoverBg));
