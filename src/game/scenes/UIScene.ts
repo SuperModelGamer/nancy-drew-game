@@ -735,7 +735,7 @@ export class UIScene extends Phaser.Scene {
 
     this.detailPlaceholder = this.add.text(detailCenterX, detailCenterY,
       'Select an item to inspect', {
-      fontFamily: JOURNAL_FONT, fontSize: '26px', color: '#6a5a4a',
+      fontFamily: JOURNAL_FONT, fontSize: '28px', color: '#6a5a4a',
       fontStyle: 'italic', align: 'center',
     }).setOrigin(0.5);
     this.evidenceContent.add(this.detailPlaceholder);
@@ -743,43 +743,43 @@ export class UIScene extends Phaser.Scene {
     this.detailImage = null;
 
     this.detailName = this.add.text(detailCenterX, contentTop + 32, '', {
-      fontFamily: JOURNAL_FONT, fontSize: '32px', color: '#3a2a1a',
+      fontFamily: JOURNAL_FONT, fontSize: '34px', color: '#3a2a1a',
       fontStyle: 'bold', align: 'center',
     }).setOrigin(0.5, 0);
     this.evidenceContent.add(this.detailName);
 
-    this.detailKeyBadge = this.add.container(detailCenterX, contentTop + 78);
-    const badgeBg = this.add.rectangle(0, 0, 170, 36, TAB_GOLD, 0.15);
+    this.detailKeyBadge = this.add.container(detailCenterX, contentTop + 80);
+    const badgeBg = this.add.rectangle(0, 0, 180, 38, TAB_GOLD, 0.15);
     badgeBg.setStrokeStyle(1.5, TAB_GOLD, 0.4);
     const badgeText = this.add.text(0, 0, '★  KEY EVIDENCE', {
-      fontFamily: JOURNAL_FONT, fontSize: '17px', color: TAB_GOLD_STR, letterSpacing: 2,
+      fontFamily: JOURNAL_FONT, fontSize: '18px', color: TAB_GOLD_STR, letterSpacing: 2,
     }).setOrigin(0.5);
     this.detailKeyBadge.add([badgeBg, badgeText]);
     this.detailKeyBadge.setVisible(false);
     this.evidenceContent.add(this.detailKeyBadge);
 
     this.detailDesc = this.add.text(detailCenterX, contentTop + 120, '', {
-      fontFamily: JOURNAL_FONT, fontSize: '24px', color: BOOK_INK,
-      wordWrap: { width: rightW - 60 }, lineSpacing: 6, align: 'center',
+      fontFamily: JOURNAL_FONT, fontSize: '26px', color: BOOK_INK,
+      wordWrap: { width: rightW - 60 }, lineSpacing: 7, align: 'center',
     }).setOrigin(0.5, 0);
     this.evidenceContent.add(this.detailDesc);
 
     const hint = this.add.text(detailCenterX, contentBottom - 28,
       'Click an item to select it for use.\nClick again to deselect.', {
-        fontFamily: JOURNAL_FONT, fontSize: '20px', color: '#6a5a4a',
+        fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#6a5a4a',
         fontStyle: 'italic', align: 'center', lineSpacing: 3,
       }).setOrigin(0.5, 1);
     this.evidenceContent.add(hint);
 
     // ── Discovery counters (bottom of left panel) ──
-    this.hotspotCounterText = this.add.text(leftX + leftW / 2, contentBottom - 52, '', {
-      fontFamily: JOURNAL_FONT, fontSize: '20px', color: '#5a4a3a',
+    this.hotspotCounterText = this.add.text(leftX + leftW / 2, contentBottom - 55, '', {
+      fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#5a4a3a',
       align: 'center',
     }).setOrigin(0.5, 1);
     this.evidenceContent.add(this.hotspotCounterText);
 
     this.roomItemCounterText = this.add.text(leftX + leftW / 2, contentBottom - 28, '', {
-      fontFamily: JOURNAL_FONT, fontSize: '20px', color: '#5a4a3a',
+      fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#5a4a3a',
       align: 'center',
     }).setOrigin(0.5, 1);
     this.evidenceContent.add(this.roomItemCounterText);
@@ -854,7 +854,7 @@ export class UIScene extends Phaser.Scene {
       }
 
       const label = this.add.text(x, y + cardW / 2 + 8, itemData.name, {
-        fontFamily: JOURNAL_FONT, fontSize: '20px',
+        fontFamily: JOURNAL_FONT, fontSize: '22px',
         color: isSelected ? TextColors.success : '#3a2a1a',
         align: 'center', wordWrap: { width: cardW - 8 },
       }).setOrigin(0.5, 0);
@@ -1056,8 +1056,8 @@ export class UIScene extends Phaser.Scene {
     this.evidenceContent.add(this.detailLoreDivider);
 
     this.detailLoreText = this.add.text(centerX, descBottom + 14, lore, {
-      fontFamily: JOURNAL_FONT, fontSize: '18px', color: '#5a4a3a',
-      fontStyle: 'italic', wordWrap: { width: rightW - 70 }, lineSpacing: 4, align: 'center',
+      fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#5a4a3a',
+      fontStyle: 'italic', wordWrap: { width: rightW - 70 }, lineSpacing: 5, align: 'center',
     }).setOrigin(0.5, 0);
     this.evidenceContent.add(this.detailLoreText);
   }
@@ -1115,19 +1115,19 @@ export class UIScene extends Phaser.Scene {
     const contentRight = panelX + panelW / 2 - 40;
     const usableW = contentRight - contentLeft;
 
-    // Ruled lines — spaced for 28px font sitting on each line
+    // Ruled lines — notebook style, consistent spacing
     const ruledGfx = this.add.graphics();
-    const lineSpacing = 38;
-    const ruledStart = contentTop + 18;
-    const ruledEnd = contentBottom - 55;
-    ruledGfx.lineStyle(1, BOOK_STAIN, 0.15);
+    const lineSpacing = 36;
+    const ruledStart = contentTop + 12;
+    const ruledEnd = contentBottom - 50;
+    ruledGfx.lineStyle(1, BOOK_STAIN, 0.18);
     for (let ly = ruledStart; ly < ruledEnd; ly += lineSpacing) {
       ruledGfx.lineBetween(contentLeft, ly, contentRight, ly);
     }
     // Red margin line
     const marginX = contentLeft + 60;
-    ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.25);
-    ruledGfx.lineBetween(marginX, contentTop + 4, marginX, contentBottom - 50);
+    ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.28);
+    ruledGfx.lineBetween(marginX, contentTop + 4, marginX, contentBottom - 45);
     this.journalContent.add(ruledGfx);
 
     if (journal.length === 0) {
@@ -1149,31 +1149,33 @@ export class UIScene extends Phaser.Scene {
     const endIdx = Math.min(startIdx + JOURNAL_ENTRIES_PER_PAGE, journal.length);
     const pageEntries = journal.slice(startIdx, endIdx);
 
-    // Calculate available height for entries (reserve space for nav)
-    const entryAreaH = ruledEnd - ruledStart;
-    const entrySpacing = Math.floor(entryAreaH / JOURNAL_ENTRIES_PER_PAGE);
     const entryLeft = marginX + 18;
     const entryTextW = usableW - 90;
+    const fontSize = 26;
+    const entryGap = 14; // gap between entries
+
+    // Flow entries naturally from the top — no artificial even spacing
+    let y = ruledStart + 6;
 
     pageEntries.forEach((entry, i) => {
       const globalIdx = startIdx + i;
       const xJitter = ((globalIdx * 7) % 3) - 1;
 
-      // Position entries evenly spaced, sitting on the ruled lines
-      const entryY = ruledStart + i * entrySpacing + 4;
-
       // Entry number — positioned in the margin area
-      const bullet = this.add.text(contentLeft + 8 + xJitter, entryY, `${globalIdx + 1}.`, {
-        fontFamily: JOURNAL_FONT, fontSize: '26px', color: BOOK_BULLET, fontStyle: 'italic',
+      const bullet = this.add.text(contentLeft + 8 + xJitter, y, `${globalIdx + 1}.`, {
+        fontFamily: JOURNAL_FONT, fontSize: `${fontSize}px`, color: BOOK_BULLET, fontStyle: 'italic',
       });
 
-      // Entry text — sits on the ruled lines like handwriting
-      const text = this.add.text(entryLeft + xJitter, entryY, entry, {
-        fontFamily: JOURNAL_FONT, fontSize: '26px', color: BOOK_INK,
-        wordWrap: { width: entryTextW }, lineSpacing: lineSpacing - 26,
+      // Entry text — flows naturally, line spacing matches ruled lines
+      const text = this.add.text(entryLeft + xJitter, y, entry, {
+        fontFamily: JOURNAL_FONT, fontSize: `${fontSize}px`, color: BOOK_INK,
+        wordWrap: { width: entryTextW }, lineSpacing: lineSpacing - fontSize,
       });
 
       this.journalContent.add([bullet, text]);
+
+      // Next entry starts after this text, with a small gap
+      y += text.height + entryGap;
     });
 
     // Page navigation — styled like a book footer
