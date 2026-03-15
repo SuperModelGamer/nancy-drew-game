@@ -283,8 +283,8 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 50;
 
-    // ── Clues in this room (gold) ──
-    this.add.text(contentX, y, 'CLUES IN ROOM', {
+    // ── Places to check in this room (gold) ──
+    this.add.text(contentX, y, 'PLACES TO CHECK', {
       fontFamily: FONT, fontSize: '10px', color: '#c9a84c',
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
@@ -385,6 +385,15 @@ export class UIScene extends Phaser.Scene {
     this.updateRightPanelStats();
   }
 
+  /** Check whether a hotspot's hideWhen condition is met (should be hidden). */
+  private isHotspotHidden(hideWhen: string | undefined): boolean {
+    if (!hideWhen) return false;
+    const save = SaveSystem.getInstance();
+    if (save.getFlag(hideWhen)) return true;
+    try { if (DialogueSystem.getInstance().hasTriggeredEvent(hideWhen)) return true; } catch { /* dialogue not ready */ }
+    return false;
+  }
+
   /** Check whether a hotspot's showWhen condition is currently met. */
   private isHotspotAvailable(showWhen: string | undefined): boolean {
     if (!showWhen) return true;
@@ -404,7 +413,7 @@ export class UIScene extends Phaser.Scene {
     const save = SaveSystem.getInstance();
     const inventory = InventorySystem.getInstance();
     const currentRoomId = save.getCurrentRoom();
-    const rooms = roomsData.rooms as { id: string; name: string; hotspots: { id: string; type: string; itemId?: string; showWhen?: string }[] }[];
+    const rooms = roomsData.rooms as { id: string; name: string; hotspots: { id: string; type: string; itemId?: string; showWhen?: string; hideWhen?: string }[] }[];
     const currentRoom = rooms.find(r => r.id === currentRoomId);
 
     // Chapter
@@ -432,19 +441,27 @@ export class UIScene extends Phaser.Scene {
       this.borderItemCountText.setText(`${roomPickupFound} / ${roomPickupTotal}`);
     }
 
-    // Per-room clue counter (only available inspect + pickup + locked hotspots)
+    // Per-room clue counter (inspect + pickup + locked + talk hotspots)
+    // Includes talk hotspots so players know they still need to speak with NPCs
     let roomClueTotal = 0;
     let roomClueFound = 0;
     if (currentRoom) {
       for (const hs of currentRoom.hotspots) {
-        if ((hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked') && this.isHotspotAvailable(hs.showWhen)) {
-          roomClueTotal++;
-          if (save.getFlag('used_hotspot_' + hs.id)) roomClueFound++;
-        }
+        const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
+        if (!isClueType) continue;
+        if (!this.isHotspotAvailable(hs.showWhen)) continue;
+        if (this.isHotspotHidden(hs.hideWhen)) continue;
+        roomClueTotal++;
+        if (save.getFlag('used_hotspot_' + hs.id)) roomClueFound++;
       }
     }
     if (this.borderRoomClueCountText) {
-      this.borderRoomClueCountText.setText(`${roomClueFound} / ${roomClueTotal}`);
+      const remaining = roomClueTotal - roomClueFound;
+      if (remaining > 0) {
+        this.borderRoomClueCountText.setText(`${roomClueFound} / ${roomClueTotal}`);
+      } else {
+        this.borderRoomClueCountText.setText(`${roomClueTotal} / ${roomClueTotal} ✓`);
+      }
     }
 
     // Total items across all rooms (all items regardless of progression)
@@ -462,15 +479,16 @@ export class UIScene extends Phaser.Scene {
       this.borderTotalItemCountText.setText(`${foundItemsAll} / ${totalItemsAll}`);
     }
 
-    // Global clue counter (all clues regardless of progression)
+    // Global clue counter (all clues regardless of progression, but respecting hideWhen)
     let totalClues = 0;
     let foundClues = 0;
     for (const room of rooms) {
       for (const hs of room.hotspots) {
-        if (hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked') {
-          totalClues++;
-          if (save.getFlag('used_hotspot_' + hs.id)) foundClues++;
-        }
+        const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
+        if (!isClueType) continue;
+        if (this.isHotspotHidden(hs.hideWhen)) continue;
+        totalClues++;
+        if (save.getFlag('used_hotspot_' + hs.id)) foundClues++;
       }
     }
     this.borderClueCountText.setText(`${foundClues} / ${totalClues}`);
@@ -877,19 +895,20 @@ export class UIScene extends Phaser.Scene {
   private updateDiscoveryCounters(): void {
     const save = SaveSystem.getInstance();
     const currentRoomId = save.getCurrentRoom();
-    const rooms = roomsData.rooms as { id: string; hotspots: { id: string; type: string; itemId?: string }[] }[];
+    const rooms = roomsData.rooms as { id: string; hotspots: { id: string; type: string; itemId?: string; hideWhen?: string }[] }[];
     const currentRoom = rooms.find(r => r.id === currentRoomId);
 
-    // Hotspot discovery counter (across all rooms)
+    // Hotspot discovery counter (across all rooms, respecting hideWhen)
     let totalHotspots = 0;
     let discoveredHotspots = 0;
     for (const room of rooms) {
       for (const hs of room.hotspots) {
-        if (hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked') {
-          totalHotspots++;
-          if (save.getFlag('used_hotspot_' + hs.id)) {
-            discoveredHotspots++;
-          }
+        const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
+        if (!isClueType) continue;
+        if (this.isHotspotHidden(hs.hideWhen)) continue;
+        totalHotspots++;
+        if (save.getFlag('used_hotspot_' + hs.id)) {
+          discoveredHotspots++;
         }
       }
     }
@@ -900,13 +919,21 @@ export class UIScene extends Phaser.Scene {
     // Per-room clue counter (all interactive hotspot types, consistent with total counter)
     if (currentRoom && this.roomItemCounterText) {
       const roomHotspots = currentRoom.hotspots.filter(
-        (hs: { type: string }) => hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked'
+        (hs: { type: string; hideWhen?: string }) => {
+          const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
+          return isClueType && !this.isHotspotHidden(hs.hideWhen);
+        }
       );
       const foundInRoom = roomHotspots.filter(
         (hs: { id: string }) => save.getFlag('used_hotspot_' + hs.id)
       ).length;
+      const remaining = roomHotspots.length - foundInRoom;
       const roomName = currentRoomId.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
-      this.roomItemCounterText.setText(`📍 ${roomName}: ${foundInRoom} / ${roomHotspots.length} clues found`);
+      if (remaining > 0) {
+        this.roomItemCounterText.setText(`📍 ${roomName}: ${foundInRoom} / ${roomHotspots.length} places to check`);
+      } else {
+        this.roomItemCounterText.setText(`📍 ${roomName}: All ${roomHotspots.length} places checked ✓`);
+      }
     }
   }
 
