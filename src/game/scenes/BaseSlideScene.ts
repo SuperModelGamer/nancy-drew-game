@@ -294,8 +294,14 @@ export abstract class BaseSlideScene extends Phaser.Scene {
 
     this.isAnimating = false;
 
+    // After text finishes (naturally or via click), pause then auto-advance.
+    // Reset abortSlide so the pause timer runs even if user clicked to rush text.
+    this.abortSlide = false;
+    await this.wait(slide.pauseAfter || 2000);
+
+    // Auto-advance to next slide after pause completes
     if (!this.abortSlide) {
-      await this.wait(slide.pauseAfter || 2000);
+      this.nextSlide();
     }
   }
 
