@@ -367,6 +367,7 @@
           "height": 167,
           "label": "Crumpled Paper",
           "type": "inspect",
+          "showWhen": "learned_about_missing_props",
           "setsFlag": "saw_threatening_note",
           "description": "A crumpled note on the stage floor. I smooth it out: 'I know what you've been doing in the basement. Stop now or I go to the police. — S.M.' S.M. — Stella Morrow. So Stella knows about the basement activity. She's been watching whoever is down there. But she didn't go to the police, and she didn't tell me. Why protect someone she's threatening?"
         }
@@ -385,7 +386,7 @@
           "height": 100,
           "label": "Work Table",
           "type": "inspect",
-          "description": "A heavy work table covered in organized chaos — old scripts, hand tools, reference photographs. The papers aren't random; they're sorted by date. Someone's been researching the theater's history right here at this table. The handwriting on the sticky notes is small and precise. I've seen writing like that before."
+          "description": "A heavy work table covered in organized chaos — old scripts, hand tools, reference photographs. The papers aren't random; they're sorted by date. Someone's been researching the theater's history right here at this table. The handwriting on the sticky notes is small and precise. I've seen writing like that before. There's a spiral notebook open to a page of absent-minded doodles — a theater mask, then a spotlight, then curtains, then a rose. They're drawn in a row, like a sequence. Stella's handwriting is underneath: 'Don't forget.' Forget what?"
         },
         {
           "id": "bs_fog_machine",
