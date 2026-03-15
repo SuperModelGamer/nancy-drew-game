@@ -215,8 +215,16 @@ export class UIScene extends Phaser.Scene {
       this.updateRightPanelStats();
     };
     InventorySystem.getInstance().onChange(onInventoryChange);
+
+    // Listen for save system changes (room transitions, flag changes) — update right panel
+    const onSaveChange = () => {
+      this.updateRightPanelStats();
+    };
+    SaveSystem.getInstance().onChange(onSaveChange);
+
     this.events.on('shutdown', () => {
       InventorySystem.getInstance().offChange(onInventoryChange);
+      SaveSystem.getInstance().offChange(onSaveChange);
     });
   }
 
