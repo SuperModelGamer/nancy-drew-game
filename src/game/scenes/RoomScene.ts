@@ -34,6 +34,7 @@ interface Hotspot {
   puzzleId?: string;
   onceOnly?: boolean;
   showWhen?: string;
+  hideWhen?: string;
   setsFlag?: string;
 }
 
@@ -336,6 +337,15 @@ export class RoomScene extends Phaser.Scene {
 
         if (!flagSet && !eventTriggered && !chapterMatch) {
           continue; // Skip this hotspot — condition not met
+        }
+      }
+
+      // Check hideWhen condition — hide hotspot once flag/event is set
+      if (hotspot.hideWhen) {
+        const hideFlag = save.getFlag(hotspot.hideWhen);
+        const hideEvent = dialogue.hasTriggeredEvent(hotspot.hideWhen);
+        if (hideFlag || hideEvent) {
+          continue;
         }
       }
 

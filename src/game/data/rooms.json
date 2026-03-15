@@ -34,7 +34,8 @@
           "label": "Master Key",
           "type": "pickup",
           "itemId": "master_key",
-          "onceOnly": true
+          "onceOnly": true,
+          "showWhen": "vivian_intro"
         },
         {
           "id": "lobby_magnifying_glass",
@@ -46,7 +47,8 @@
           "type": "pickup",
           "description": "A silver-handled magnifying glass. Vivian left another note: 'You'll need sharp eyes here.' She's been preparing for my visit. Almost like she's done this before — set up a trail of breadcrumbs for someone to follow.",
           "itemId": "magnifying_glass",
-          "onceOnly": true
+          "onceOnly": true,
+          "showWhen": "vivian_intro"
         },
         {
           "id": "lobby_chandelier",
@@ -68,7 +70,8 @@
           "type": "locked",
           "description": "An ornate staircase — the carpet is worn right down the center, but the brass handrails are recently polished. Whoever's been walking through this lobby has been taking care of the place. That's not demolition crew behavior.",
           "requiredItem": "master_key",
-          "targetRoom": "auditorium"
+          "targetRoom": "auditorium",
+          "showWhen": "vivian_intro"
         },
         {
           "id": "lobby_playbills",
@@ -312,7 +315,8 @@
           "height": 190,
           "label": "Backstage Door",
           "type": "navigate",
-          "targetRoom": "backstage"
+          "targetRoom": "backstage",
+          "showWhen": "edwin_auditorium"
         },
         {
           "id": "aud_exit_signs",
