@@ -71,7 +71,7 @@ export class UIScene extends Phaser.Scene {
   private hotspotCounterText: Phaser.GameObjects.Text | null = null;
   private roomItemCounterText: Phaser.GameObjects.Text | null = null;
   private selectedItemId: string | null = null;
-  private evidenceLayout = { leftX: 0, contentTop: 0, contentH: 0, leftW: 0, rightW: 0, rightX: 0 };
+  private evidenceLayout = { leftX: 0, contentTop: 0, contentH: 0, contentBottom: 0, leftW: 0, rightW: 0, rightX: 0 };
 
   // ── Journal panel state ──
   private journalOpen = false;
@@ -784,7 +784,7 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(0.5, 1);
     this.evidenceContent.add(this.roomItemCounterText);
 
-    this.evidenceLayout = { leftX, contentTop, contentH, leftW, rightW, rightX };
+    this.evidenceLayout = { leftX, contentTop, contentH, contentBottom, leftW, rightW, rightX };
   }
 
   private _refreshingGrid = false;
@@ -1046,8 +1046,13 @@ export class UIScene extends Phaser.Scene {
   private showLoreText(centerX: number, lore: string): void {
     this.hideLoreText();
 
-    const { rightW } = this.evidenceLayout;
+    const { rightW, contentBottom } = this.evidenceLayout;
     const descBottom = this.detailDesc.y + this.detailDesc.height + 16;
+
+    // Reserve space for the hint text at the bottom (two lines ~50px + padding)
+    const maxLoreBottom = contentBottom - 60;
+    const availableH = maxLoreBottom - descBottom - 14;
+    if (availableH <= 0) return; // no room for lore
 
     // Divider line
     this.detailLoreDivider = this.add.graphics();
@@ -1060,6 +1065,11 @@ export class UIScene extends Phaser.Scene {
       fontStyle: 'italic', wordWrap: { width: rightW - 70 }, lineSpacing: 5, align: 'center',
     }).setOrigin(0.5, 0);
     this.evidenceContent.add(this.detailLoreText);
+
+    // Crop the lore text if it overflows available space
+    if (this.detailLoreText.height > availableH) {
+      this.detailLoreText.setCrop(0, 0, this.detailLoreText.width, availableH);
+    }
   }
 
   private hideLoreText(): void {
