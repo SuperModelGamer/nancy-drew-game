@@ -136,14 +136,16 @@ export class RoomScene extends Phaser.Scene {
       SaveSystem.getInstance().setFlag(visitedFlag, true);
       this.showRoomAnnouncement(gameW, gameH, () => {
         this.input.setDefaultCursor(this.getExploreCursor());
+        // Create hotspots only after announcement is dismissed
+        // so the dismiss click doesn't trigger hotspots underneath
+        this.createHotspots();
       });
     } else {
       // Already visited — go straight to explore cursor
       this.input.setDefaultCursor(this.getExploreCursor());
+      // Create hotspots immediately for revisited rooms
+      this.createHotspots();
     }
-
-    // Create hotspots (filtered by showWhen)
-    this.createHotspots();
 
     // Selected item indicator (top-right)
     this.selectedItemIndicator = this.add.text(gameW - 20, 20, '', {
