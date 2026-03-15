@@ -5,6 +5,7 @@ import { AuthManager } from '../systems/AuthManager';
 import { Colors, TextColors, FONT } from '../utils/constants';
 import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createAuthFormElements, submitAuthForm } from '../ui/AuthFormOverlay';
+import { drawCornerOrnament, drawDecoDivider, drawSunburst, drawGeoBorder, DecoColors } from '../utils/art-deco';
 
 export class TitleScene extends Phaser.Scene {
   constructor() {
@@ -161,7 +162,7 @@ export class TitleScene extends Phaser.Scene {
     }
   }
 
-  // ── Auth Dialog — themed welcome gate ──
+  // ── Auth Dialog — art deco theater welcome gate ──
 
   private showAuthDialog(width: number, height: number): void {
     const container = this.add.container(width / 2, height / 2);
@@ -169,78 +170,80 @@ export class TitleScene extends Phaser.Scene {
     container.setAlpha(0);
 
     // Full-screen dimmer
-    const dimmer = this.add.rectangle(0, 0, width, height, 0x04030a, 0.88);
+    const dimmer = this.add.rectangle(0, 0, width, height, 0x02010a, 0.92);
     dimmer.setInteractive();
     container.add(dimmer);
 
-    // ── Outer frame — double-border "theater program" style ──
-    const panelW = 560;
-    const panelH = 580;
+    // ── Panel dimensions — larger for readability ──
+    const panelW = 640;
+    const panelH = 680;
 
-    // Outer decorative border
+    // ── Subtle sunburst behind the panel ──
+    const sunburstGfx = this.add.graphics();
+    drawSunburst(sunburstGfx, 0, -60, 500, 24, Colors.gold, 0.04);
+    container.add(sunburstGfx);
+
+    // ── Outer decorative border ──
     const outerFrame = this.add.graphics();
-    outerFrame.lineStyle(1, Colors.gold, 0.25);
-    outerFrame.strokeRect(-panelW / 2 - 8, -panelH / 2 - 8, panelW + 16, panelH + 16);
+    outerFrame.lineStyle(1, Colors.gold, 0.2);
+    outerFrame.strokeRect(-panelW / 2 - 12, -panelH / 2 - 12, panelW + 24, panelH + 24);
     container.add(outerFrame);
 
-    // Main panel
+    // ── Main panel ──
     const box = this.add.rectangle(0, 0, panelW, panelH, 0x08071a, 0.97);
     box.setStrokeStyle(2, Colors.gold, 0.6);
     container.add(box);
 
-    // ── Corner flourishes ──
+    // ── Inner border (double-line art deco effect) ──
+    const innerFrame = this.add.graphics();
+    innerFrame.lineStyle(1, Colors.gold, 0.2);
+    innerFrame.strokeRect(-panelW / 2 + 6, -panelH / 2 + 6, panelW - 12, panelH - 12);
+    container.add(innerFrame);
+
+    // ── Corner ornaments ──
     const cornerGfx = this.add.graphics();
-    cornerGfx.lineStyle(1, Colors.gold, 0.35);
-    const cSize = 20;
-    const cInset = 12;
-    // Top-left
-    cornerGfx.lineBetween(-panelW / 2 + cInset, -panelH / 2 + cInset + cSize, -panelW / 2 + cInset, -panelH / 2 + cInset);
-    cornerGfx.lineBetween(-panelW / 2 + cInset, -panelH / 2 + cInset, -panelW / 2 + cInset + cSize, -panelH / 2 + cInset);
-    // Top-right
-    cornerGfx.lineBetween(panelW / 2 - cInset - cSize, -panelH / 2 + cInset, panelW / 2 - cInset, -panelH / 2 + cInset);
-    cornerGfx.lineBetween(panelW / 2 - cInset, -panelH / 2 + cInset, panelW / 2 - cInset, -panelH / 2 + cInset + cSize);
-    // Bottom-left
-    cornerGfx.lineBetween(-panelW / 2 + cInset, panelH / 2 - cInset, -panelW / 2 + cInset, panelH / 2 - cInset - cSize);
-    cornerGfx.lineBetween(-panelW / 2 + cInset, panelH / 2 - cInset, -panelW / 2 + cInset + cSize, panelH / 2 - cInset);
-    // Bottom-right
-    cornerGfx.lineBetween(panelW / 2 - cInset, panelH / 2 - cInset - cSize, panelW / 2 - cInset, panelH / 2 - cInset);
-    cornerGfx.lineBetween(panelW / 2 - cInset - cSize, panelH / 2 - cInset, panelW / 2 - cInset, panelH / 2 - cInset);
+    drawCornerOrnament(cornerGfx, -panelW / 2 + 2, -panelH / 2 + 2, 32, 'tl', Colors.gold, 0.4);
+    drawCornerOrnament(cornerGfx, panelW / 2 - 2, -panelH / 2 + 2, 32, 'tr', Colors.gold, 0.4);
+    drawCornerOrnament(cornerGfx, -panelW / 2 + 2, panelH / 2 - 2, 32, 'bl', Colors.gold, 0.4);
+    drawCornerOrnament(cornerGfx, panelW / 2 - 2, panelH / 2 - 2, 32, 'br', Colors.gold, 0.4);
     container.add(cornerGfx);
 
-    // ── Header — "Case File" style ──
-    const headerLabel = this.add.text(0, -250, '— WELCOME, DETECTIVE —', {
-      fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim, letterSpacing: 4,
+    // ── Top geometric border accent ──
+    const topBorderGfx = this.add.graphics();
+    drawGeoBorder(topBorderGfx, -panelW / 2 + 40, -panelH / 2 + 16, panelW - 80, Colors.gold, 0.15, 14, 4);
+    container.add(topBorderGfx);
+
+    // ── Header ──
+    const headerLabel = this.add.text(0, -290, '— WELCOME, DETECTIVE —', {
+      fontFamily: FONT, fontSize: '18px', color: TextColors.goldDim, letterSpacing: 6,
     }).setOrigin(0.5);
     container.add(headerLabel);
 
-    const titleText = this.add.text(0, -215, 'Sign In to Begin', {
-      fontFamily: FONT, fontSize: '34px', color: '#e8c55a', fontStyle: 'bold',
+    const titleText = this.add.text(0, -248, 'Join the Investigation', {
+      fontFamily: FONT, fontSize: '40px', color: '#e8c55a', fontStyle: 'bold',
     }).setOrigin(0.5);
     container.add(titleText);
 
-    // Subtitle explaining why
-    const subtitleText = this.add.text(0, -178, 'Your investigation progress will be saved to the cloud', {
-      fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim, fontStyle: 'italic',
+    const subtitleText = this.add.text(0, -205, 'Save your progress to the cloud across devices', {
+      fontFamily: FONT, fontSize: '17px', color: TextColors.goldDim, fontStyle: 'italic',
     }).setOrigin(0.5);
     container.add(subtitleText);
 
-    // ── Decorative divider ──
+    // ── Decorative divider with diamond ──
     const divGfx = this.add.graphics();
-    divGfx.lineStyle(1, Colors.gold, 0.3);
-    divGfx.lineBetween(-200, -155, 200, -155);
-    this.drawDiamond(divGfx, 0, -155, 4, Colors.gold, 0.4);
+    drawDecoDivider(divGfx, 0, -175, 460, Colors.gold, 0.35);
     container.add(divGfx);
 
     // ── Tab toggle: Sign In | Register ──
     let mode: 'signin' | 'signup' = 'signup';
 
-    const signInTab = this.add.text(-90, -125, 'SIGN IN', {
-      fontFamily: FONT, fontSize: '17px', color: TextColors.muted, letterSpacing: 3,
+    const signInTab = this.add.text(-100, -145, 'SIGN IN', {
+      fontFamily: FONT, fontSize: '19px', color: TextColors.muted, letterSpacing: 4,
     }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
     container.add(signInTab);
 
-    const registerTab = this.add.text(90, -125, 'REGISTER', {
-      fontFamily: FONT, fontSize: '17px', color: TextColors.gold, letterSpacing: 3,
+    const registerTab = this.add.text(100, -145, 'REGISTER', {
+      fontFamily: FONT, fontSize: '19px', color: TextColors.gold, letterSpacing: 4,
     }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
     container.add(registerTab);
 
@@ -251,12 +254,12 @@ export class TitleScene extends Phaser.Scene {
       signInTab.setColor(mode === 'signin' ? TextColors.gold : TextColors.muted);
       registerTab.setColor(mode === 'signup' ? TextColors.gold : TextColors.muted);
       tabUnderline.clear();
-      tabUnderline.lineStyle(2, Colors.gold, 0.7);
+      tabUnderline.lineStyle(2, Colors.gold, 0.8);
       if (mode === 'signin') {
-        tabUnderline.lineBetween(-130, -110, -50, -110);
+        tabUnderline.lineBetween(-145, -128, -55, -128);
         titleText.setText('Welcome Back');
       } else {
-        tabUnderline.lineBetween(45, -110, 135, -110);
+        tabUnderline.lineBetween(45, -128, 155, -128);
         titleText.setText('Join the Investigation');
       }
       updateSubmitLabel();
@@ -267,21 +270,21 @@ export class TitleScene extends Phaser.Scene {
 
     // ── DOM form inputs ──
     const formX = width / 2;
-    const formY = height / 2 - 60;
-    const formW = 380;
+    const formY = height / 2 - 70;
+    const formW = 440;
     const form = createAuthFormElements(this, formX, formY, formW);
 
-    // ── Submit button — prominent, gold-bordered ──
-    const submitBg = this.add.rectangle(0, 65, 380, 58, 0x14132e, 0.95);
+    // ── Submit button — prominent, art deco styled ──
+    const submitBg = this.add.rectangle(0, 55, 440, 62, 0x14132e, 0.95);
     submitBg.setStrokeStyle(2, Colors.gold, 0.8);
     submitBg.setInteractive({ cursor: POINTER_CURSOR });
-    const submitText = this.add.text(0, 65, 'Create Account', {
-      fontFamily: FONT, fontSize: '22px', color: '#e8c55a', fontStyle: 'bold',
+    const submitText = this.add.text(0, 55, 'CREATE ACCOUNT', {
+      fontFamily: FONT, fontSize: '22px', color: '#e8c55a', fontStyle: 'bold', letterSpacing: 3,
     }).setOrigin(0.5);
     container.add([submitBg, submitText]);
 
     const updateSubmitLabel = () => {
-      submitText.setText(mode === 'signin' ? 'Sign In' : 'Create Account');
+      submitText.setText(mode === 'signin' ? 'SIGN IN' : 'CREATE ACCOUNT');
     };
 
     let submitting = false;
@@ -310,7 +313,6 @@ export class TitleScene extends Phaser.Scene {
         updateSubmitLabel();
         submitting = false;
       } else {
-        // Success — sync cloud saves and restart
         form.destroy();
         container.destroy();
         await SaveSystem.getInstance().syncFromCloud();
@@ -318,29 +320,44 @@ export class TitleScene extends Phaser.Scene {
       }
     });
 
-    // ── Bottom divider ──
-    const bottomDiv = this.add.graphics();
-    bottomDiv.lineStyle(1, Colors.gold, 0.15);
-    bottomDiv.lineBetween(-200, 120, 200, 120);
-    container.add(bottomDiv);
+    // ── Divider between sign-in and guest ──
+    const midDivGfx = this.add.graphics();
+    drawDecoDivider(midDivGfx, 0, 115, 400, Colors.gold, 0.25);
+    container.add(midDivGfx);
 
-    // ── Continue as Guest — de-emphasized ──
-    const guestText = this.add.text(0, 150, 'Continue as Guest', {
-      fontFamily: FONT, fontSize: '16px', color: TextColors.muted,
-    }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
-    container.add(guestText);
+    // ── Continue as Guest — equal prominence, art deco button ──
+    const guestBg = this.add.rectangle(0, 170, 440, 62, 0x0e0d1e, 0.9);
+    guestBg.setStrokeStyle(1.5, Colors.gold, 0.5);
+    guestBg.setInteractive({ cursor: POINTER_CURSOR });
+    const guestText = this.add.text(0, 170, 'CONTINUE AS GUEST', {
+      fontFamily: FONT, fontSize: '22px', color: TextColors.light, letterSpacing: 3,
+    }).setOrigin(0.5);
+    container.add([guestBg, guestText]);
 
-    const guestNote = this.add.text(0, 175, 'You can create an account later from Settings', {
-      fontFamily: FONT, fontSize: '13px', color: TextColors.muted, fontStyle: 'italic',
-    }).setOrigin(0.5).setAlpha(0.6);
+    const guestNote = this.add.text(0, 215, 'You can create an account later from Settings', {
+      fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim, fontStyle: 'italic',
+    }).setOrigin(0.5);
     container.add(guestNote);
 
-    guestText.on('pointerover', () => guestText.setColor(TextColors.goldDim));
-    guestText.on('pointerout', () => guestText.setColor(TextColors.muted));
-    guestText.on('pointerdown', () => {
+    guestBg.on('pointerover', () => {
+      guestBg.setFillStyle(0x1a1a3e, 1);
+      guestBg.setStrokeStyle(1.5, Colors.gold, 0.8);
+      guestText.setColor(TextColors.gold);
+    });
+    guestBg.on('pointerout', () => {
+      guestBg.setFillStyle(0x0e0d1e, 0.9);
+      guestBg.setStrokeStyle(1.5, Colors.gold, 0.5);
+      guestText.setColor(TextColors.light);
+    });
+    guestBg.on('pointerdown', () => {
       form.destroy();
       container.destroy();
     });
+
+    // ── Bottom geometric border accent ──
+    const bottomBorderGfx = this.add.graphics();
+    drawGeoBorder(bottomBorderGfx, -panelW / 2 + 40, panelH / 2 - 16, panelW - 80, Colors.gold, 0.15, 14, 4);
+    container.add(bottomBorderGfx);
 
     // Initialize tabs
     updateTabs();
@@ -349,7 +366,7 @@ export class TitleScene extends Phaser.Scene {
     this.tweens.add({
       targets: container,
       alpha: { from: 0, to: 1 },
-      duration: 500,
+      duration: 600,
       ease: 'Power2',
     });
   }
