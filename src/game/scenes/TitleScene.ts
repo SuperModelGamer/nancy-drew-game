@@ -1,10 +1,14 @@
 import Phaser from 'phaser';
-import { SaveSystem } from '../systems/SaveSystem';
+import { SaveSystem, SlotSummary } from '../systems/SaveSystem';
 import { ChapterSystem } from '../systems/ChapterSystem';
+import { AuthManager } from '../systems/AuthManager';
 import { Colors, TextColors, FONT } from '../utils/constants';
 import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
+import { createAuthFormElements, submitAuthForm } from '../ui/AuthFormOverlay';
 
 export class TitleScene extends Phaser.Scene {
+  private authStatusContainer?: Phaser.GameObjects.Container;
+
   constructor() {
     super({ key: 'TitleScene' });
   }
@@ -12,7 +16,9 @@ export class TitleScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
     const save = SaveSystem.getInstance();
-    const hasSave = save.hasSave();
+
+    // Initialize auth manager
+    AuthManager.getInstance().init();
 
     // ── Cover image background ──
     this.cameras.main.setBackgroundColor('#0a0a0f');
@@ -94,39 +100,23 @@ export class TitleScene extends Phaser.Scene {
     // Build menu items with texture keys
     const menuItems: { label: string; textureKey: string; action: () => void; primary?: boolean; subtitle?: string }[] = [];
 
-    if (hasSave) {
-      save.load();
-      const chapterTitle = ChapterSystem.getInstance().getChapterTitle(save.getChapter());
+    // Slot-aware: "Continue" opens slot picker, "New Investigation" opens slot picker for empty slot
+    const hasAnySave = save.hasAnySave();
+
+    if (hasAnySave) {
       menuItems.push({
         label: 'Continue',
         textureKey: 'btn_continue',
-        subtitle: chapterTitle,
         primary: true,
-        action: () => {
-          this.cameras.main.fadeOut(500, 0, 0, 0);
-          this.time.delayedCall(500, () => {
-            const roomId = save.getCurrentRoom() || 'lobby';
-            this.scene.start('RoomScene', { roomId });
-            this.scene.launch('UIScene');
-          });
-        },
+        action: () => this.showSlotPicker(width, height, 'load'),
       });
     }
 
     menuItems.push({
-      label: hasSave ? 'New Investigation' : 'Begin Investigation',
+      label: hasAnySave ? 'New Investigation' : 'Begin Investigation',
       textureKey: 'btn_new_case',
-      primary: !hasSave,
-      action: () => {
-        if (hasSave) {
-          this.showConfirmDialog(width, height, () => {
-            save.deleteSave();
-            this.startNewGame();
-          });
-        } else {
-          this.startNewGame();
-        }
-      },
+      primary: !hasAnySave,
+      action: () => this.showSlotPicker(width, height, 'new'),
     });
 
     menuItems.push({
@@ -151,6 +141,9 @@ export class TitleScene extends Phaser.Scene {
       this.createMenuButton(menuX, y, btnDisplayW, btnDisplayH, item.label, item.textureKey, item.action, item.primary, item.subtitle, i);
     });
 
+    // ── Auth status indicator (top-right) ──
+    this.createAuthStatus(width);
+
     // ── Credits ──
     this.add.text(contentX, height - 20, 'Created by Carley Beck', {
       fontFamily: FONT,
@@ -163,6 +156,417 @@ export class TitleScene extends Phaser.Scene {
 
     // Fade in
     this.cameras.main.fadeIn(1000, 0, 0, 0);
+  }
+
+  // ── Auth status in top-right corner ──
+
+  private createAuthStatus(width: number): void {
+    if (this.authStatusContainer) this.authStatusContainer.destroy();
+
+    const auth = AuthManager.getInstance();
+    const container = this.add.container(width - 20, 18);
+    container.setDepth(50);
+    this.authStatusContainer = container;
+
+    if (!auth.isAvailable()) return; // no Supabase configured, hide completely
+
+    if (auth.isSignedIn()) {
+      const name = auth.getDisplayName();
+      const nameText = this.add.text(-70, 0, name, {
+        fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim,
+      }).setOrigin(1, 0.5);
+      container.add(nameText);
+
+      const signOutText = this.add.text(0, 0, 'Sign Out', {
+        fontFamily: FONT, fontSize: '14px', color: TextColors.muted,
+      }).setOrigin(1, 0.5).setInteractive({ cursor: POINTER_CURSOR });
+      signOutText.on('pointerover', () => signOutText.setColor(TextColors.gold));
+      signOutText.on('pointerout', () => signOutText.setColor(TextColors.muted));
+      signOutText.on('pointerdown', async () => {
+        await auth.signOut();
+        this.scene.restart();
+      });
+      container.add(signOutText);
+
+      // Cloud icon indicator
+      const cloudText = this.add.text(-70 - nameText.width - 10, 0, '☁', {
+        fontFamily: FONT, fontSize: '16px', color: TextColors.success,
+      }).setOrigin(1, 0.5);
+      container.add(cloudText);
+    } else {
+      const signInText = this.add.text(0, 0, 'Sign In for Cloud Saves', {
+        fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim,
+      }).setOrigin(1, 0.5).setInteractive({ cursor: POINTER_CURSOR });
+      signInText.on('pointerover', () => signInText.setColor(TextColors.gold));
+      signInText.on('pointerout', () => signInText.setColor(TextColors.goldDim));
+      signInText.on('pointerdown', () => {
+        const { width, height } = this.cameras.main;
+        this.showAuthDialog(width, height);
+      });
+      container.add(signInText);
+    }
+  }
+
+  // ── Auth Dialog (Sign In / Register) ──
+
+  private showAuthDialog(width: number, height: number): void {
+    const container = this.add.container(width / 2, height / 2);
+    container.setDepth(100);
+
+    const dimmer = this.add.rectangle(0, 0, width, height, Colors.darkBg, 0.8);
+    dimmer.setInteractive();
+    container.add(dimmer);
+
+    const panelW = 520;
+    const panelH = 480;
+    const box = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.97);
+    box.setStrokeStyle(2, Colors.gold, 0.7);
+    container.add(box);
+
+    // Title
+    const titleText = this.add.text(0, -200, 'Sign In', {
+      fontFamily: FONT, fontSize: '30px', color: '#e8c55a', fontStyle: 'bold',
+    }).setOrigin(0.5);
+    container.add(titleText);
+
+    // Divider
+    const divGfx = this.add.graphics();
+    divGfx.lineStyle(1, Colors.gold, 0.3);
+    divGfx.lineBetween(-180, -170, 180, -170);
+    container.add(divGfx);
+
+    // Tab toggle: Sign In | Register
+    let mode: 'signin' | 'signup' = 'signin';
+
+    const signInTab = this.add.text(-80, -145, 'SIGN IN', {
+      fontFamily: FONT, fontSize: '16px', color: TextColors.gold, letterSpacing: 2,
+    }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
+    container.add(signInTab);
+
+    const registerTab = this.add.text(80, -145, 'REGISTER', {
+      fontFamily: FONT, fontSize: '16px', color: TextColors.muted, letterSpacing: 2,
+    }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
+    container.add(registerTab);
+
+    const tabUnderline = this.add.graphics();
+    container.add(tabUnderline);
+
+    const updateTabs = () => {
+      signInTab.setColor(mode === 'signin' ? TextColors.gold : TextColors.muted);
+      registerTab.setColor(mode === 'signup' ? TextColors.gold : TextColors.muted);
+      tabUnderline.clear();
+      tabUnderline.lineStyle(2, Colors.gold, 0.8);
+      if (mode === 'signin') {
+        tabUnderline.lineBetween(-120, -130, -40, -130);
+      } else {
+        tabUnderline.lineBetween(35, -130, 125, -130);
+      }
+      titleText.setText(mode === 'signin' ? 'Sign In' : 'Register');
+    };
+
+    signInTab.on('pointerdown', () => { mode = 'signin'; updateTabs(); });
+    registerTab.on('pointerdown', () => { mode = 'signup'; updateTabs(); });
+    updateTabs();
+
+    // DOM form inputs — positioned over the Phaser canvas
+    const formX = width / 2;
+    const formY = height / 2 - 80;
+    const formW = 360;
+    const form = createAuthFormElements(this, formX, formY, formW);
+
+    // Submit button
+    const submitBg = this.add.rectangle(0, 60, 360, 54, Colors.sceneBg, 0.9);
+    submitBg.setStrokeStyle(2, Colors.gold, 0.7);
+    submitBg.setInteractive({ cursor: POINTER_CURSOR });
+    const submitText = this.add.text(0, 60, 'Sign In', {
+      fontFamily: FONT, fontSize: '20px', color: TextColors.gold,
+    }).setOrigin(0.5);
+    container.add([submitBg, submitText]);
+
+    const updateSubmitLabel = () => {
+      submitText.setText(mode === 'signin' ? 'Sign In' : 'Create Account');
+    };
+    signInTab.on('pointerdown', updateSubmitLabel);
+    registerTab.on('pointerdown', updateSubmitLabel);
+
+    let submitting = false;
+    submitBg.on('pointerover', () => submitBg.setFillStyle(Colors.hoverBg));
+    submitBg.on('pointerout', () => submitBg.setFillStyle(Colors.sceneBg, 0.9));
+    submitBg.on('pointerdown', async () => {
+      if (submitting) return;
+      submitting = true;
+      submitText.setText('...');
+      form.errorDiv.textContent = '';
+
+      const error = await submitAuthForm(
+        form.emailInput.value,
+        form.passwordInput.value,
+        mode,
+      );
+
+      if (error) {
+        form.errorDiv.textContent = error;
+        updateSubmitLabel();
+        submitting = false;
+      } else {
+        // Success — sync cloud saves and restart
+        form.destroy();
+        container.destroy();
+        await SaveSystem.getInstance().syncFromCloud();
+        this.scene.restart();
+      }
+    });
+
+    // Google sign-in button
+    const googleBg = this.add.rectangle(0, 125, 360, 48, 0x1a1a2e, 0.8);
+    googleBg.setStrokeStyle(1, 0x6a5a3a, 0.4);
+    googleBg.setInteractive({ cursor: POINTER_CURSOR });
+    const googleText = this.add.text(0, 125, 'Continue with Google', {
+      fontFamily: FONT, fontSize: '17px', color: TextColors.light,
+    }).setOrigin(0.5);
+    container.add([googleBg, googleText]);
+
+    googleBg.on('pointerover', () => googleBg.setFillStyle(Colors.hoverBg));
+    googleBg.on('pointerout', () => googleBg.setFillStyle(0x1a1a2e, 0.8));
+    googleBg.on('pointerdown', async () => {
+      const result = await AuthManager.getInstance().signInWithGoogle();
+      if (result.error) {
+        form.errorDiv.textContent = result.error;
+      }
+      // Google OAuth redirects, so no explicit success handling needed here
+    });
+
+    // Close / Guest button
+    const closeBg = this.add.rectangle(0, 195, 200, 48, Colors.sceneBg, 0.6);
+    closeBg.setStrokeStyle(1, Colors.gold, 0.3);
+    closeBg.setInteractive({ cursor: POINTER_CURSOR });
+    const closeText = this.add.text(0, 195, 'Continue as Guest', {
+      fontFamily: FONT, fontSize: '16px', color: TextColors.goldDim,
+    }).setOrigin(0.5);
+    container.add([closeBg, closeText]);
+
+    closeBg.on('pointerover', () => closeBg.setFillStyle(Colors.hoverBg));
+    closeBg.on('pointerout', () => closeBg.setFillStyle(Colors.sceneBg, 0.6));
+    closeBg.on('pointerdown', () => {
+      form.destroy();
+      container.destroy();
+    });
+  }
+
+  // ── Save Slot Picker ──
+
+  private async showSlotPicker(width: number, height: number, intent: 'load' | 'new'): Promise<void> {
+    const save = SaveSystem.getInstance();
+    const container = this.add.container(width / 2, height / 2);
+    container.setDepth(100);
+
+    const dimmer = this.add.rectangle(0, 0, width, height, Colors.darkBg, 0.8);
+    dimmer.setInteractive();
+    container.add(dimmer);
+
+    const panelW = 700;
+    const panelH = 500;
+    const box = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.97);
+    box.setStrokeStyle(2, Colors.gold, 0.7);
+    container.add(box);
+
+    const title = intent === 'load' ? 'Select Save Slot' : 'Choose a Slot';
+    const titleText = this.add.text(0, -210, title, {
+      fontFamily: FONT, fontSize: '30px', color: '#e8c55a', fontStyle: 'bold',
+    }).setOrigin(0.5);
+    container.add(titleText);
+
+    // Divider
+    const divGfx = this.add.graphics();
+    divGfx.lineStyle(1, Colors.gold, 0.3);
+    divGfx.lineBetween(-250, -180, 250, -180);
+    container.add(divGfx);
+
+    // Loading text
+    const loadingText = this.add.text(0, 0, 'Loading saves...', {
+      fontFamily: FONT, fontSize: '18px', color: TextColors.goldDim,
+    }).setOrigin(0.5);
+    container.add(loadingText);
+
+    // Fetch slot summaries
+    let slots: SlotSummary[];
+    try {
+      slots = await save.getSlotSummaries();
+    } catch {
+      slots = [
+        { slot: 0, timestamp: 0, chapter: 0, currentRoom: '', empty: true },
+        { slot: 1, timestamp: 0, chapter: 0, currentRoom: '', empty: true },
+        { slot: 2, timestamp: 0, chapter: 0, currentRoom: '', empty: true },
+      ];
+    }
+    loadingText.destroy();
+
+    // Render slot cards
+    const cardW = 580;
+    const cardH = 100;
+    const cardGap = 16;
+    const startY = -140;
+
+    slots.forEach((slot, i) => {
+      const cardY = startY + i * (cardH + cardGap);
+      this.createSlotCard(container, 0, cardY, cardW, cardH, slot, intent, () => {
+        container.destroy();
+      });
+    });
+
+    // Close button
+    const closeBg = this.add.rectangle(0, 200, 180, 54, Colors.sceneBg, 0.9);
+    closeBg.setStrokeStyle(1, Colors.gold, 0.5);
+    closeBg.setInteractive({ cursor: POINTER_CURSOR });
+    const closeText = this.add.text(0, 200, 'Cancel', {
+      fontFamily: FONT, fontSize: '20px', color: TextColors.gold,
+    }).setOrigin(0.5);
+    closeBg.on('pointerover', () => closeBg.setFillStyle(Colors.hoverBg));
+    closeBg.on('pointerout', () => closeBg.setFillStyle(Colors.sceneBg, 0.9));
+    closeBg.on('pointerdown', () => container.destroy());
+    container.add([closeBg, closeText]);
+  }
+
+  private createSlotCard(
+    parent: Phaser.GameObjects.Container,
+    x: number, y: number, w: number, h: number,
+    slot: SlotSummary,
+    intent: 'load' | 'new',
+    onClose: () => void,
+  ): void {
+    const save = SaveSystem.getInstance();
+    const { width, height } = this.cameras.main;
+
+    const cardBg = this.add.rectangle(x, y, w, h, 0x0e0d16, 0.85);
+    cardBg.setStrokeStyle(1, slot.empty ? 0x3a3a4a : Colors.gold, slot.empty ? 0.3 : 0.5);
+    parent.add(cardBg);
+
+    // Slot number label
+    const slotLabel = this.add.text(x - w / 2 + 24, y - 14, `Slot ${slot.slot + 1}`, {
+      fontFamily: FONT, fontSize: '20px', color: TextColors.gold,
+    }).setOrigin(0, 0.5);
+    parent.add(slotLabel);
+
+    if (slot.empty) {
+      const emptyText = this.add.text(x - w / 2 + 24, y + 14, 'Empty', {
+        fontFamily: FONT, fontSize: '16px', color: TextColors.muted, fontStyle: 'italic',
+      }).setOrigin(0, 0.5);
+      parent.add(emptyText);
+
+      if (intent === 'new') {
+        // "New Game" button for empty slots
+        const newBg = this.add.rectangle(x + w / 2 - 90, y, 140, 44, Colors.sceneBg, 0.9);
+        newBg.setStrokeStyle(1, Colors.gold, 0.5);
+        newBg.setInteractive({ cursor: POINTER_CURSOR });
+        const newText = this.add.text(x + w / 2 - 90, y, 'New Game', {
+          fontFamily: FONT, fontSize: '17px', color: TextColors.gold,
+        }).setOrigin(0.5);
+        newBg.on('pointerover', () => newBg.setFillStyle(Colors.hoverBg));
+        newBg.on('pointerout', () => newBg.setFillStyle(Colors.sceneBg, 0.9));
+        newBg.on('pointerdown', () => {
+          save.setActiveSlot(slot.slot);
+          save.deleteSave();
+          onClose();
+          this.startNewGame();
+        });
+        parent.add([newBg, newText]);
+      }
+    } else {
+      // Show save details
+      const chapter = ChapterSystem.getInstance().getChapterTitle(slot.chapter);
+      const chapterText = this.add.text(x - w / 2 + 24, y + 6, chapter, {
+        fontFamily: FONT, fontSize: '15px', color: TextColors.light, fontStyle: 'italic',
+      }).setOrigin(0, 0.5);
+      parent.add(chapterText);
+
+      // Timestamp
+      const timeStr = this.formatTimestamp(slot.timestamp);
+      const timeText = this.add.text(x - w / 2 + 24, y + 28, timeStr, {
+        fontFamily: FONT, fontSize: '13px', color: TextColors.muted,
+      }).setOrigin(0, 0.5);
+      parent.add(timeText);
+
+      // Room name
+      const roomText = this.add.text(x + 60, y - 14, slot.currentRoom.replace(/_/g, ' '), {
+        fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim,
+      }).setOrigin(0, 0.5);
+      parent.add(roomText);
+
+      if (intent === 'load') {
+        // Load button
+        const loadBg = this.add.rectangle(x + w / 2 - 90, y - 12, 140, 38, Colors.sceneBg, 0.9);
+        loadBg.setStrokeStyle(1, Colors.gold, 0.6);
+        loadBg.setInteractive({ cursor: POINTER_CURSOR });
+        const loadText = this.add.text(x + w / 2 - 90, y - 12, 'Load', {
+          fontFamily: FONT, fontSize: '17px', color: TextColors.gold,
+        }).setOrigin(0.5);
+        loadBg.on('pointerover', () => loadBg.setFillStyle(Colors.hoverBg));
+        loadBg.on('pointerout', () => loadBg.setFillStyle(Colors.sceneBg, 0.9));
+        loadBg.on('pointerdown', () => {
+          save.setActiveSlot(slot.slot);
+          save.load();
+          onClose();
+          this.cameras.main.fadeOut(500, 0, 0, 0);
+          this.time.delayedCall(500, () => {
+            const roomId = save.getCurrentRoom() || 'lobby';
+            this.scene.start('RoomScene', { roomId });
+            this.scene.launch('UIScene');
+          });
+        });
+        parent.add([loadBg, loadText]);
+
+        // Delete button
+        const delBg = this.add.rectangle(x + w / 2 - 90, y + 22, 140, 32, 0x1a0a0a, 0.6);
+        delBg.setStrokeStyle(1, Colors.error, 0.3);
+        delBg.setInteractive({ cursor: POINTER_CURSOR });
+        const delText = this.add.text(x + w / 2 - 90, y + 22, 'Delete', {
+          fontFamily: FONT, fontSize: '14px', color: TextColors.error,
+        }).setOrigin(0.5);
+        delBg.on('pointerover', () => delBg.setFillStyle(0x2a0a0a, 0.8));
+        delBg.on('pointerout', () => delBg.setFillStyle(0x1a0a0a, 0.6));
+        delBg.on('pointerdown', () => {
+          this.showConfirmDialog(width, height, () => {
+            save.setActiveSlot(slot.slot);
+            save.deleteSave();
+            this.scene.restart();
+          });
+        });
+        parent.add([delBg, delText]);
+      } else {
+        // "Overwrite" button for new game on occupied slot
+        const overBg = this.add.rectangle(x + w / 2 - 90, y, 140, 44, 0x1a0a0a, 0.7);
+        overBg.setStrokeStyle(1, Colors.error, 0.4);
+        overBg.setInteractive({ cursor: POINTER_CURSOR });
+        const overText = this.add.text(x + w / 2 - 90, y, 'Overwrite', {
+          fontFamily: FONT, fontSize: '16px', color: TextColors.error,
+        }).setOrigin(0.5);
+        overBg.on('pointerover', () => overBg.setFillStyle(0x2a0a0a, 0.8));
+        overBg.on('pointerout', () => overBg.setFillStyle(0x1a0a0a, 0.7));
+        overBg.on('pointerdown', () => {
+          this.showConfirmDialog(width, height, () => {
+            save.setActiveSlot(slot.slot);
+            save.deleteSave();
+            onClose();
+            this.startNewGame();
+          });
+        });
+        parent.add([overBg, overText]);
+      }
+    }
+  }
+
+  private formatTimestamp(ts: number): string {
+    if (!ts) return '';
+    const date = new Date(ts);
+    const now = Date.now();
+    const diff = now - ts;
+
+    if (diff < 60_000) return 'Just now';
+    if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
+    if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
+    if (diff < 604_800_000) return `${Math.floor(diff / 86_400_000)}d ago`;
+
+    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   private drawDiamond(
