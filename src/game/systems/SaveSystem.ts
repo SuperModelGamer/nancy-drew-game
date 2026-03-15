@@ -25,6 +25,7 @@ export class SaveSystem {
   private journal: string[] = [];
   private flags: Record<string, boolean | string> = {};
   private discoveredRooms: Set<string> = new Set(['lobby']);
+  private listeners: Array<() => void> = [];
 
   static getInstance(): SaveSystem {
     if (!SaveSystem.instance) {
@@ -33,9 +34,23 @@ export class SaveSystem {
     return SaveSystem.instance;
   }
 
+  onChange(listener: () => void): void {
+    this.listeners.push(listener);
+  }
+
+  offChange(listener: () => void): void {
+    const idx = this.listeners.indexOf(listener);
+    if (idx !== -1) this.listeners.splice(idx, 1);
+  }
+
+  private notify(): void {
+    this.listeners.forEach(fn => fn());
+  }
+
   setCurrentRoom(roomId: string): void {
     this.currentRoom = roomId;
     this.discoveredRooms.add(roomId);
+    this.notify();
   }
 
   getCurrentRoom(): string {
@@ -74,6 +89,7 @@ export class SaveSystem {
 
   setFlag(flag: string, value: boolean | string): void {
     this.flags[flag] = value;
+    this.notify();
   }
 
   getFlag(flag: string): boolean | string {
