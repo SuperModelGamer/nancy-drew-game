@@ -500,9 +500,10 @@ export class RoomScene extends Phaser.Scene {
     switch (hotspot.type) {
       case 'inspect':
         this.showDescription(hotspot.description || 'Nothing noteworthy.');
+        // Always mark as examined so clue counter tracks it
+        SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
         if (hotspot.onceOnly) {
           this.usedHotspots.add(hotspot.id);
-          SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
           this.createHotspots();
         }
         break;
@@ -550,6 +551,17 @@ export class RoomScene extends Phaser.Scene {
           this.hideAllHotspotLabels();
           const dialogue = DialogueSystem.getInstance();
           dialogue.startDialogue(hotspot.dialogueId, this);
+          // Refresh hotspots after dialogue ends (events may unlock new hotspots)
+          const checkDialogueEnd = this.time.addEvent({
+            delay: 250,
+            loop: true,
+            callback: () => {
+              if (!dialogue.isActive()) {
+                checkDialogueEnd.destroy();
+                this.createHotspots();
+              }
+            },
+          });
         }
         break;
     }
