@@ -4,7 +4,7 @@ import { DialogueSystem } from '../systems/DialogueSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
-import { drawArtDecoFrame, drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
+import { drawDecoDivider, DecoColors } from '../utils/art-deco';
 
 interface SuspectProfile {
   id: string;
@@ -142,19 +142,16 @@ const SUSPECTS: SuspectProfile[] = [
   },
 ];
 
-// Paper dossier color palette
-const PaperColors = {
-  parchment: 0xF0E6CC,       // warm cream paper background
-  parchmentDark: 0xE8DCC0,   // slightly darker for cards
-  parchmentMid: 0xEBE0C8,    // mid-tone for alternating rows
-  headerNavy: 0x0c1525,      // dark header bar
-  ink: '#2a1a0a',             // dark ink for body text
-  inkLight: '#3a2a1a',       // slightly lighter ink
-  thoughtBlue: '#3a4a5a',    // dark blue-gray for Nancy's thoughts
-  undiscovered: '#8a7a6a',   // medium gray for undiscovered placeholders
-  sectionHeader: '#7a6a3a',  // darkened gold for section headers on paper
-  progressTrack: 0xD8CCB0,   // subtle track on paper
-};
+// Book visual constants — matching Evidence & Journal panels
+const BOOK_LEATHER = 0x3a2a1a;
+const BOOK_PAPER = 0xF5E6C8;
+const BOOK_INK = '#2a1a0a';
+const BOOK_SPINE = 0x2a1a0a;
+const BOOK_STAIN = 0x8B7355;
+const JOURNAL_FONT = "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
+const TAB_GOLD = 0xc9a84c;
+const TAB_GOLD_STR = '#c9a84c';
+const LEATHER_BORDER = 14;
 
 // Toolbar height matching UIScene
 const TOOLBAR_H = 112;
@@ -163,6 +160,10 @@ const BOTTOM_MARGIN = 12;
 export class SuspectScene extends Phaser.Scene {
   private container!: Phaser.GameObjects.Container;
   private selectedIndex = 0;
+  private scrollY = 0;
+  private maxScrollY = 0;
+  private detailContainer!: Phaser.GameObjects.Container;
+  private detailMask!: Phaser.Display.Masks.GeometryMask;
 
   constructor() {
     super({ key: 'SuspectScene' });
@@ -178,86 +179,118 @@ export class SuspectScene extends Phaser.Scene {
     this.container = this.add.container(0, 0);
     this.container.setDepth(Depths.suspectContent);
 
-    // ─── Main panel ───
+    // ─── Main panel — leather-bound book (matching Evidence & Journal) ───
     const panelW = Math.min(1650, width - 60);
-    const panelH = height - TOOLBAR_H - BOTTOM_MARGIN - 24;
+    const panelH = height - TOOLBAR_H - BOTTOM_MARGIN - 45;
     const panelX = width / 2;
-    const panelY = panelH / 2 + 12;
+    const panelY = panelH / 2 + 15;
 
-    // Background — art deco framed dossier with paper fill
     const panelLeft = panelX - panelW / 2;
     const panelTop = panelY - panelH / 2;
-    const decoFrame = drawArtDecoFrame(this, panelLeft, panelTop, panelW, panelH, {
-      color: DecoColors.gold,
-      alpha: 0.5,
-      cornerSize: 32,
-      doubleBorder: true,
-      fillColor: PaperColors.parchment,
-      fillAlpha: 0.97,
-    });
-    this.container.add(decoFrame);
 
-    // Subtle paper texture — scattered small alpha rects for grain effect
-    const texGfx = this.add.graphics();
-    for (let i = 0; i < 80; i++) {
-      const tx = panelLeft + 10 + Math.random() * (panelW - 20);
-      const ty = panelTop + 10 + Math.random() * (panelH - 20);
-      const tw = 2 + Math.random() * 6;
-      const th = 2 + Math.random() * 4;
-      texGfx.fillStyle(0x8B7355, 0.03 + Math.random() * 0.04);
-      texGfx.fillRect(tx, ty, tw, th);
-    }
-    this.container.add(texGfx);
+    // Leather-bound book background
+    const bookGfx = this.add.graphics();
+    bookGfx.fillStyle(BOOK_LEATHER, 1);
+    bookGfx.fillRoundedRect(panelLeft, panelTop, panelW, panelH, 8);
 
-    // ─── Header bar ───
-    const headerH = 64;
-    const headerY = panelY - panelH / 2 + headerH / 2;
+    const paperLeft = panelLeft + LEATHER_BORDER;
+    const paperTop = panelTop + LEATHER_BORDER;
+    const paperW = panelW - LEATHER_BORDER * 2;
+    const paperH = panelH - LEATHER_BORDER * 2;
+    bookGfx.fillStyle(BOOK_PAPER, 1);
+    bookGfx.fillRoundedRect(paperLeft, paperTop, paperW, paperH, 4);
 
-    const headerBg = this.add.rectangle(panelX, headerY, panelW - 12, headerH, PaperColors.headerNavy, 1);
+    // Spine binding
+    const spineX = panelLeft + LEATHER_BORDER + 6;
+    bookGfx.lineStyle(3, BOOK_SPINE, 0.5);
+    bookGfx.lineBetween(spineX, paperTop + 8, spineX, paperTop + paperH - 8);
+    bookGfx.lineStyle(1, BOOK_SPINE, 0.25);
+    bookGfx.lineBetween(spineX + 4, paperTop + 8, spineX + 4, paperTop + paperH - 8);
+
+    // Leather edge
+    bookGfx.lineStyle(1, 0x5a4a3a, 0.4);
+    bookGfx.strokeRoundedRect(panelLeft + 1, panelTop + 1, panelW - 2, panelH - 2, 8);
+    bookGfx.lineStyle(1, 0x1a0e08, 0.6);
+    bookGfx.strokeRoundedRect(panelLeft, panelTop, panelW, panelH, 8);
+    this.container.add(bookGfx);
+
+    // Subtle aged paper texture
+    const stainGfx = this.add.graphics();
+    stainGfx.fillStyle(BOOK_STAIN, 0.03);
+    stainGfx.fillEllipse(panelX - panelW / 4, panelY - panelH / 5, 90, 40);
+    stainGfx.fillEllipse(panelX + panelW / 3, panelY + panelH / 6, 70, 30);
+    stainGfx.fillStyle(BOOK_STAIN, 0.02);
+    stainGfx.fillEllipse(panelX + panelW / 5, panelY - panelH / 3, 60, 25);
+    this.container.add(stainGfx);
+
+    // ─── Header ───
+    const headerH = 72;
+    const headerY = panelTop + LEATHER_BORDER + headerH / 2;
+
+    const headerBg = this.add.rectangle(panelX, headerY, paperW, headerH, 0x3a2a1a, 0.15);
     this.container.add(headerBg);
 
-    // Header bottom border
-    const headerLine = this.add.graphics();
-    headerLine.lineStyle(2, DecoColors.gold, 0.5);
-    headerLine.lineBetween(panelLeft + 4, panelTop + headerH, panelLeft + panelW - 4, panelTop + headerH);
-    this.container.add(headerLine);
+    const headerLineGfx = this.add.graphics();
+    headerLineGfx.lineStyle(1.5, BOOK_LEATHER, 0.3);
+    headerLineGfx.lineBetween(paperLeft + 20, paperTop + headerH, paperLeft + paperW - 20, paperTop + headerH);
+    this.container.add(headerLineGfx);
 
-    const title = this.add.text(panelX, headerY, 'CASE FILE — SUSPECT DOSSIERS', {
-      fontFamily: FONT,
-      fontSize: '24px',
-      color: DecoTextColors.goldBright,
-      fontStyle: 'bold',
-      letterSpacing: 7,
+    const title = this.add.text(panelX, headerY, 'SUSPECT DOSSIERS', {
+      fontFamily: JOURNAL_FONT,
+      fontSize: '32px',
+      color: '#3a2a1a',
+      fontStyle: 'bold italic',
+      letterSpacing: 6,
     }).setOrigin(0.5);
     this.container.add(title);
 
-    // Decorative divider flanking title
-    const divGfxHeader = this.add.graphics();
-    drawDecoDivider(divGfxHeader, panelX, headerY, panelW * 0.6, DecoColors.gold, 0.3);
-    this.container.add(divGfxHeader);
+    // Decorative flourish
+    const flourishGfx = this.add.graphics();
+    flourishGfx.lineStyle(1, 0x3a2a1a, 0.3);
+    const flourishW = 140;
+    flourishGfx.lineBetween(panelX - flourishW, headerY + 18, panelX + flourishW, headerY + 18);
+    flourishGfx.fillStyle(0x3a2a1a, 0.4);
+    const fd = 4;
+    flourishGfx.fillPoints([
+      new Phaser.Geom.Point(panelX, headerY + 18 - fd),
+      new Phaser.Geom.Point(panelX + fd, headerY + 18),
+      new Phaser.Geom.Point(panelX, headerY + 18 + fd),
+      new Phaser.Geom.Point(panelX - fd, headerY + 18),
+    ], true);
+    this.container.add(flourishGfx);
 
     // Close button
-    const closeBtn = createCloseButton(this, panelX + panelW / 2 - 33, headerY, () => this.scene.stop(), 120);
+    const closeBtn = createCloseButton(this, panelLeft + panelW - LEATHER_BORDER - 30, headerY, () => this.scene.stop(), 120);
     closeBtn.setDepth(Depths.suspectContent);
 
-    // ─── Suspect tabs (horizontal strip below header) ───
-    const tabStripY = headerY + headerH / 2 + 68;
-    const tabW = 285;
-    const tabH = 100;
-    const tabGap = 18;
-    const totalTabsW = SUSPECTS.length * tabW + (SUSPECTS.length - 1) * tabGap;
-    const tabStartX = panelX - totalTabsW / 2 + tabW / 2;
+    // ─── Content area ───
+    const contentTop = paperTop + headerH + 18;
+    const contentBottom = panelTop + panelH - LEATHER_BORDER - 18;
 
     const save = SaveSystem.getInstance();
     const dialogue = DialogueSystem.getInstance();
 
-    // If selected suspect hasn't been met, fall back to the first met suspect
     const isMet = (s: SuspectProfile) =>
       save.getFlag(s.metFlag) || dialogue.hasTriggeredEvent(s.metFlag);
+
+    // Default to the suspect being talked to, or first met suspect
+    const currentDialogueSuspect = this.registry.get('currentDialogueSuspect') as string | undefined;
+    if (currentDialogueSuspect) {
+      const idx = SUSPECTS.findIndex(s => s.id === currentDialogueSuspect);
+      if (idx >= 0 && isMet(SUSPECTS[idx])) this.selectedIndex = idx;
+    }
     if (!isMet(SUSPECTS[this.selectedIndex])) {
       const firstMet = SUSPECTS.findIndex(s => isMet(s));
       this.selectedIndex = firstMet >= 0 ? firstMet : 0;
     }
+
+    // ─── Suspect tabs — row of name tabs like book page markers ───
+    const tabStripY = contentTop + 28;
+    const tabW = Math.min(220, (paperW - 60) / SUSPECTS.length - 10);
+    const tabH = 70;
+    const tabGap = 10;
+    const totalTabsW = SUSPECTS.length * tabW + (SUSPECTS.length - 1) * tabGap;
+    const tabStartX = panelX - totalTabsW / 2 + tabW / 2;
 
     SUSPECTS.forEach((suspect, i) => {
       const tx = tabStartX + i * (tabW + tabGap);
@@ -265,67 +298,56 @@ export class SuspectScene extends Phaser.Scene {
       const met = isMet(suspect);
       const colorHex = `#${suspect.color.toString(16).padStart(6, '0')}`;
 
-      // Tab card — parchment-colored on paper
+      // Tab background — like a page tab
       const tabBg = this.add.rectangle(tx, tabStripY, tabW, tabH,
-        isSelected ? PaperColors.parchmentDark : PaperColors.parchmentMid,
-        isSelected ? 1 : 0.9);
-      tabBg.setStrokeStyle(isSelected ? 3 : 1,
+        isSelected ? 0x3a2a1a : BOOK_PAPER,
+        isSelected ? 0.12 : 0.01);
+      tabBg.setStrokeStyle(isSelected ? 2 : 1,
         met ? suspect.color : 0x8a7a6a,
-        isSelected ? 0.8 : 0.3);
+        isSelected ? 0.7 : 0.25);
 
-      // Bottom accent bar when selected
-      if (isSelected) {
-        const accent = this.add.rectangle(tx, tabStripY + tabH / 2 - 3, tabW, 5, suspect.color, 0.9);
+      // Bottom accent when selected
+      if (isSelected && met) {
+        const accent = this.add.rectangle(tx, tabStripY + tabH / 2 - 2, tabW, 4, suspect.color, 0.8);
         this.container.add(accent);
       }
 
-      // Portrait icon
-      const portraitX = tx - tabW / 2 + 40;
-      const portraitSize = 64;
+      // Portrait icon or lock
       if (met) {
         const portraitKey = `portrait_${suspect.id}`;
         if (this.textures.exists(portraitKey)) {
-          const portrait = this.add.image(portraitX, tabStripY, portraitKey);
-          portrait.setDisplaySize(portraitSize, portraitSize);
+          const portrait = this.add.image(tx - tabW / 2 + 28, tabStripY, portraitKey);
+          portrait.setDisplaySize(44, 44);
           const maskGfx = this.make.graphics({});
-          maskGfx.fillCircle(portraitX, tabStripY, portraitSize / 2);
+          maskGfx.fillCircle(tx - tabW / 2 + 28, tabStripY, 22);
           portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
           this.container.add(portrait);
         } else {
-          const circle = this.add.ellipse(portraitX, tabStripY, portraitSize, portraitSize, suspect.color, 0.15);
-          const letter = this.add.text(portraitX, tabStripY, suspect.icon, {
-            fontFamily: FONT, fontSize: '30px', color: colorHex, fontStyle: 'bold',
+          const circle = this.add.ellipse(tx - tabW / 2 + 28, tabStripY, 44, 44, suspect.color, 0.15);
+          const letter = this.add.text(tx - tabW / 2 + 28, tabStripY, suspect.icon, {
+            fontFamily: JOURNAL_FONT, fontSize: '24px', color: colorHex, fontStyle: 'bold',
           }).setOrigin(0.5);
           this.container.add([circle, letter]);
         }
         tabBg.setInteractive({ cursor: POINTER_CURSOR });
       } else {
-        // Locked silhouette
-        const circle = this.add.ellipse(portraitX, tabStripY, portraitSize, portraitSize, 0x8a7a6a, 0.15);
-        const lock = this.add.text(portraitX, tabStripY, '🔒', {
-          fontSize: '28px',
+        const circle = this.add.ellipse(tx - tabW / 2 + 28, tabStripY, 44, 44, 0x8a7a6a, 0.1);
+        const lock = this.add.text(tx - tabW / 2 + 28, tabStripY, '🔒', {
+          fontSize: '22px',
         }).setOrigin(0.5);
         this.container.add([circle, lock]);
       }
 
-      // Name / ???
+      // Name
       const firstName = met ? suspect.name.split(' ')[0] : '???';
-      const nameText = this.add.text(tx + 4, tabStripY - 12, firstName, {
-        fontFamily: FONT,
-        fontSize: '24px',
-        color: met ? (isSelected ? PaperColors.ink : '#4a3a2a') : PaperColors.undiscovered,
+      const nameText = this.add.text(tx + 10, tabStripY - 2, firstName, {
+        fontFamily: JOURNAL_FONT,
+        fontSize: '22px',
+        color: met ? (isSelected ? BOOK_INK : '#4a3a2a') : '#8a7a6a',
         fontStyle: isSelected ? 'bold' : 'normal',
       }).setOrigin(0.5, 0.5);
 
-      // Role / Unknown
-      const roleText = this.add.text(tx + 4, tabStripY + 18, met ? suspect.role : 'Unknown', {
-        fontFamily: FONT,
-        fontSize: '17px',
-        color: met ? (isSelected ? '#5a4a3a' : '#7a6a5a') : PaperColors.undiscovered,
-        fontStyle: 'italic',
-      }).setOrigin(0.5, 0.5);
-
-      this.container.add([tabBg, nameText, roleText]);
+      this.container.add([tabBg, nameText]);
 
       if (met) {
         tabBg.on('pointerdown', () => {
@@ -333,29 +355,34 @@ export class SuspectScene extends Phaser.Scene {
           this.scene.restart();
         });
         tabBg.on('pointerover', () => {
-          if (i !== this.selectedIndex) tabBg.setFillStyle(PaperColors.parchmentDark, 0.95);
+          if (i !== this.selectedIndex) tabBg.setFillStyle(0x3a2a1a, 0.08);
         });
         tabBg.on('pointerout', () => {
-          if (i !== this.selectedIndex) tabBg.setFillStyle(PaperColors.parchmentMid, 0.9);
+          if (i !== this.selectedIndex) tabBg.setFillStyle(BOOK_PAPER, 0.01);
         });
       }
     });
 
     // ─── Detail area (below tabs) ───
-    const detailTop = tabStripY + tabH / 2 + 18;
-    const detailBottom = panelY + panelH / 2 - 21;
+    const detailTop = tabStripY + tabH / 2 + 14;
+    const detailBottom = contentBottom;
     const detailH = detailBottom - detailTop;
-    const detailW = panelW - 90;
+    const detailW = paperW - 50;
     const detailCenterX = panelX;
-    const detailCenterY = detailTop + detailH / 2;
+
+    // Thin divider below tabs
+    const tabDivGfx = this.add.graphics();
+    tabDivGfx.lineStyle(1, BOOK_LEATHER, 0.2);
+    tabDivGfx.lineBetween(paperLeft + 30, detailTop, paperLeft + paperW - 30, detailTop);
+    this.container.add(tabDivGfx);
 
     if (isMet(SUSPECTS[this.selectedIndex])) {
-      this.showSuspectDetail(SUSPECTS[this.selectedIndex], detailCenterX, detailCenterY, detailW, detailH);
+      this.showSuspectDetail(SUSPECTS[this.selectedIndex], detailCenterX, detailTop, detailW, detailH, paperLeft, paperW);
     } else {
-      // No suspects met yet — show placeholder
-      const placeholder = this.add.text(detailCenterX, detailCenterY, 'Talk to people in the theater\nto learn about suspects.', {
-        fontFamily: FONT, fontSize: '26px', color: PaperColors.undiscovered,
-        fontStyle: 'italic', align: 'center', lineSpacing: 8,
+      const placeholder = this.add.text(detailCenterX, detailTop + detailH / 2,
+        'Talk to people in the theater\nto learn about suspects.', {
+        fontFamily: JOURNAL_FONT, fontSize: '28px', color: '#6a5a4a',
+        fontStyle: 'italic', align: 'center', lineSpacing: 10,
       }).setOrigin(0.5);
       this.container.add(placeholder);
     }
@@ -367,149 +394,163 @@ export class SuspectScene extends Phaser.Scene {
 
   private showSuspectDetail(
     suspect: SuspectProfile,
-    cx: number, cy: number, dw: number, dh: number,
+    cx: number, detailTop: number, dw: number, dh: number,
+    paperLeft: number, paperW: number,
   ): void {
     const colorHex = `#${suspect.color.toString(16).padStart(6, '0')}`;
     const save = SaveSystem.getInstance();
     const dialogue = DialogueSystem.getInstance();
 
-    // ── Left column: portrait + info card ──
-    const leftW = 420;
+    // ── Left column: portrait + info ──
+    const leftW = 380;
     const leftX = cx - dw / 2;
+    const leftCx = leftX + leftW / 2;
+    const detailBottom = detailTop + dh;
 
-    // Portrait card background — darker parchment card
-    const cardH = Math.min(dh - 15, 720);
-    const cardY = cy;
-    const cardBg = this.add.rectangle(leftX + leftW / 2, cardY, leftW, cardH, PaperColors.parchmentDark, 0.8);
-    cardBg.setStrokeStyle(2, DecoColors.gold, 0.3);
+    // Portrait card — subtle tinted area
+    const cardTop = detailTop + 16;
+    const cardH = Math.min(dh - 30, 620);
+    const cardCy = cardTop + cardH / 2;
+
+    const cardBg = this.add.rectangle(leftCx, cardCy, leftW, cardH, 0x3a2a1a, 0.05);
+    cardBg.setStrokeStyle(1, BOOK_LEATHER, 0.15);
     this.container.add(cardBg);
 
     // Large portrait
-    const portraitSize = 240;
-    const portraitY = cardY - cardH / 2 + 30 + portraitSize / 2;
-    const portraitX = leftX + leftW / 2;
+    const portraitSize = 200;
+    const portraitY = cardTop + 24 + portraitSize / 2;
     const portraitKey = `portrait_${suspect.id}`;
 
     if (this.textures.exists(portraitKey)) {
-      const portrait = this.add.image(portraitX, portraitY, portraitKey);
+      const portrait = this.add.image(leftCx, portraitY, portraitKey);
       portrait.setDisplaySize(portraitSize, portraitSize);
       const maskGfx = this.make.graphics({});
       maskGfx.fillRoundedRect(
-        portraitX - portraitSize / 2, portraitY - portraitSize / 2,
-        portraitSize, portraitSize, 15
+        leftCx - portraitSize / 2, portraitY - portraitSize / 2,
+        portraitSize, portraitSize, 12
       );
       portrait.setMask(new Phaser.Display.Masks.GeometryMask(this, maskGfx));
       this.container.add(portrait);
 
-      // Portrait frame
+      // Portrait frame — subtle suspect color border
       const frame = this.add.graphics();
-      frame.lineStyle(3, suspect.color, 0.5);
+      frame.lineStyle(2, suspect.color, 0.4);
       frame.strokeRoundedRect(
-        portraitX - portraitSize / 2, portraitY - portraitSize / 2,
-        portraitSize, portraitSize, 15
+        leftCx - portraitSize / 2, portraitY - portraitSize / 2,
+        portraitSize, portraitSize, 12
       );
       this.container.add(frame);
     } else {
-      // Fallback icon
-      const iconBg = this.add.rectangle(portraitX, portraitY, portraitSize, portraitSize, suspect.color, 0.1);
-      iconBg.setStrokeStyle(2, suspect.color, 0.3);
-      const iconText = this.add.text(portraitX, portraitY, suspect.icon, {
-        fontFamily: FONT, fontSize: '90px', color: colorHex, fontStyle: 'bold',
+      const iconBg = this.add.rectangle(leftCx, portraitY, portraitSize, portraitSize, suspect.color, 0.08);
+      iconBg.setStrokeStyle(2, suspect.color, 0.25);
+      const iconText = this.add.text(leftCx, portraitY, suspect.icon, {
+        fontFamily: JOURNAL_FONT, fontSize: '80px', color: colorHex, fontStyle: 'bold',
       }).setOrigin(0.5);
       this.container.add([iconBg, iconText]);
     }
 
-    // Name (below portrait)
-    const nameY = portraitY + portraitSize / 2 + 30;
-    this.container.add(this.add.text(portraitX, nameY, suspect.name, {
-      fontFamily: FONT,
-      fontSize: '36px',
-      color: PaperColors.ink,
+    // Name
+    const nameY = portraitY + portraitSize / 2 + 26;
+    this.container.add(this.add.text(leftCx, nameY, suspect.name, {
+      fontFamily: JOURNAL_FONT,
+      fontSize: '32px',
+      color: BOOK_INK,
       fontStyle: 'bold',
       align: 'center',
     }).setOrigin(0.5));
 
     // Role
-    this.container.add(this.add.text(portraitX, nameY + 45, suspect.role, {
-      fontFamily: FONT,
+    this.container.add(this.add.text(leftCx, nameY + 40, suspect.role, {
+      fontFamily: JOURNAL_FONT,
       fontSize: '24px',
       color: '#5a4a3a',
       fontStyle: 'italic',
     }).setOrigin(0.5));
 
-    // Info chips
-    const chipStartY = nameY + 96;
-    const chips = [
-      { label: `Age: ${suspect.age}`, icon: '◈' },
-      { label: suspect.location, icon: '◉' },
-    ];
-    chips.forEach((chip, i) => {
-      const chipY = chipStartY + i * 50;
-      const chipBg = this.add.rectangle(portraitX, chipY, 300, 40, suspect.color, 0.1);
-      chipBg.setStrokeStyle(1, suspect.color, 0.25);
-      this.container.add(chipBg);
-      const chipLabel = this.add.text(portraitX, chipY, `${chip.icon}  ${chip.label}`, {
-        fontFamily: FONT, fontSize: '24px', color: PaperColors.inkLight,
-      }).setOrigin(0.5);
-      this.container.add(chipLabel);
-    });
+    // Info line — age & location
+    const infoY = nameY + 80;
+    this.container.add(this.add.text(leftCx, infoY, `Age: ${suspect.age}  ·  ${suspect.location}`, {
+      fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#5a4a3a',
+    }).setOrigin(0.5));
 
-    // Discovery count
+    // Discovery progress
     const discovered = suspect.facts.filter(f =>
       !f.requiresFlag || save.getFlag(f.requiresFlag) || dialogue.hasTriggeredEvent(f.requiresFlag)
     ).length;
     const total = suspect.facts.length;
 
-    const progressY = chipStartY + 130;
-    const progressW = 300;
-    const progressH = 10;
+    const progressY = infoY + 50;
+    const progressW = 260;
+    const progressH = 8;
 
-    const trackBg = this.add.rectangle(portraitX, progressY, progressW, progressH, PaperColors.progressTrack, 1);
-    trackBg.setStrokeStyle(1, DecoColors.goldDim, 0.3);
+    const trackBg = this.add.rectangle(leftCx, progressY, progressW, progressH, 0xD8CCB0, 1);
+    trackBg.setStrokeStyle(1, BOOK_LEATHER, 0.2);
     this.container.add(trackBg);
 
     const pct = discovered / total;
     if (pct > 0) {
       const fill = this.add.rectangle(
-        portraitX - progressW / 2 + (progressW * pct) / 2, progressY,
-        progressW * pct, progressH, suspect.color, 0.8
+        leftCx - progressW / 2 + (progressW * pct) / 2, progressY,
+        progressW * pct, progressH, suspect.color, 0.7
       );
       this.container.add(fill);
     }
 
-    this.container.add(this.add.text(portraitX, progressY + 24, `${discovered} / ${total} facts discovered`, {
-      fontFamily: FONT, fontSize: '22px', color: '#6a5a4a', fontStyle: 'italic',
+    this.container.add(this.add.text(leftCx, progressY + 22, `${discovered} / ${total} facts discovered`, {
+      fontFamily: JOURNAL_FONT, fontSize: '20px', color: '#6a5a4a', fontStyle: 'italic',
     }).setOrigin(0.5));
 
-    // ── Right column: Known Facts ──
-    const rightX = leftX + leftW + 36;
-    const rightW = dw - leftW - 36;
+    // ── Right column: Known Facts + Thoughts (scrollable) ──
+    const rightX = leftX + leftW + 30;
+    const rightW = dw - leftW - 30;
     const rightCx = rightX + rightW / 2;
 
-    // Facts panel background — darker parchment card
+    // Facts panel background
+    const factsPanelTop = detailTop + 16;
     const factsPanelH = cardH;
-    const factsBg = this.add.rectangle(rightCx, cy, rightW, factsPanelH, PaperColors.parchmentDark, 0.6);
-    factsBg.setStrokeStyle(2, DecoColors.gold, 0.3);
+    const factsCy = factsPanelTop + factsPanelH / 2;
+
+    const factsBg = this.add.rectangle(rightCx, factsCy, rightW, factsPanelH, 0x3a2a1a, 0.04);
+    factsBg.setStrokeStyle(1, BOOK_LEATHER, 0.12);
     this.container.add(factsBg);
 
-    // Section header
-    const factsHeaderY = cy - factsPanelH / 2 + 36;
-    this.container.add(this.add.text(rightX + 30, factsHeaderY, 'KNOWN FACTS', {
-      fontFamily: FONT,
+    // Create scrollable detail container
+    this.detailContainer = this.add.container(0, 0);
+    this.detailContainer.setDepth(Depths.suspectContent);
+
+    // Mask for scrolling
+    const maskShape = this.make.graphics({});
+    maskShape.fillRect(rightX, factsPanelTop + 4, rightW, factsPanelH - 8);
+    this.detailMask = new Phaser.Display.Masks.GeometryMask(this, maskShape);
+    this.detailContainer.setMask(this.detailMask);
+
+    // Section header — KNOWN FACTS
+    let y = factsPanelTop + 30;
+    this.detailContainer.add(this.add.text(rightX + 28, y, 'KNOWN FACTS', {
+      fontFamily: JOURNAL_FONT,
       fontSize: '24px',
-      color: PaperColors.sectionHeader,
+      color: '#5a4a3a',
       fontStyle: 'bold',
-      letterSpacing: 5,
+      letterSpacing: 4,
     }));
 
-    // Divider under header (art deco) — thicker, more visible gold
+    // Divider
     const divGfx = this.add.graphics();
-    drawDecoDivider(divGfx, rightCx, factsHeaderY + 36, rightW - 60, DecoColors.gold, 0.4);
-    this.container.add(divGfx);
+    divGfx.lineStyle(1, BOOK_LEATHER, 0.3);
+    divGfx.lineBetween(rightX + 28, y + 36, rightX + rightW - 28, y + 36);
+    divGfx.fillStyle(BOOK_LEATHER, 0.4);
+    const dmd = 3;
+    const dmx = rightCx;
+    divGfx.fillPoints([
+      new Phaser.Geom.Point(dmx, y + 36 - dmd),
+      new Phaser.Geom.Point(dmx + dmd, y + 36),
+      new Phaser.Geom.Point(dmx, y + 36 + dmd),
+      new Phaser.Geom.Point(dmx - dmd, y + 36),
+    ], true);
+    this.detailContainer.add(divGfx);
 
-    // Facts list
-    let y = factsHeaderY + 66;
-    const factMaxW = rightW - 90;
+    y += 54;
+    const factMaxW = rightW - 80;
 
     suspect.facts.forEach((fact, idx) => {
       const unlocked = !fact.requiresFlag ||
@@ -518,85 +559,109 @@ export class SuspectScene extends Phaser.Scene {
 
       // Alternating subtle row tint
       if (idx % 2 === 0) {
-        const rowBg = this.add.rectangle(rightCx, y + 18, rightW - 30, 60, 0x8B7355, 0.06);
-        this.container.add(rowBg);
+        const rowBg = this.add.rectangle(rightCx, y + 16, rightW - 24, 52, BOOK_STAIN, 0.04);
+        this.detailContainer.add(rowBg);
       }
 
-      // Bullet — dark ink for readability
+      // Bullet
       const bullet = unlocked ? '◆' : '◇';
-      const bulletColor = unlocked ? PaperColors.ink : PaperColors.undiscovered;
-      this.container.add(this.add.text(rightX + 36, y, bullet, {
-        fontFamily: FONT, fontSize: '26px', color: bulletColor,
+      const bulletColor = unlocked ? BOOK_INK : '#8a7a6a';
+      this.detailContainer.add(this.add.text(rightX + 32, y, bullet, {
+        fontFamily: JOURNAL_FONT, fontSize: '22px', color: bulletColor,
       }));
 
       // Fact text
       const displayText = unlocked ? fact.text : '— Undiscovered —';
-      const factText = this.add.text(rightX + 72, y, displayText, {
-        fontFamily: FONT,
-        fontSize: '26px',
-        color: unlocked ? PaperColors.ink : PaperColors.undiscovered,
+      const factText = this.add.text(rightX + 62, y, displayText, {
+        fontFamily: JOURNAL_FONT,
+        fontSize: '24px',
+        color: unlocked ? BOOK_INK : '#8a7a6a',
         fontStyle: unlocked ? 'normal' : 'italic',
         wordWrap: { width: factMaxW },
-        lineSpacing: 4,
+        lineSpacing: 5,
       });
-      this.container.add(factText);
+      this.detailContainer.add(factText);
 
-      y += Math.max(factText.height + 24, 60);
+      y += Math.max(factText.height + 20, 52);
     });
 
-    // ── Nancy's Inner Monologue ──
+    // ── Nancy's Thoughts ──
     const unlockedThoughts = suspect.thoughts.filter(t =>
       !t.requiresFlag || save.getFlag(t.requiresFlag) || dialogue.hasTriggeredEvent(t.requiresFlag)
     );
 
     if (unlockedThoughts.length > 0) {
-      y += 18;
+      y += 16;
 
-      // Divider — thicker gold
+      // Divider
       const thoughtDivGfx = this.add.graphics();
-      drawDecoDivider(thoughtDivGfx, rightCx, y, rightW - 90, DecoColors.gold, 0.35);
-      this.container.add(thoughtDivGfx);
-      y += 30;
+      thoughtDivGfx.lineStyle(1, BOOK_LEATHER, 0.25);
+      thoughtDivGfx.lineBetween(rightX + 40, y, rightX + rightW - 40, y);
+      this.detailContainer.add(thoughtDivGfx);
+      y += 24;
 
       // Section header
-      this.container.add(this.add.text(rightX + 30, y, 'NANCY\'S THOUGHTS', {
-        fontFamily: FONT,
-        fontSize: '24px',
-        color: PaperColors.sectionHeader,
+      this.detailContainer.add(this.add.text(rightX + 28, y, "NANCY'S THOUGHTS", {
+        fontFamily: JOURNAL_FONT,
+        fontSize: '22px',
+        color: '#5a4a3a',
         fontStyle: 'bold italic',
-        letterSpacing: 4,
+        letterSpacing: 3,
       }));
-      y += 48;
+      y += 42;
 
-      // Show the most recent unlocked thought (last in array = most progression)
+      // Most recent thought
       const latestThought = unlockedThoughts[unlockedThoughts.length - 1];
-      const thoughtText = this.add.text(rightX + 36, y, latestThought.text, {
-        fontFamily: FONT,
+      const thoughtText = this.add.text(rightX + 32, y, latestThought.text, {
+        fontFamily: JOURNAL_FONT,
         fontSize: '24px',
-        color: PaperColors.thoughtBlue,
+        color: '#3a4a5a',
         fontStyle: 'italic',
         wordWrap: { width: factMaxW },
         lineSpacing: 6,
       });
-      this.container.add(thoughtText);
-      y += thoughtText.height + 16;
+      this.detailContainer.add(thoughtText);
+      y += thoughtText.height + 14;
 
-      // If there are earlier thoughts, show them slightly lighter
+      // Earlier thoughts — slightly lighter
       if (unlockedThoughts.length > 1) {
         for (let ti = unlockedThoughts.length - 2; ti >= 0; ti--) {
           const olderThought = unlockedThoughts[ti];
-          const olderText = this.add.text(rightX + 36, y, olderThought.text, {
-            fontFamily: FONT,
-            fontSize: '21px',
+          const olderText = this.add.text(rightX + 32, y, olderThought.text, {
+            fontFamily: JOURNAL_FONT,
+            fontSize: '22px',
             color: '#5a6a7a',
             fontStyle: 'italic',
             wordWrap: { width: factMaxW },
             lineSpacing: 5,
           });
-          this.container.add(olderText);
-          y += olderText.height + 12;
+          this.detailContainer.add(olderText);
+          y += olderText.height + 10;
         }
       }
+    }
+
+    // Calculate scroll bounds
+    const contentEndY = y + 20;
+    const visibleH = factsPanelH - 8;
+    this.maxScrollY = Math.max(0, contentEndY - factsPanelTop - visibleH);
+    this.scrollY = 0;
+
+    // Scroll input
+    if (this.maxScrollY > 0) {
+      // Scroll indicator
+      const scrollHint = this.add.text(rightX + rightW - 36, factsPanelTop + factsPanelH - 20, '▼', {
+        fontFamily: JOURNAL_FONT, fontSize: '18px', color: '#8a7a6a',
+      }).setOrigin(0.5);
+      this.container.add(scrollHint);
+      this.tweens.add({
+        targets: scrollHint, alpha: 0.3, duration: 1000, yoyo: true, repeat: -1,
+      });
+
+      this.input.on('wheel', (_pointer: Phaser.Input.Pointer, _go: Phaser.GameObjects.GameObject[], _dx: number, dy: number) => {
+        this.scrollY = Phaser.Math.Clamp(this.scrollY + dy * 0.5, 0, this.maxScrollY);
+        this.detailContainer.setY(-this.scrollY);
+      });
     }
   }
 }

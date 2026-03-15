@@ -852,6 +852,11 @@ export class DialogueSystem {
     });
   }
 
+  /** Returns the last NPC speaker name (for defaulting suspect dossier tab). */
+  getLastSpeaker(): string {
+    return this.lastSpeaker;
+  }
+
   // ─── Speaker Data ─────────────────────────────────────────────────────────
 
   private getSpeakerPortraitKey(speaker: string): string | null {
