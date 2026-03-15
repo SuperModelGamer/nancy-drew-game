@@ -271,7 +271,7 @@ export class UIScene extends Phaser.Scene {
     y += 28;
 
     // ── ITEMS (per-room) ──
-    this.add.text(contentX, y, 'ITEMS', {
+    this.add.text(contentX, y, 'ITEMS IN ROOM', {
       fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue,
       letterSpacing: 4, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
@@ -320,7 +320,7 @@ export class UIScene extends Phaser.Scene {
     y += 22;
 
     // ── CLUES (global) ──
-    this.add.text(contentX, y, 'CLUES', {
+    this.add.text(contentX, y, 'CLUES TOTAL', {
       fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue,
       letterSpacing: 4, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
