@@ -1001,7 +1001,7 @@ export class UIScene extends Phaser.Scene {
 
     const iconKey = `item_icon_${itemId}`;
     if (this.textures.exists(iconKey)) {
-      const imgMaxSize = Math.min(rightW - 60, 220);
+      const imgMaxSize = Math.min(rightW - 60, 280);
       if (this.detailImage) {
         this.detailImage.setTexture(iconKey);
         this.detailImage.setPosition(detailCenterX, descY + 20);
@@ -1151,7 +1151,7 @@ export class UIScene extends Phaser.Scene {
 
     const entryLeft = marginX + 18;
     const entryTextW = usableW - 90;
-    const fontSize = 26;
+    const fontSize = 28;
     const entryGap = 14; // gap between entries
 
     // Flow entries naturally from the top — no artificial even spacing
@@ -1182,13 +1182,13 @@ export class UIScene extends Phaser.Scene {
     const navY = contentBottom - 18;
 
     const pageText = this.add.text(panelX, navY, `— page ${this.journalPage + 1} of ${totalPages} —`, {
-      fontFamily: JOURNAL_FONT, fontSize: '20px', color: '#7a6a5a', fontStyle: 'italic',
+      fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#7a6a5a', fontStyle: 'italic',
     }).setOrigin(0.5);
     this.journalContent.add(pageText);
 
     if (this.journalPage > 0) {
       const prevBtn = this.add.text(contentLeft + 20, navY, '◀  Previous', {
-        fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#5a3a2a', fontStyle: 'bold',
+        fontFamily: JOURNAL_FONT, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
       }).setOrigin(0, 0.5);
       prevBtn.setInteractive({ cursor: POINTER_CURSOR });
       prevBtn.on('pointerover', () => prevBtn.setColor(TAB_GOLD_STR));
@@ -1199,7 +1199,7 @@ export class UIScene extends Phaser.Scene {
 
     if (this.journalPage < totalPages - 1) {
       const nextBtn = this.add.text(contentRight - 20, navY, 'Next  ▶', {
-        fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#5a3a2a', fontStyle: 'bold',
+        fontFamily: JOURNAL_FONT, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
       }).setOrigin(1, 0.5);
       nextBtn.setInteractive({ cursor: POINTER_CURSOR });
       nextBtn.on('pointerover', () => nextBtn.setColor(TAB_GOLD_STR));

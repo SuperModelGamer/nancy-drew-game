@@ -417,7 +417,7 @@ export class SuspectScene extends Phaser.Scene {
     this.container.add(cardBg);
 
     // Large portrait
-    const portraitSize = 200;
+    const portraitSize = 280;
     const portraitY = cardTop + 24 + portraitSize / 2;
     const portraitKey = `portrait_${suspect.id}`;
 
@@ -444,7 +444,7 @@ export class SuspectScene extends Phaser.Scene {
       const iconBg = this.add.rectangle(leftCx, portraitY, portraitSize, portraitSize, suspect.color, 0.08);
       iconBg.setStrokeStyle(2, suspect.color, 0.25);
       const iconText = this.add.text(leftCx, portraitY, suspect.icon, {
-        fontFamily: JOURNAL_FONT, fontSize: '80px', color: colorHex, fontStyle: 'bold',
+        fontFamily: JOURNAL_FONT, fontSize: '100px', color: colorHex, fontStyle: 'bold',
       }).setOrigin(0.5);
       this.container.add([iconBg, iconText]);
     }
@@ -453,24 +453,24 @@ export class SuspectScene extends Phaser.Scene {
     const nameY = portraitY + portraitSize / 2 + 26;
     this.container.add(this.add.text(leftCx, nameY, suspect.name, {
       fontFamily: JOURNAL_FONT,
-      fontSize: '32px',
+      fontSize: '36px',
       color: BOOK_INK,
       fontStyle: 'bold',
       align: 'center',
     }).setOrigin(0.5));
 
     // Role
-    this.container.add(this.add.text(leftCx, nameY + 40, suspect.role, {
+    this.container.add(this.add.text(leftCx, nameY + 44, suspect.role, {
       fontFamily: JOURNAL_FONT,
-      fontSize: '24px',
+      fontSize: '26px',
       color: '#5a4a3a',
       fontStyle: 'italic',
     }).setOrigin(0.5));
 
     // Info line — age & location
-    const infoY = nameY + 80;
+    const infoY = nameY + 86;
     this.container.add(this.add.text(leftCx, infoY, `Age: ${suspect.age}  ·  ${suspect.location}`, {
-      fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#5a4a3a',
+      fontFamily: JOURNAL_FONT, fontSize: '24px', color: '#5a4a3a',
     }).setOrigin(0.5));
 
     // Discovery progress
@@ -497,7 +497,7 @@ export class SuspectScene extends Phaser.Scene {
     }
 
     this.container.add(this.add.text(leftCx, progressY + 22, `${discovered} / ${total} facts discovered`, {
-      fontFamily: JOURNAL_FONT, fontSize: '20px', color: '#6a5a4a', fontStyle: 'italic',
+      fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#6a5a4a', fontStyle: 'italic',
     }).setOrigin(0.5));
 
     // ── Right column: Known Facts + Thoughts (scrollable) ──
@@ -528,7 +528,7 @@ export class SuspectScene extends Phaser.Scene {
     let y = factsPanelTop + 30;
     this.detailContainer.add(this.add.text(rightX + 28, y, 'KNOWN FACTS', {
       fontFamily: JOURNAL_FONT,
-      fontSize: '24px',
+      fontSize: '26px',
       color: '#5a4a3a',
       fontStyle: 'bold',
       letterSpacing: 4,
@@ -567,14 +567,14 @@ export class SuspectScene extends Phaser.Scene {
       const bullet = unlocked ? '◆' : '◇';
       const bulletColor = unlocked ? BOOK_INK : '#8a7a6a';
       this.detailContainer.add(this.add.text(rightX + 32, y, bullet, {
-        fontFamily: JOURNAL_FONT, fontSize: '22px', color: bulletColor,
+        fontFamily: JOURNAL_FONT, fontSize: '26px', color: bulletColor,
       }));
 
       // Fact text
       const displayText = unlocked ? fact.text : '— Undiscovered —';
       const factText = this.add.text(rightX + 62, y, displayText, {
         fontFamily: JOURNAL_FONT,
-        fontSize: '24px',
+        fontSize: '26px',
         color: unlocked ? BOOK_INK : '#8a7a6a',
         fontStyle: unlocked ? 'normal' : 'italic',
         wordWrap: { width: factMaxW },
@@ -603,7 +603,7 @@ export class SuspectScene extends Phaser.Scene {
       // Section header
       this.detailContainer.add(this.add.text(rightX + 28, y, "NANCY'S THOUGHTS", {
         fontFamily: JOURNAL_FONT,
-        fontSize: '22px',
+        fontSize: '24px',
         color: '#5a4a3a',
         fontStyle: 'bold italic',
         letterSpacing: 3,
@@ -614,11 +614,11 @@ export class SuspectScene extends Phaser.Scene {
       const latestThought = unlockedThoughts[unlockedThoughts.length - 1];
       const thoughtText = this.add.text(rightX + 32, y, latestThought.text, {
         fontFamily: JOURNAL_FONT,
-        fontSize: '24px',
+        fontSize: '26px',
         color: '#3a4a5a',
         fontStyle: 'italic',
         wordWrap: { width: factMaxW },
-        lineSpacing: 6,
+        lineSpacing: 7,
       });
       this.detailContainer.add(thoughtText);
       y += thoughtText.height + 14;
@@ -629,11 +629,11 @@ export class SuspectScene extends Phaser.Scene {
           const olderThought = unlockedThoughts[ti];
           const olderText = this.add.text(rightX + 32, y, olderThought.text, {
             fontFamily: JOURNAL_FONT,
-            fontSize: '22px',
+            fontSize: '24px',
             color: '#5a6a7a',
             fontStyle: 'italic',
             wordWrap: { width: factMaxW },
-            lineSpacing: 5,
+            lineSpacing: 6,
           });
           this.detailContainer.add(olderText);
           y += olderText.height + 10;
