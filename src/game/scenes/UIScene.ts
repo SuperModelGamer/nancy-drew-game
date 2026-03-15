@@ -496,13 +496,14 @@ export class UIScene extends Phaser.Scene {
       this.borderTotalItemCountText.setText(`${foundItemsAll} / ${totalItemsAll}`);
     }
 
-    // Global clue counter (all clues regardless of progression, but respecting hideWhen)
+    // Global clue counter (only clues currently available to the player)
     let totalClues = 0;
     let foundClues = 0;
     for (const room of rooms) {
       for (const hs of room.hotspots) {
         const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
         if (!isClueType) continue;
+        if (!this.isHotspotAvailable((hs as { showWhen?: string }).showWhen)) continue;
         if (this.isHotspotHidden(hs.hideWhen)) continue;
         totalClues++;
         if (save.getFlag('used_hotspot_' + hs.id)) foundClues++;
@@ -764,13 +765,6 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     this.evidenceContent.add(this.detailDesc);
 
-    const hint = this.add.text(detailCenterX, contentBottom - 28,
-      'Click an item to select it for use.\nClick again to deselect.', {
-        fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#6a5a4a',
-        fontStyle: 'italic', align: 'center', lineSpacing: 3,
-      }).setOrigin(0.5, 1);
-    this.evidenceContent.add(hint);
-
     // ── Discovery counters (bottom of left panel) ──
     this.hotspotCounterText = this.add.text(leftX + leftW / 2, contentBottom - 55, '', {
       fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#5a4a3a',
@@ -923,13 +917,14 @@ export class UIScene extends Phaser.Scene {
     const rooms = roomsData.rooms as { id: string; hotspots: { id: string; type: string; itemId?: string; hideWhen?: string }[] }[];
     const currentRoom = rooms.find(r => r.id === currentRoomId);
 
-    // Hotspot discovery counter (across all rooms, respecting hideWhen)
+    // Hotspot discovery counter (across all rooms, only currently available clues)
     let totalHotspots = 0;
     let discoveredHotspots = 0;
     for (const room of rooms) {
       for (const hs of room.hotspots) {
         const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
         if (!isClueType) continue;
+        if (!this.isHotspotAvailable((hs as { showWhen?: string }).showWhen)) continue;
         if (this.isHotspotHidden(hs.hideWhen)) continue;
         totalHotspots++;
         if (save.getFlag('used_hotspot_' + hs.id)) {
@@ -944,9 +939,9 @@ export class UIScene extends Phaser.Scene {
     // Per-room clue counter (all interactive hotspot types, consistent with total counter)
     if (currentRoom && this.roomItemCounterText) {
       const roomHotspots = currentRoom.hotspots.filter(
-        (hs: { type: string; hideWhen?: string }) => {
+        (hs: { type: string; showWhen?: string; hideWhen?: string }) => {
           const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
-          return isClueType && !this.isHotspotHidden(hs.hideWhen);
+          return isClueType && this.isHotspotAvailable(hs.showWhen) && !this.isHotspotHidden(hs.hideWhen);
         }
       );
       const foundInRoom = roomHotspots.filter(
@@ -1049,8 +1044,7 @@ export class UIScene extends Phaser.Scene {
     const { rightW, contentBottom } = this.evidenceLayout;
     const descBottom = this.detailDesc.y + this.detailDesc.height + 16;
 
-    // Reserve space for the hint text at the bottom (two lines ~50px + padding)
-    const maxLoreBottom = contentBottom - 60;
+    const maxLoreBottom = contentBottom - 10;
     const availableH = maxLoreBottom - descBottom - 14;
     if (availableH <= 0) return; // no room for lore
 
