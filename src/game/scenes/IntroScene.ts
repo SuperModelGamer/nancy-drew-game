@@ -1,5 +1,7 @@
+import Phaser from 'phaser';
 import { BaseSlideScene, Slide } from './BaseSlideScene';
-import { initSceneCursor } from '../utils/cursors';
+import { initSceneCursor, POINTER_CURSOR } from '../utils/cursors';
+import { Colors, TextColors, FONT } from '../utils/constants';
 
 // ─── Intro Slides ────────────────────────────────────────────────────────────
 
@@ -171,6 +173,11 @@ const INTRO_SLIDES: Slide[] = [
 // ─── IntroScene ──────────────────────────────────────────────────────────────
 
 export class IntroScene extends BaseSlideScene {
+  private video: Phaser.GameObjects.Video | null = null;
+  private videoSkipBtn: Phaser.GameObjects.Text | null = null;
+  private videoOverlay: Phaser.GameObjects.Rectangle | null = null;
+  private videoPlaying = false;
+
   constructor() {
     super({ key: 'IntroScene' });
   }
@@ -181,6 +188,12 @@ export class IntroScene extends BaseSlideScene {
 
   protected onSceneCreate(): void {
     initSceneCursor(this);
+
+    // If the video loaded successfully, play it before the slides
+    if (this.cache.video.exists('intro_monarch_video')) {
+      this.playVideoPreroll();
+    }
+    // Otherwise BaseSlideScene proceeds directly to slides
   }
 
   protected getStageDirectionPrefixes(): string[] {
@@ -190,5 +203,123 @@ export class IntroScene extends BaseSlideScene {
   protected onTransitionComplete(): void {
     this.scene.start('RoomScene', { roomId: 'lobby' });
     this.scene.launch('UIScene');
+  }
+
+  // ─── Video Pre-roll ────────────────────────────────────────────────────────
+
+  private playVideoPreroll(): void {
+    const { width, height } = this.cameras.main;
+    this.videoPlaying = true;
+
+    // Pause the slide system — prevent clicks from advancing slides during video
+    this.canSkip = false;
+
+    // Create video game object centered on screen
+    this.video = this.add.video(width / 2, height / 2, 'intro_monarch_video');
+    this.video.setDepth(50); // Above everything else
+    this.video.setAlpha(0);
+
+    // Scale video to cover the full screen (maintain aspect ratio)
+    const videoWidth = this.video.width || 1920;
+    const videoHeight = this.video.height || 1080;
+    const scaleX = width / videoWidth;
+    const scaleY = height / videoHeight;
+    const coverScale = Math.max(scaleX, scaleY);
+    this.video.setScale(coverScale);
+
+    // Dark overlay behind video (covers any slide content)
+    this.videoOverlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 1);
+    this.videoOverlay.setDepth(49);
+
+    // "SKIP" button for the video
+    this.videoSkipBtn = this.add.text(width - 24, 24, 'SKIP \u25b8', {
+      fontFamily: FONT, fontSize: '21px', color: TextColors.goldDim, letterSpacing: 2,
+    }).setOrigin(1, 0).setAlpha(0).setDepth(51);
+    this.videoSkipBtn.setInteractive({ cursor: POINTER_CURSOR });
+    this.videoSkipBtn.on('pointerover', () => this.videoSkipBtn?.setColor(TextColors.gold));
+    this.videoSkipBtn.on('pointerout', () => this.videoSkipBtn?.setColor(TextColors.goldDim));
+    this.videoSkipBtn.on('pointerdown', () => this.endVideoPreroll());
+
+    // Show skip button after a short delay
+    this.tweens.add({ targets: this.videoSkipBtn, alpha: 0.7, duration: 1500, delay: 1500 });
+
+    // Fade video in and play
+    this.tweens.add({
+      targets: this.video,
+      alpha: 1,
+      duration: 800,
+      onComplete: () => {
+        if (!this.video) return;
+        this.video.play(false); // false = don't loop
+
+        // When video ends naturally, transition to slides
+        this.video.on('complete', () => {
+          this.endVideoPreroll();
+        });
+      },
+    });
+
+    // Allow clicking anywhere (except skip button area) to skip video too
+    const videoClickHandler = (pointer: Phaser.Input.Pointer) => {
+      if (!this.videoPlaying) return;
+      // Ignore clicks near the skip button
+      if (pointer.x > width - 80 && pointer.y < 50) return;
+      // Require at least 2 seconds of video before click-to-skip works
+      if (this.video && this.video.getCurrentTime() < 2) return;
+      this.endVideoPreroll();
+    };
+    this.input.on('pointerdown', videoClickHandler);
+
+    // ESC to skip video
+    this.input.keyboard?.on('keydown-ESC', () => {
+      if (this.videoPlaying) this.endVideoPreroll();
+    });
+  }
+
+  private endVideoPreroll(): void {
+    if (!this.videoPlaying) return;
+    this.videoPlaying = false;
+
+    const { width, height } = this.cameras.main;
+
+    // Fade out video
+    if (this.video) {
+      this.tweens.add({
+        targets: this.video,
+        alpha: 0,
+        duration: 600,
+        onComplete: () => {
+          if (this.video) {
+            this.video.stop();
+            this.video.destroy();
+            this.video = null;
+          }
+        },
+      });
+    }
+
+    // Fade out overlay
+    if (this.videoOverlay) {
+      this.tweens.add({
+        targets: this.videoOverlay,
+        fillAlpha: 0,
+        duration: 800,
+        onComplete: () => {
+          this.videoOverlay?.destroy();
+          this.videoOverlay = null;
+        },
+      });
+    }
+
+    // Remove skip button
+    if (this.videoSkipBtn) {
+      this.videoSkipBtn.destroy();
+      this.videoSkipBtn = null;
+    }
+
+    // Re-enable slide system after video fades out
+    this.time.delayedCall(900, () => {
+      this.canSkip = true;
+    });
   }
 }

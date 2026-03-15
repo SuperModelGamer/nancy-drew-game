@@ -153,6 +153,9 @@ export class BootScene extends Phaser.Scene {
       this.load.image(key, `assets/ui/dialogue/${filename}.png`);
     }
 
+    // Load intro cinematic video (optional — intro degrades gracefully to slides only)
+    this.load.video('intro_monarch_video', 'assets/cinematics/Monarch.mp4', true);
+
     // Load cinematic slide backgrounds (optional — cinematics degrade gracefully without images)
     const cinematicImages: Record<string, string> = {
       cine_ghost_fog: 'ghost-fog',
@@ -169,7 +172,8 @@ export class BootScene extends Phaser.Scene {
       if (file.key.startsWith('intro_') || file.key.startsWith('sfx_') ||
           file.key.startsWith('ambient_') || file.key.startsWith('music_') ||
           file.key.startsWith('amb_') || file.key.startsWith('cine_') ||
-          file.key.startsWith('ui_') || file.key.startsWith('dlg_')) {
+          file.key.startsWith('ui_') || file.key.startsWith('dlg_') ||
+          file.key === 'intro_monarch_video') {
         // Silently ignore — scenes work without these assets
         return;
       }
