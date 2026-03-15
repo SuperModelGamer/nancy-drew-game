@@ -7,8 +7,6 @@ import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createAuthFormElements, submitAuthForm } from '../ui/AuthFormOverlay';
 
 export class TitleScene extends Phaser.Scene {
-  private authStatusContainer?: Phaser.GameObjects.Container;
-
   constructor() {
     super({ key: 'TitleScene' });
   }
@@ -141,9 +139,6 @@ export class TitleScene extends Phaser.Scene {
       this.createMenuButton(menuX, y, btnDisplayW, btnDisplayH, item.label, item.textureKey, item.action, item.primary, item.subtitle, i);
     });
 
-    // ── Auth status indicator (top-right) ──
-    this.createAuthStatus(width);
-
     // ── Credits ──
     this.add.text(contentX, height - 20, 'Created by Carley Beck', {
       fontFamily: FONT,
@@ -156,57 +151,6 @@ export class TitleScene extends Phaser.Scene {
 
     // Fade in
     this.cameras.main.fadeIn(1000, 0, 0, 0);
-  }
-
-  // ── Auth status in top-right corner ──
-
-  private createAuthStatus(width: number): void {
-    if (this.authStatusContainer) this.authStatusContainer.destroy();
-
-    const auth = AuthManager.getInstance();
-    const container = this.add.container(width - 20, 18);
-    container.setDepth(50);
-    this.authStatusContainer = container;
-
-    if (!auth.isAvailable()) return; // no Supabase configured, hide completely
-
-    if (auth.isSignedIn()) {
-      const name = auth.getDisplayName();
-
-      const signOutText = this.add.text(0, 0, 'Sign Out', {
-        fontFamily: FONT, fontSize: '16px', color: TextColors.muted,
-      }).setOrigin(1, 0.5).setInteractive({ cursor: POINTER_CURSOR });
-      signOutText.on('pointerover', () => signOutText.setColor(TextColors.gold));
-      signOutText.on('pointerout', () => signOutText.setColor(TextColors.muted));
-      signOutText.on('pointerdown', async () => {
-        await auth.signOut();
-        this.scene.restart();
-      });
-      container.add(signOutText);
-
-      const nameText = this.add.text(-signOutText.width - 16, 0, name, {
-        fontFamily: FONT, fontSize: '17px', color: TextColors.gold,
-      }).setOrigin(1, 0.5);
-      container.add(nameText);
-
-      // Cloud icon indicator
-      const cloudText = this.add.text(-signOutText.width - nameText.width - 26, 0, '☁', {
-        fontFamily: FONT, fontSize: '18px', color: TextColors.success,
-      }).setOrigin(1, 0.5);
-      container.add(cloudText);
-    } else {
-      // Prominent but non-blocking sign-in link
-      const signInText = this.add.text(0, 0, 'Sign In / Register', {
-        fontFamily: FONT, fontSize: '17px', color: TextColors.gold,
-      }).setOrigin(1, 0.5).setInteractive({ cursor: POINTER_CURSOR });
-      signInText.on('pointerover', () => signInText.setColor('#e8c55a'));
-      signInText.on('pointerout', () => signInText.setColor(TextColors.gold));
-      signInText.on('pointerdown', () => {
-        const { width: w, height: h } = this.cameras.main;
-        this.showAuthDialog(w, h);
-      });
-      container.add(signInText);
-    }
   }
 
   // ── Auth Dialog — themed welcome gate ──
