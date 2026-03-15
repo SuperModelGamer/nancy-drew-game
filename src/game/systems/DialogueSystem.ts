@@ -993,7 +993,7 @@ export class DialogueSystem {
   // Maps _done dialogue IDs to the flag that indicates the character's arc is complete.
   // When this flag is set, the brief dismissal dialogue plays instead of the full revisit.
   private static DONE_CONDITIONS: Record<string, string> = {
-    'vivian_intro_done': 'vivian_intro',           // Done after first conversation (item-triggered dialogues handle the rest)
+    'vivian_intro_done': 'vivian_full_trust',       // Done after earning Vivian's full trust through key evidence
     'edwin_auditorium_done': 'edwin_personal_revealed', // Done after grandfather revelation
     'stella_backstage_done': 'basement_key_location',   // Done after revealing basement key
     'diego_booth_done': 'cipher_discussed',              // Done after cipher solved

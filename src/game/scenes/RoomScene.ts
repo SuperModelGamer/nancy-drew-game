@@ -547,6 +547,8 @@ export class RoomScene extends Phaser.Scene {
 
       case 'talk':
         if (hotspot.dialogueId) {
+          // Mark as examined so clue counter tracks it
+          SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
           // Hide all hotspot labels so they don't show through the dialogue overlay
           this.hideAllHotspotLabels();
           const dialogue = DialogueSystem.getInstance();
@@ -948,6 +950,40 @@ export class RoomScene extends Phaser.Scene {
       lineSpacing: 6,
     }).setOrigin(0.5);
     container.add(desc);
+
+    // Places to check count — helps player know scope of investigation in this room
+    const placesToCheck = this.currentRoom.hotspots.filter(hs => {
+      const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
+      if (!isClueType) return false;
+      // Respect showWhen gates
+      if (hs.showWhen) {
+        const save = SaveSystem.getInstance();
+        const dialogue = DialogueSystem.getInstance();
+        const flagSet = save.getFlag(hs.showWhen);
+        const eventTriggered = dialogue.hasTriggeredEvent(hs.showWhen);
+        if (!flagSet && !eventTriggered) return false;
+      }
+      // Respect hideWhen gates
+      if (hs.hideWhen) {
+        const save = SaveSystem.getInstance();
+        const dialogue = DialogueSystem.getInstance();
+        if (save.getFlag(hs.hideWhen) || dialogue.hasTriggeredEvent(hs.hideWhen)) return false;
+      }
+      return true;
+    }).length;
+
+    if (placesToCheck > 0) {
+      const clueHintY = desc.y + desc.height / 2 + 30;
+      const clueHint = this.add.text(width / 2, clueHintY, `${placesToCheck} places to investigate`, {
+        fontFamily: FONT,
+        fontSize: '20px',
+        color: TextColors.gold,
+        fontStyle: 'bold',
+        letterSpacing: 3,
+        align: 'center',
+      }).setOrigin(0.5);
+      container.add(clueHint);
+    }
 
     // Fade in
     container.setAlpha(0);
