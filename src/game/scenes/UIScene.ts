@@ -22,7 +22,7 @@ const BTN_CHEVRON = 6;
 const itemMap = new Map(itemsData.items.map(i => [i.id, i]));
 
 // Journal pagination
-const JOURNAL_ENTRIES_PER_PAGE = 5;
+const JOURNAL_ENTRIES_PER_PAGE = 4;
 
 // Book visual constants (shared by Evidence + Journal panels)
 const BOOK_LEATHER = 0x3a2a1a;
@@ -154,7 +154,16 @@ export class UIScene extends Phaser.Scene {
 
     const buttons = [
       { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: toolbarCenterX - btnSpacing * 1.5, action: () => this.toggleEvidence() },
-      { label: 'SUSPECTS', icon: '◉', color: 0xb4a0d4, x: toolbarCenterX - btnSpacing * 0.5, action: () => this.scene.launch('SuspectScene') },
+      { label: 'SUSPECTS', icon: '◉', color: 0xb4a0d4, x: toolbarCenterX - btnSpacing * 0.5, action: () => {
+        // Pass current dialogue speaker so Suspects defaults to their page
+        const speaker = DialogueSystem.getInstance().getLastSpeaker();
+        const speakerToSuspect: Record<string, string> = {
+          'Vivian': 'vivian', 'Edwin': 'edwin', 'Stella': 'stella',
+          'Ashworth': 'ashworth', 'Diego': 'diego',
+        };
+        this.registry.set('currentDialogueSuspect', speakerToSuspect[speaker] || null);
+        this.scene.launch('SuspectScene');
+      }},
       { label: 'MAP', icon: '◇', color: Colors.mapBlue, x: toolbarCenterX + btnSpacing * 0.5, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
       { label: 'JOURNAL', icon: '◆', color: DecoColors.gold, x: toolbarCenterX + btnSpacing * 1.5, action: () => this.toggleJournal() },
     ];
@@ -631,14 +640,14 @@ export class UIScene extends Phaser.Scene {
     bookGfx.strokeRoundedRect(panelLeft, panelTop, panelW, panelH, 8);
     container.add(bookGfx);
 
-    // Stain patches
+    // Subtle aged paper texture — very faint stains
     const stainGfx = this.add.graphics();
-    stainGfx.fillStyle(BOOK_STAIN, 0.06);
-    stainGfx.fillCircle(panelX - panelW / 4, panelY - panelH / 5, 55);
-    stainGfx.fillCircle(panelX + panelW / 3, panelY + panelH / 6, 40);
+    stainGfx.fillStyle(BOOK_STAIN, 0.03);
+    stainGfx.fillEllipse(panelX - panelW / 4, panelY - panelH / 5, 90, 40);
+    stainGfx.fillEllipse(panelX + panelW / 3, panelY + panelH / 6, 70, 30);
     stainGfx.fillEllipse(panelX - panelW / 6, panelY + panelH / 4, 80, 34);
-    stainGfx.fillStyle(BOOK_STAIN, 0.04);
-    stainGfx.fillCircle(panelX + panelW / 5, panelY - panelH / 3, 35);
+    stainGfx.fillStyle(BOOK_STAIN, 0.02);
+    stainGfx.fillEllipse(panelX + panelW / 5, panelY - panelH / 3, 60, 25);
     container.add(stainGfx);
 
     // Header
@@ -654,8 +663,8 @@ export class UIScene extends Phaser.Scene {
     container.add(headerLineGfx);
 
     const titleText = this.add.text(panelX, headerY, title, {
-      fontFamily: JOURNAL_FONT, fontSize: '28px', color: '#3a2a1a',
-      fontStyle: 'bold italic', letterSpacing: 5,
+      fontFamily: JOURNAL_FONT, fontSize: '32px', color: '#3a2a1a',
+      fontStyle: 'bold italic', letterSpacing: 6,
     }).setOrigin(0.5);
     container.add(titleText);
 
@@ -707,69 +716,70 @@ export class UIScene extends Phaser.Scene {
   private createEvidenceContent(layout: BookPanelLayout): void {
     const { paperLeft, paperW, contentTop, contentBottom } = layout;
     const contentH = contentBottom - contentTop;
-    const leftW = paperW * 0.55;
-    const rightW = paperW - leftW - 45;
-    const leftX = paperLeft + 22;
-    const rightX = leftX + leftW + 22;
+    const leftW = paperW * 0.52;
+    const rightW = paperW - leftW - 50;
+    const leftX = paperLeft + 26;
+    const rightX = leftX + leftW + 26;
 
     // Items grid
     this.itemsGrid = this.add.container(0, 0);
     this.evidenceContent.add(this.itemsGrid);
 
-    // Right detail panel
+    // Right detail panel — subtle inset
     const detailCenterX = rightX + rightW / 2;
     const detailCenterY = contentTop + contentH / 2;
 
-    const detailBg = this.add.rectangle(detailCenterX, detailCenterY, rightW, contentH, 0x3a2a1a, 0.08);
-    detailBg.setStrokeStyle(1, BOOK_LEATHER, 0.2);
+    const detailBg = this.add.rectangle(detailCenterX, detailCenterY, rightW, contentH, 0x3a2a1a, 0.06);
+    detailBg.setStrokeStyle(1, BOOK_LEATHER, 0.15);
     this.evidenceContent.add(detailBg);
 
-    this.detailPlaceholder = this.add.text(detailCenterX, detailCenterY, 'Select an item to inspect', {
-      fontFamily: JOURNAL_FONT, fontSize: '21px', color: '#6a5a4a',
+    this.detailPlaceholder = this.add.text(detailCenterX, detailCenterY,
+      'Select an item to inspect', {
+      fontFamily: JOURNAL_FONT, fontSize: '26px', color: '#6a5a4a',
       fontStyle: 'italic', align: 'center',
     }).setOrigin(0.5);
     this.evidenceContent.add(this.detailPlaceholder);
 
     this.detailImage = null;
 
-    this.detailName = this.add.text(detailCenterX, contentTop + 30, '', {
-      fontFamily: JOURNAL_FONT, fontSize: '28px', color: '#3a2a1a',
+    this.detailName = this.add.text(detailCenterX, contentTop + 32, '', {
+      fontFamily: JOURNAL_FONT, fontSize: '32px', color: '#3a2a1a',
       fontStyle: 'bold', align: 'center',
     }).setOrigin(0.5, 0);
     this.evidenceContent.add(this.detailName);
 
-    this.detailKeyBadge = this.add.container(detailCenterX, contentTop + 72);
-    const badgeBg = this.add.rectangle(0, 0, 150, 33, TAB_GOLD, 0.15);
+    this.detailKeyBadge = this.add.container(detailCenterX, contentTop + 78);
+    const badgeBg = this.add.rectangle(0, 0, 170, 36, TAB_GOLD, 0.15);
     badgeBg.setStrokeStyle(1.5, TAB_GOLD, 0.4);
     const badgeText = this.add.text(0, 0, '★  KEY EVIDENCE', {
-      fontFamily: FONT, fontSize: '15px', color: TAB_GOLD_STR, letterSpacing: 1,
+      fontFamily: JOURNAL_FONT, fontSize: '17px', color: TAB_GOLD_STR, letterSpacing: 2,
     }).setOrigin(0.5);
     this.detailKeyBadge.add([badgeBg, badgeText]);
     this.detailKeyBadge.setVisible(false);
     this.evidenceContent.add(this.detailKeyBadge);
 
     this.detailDesc = this.add.text(detailCenterX, contentTop + 120, '', {
-      fontFamily: JOURNAL_FONT, fontSize: '21px', color: BOOK_INK,
-      wordWrap: { width: rightW - 60 }, lineSpacing: 5, align: 'center',
+      fontFamily: JOURNAL_FONT, fontSize: '24px', color: BOOK_INK,
+      wordWrap: { width: rightW - 60 }, lineSpacing: 6, align: 'center',
     }).setOrigin(0.5, 0);
     this.evidenceContent.add(this.detailDesc);
 
-    const hint = this.add.text(detailCenterX, contentBottom - 30,
+    const hint = this.add.text(detailCenterX, contentBottom - 28,
       'Click an item to select it for use.\nClick again to deselect.', {
-        fontFamily: JOURNAL_FONT, fontSize: '17px', color: '#6a5a4a',
-        fontStyle: 'italic', align: 'center', lineSpacing: 2,
+        fontFamily: JOURNAL_FONT, fontSize: '20px', color: '#6a5a4a',
+        fontStyle: 'italic', align: 'center', lineSpacing: 3,
       }).setOrigin(0.5, 1);
     this.evidenceContent.add(hint);
 
     // ── Discovery counters (bottom of left panel) ──
     this.hotspotCounterText = this.add.text(leftX + leftW / 2, contentBottom - 52, '', {
-      fontFamily: JOURNAL_FONT, fontSize: '17px', color: '#5a4a3a',
+      fontFamily: JOURNAL_FONT, fontSize: '20px', color: '#5a4a3a',
       align: 'center',
     }).setOrigin(0.5, 1);
     this.evidenceContent.add(this.hotspotCounterText);
 
-    this.roomItemCounterText = this.add.text(leftX + leftW / 2, contentBottom - 30, '', {
-      fontFamily: JOURNAL_FONT, fontSize: '17px', color: '#5a4a3a',
+    this.roomItemCounterText = this.add.text(leftX + leftW / 2, contentBottom - 28, '', {
+      fontFamily: JOURNAL_FONT, fontSize: '20px', color: '#5a4a3a',
       align: 'center',
     }).setOrigin(0.5, 1);
     this.evidenceContent.add(this.roomItemCounterText);
@@ -796,18 +806,18 @@ export class UIScene extends Phaser.Scene {
     const { leftX, contentTop, contentH, leftW } = this.evidenceLayout;
 
     const cols = 3;
-    const cardW = Math.floor((leftW - 30) / cols) - 12;
-    const cardH = cardW + 45;
-    const gap = 15;
-    const gridStartX = leftX + 15;
-    const gridStartY = contentTop + 12;
+    const cardW = Math.floor((leftW - 40) / cols) - 14;
+    const cardH = cardW + 50;
+    const gap = 16;
+    const gridStartX = leftX + 18;
+    const gridStartY = contentTop + 16;
 
     if (items.length === 0) {
       const emptyText = this.add.text(
         leftX + leftW / 2, contentTop + contentH / 2,
         'No evidence collected yet.\n\nExplore the theater to find items.',
-        { fontFamily: JOURNAL_FONT, fontSize: '21px', color: '#6a5a4a',
-          fontStyle: 'italic', align: 'center', lineSpacing: 6 }
+        { fontFamily: JOURNAL_FONT, fontSize: '26px', color: '#6a5a4a',
+          fontStyle: 'italic', align: 'center', lineSpacing: 8 }
       ).setOrigin(0.5);
       this.itemsGrid.add(emptyText);
       this._refreshingGrid = false;
@@ -843,8 +853,8 @@ export class UIScene extends Phaser.Scene {
         icon = this.add.text(x, y, itemData.icon || '?', { fontSize: '72px' }).setOrigin(0.5);
       }
 
-      const label = this.add.text(x, y + cardW / 2 + 6, itemData.name, {
-        fontFamily: JOURNAL_FONT, fontSize: '17px',
+      const label = this.add.text(x, y + cardW / 2 + 8, itemData.name, {
+        fontFamily: JOURNAL_FONT, fontSize: '20px',
         color: isSelected ? TextColors.success : '#3a2a1a',
         align: 'center', wordWrap: { width: cardW - 8 },
       }).setOrigin(0.5, 0);
@@ -867,21 +877,28 @@ export class UIScene extends Phaser.Scene {
       }
 
       cardBg.on('pointerdown', () => {
-        if (selectedItem === itemId) {
-          inventory.selectItem(null);
+        if (this.selectedItemId === itemId) {
+          // Toggle: clicking the already-inspected item selects/deselects it for use
+          if (selectedItem === itemId) {
+            inventory.selectItem(null);
+          } else {
+            inventory.selectItem(itemId);
+          }
+          this.refreshInventoryGrid();
         } else {
-          inventory.selectItem(itemId);
+          // First click: inspect the item
+          this.showItemDetail(itemId);
+          this.refreshInventoryGrid();
         }
-        this.showItemDetail(itemId);
       });
 
       cardBg.on('pointerover', () => {
-        cardBg.setFillStyle(0x3a2a1a, 0.15);
-        cardBg.setStrokeStyle(2, TAB_GOLD, 0.6);
-        this.showItemDetail(itemId);
+        cardBg.setFillStyle(0x3a2a1a, 0.12);
+        cardBg.setStrokeStyle(2, TAB_GOLD, 0.5);
       });
       cardBg.on('pointerout', () => {
-        if (this.selectedItemId !== itemId) {
+        const isCurrentlyInspected = this.selectedItemId === itemId;
+        if (!isCurrentlyInspected) {
           cardBg.setFillStyle(0x3a2a1a, 0.08);
           const bc = (selectedItem === itemId) ? Colors.success : BOOK_LEATHER;
           const ba = (selectedItem === itemId) ? 0.9 : 0.2;
@@ -1094,30 +1111,30 @@ export class UIScene extends Phaser.Scene {
     const save = SaveSystem.getInstance();
     const journal = save.getJournal();
 
-    const contentLeft = panelX - panelW / 2 + 30;
-    const contentRight = panelX + panelW / 2 - 30;
+    const contentLeft = panelX - panelW / 2 + 40;
+    const contentRight = panelX + panelW / 2 - 40;
     const usableW = contentRight - contentLeft;
 
-    // Ruled lines
+    // Ruled lines — spaced for 28px font sitting on each line
     const ruledGfx = this.add.graphics();
-    const lineSpacing = 33;
-    const ruledStart = contentTop + 10;
-    const ruledEnd = contentBottom - 50;
-    ruledGfx.lineStyle(1, BOOK_STAIN, 0.12);
+    const lineSpacing = 38;
+    const ruledStart = contentTop + 18;
+    const ruledEnd = contentBottom - 55;
+    ruledGfx.lineStyle(1, BOOK_STAIN, 0.15);
     for (let ly = ruledStart; ly < ruledEnd; ly += lineSpacing) {
       ruledGfx.lineBetween(contentLeft, ly, contentRight, ly);
     }
     // Red margin line
-    const marginX = contentLeft + 55;
-    ruledGfx.lineStyle(1, BOOK_MARGIN_RED, 0.2);
-    ruledGfx.lineBetween(marginX, contentTop, marginX, contentBottom - 45);
+    const marginX = contentLeft + 60;
+    ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.25);
+    ruledGfx.lineBetween(marginX, contentTop + 4, marginX, contentBottom - 50);
     this.journalContent.add(ruledGfx);
 
     if (journal.length === 0) {
       const empty = this.add.text(panelX, (contentTop + contentBottom) / 2,
         "No entries yet.\n\nExplore the theater and talk to people\nto fill Nancy's journal.", {
-          fontFamily: JOURNAL_FONT, fontSize: '21px', color: '#6a5a4a',
-          fontStyle: 'italic', align: 'center', lineSpacing: 6,
+          fontFamily: JOURNAL_FONT, fontSize: '28px', color: '#6a5a4a',
+          fontStyle: 'italic', align: 'center', lineSpacing: 10,
         }).setOrigin(0.5);
       this.journalContent.add(empty);
       return;
@@ -1132,37 +1149,44 @@ export class UIScene extends Phaser.Scene {
     const endIdx = Math.min(startIdx + JOURNAL_ENTRIES_PER_PAGE, journal.length);
     const pageEntries = journal.slice(startIdx, endIdx);
 
-    let y = contentTop + 20;
-    const entryLeft = marginX + 15;
+    // Calculate available height for entries (reserve space for nav)
+    const entryAreaH = ruledEnd - ruledStart;
+    const entrySpacing = Math.floor(entryAreaH / JOURNAL_ENTRIES_PER_PAGE);
+    const entryLeft = marginX + 18;
+    const entryTextW = usableW - 90;
 
     pageEntries.forEach((entry, i) => {
       const globalIdx = startIdx + i;
-      const xJitter = ((globalIdx * 7) % 5) - 3;
+      const xJitter = ((globalIdx * 7) % 3) - 1;
 
-      const bullet = this.add.text(contentLeft + 10 + xJitter, y, `${globalIdx + 1}.`, {
-        fontFamily: JOURNAL_FONT, fontSize: '22px', color: BOOK_BULLET, fontStyle: 'italic',
+      // Position entries evenly spaced, sitting on the ruled lines
+      const entryY = ruledStart + i * entrySpacing + 4;
+
+      // Entry number — positioned in the margin area
+      const bullet = this.add.text(contentLeft + 8 + xJitter, entryY, `${globalIdx + 1}.`, {
+        fontFamily: JOURNAL_FONT, fontSize: '26px', color: BOOK_BULLET, fontStyle: 'italic',
       });
 
-      const text = this.add.text(entryLeft + xJitter, y, entry, {
-        fontFamily: JOURNAL_FONT, fontSize: '22px', color: BOOK_INK,
-        wordWrap: { width: usableW - 80 }, lineSpacing: 5,
+      // Entry text — sits on the ruled lines like handwriting
+      const text = this.add.text(entryLeft + xJitter, entryY, entry, {
+        fontFamily: JOURNAL_FONT, fontSize: '26px', color: BOOK_INK,
+        wordWrap: { width: entryTextW }, lineSpacing: lineSpacing - 26,
       });
 
       this.journalContent.add([bullet, text]);
-      y += text.height + 18;
     });
 
-    // Page navigation
-    const navY = contentBottom - 20;
+    // Page navigation — styled like a book footer
+    const navY = contentBottom - 18;
 
-    const pageText = this.add.text(panelX, navY, `Page ${this.journalPage + 1} of ${totalPages}`, {
-      fontFamily: JOURNAL_FONT, fontSize: '18px', color: BOOK_BULLET, fontStyle: 'italic',
+    const pageText = this.add.text(panelX, navY, `— page ${this.journalPage + 1} of ${totalPages} —`, {
+      fontFamily: JOURNAL_FONT, fontSize: '20px', color: '#7a6a5a', fontStyle: 'italic',
     }).setOrigin(0.5);
     this.journalContent.add(pageText);
 
     if (this.journalPage > 0) {
-      const prevBtn = this.add.text(contentLeft + 20, navY, '← Previous', {
-        fontFamily: JOURNAL_FONT, fontSize: '18px', color: '#5a3a2a', fontStyle: 'bold',
+      const prevBtn = this.add.text(contentLeft + 20, navY, '◀  Previous', {
+        fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#5a3a2a', fontStyle: 'bold',
       }).setOrigin(0, 0.5);
       prevBtn.setInteractive({ cursor: POINTER_CURSOR });
       prevBtn.on('pointerover', () => prevBtn.setColor(TAB_GOLD_STR));
@@ -1172,8 +1196,8 @@ export class UIScene extends Phaser.Scene {
     }
 
     if (this.journalPage < totalPages - 1) {
-      const nextBtn = this.add.text(contentRight - 20, navY, 'Next →', {
-        fontFamily: JOURNAL_FONT, fontSize: '18px', color: '#5a3a2a', fontStyle: 'bold',
+      const nextBtn = this.add.text(contentRight - 20, navY, 'Next  ▶', {
+        fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#5a3a2a', fontStyle: 'bold',
       }).setOrigin(1, 0.5);
       nextBtn.setInteractive({ cursor: POINTER_CURSOR });
       nextBtn.on('pointerover', () => nextBtn.setColor(TAB_GOLD_STR));
