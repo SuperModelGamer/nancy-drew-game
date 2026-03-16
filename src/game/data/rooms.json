@@ -23,7 +23,7 @@
           "height": 72,
           "label": "Concierge Desk",
           "type": "inspect",
-          "description": "An old concierge desk. There's a master key sitting on a brass hook and a note in shaky handwriting: 'Nancy — take the key. V.D.' Vivian's hand was trembling when she wrote this. She's more frightened than she's letting on."
+          "description": "An old concierge desk. There's a master key sitting on a brass hook and a note in shaky handwriting: 'Nancy — take the key. V.D.' Whoever wrote this was trembling. The ink smeared where the pen hesitated."
         },
         {
           "id": "lobby_key",
@@ -131,7 +131,8 @@
           "height": 233,
           "label": "Coat Check",
           "type": "inspect",
-          "description": "An old coat check — mothballs and empty hangers. Wait. There's a modern rain jacket on one hook. That doesn't belong here. The pockets have a granola bar wrapper and... a receipt from a chemical supply company. Dated last week. Someone bought antimony tartrate, glycol fog fluid, and UV-reactive paint. Paid cash — smart, no card trail. But they left the receipt in their pocket — not so smart. And the store is three blocks from Edwin's address. Antimony for poison, glycol for fog, UV paint for glowing. Whoever bought this was building a ghost AND planning to hurt someone. I'd better hang onto this information."
+          "description": "An old coat check — mothballs and empty hangers. Wait. There's a modern rain jacket on one hook. That doesn't belong here. The pockets have a granola bar wrapper and... a receipt from a chemical supply company. Dated last week. Someone bought antimony tartrate, glycol fog fluid, and UV-reactive paint. Paid cash — smart, no card trail. But they left the receipt in their pocket — not so smart. Antimony is a poison. Glycol is used in fog machines. UV paint makes things glow in the dark. Whoever bought this had a very specific plan. I'd better hang onto this information.",
+          "setsFlag": "found_chemical_receipt"
         },
         {
           "id": "lobby_wall_sconce",
@@ -617,7 +618,7 @@
           "height": 369,
           "label": "Rose Vase",
           "type": "inspect",
-          "description": "A corsage of dried red roses preserved under glass. The card reads: 'Break a leg, darling — C.' Cecilia sent this to Margaux on the night of the final performance. 'Break a leg.' Wait — Cecilia sent the corsage AND the mirror says C.D. changed the goblet. She was right there, backstage, that night. She had access to the props. If Cecilia really did poison her, then this card is the coldest thing I've ever read. A goodbye disguised as a good luck wish."
+          "description": "A corsage of dried red roses preserved under glass. The card reads: 'Break a leg, darling — C.' Someone with the initial C sent this to Margaux on the night of the final performance. 'Break a leg.' Whoever C was, they were close to Margaux — close enough to be backstage that night. Close enough to have access to the props. 'Break a leg' feels like a cruel joke if C knew what was about to happen."
         },
         {
           "id": "dr_costume_hook",
@@ -627,7 +628,7 @@
           "height": 611,
           "label": "Hanging Costumes",
           "type": "inspect",
-          "description": "Hooks for Margaux's costumes — most are moth-eaten relics. But one hook is empty. The label reads 'Lady Ashford — Act III, The Crimson Veil.' The costume from her death scene. I saw it backstage — freshly worn, hem still damp. Someone took it from this room. Someone who wanted to become Margaux's ghost."
+          "description": "Hooks for Margaux's costumes — most are moth-eaten relics. But one hook is empty. The label reads 'Lady Ashford — Act III, The Crimson Veil.' The costume from her death scene is missing. Someone took it from this room. Someone who wanted to become Margaux's ghost."
         },
         {
           "id": "dr_photos",
@@ -1187,7 +1188,7 @@
           "height": 150,
           "label": "Bottle Shelves",
           "type": "inspect",
-          "description": "Chemical bottles on a shelf — some labeled for the fog machine, but others are pharmaceutical compounds. I read the labels and my stomach drops. Antimony tartrate. The same substance from Margaux's alchemy book. Hold on — let me think. The alchemy book was in the dressing room. The chemical receipt was in the coat check. The dosage notes are in Edwin's handwriting. He found Margaux's research, identified the compound she was poisoned with, and then used the exact same poison on Ashworth. He used her own murder to commit his crime. A precise dose — they wanted to make someone sick, not kill them. But still."
+          "description": "Chemical bottles on a shelf — some labeled for the fog machine, but others are pharmaceutical compounds. I read the labels and my stomach drops. Antimony tartrate. The same compound used to poison people in the 1920s. And here it is, in a basement underneath the theater where someone was recently poisoned. A measuring syringe sits beside the bottle with careful dosage notes — whoever did this calculated a precise amount. Enough to make someone very sick, but not enough to kill. That's not rage. That's planning."
         },
         {
           "id": "bm_fog_controls",
@@ -1219,7 +1220,7 @@
           "height": 150,
           "label": "Stone Archway",
           "type": "inspect",
-          "description": "A section of the basement wall has been carefully dismantled — the mortar here is different from the rest, newer somehow. Someone noticed that inconsistency and pried it open. Inside the alcove: letters tied with ribbon, and a small vial with crystalline residue. The letters are between Cecilia Drake and a pharmacist, dated October 1928. Cecilia bricked up the evidence of her own crime in this wall, probably thinking no one would ever look. It stayed hidden for almost a century — until someone who'd been studying this building for fifteen years noticed the mortar didn't match."
+          "description": "A section of the basement wall has been carefully dismantled — the mortar here is different from the rest, newer somehow. Someone noticed that inconsistency and pried it open. Inside the alcove: letters tied with ribbon, and a small vial with crystalline residue. The letters are correspondence with a pharmacist, dated October 1928. Someone bricked up the evidence of their own crime in this wall, probably thinking no one would ever look. It stayed hidden for almost a century — until someone studying this building noticed the mortar didn't match."
         },
         {
           "id": "bm_cecilia_letter",
@@ -1333,7 +1334,7 @@
           "height": 60,
           "label": "Strange Device",
           "type": "inspect",
-          "description": "Something glows faintly blue in the corner. I step closer — it's a UV light source. The kind that makes luminescent paint glow in the dark. Of course. The white costume, the UV-reactive paint from the chemical receipt, this light. Under these conditions, the 'ghost' wouldn't just appear — it would glow. Otherworldly. Beautiful. Completely fake."
+          "description": "Something glows faintly blue in the corner. I step closer — it's a UV light source. The kind that makes luminescent paint glow in the dark. Combine this with a white costume and luminous paint, and you'd get something that doesn't just appear — it would glow. Otherworldly. Beautiful. Completely fake."
         },
         {
           "id": "bm_evidence_board",
