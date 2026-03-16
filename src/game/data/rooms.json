@@ -638,7 +638,7 @@
           "height": 431,
           "label": "Wall Photos",
           "type": "inspect",
-          "description": "Framed photographs of Margaux in her roles — she was beautiful. Commanding. In one, she stands with a younger woman. The inscription reads: 'With my dear Cecilia, who will one day outshine us all.' The glass over Cecilia's face is cracked. Deliberately. Someone punched this. Someone who knew what Cecilia did."
+          "description": "Framed photographs of Margaux in her roles — she was beautiful. Commanding. In one, she stands with a younger woman. The inscription reads: 'With my dear C., who will one day outshine us all.' The glass over the younger woman's face is cracked. Deliberately. Someone punched this. Someone who knew what she did."
         },
         {
           "id": "dr_lamp",
@@ -711,6 +711,17 @@
           "label": "Theater Mask",
           "type": "inspect",
           "description": "A porcelain theater mask — comedy faces outward, but I turn it over and find the tragedy side. Scratched into the inner rim: 'For M. — the greatest actress who ever lived. —J.' There's J. again. He gave her this. Comedy and tragedy in one — that's a love letter from someone who understood her. I'm starting to think J. might be the key to this whole story."
+        },
+        {
+          "id": "dr_vivian_archive",
+          "x": 162,
+          "y": 290,
+          "width": 160,
+          "height": 120,
+          "label": "Vivian's Archive Box",
+          "type": "inspect",
+          "showWhen": "vivian_full_trust",
+          "description": "A box tucked in the corner — Vivian's private archive. She said I could look through Margaux's personal effects. Inside: bundles of letters tied with ribbon, playbills annotated in Margaux's hand, and a sealed envelope marked 'For Vivian — if something happens to me.' It was never opened. Vivian couldn't bring herself to read it. Inside is a single page in Margaux's handwriting: 'I know what C. has been putting in my tea. I can taste it. But I won't stop performing — this role is mine and I will die on that stage before I give it up. If you're reading this, ma petite étoile, then I did.' The bravest and most heartbreaking thing I've ever read."
         },
         {
           "id": "dr_back",
@@ -846,6 +857,17 @@
           "label": "Old Stool",
           "type": "inspect",
           "description": "A worn wooden stool where the projectionist once sat for hours. Decades of splinters and coffee rings mark its surface."
+        },
+        {
+          "id": "pb_film_decoded",
+          "x": 1094,
+          "y": 851,
+          "width": 143,
+          "height": 80,
+          "label": "Decoded Film",
+          "type": "inspect",
+          "showWhen": "film_decoded",
+          "description": "Now that the frames are in order, the sequence is devastating. Frame one: a toast on stage, the goblet is raised. Frame two: Margaux drinks. Frame three: she collapses. Frame four: a figure in the wings steps forward — the understudy, already in costume, already ready. She was prepared. She knew what was going to happen. This isn't a rehearsal gone wrong. It's a murder caught on film."
         },
         {
           "id": "pb_graffiti",
