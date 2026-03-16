@@ -91,7 +91,7 @@
           "height": 115,
           "label": "Faded Poster",
           "type": "inspect",
-          "description": "A half-torn touring poster: 'BLACKMOOR PLAYERS present: The Penvellyn Curse — A Tale of Alchemy and Shadows.' There's pencil at the bottom: 'Brilliant. Almost too real. —M.F.' Margaux's handwriting. A play about alchemy... and later she'd be poisoned by an alchemical compound. 'Almost too real' is right, Margaux. Next to it, a smaller bill: 'Mystico the Magnificent — One Night Only!' with a cartoon magician in a top hat. Cute."
+          "description": "A half-torn touring poster: 'BLACKMOOR PLAYERS present: The Penvellyn Curse — A Tale of Alchemy and Shadows.' There's pencil at the bottom: 'Brilliant. Almost too real. —M.F.' Margaux's handwriting. A play about alchemy and poison. Given what happened to Margaux, 'almost too real' hits differently. Next to it, a smaller bill: 'Mystico the Magnificent — One Night Only!' with a cartoon magician in a top hat. Cute."
         },
         {
           "id": "lobby_vivian",
@@ -230,6 +230,7 @@
           "height": 136,
           "label": "Seat G-12",
           "type": "inspect",
+          "showWhen": "edwin_auditorium",
           "description": "This is Edwin's regular seat — G-12. There's a folded note in the pocket, his handwriting: 'Lighting cue for Act III, Scene 4 — crimson wash, moonlight blue, center spot, crimson wash. She would have been standing HERE when the lights changed.' An arrow points to center stage. He's reconstructing the exact moment Margaux died. That's... incredibly thorough. Or incredibly personal."
         },
         {
@@ -458,7 +459,7 @@
           "height": 166,
           "label": "Rigging Ropes",
           "type": "inspect",
-          "description": "Dozens of hemp ropes running up to the fly loft — each one moves a different piece of scenery. The counterweights are massive lead bricks on steel cables. Don't touch. But one rope catches my eye — it's new. Fresh hemp, not frayed like the others. The label reads 'TRAP CENTER' in neat, precise handwriting. I've seen that handwriting in the guest ledger. Edwin's."
+          "description": "Dozens of hemp ropes running up to the fly loft — each one moves a different piece of scenery. The counterweights are massive lead bricks on steel cables. Don't touch. But one rope catches my eye — it's new. Fresh hemp, not frayed like the others. The label reads 'TRAP CENTER' in neat, precise handwriting. Someone replaced this rope recently — and they labeled it like a professional. Or an obsessive."
         },
         {
           "id": "bs_basement_door",
@@ -687,6 +688,7 @@
           "height": 139,
           "label": "Old Book",
           "type": "inspect",
+          "setsFlag": "found_alchemy_book",
           "description": "Wedged behind the settee cushion — a leather-bound book: 'The Alchemist's Apprentice — A Study of Poisons and Their Remedies, 1890.' A bookplate reads: 'From the library of the Penvellyn Family, Blackmoor Manor.' I flip through dog-eared pages until I find it: a section on antimony compounds, annotated in Margaux's handwriting. 'These are my symptoms exactly.' She was researching her own poisoning. She figured it out, documented it, and still nobody helped her. That's heartbreaking."
         },
         {
@@ -852,7 +854,7 @@
           "height": 144,
           "label": "Wall Scratches",
           "type": "inspect",
-          "description": "Decades of scratched graffiti from bored projectionists — initials, dates, little drawings. One makes me stop: 'M.F. + J.H. 1927 ♥.' Margaux Fontaine and J.H. — so J.'s last name started with H. And below it, much newer: 'E.H. was here. For her.' E.H. Edwin Hale. His last name is Hale. J.H.... could J. have been a Hale too? In the corner, scratched with what looks like a key: 'SONNY JOON WAS HERE — THE TRUTH IS OUT THERE' surrounded by tiny alien doodles. Okay, that one I can't explain."
+          "description": "Decades of scratched graffiti from bored projectionists — initials, dates, little drawings. One makes me stop: 'M.F. + J.H. 1927 ♥.' Margaux Fontaine and J.H. — so J.'s last name started with H. And below it, much newer: 'E.H. was here. For her.' E.H. — someone with the same last initial as J.H. That's a coincidence I'm not comfortable ignoring. In the corner, scratched with what looks like a key: 'SONNY JOON WAS HERE — THE TRUTH IS OUT THERE' surrounded by tiny alien doodles. Okay, that one I can't explain."
         },
         {
           "id": "pb_back",
@@ -1026,8 +1028,8 @@
           "label": "Poisoned Teacup",
           "type": "locked",
           "puzzleId": "tea_analysis",
-          "description": "The teacup from Ashworth's poisoning — still sitting on his desk with crystalline residue at the bottom. The police left it here as 'not evidence enough.' But I have Margaux's alchemy book from the dressing room. If I compare the residue to the compounds described in her annotations, I can identify exactly what was used.",
-          "showWhen": "chapter_3"
+          "description": "The teacup from Ashworth's poisoning — still sitting on his desk with crystalline residue at the bottom. The police left it here as 'not evidence enough.' But that alchemy book from the dressing room has detailed annotations about compounds and their effects. If I compare the residue to what's described in those notes, I can identify exactly what was used.",
+          "showWhen": "found_alchemy_book"
         },
         {
           "id": "mo_back",
@@ -1148,7 +1150,7 @@
           "height": 140,
           "label": "Carved Initials",
           "type": "inspect",
-          "description": "Initials carved into the railing — decades of stagehands. One set stops me cold: 'M.F. ♥ J.H. — 1927.' The same initials from the projection booth. M.F. and J.H. came up here together, a hundred feet above the world. They carved their names where nobody would see. J.H. — James Hale. Edwin's grandfather. Margaux's secret lover was Edwin's grandfather. Edwin isn't just a historian. He's family. This whole investigation is personal for him. That changes everything."
+          "description": "Initials carved into the railing — decades of stagehands. One set stops me cold: 'M.F. ♥ J.H. — 1927.' M.F. and J.H. came up here together, a hundred feet above the world. They carved their names where nobody would see. Margaux and her mysterious J. This is the most intimate thing I've found yet. Whoever J.H. was, this wasn't casual."
         },
         {
           "id": "cw_back",
@@ -1270,7 +1272,8 @@
           "height": 120,
           "label": "Edwin Hale",
           "type": "talk",
-          "dialogueId": "edwin_confronted"
+          "dialogueId": "edwin_confronted",
+          "showWhen": "edwins_notebook"
         },
         {
           "id": "bm_old_crates",
@@ -1320,7 +1323,7 @@
           "height": 50,
           "label": "Sleeping Bag",
           "type": "inspect",
-          "description": "A sleeping bag, a camp stove, canned food — all neatly organized, because of course they are. And a neat stack of books — every single one about Margaux Fontaine, the Monarch Theatre, or theatrical special effects. Alphabetized by author. Even when living in a freezing basement eating cold soup and sleeping on concrete, Edwin Hale organizes his bibliography. I don't know if that's devotion or madness. Maybe there's no difference."
+          "description": "A sleeping bag, a camp stove, canned food — all neatly organized. And a neat stack of books — every single one about Margaux Fontaine, the Monarch Theatre, or theatrical special effects. Alphabetized by author. Even living in a freezing basement eating cold soup and sleeping on concrete, whoever's been down here organizes their bibliography. I don't know if that's devotion or madness. Maybe there's no difference."
         },
         {
           "id": "bm_blue_machine",
