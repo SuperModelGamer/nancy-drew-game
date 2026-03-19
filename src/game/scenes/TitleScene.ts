@@ -8,11 +8,20 @@ import { createAuthFormElements, submitAuthForm } from '../ui/AuthFormOverlay';
 import { drawCornerOrnament, drawDecoDivider, drawSunburst, drawGeoBorder, DecoColors } from '../utils/art-deco';
 
 export class TitleScene extends Phaser.Scene {
+  private authFormDestroy: (() => void) | null = null;
+
   constructor() {
     super({ key: 'TitleScene' });
   }
 
   create(): void {
+    // Clean up DOM auth form elements when this scene shuts down
+    this.events.once('shutdown', () => {
+      if (this.authFormDestroy) {
+        this.authFormDestroy();
+        this.authFormDestroy = null;
+      }
+    });
     const { width, height } = this.cameras.main;
     const save = SaveSystem.getInstance();
 
@@ -285,6 +294,8 @@ export class TitleScene extends Phaser.Scene {
     const formY = height / 2 - 80;
     const formW = 460;
     const form = createAuthFormElements(this, formX, formY, formW);
+    // Track so we can clean up DOM elements if the scene shuts down
+    this.authFormDestroy = form.destroy;
 
     // ── Submit button — prominent, art deco styled with diamond accents ──
     const submitY = 75;
@@ -346,6 +357,7 @@ export class TitleScene extends Phaser.Scene {
         submitting = false;
       } else {
         form.destroy();
+        this.authFormDestroy = null;
         container.destroy();
         await SaveSystem.getInstance().syncFromCloud();
         this.scene.restart();
@@ -394,6 +406,7 @@ export class TitleScene extends Phaser.Scene {
     });
     guestBg.on('pointerdown', () => {
       form.destroy();
+      this.authFormDestroy = null;
       container.destroy();
     });
 
