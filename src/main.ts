@@ -14,6 +14,7 @@ import { IntroScene } from './game/scenes/IntroScene';
 import { CinematicScene } from './game/scenes/CinematicScene';
 import { HotspotEditorScene } from './game/scenes/HotspotEditorScene';
 import { AuthManager } from './game/systems/AuthManager';
+import { SaveSystem } from './game/systems/SaveSystem';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -41,18 +42,21 @@ const config: Phaser.Types.Core.GameConfig = {
 
 const game = new Phaser.Game(config);
 
-// Warn guest users that unsaved progress will be lost when leaving the page
+// Handle page unload: auto-save for signed-in users, warn guests
 window.addEventListener('beforeunload', (e) => {
   const auth = AuthManager.getInstance();
+  const activeScenes = game.scene.getScenes(true);
+  const isPlaying = activeScenes.some(
+    (s: Phaser.Scene) => s.scene.key === 'RoomScene' || s.scene.key === 'PuzzleScene',
+  );
 
-  // Only warn if: auth is available, user is NOT signed in, and a game scene is active
-  if (auth.isAvailable() && !auth.isSignedIn()) {
-    const activeScenes = game.scene.getScenes(true);
-    const isPlaying = activeScenes.some(
-      (s: Phaser.Scene) => s.scene.key === 'RoomScene' || s.scene.key === 'PuzzleScene',
-    );
-    if (isPlaying) {
-      e.preventDefault();
-    }
+  if (!isPlaying) return;
+
+  if (auth.isAvailable() && auth.isSignedIn()) {
+    // Signed-in users: auto-save silently, no warning
+    SaveSystem.getInstance().save();
+  } else {
+    // Guest users: warn about unsaved progress
+    e.preventDefault();
   }
 });

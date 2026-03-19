@@ -9,6 +9,8 @@ import { POINTER_CURSOR } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
 import { drawChevronTab, drawCornerOrnament, drawDecoDivider, drawSunburst, drawGeoBorder, DecoColors } from '../utils/art-deco';
+import { AuthManager } from '../systems/AuthManager';
+import { createAuthFormElements, submitAuthForm } from '../ui/AuthFormOverlay';
 
 // Height of the bottom toolbar strip (buttons + chapter label)
 const TOOLBAR_H = 112;
@@ -1521,11 +1523,211 @@ export class UIScene extends Phaser.Scene {
     this.settingsContent.add(divGfx2);
     y += 30;
 
+    // ── Account / Cloud Saves ──
+    const auth = AuthManager.getInstance();
+    if (auth.isAvailable()) {
+      this.settingsContent.add(this.add.text(cx, y, 'ACCOUNT', {
+        fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+        fontStyle: 'bold', letterSpacing: 4,
+      }).setOrigin(0.5, 0));
+      y += 35;
+
+      if (auth.isSignedIn()) {
+        // Show connected status
+        this.settingsContent.add(this.add.text(cx, y, `Signed in as ${auth.getDisplayName()}`, {
+          fontFamily: FONT, fontSize: '16px', color: '#4a6a4a', fontStyle: 'italic',
+        }).setOrigin(0.5, 0));
+        y += 30;
+
+        this.settingsContent.add(this.add.text(cx, y, 'Your progress is saved automatically.', {
+          fontFamily: FONT, fontSize: '14px', color: '#6a5a4a', fontStyle: 'italic',
+        }).setOrigin(0.5, 0));
+        y += 40;
+      } else {
+        // Guest user — show create account button
+        this.settingsContent.add(this.add.text(cx, y, 'Playing as guest — progress is local only.', {
+          fontFamily: FONT, fontSize: '15px', color: '#7a4a3a', fontStyle: 'italic',
+        }).setOrigin(0.5, 0));
+        y += 35;
+
+        const acctBtnW = 260;
+        const acctBtnH = 48;
+        const acctBg = this.add.rectangle(cx, y + acctBtnH / 2, acctBtnW, acctBtnH, 0x1a2a1a, 0.4);
+        acctBg.setStrokeStyle(1.5, TAB_GOLD, 0.6);
+        acctBg.setInteractive({ cursor: POINTER_CURSOR });
+        this.settingsContent.add(acctBg);
+
+        const acctText = this.add.text(cx, y + acctBtnH / 2, 'Create Account', {
+          fontFamily: FONT, fontSize: '20px', color: TAB_GOLD_STR, fontStyle: 'bold',
+        }).setOrigin(0.5);
+        this.settingsContent.add(acctText);
+
+        acctBg.on('pointerover', () => {
+          acctBg.setFillStyle(0x2a3a2a, 0.6);
+          acctBg.setStrokeStyle(1.5, TAB_GOLD, 0.9);
+        });
+        acctBg.on('pointerout', () => {
+          acctBg.setFillStyle(0x1a2a1a, 0.4);
+          acctBg.setStrokeStyle(1.5, TAB_GOLD, 0.6);
+        });
+        acctBg.on('pointerdown', () => {
+          UISounds.click();
+          this.closeSettings();
+          this.showInGameAuthDialog();
+        });
+
+        y += acctBtnH + 40;
+      }
+
+      // ── Divider ──
+      const divGfx3 = this.add.graphics();
+      divGfx3.lineStyle(1, 0x5a4a3a, 0.2);
+      divGfx3.lineBetween(cx - sliderW / 2, y, cx + sliderW / 2, y);
+      this.settingsContent.add(divGfx3);
+      y += 30;
+    }
+
     // ── Credits / About ──
     this.settingsContent.add(this.add.text(cx, y,
       'Nancy Drew: The Last Curtain Call\nA mystery by @supermodelgamer', {
         fontFamily: FONT, fontSize: '17px', color: '#6a5a4a',
         fontStyle: 'italic', align: 'center', lineSpacing: 6,
       }).setOrigin(0.5, 0));
+  }
+
+  // ── In-game auth dialog for guest users ──
+  private authFormRef: { destroy: () => void } | null = null;
+
+  private showInGameAuthDialog(): void {
+    const { width, height } = this.cameras.main;
+
+    const container = this.add.container(width / 2, height / 2);
+    container.setDepth(Depths.dialogueBox + 50);
+    container.setAlpha(0);
+
+    // Full-screen dimmer
+    const dimmer = this.add.rectangle(0, 0, width, height, 0x02010a, 0.92);
+    dimmer.setInteractive();
+    container.add(dimmer);
+
+    // Panel
+    const panelW = 560;
+    const panelH = 520;
+    const box = this.add.rectangle(0, 0, panelW, panelH, 0x0a0918, 0.97);
+    box.setStrokeStyle(2, Colors.gold, 0.55);
+    container.add(box);
+
+    // Header
+    container.add(this.add.text(0, -220, 'CREATE ACCOUNT', {
+      fontFamily: FONT, fontSize: '22px', color: TextColors.gold,
+      fontStyle: 'bold', letterSpacing: 6,
+    }).setOrigin(0.5));
+
+    container.add(this.add.text(0, -185, 'Save your progress to the cloud', {
+      fontFamily: FONT, fontSize: '16px', color: TextColors.goldDim,
+      fontStyle: 'italic',
+    }).setOrigin(0.5));
+
+    // Tab toggle: SIGN IN | REGISTER
+    let mode: 'signin' | 'signup' = 'signup';
+    const tabY = -145;
+
+    const signInTab = this.add.text(-80, tabY, 'SIGN IN', {
+      fontFamily: FONT, fontSize: '18px', color: TextColors.muted,
+      letterSpacing: 4, fontStyle: 'bold',
+    }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
+    container.add(signInTab);
+
+    const tabSep = this.add.graphics();
+    tabSep.lineStyle(1.5, Colors.gold, 0.35);
+    tabSep.lineBetween(0, tabY - 12, 0, tabY + 12);
+    container.add(tabSep);
+
+    const registerTab = this.add.text(80, tabY, 'REGISTER', {
+      fontFamily: FONT, fontSize: '18px', color: TextColors.gold,
+      letterSpacing: 4, fontStyle: 'bold',
+    }).setOrigin(0.5).setInteractive({ cursor: POINTER_CURSOR });
+    container.add(registerTab);
+
+    const updateTabs = () => {
+      signInTab.setColor(mode === 'signin' ? TextColors.gold : TextColors.muted);
+      registerTab.setColor(mode === 'signup' ? TextColors.gold : TextColors.muted);
+      submitLabel.setText(mode === 'signin' ? 'SIGN IN' : 'CREATE ACCOUNT');
+    };
+    signInTab.on('pointerdown', () => { mode = 'signin'; updateTabs(); });
+    registerTab.on('pointerdown', () => { mode = 'signup'; updateTabs(); });
+
+    // DOM form inputs
+    const formX = width / 2;
+    const formY = height / 2 - 60;
+    const formW = 400;
+    const form = createAuthFormElements(this, formX, formY, formW);
+    this.authFormRef = form;
+
+    // Submit button
+    const submitY = 60;
+    const submitBg = this.add.rectangle(0, submitY, 400, 54, 0x14132e, 0.95);
+    submitBg.setStrokeStyle(2, Colors.gold, 0.8);
+    submitBg.setInteractive({ cursor: POINTER_CURSOR });
+    const submitLabel = this.add.text(0, submitY, 'CREATE ACCOUNT', {
+      fontFamily: FONT, fontSize: '20px', color: '#e8c55a',
+      fontStyle: 'bold', letterSpacing: 4,
+    }).setOrigin(0.5);
+    container.add([submitBg, submitLabel]);
+
+    let submitting = false;
+    submitBg.on('pointerover', () => submitBg.setFillStyle(0x1e1d3e, 1));
+    submitBg.on('pointerout', () => submitBg.setFillStyle(0x14132e, 0.95));
+    submitBg.on('pointerdown', async () => {
+      if (submitting) return;
+      submitting = true;
+      submitLabel.setText('...');
+      form.errorDiv.textContent = '';
+
+      const error = await submitAuthForm(form.emailInput.value, form.passwordInput.value, mode);
+      if (error) {
+        form.errorDiv.textContent = error;
+        updateTabs();
+        submitting = false;
+      } else {
+        form.destroy();
+        this.authFormRef = null;
+        container.destroy();
+        // Sync existing local save to cloud
+        await SaveSystem.getInstance().syncFromCloud();
+        // Save current progress to cloud immediately
+        SaveSystem.getInstance().save();
+      }
+    });
+
+    // Cancel button
+    const cancelY = 140;
+    const cancelBg = this.add.rectangle(0, cancelY, 400, 48, 0x0e0d1e, 0.9);
+    cancelBg.setStrokeStyle(1.5, Colors.gold, 0.4);
+    cancelBg.setInteractive({ cursor: POINTER_CURSOR });
+    const cancelLabel = this.add.text(0, cancelY, 'CANCEL', {
+      fontFamily: FONT, fontSize: '18px', color: TextColors.light,
+      letterSpacing: 4,
+    }).setOrigin(0.5);
+    container.add([cancelBg, cancelLabel]);
+
+    cancelBg.on('pointerover', () => cancelBg.setFillStyle(0x1a1a3e, 1));
+    cancelBg.on('pointerout', () => cancelBg.setFillStyle(0x0e0d1e, 0.9));
+    cancelBg.on('pointerdown', () => {
+      form.destroy();
+      this.authFormRef = null;
+      container.destroy();
+    });
+
+    // Fade in
+    this.tweens.add({ targets: container, alpha: 1, duration: 400, ease: 'Power2' });
+
+    // Clean up DOM on scene shutdown
+    this.events.once('shutdown', () => {
+      if (this.authFormRef) {
+        this.authFormRef.destroy();
+        this.authFormRef = null;
+      }
+    });
   }
 }
