@@ -217,7 +217,7 @@ export class TitleScene extends Phaser.Scene {
 
     // ── Panel dimensions ──
     const panelW = 660;
-    const panelH = 740;
+    const panelH = 820;
 
     // ── Subtle sunburst behind the panel ──
     const sunburstGfx = this.add.graphics();
@@ -323,14 +323,14 @@ export class TitleScene extends Phaser.Scene {
 
     // ── DOM form inputs (positioned in the center of the panel) ──
     const formX = width / 2;
-    const formY = height / 2 - 80;
+    const formY = height / 2 - 115;
     const formW = 460;
     const form = createAuthFormElements(this, formX, formY, formW);
     // Track so we can clean up DOM elements if the scene shuts down
     this.authFormDestroy = form.destroy;
 
     // ── Submit button — prominent, art deco styled with diamond accents ──
-    const submitY = 75;
+    const submitY = 135;
     const btnW = 460;
     const btnH = 62;
 
@@ -397,7 +397,7 @@ export class TitleScene extends Phaser.Scene {
     });
 
     // ── Continue as Guest — art deco button with double border ──
-    const guestY = 175;
+    const guestY = 235;
 
     const guestOuterGfx = this.add.graphics();
     guestOuterGfx.lineStyle(1, Colors.gold, 0.2);
