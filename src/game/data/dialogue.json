@@ -102,7 +102,8 @@
             },
             {
               "text": "Did Margaux have a lover? The diary mentions someone named 'J.'",
-              "nextNode": "lover_reveal"
+              "nextNode": "lover_reveal",
+              "requiredItem": "margaux_diary"
             }
           ]
         },
@@ -232,7 +233,7 @@
             {
               "text": "Your grandfather was James Hale — Margaux's lover.",
               "nextNode": "grandfather",
-              "requiredFlag": "learned_about_hale_family"
+              "requiredFlag": "saw_ghost"
             },
             {
               "text": "Stella says props have been going missing. Do you know anything about that?",
@@ -490,7 +491,8 @@
             {
               "text": "Tell me who's in the basement and I'll focus on the poisoning.",
               "nextNode": "stella_reveals_edwin",
-              "triggerEvent": "stella_confession"
+              "triggerEvent": "stella_confession",
+              "requiredItem": "stella_records"
             },
             {
               "text": "Let's talk about the effects system first.",
@@ -648,7 +650,7 @@
             { "speaker": "Diego", "text": "Actually, yes! I found an original script of The Crimson Veil stuffed inside a film canister. Handwritten annotations all through the margins in red ink. It's like finding a first folio in a dumpster — sorry, I'm a theater nerd." },
             { "speaker": "Diego", "text": "I thought it was blocking notes at first, but the marks are weird. Circled letters that don't match any stage directions I know. It's like — you know in mystery novels when there's a cipher? It's exactly like that, except I'm terrible at ciphers." },
             { "speaker": "Nancy", "text": "How many circled letters are there?" },
-            { "speaker": "Diego", "text": "I counted six in Act III alone. G, O, B, L, E, T — but I couldn't figure out what they mean. They're scattered through the stage directions, not the dialogue." }
+            { "speaker": "Diego", "text": "I counted six in Act III alone — scattered through the stage directions, not the dialogue. They don't spell anything obvious... at least, nothing I could figure out. But someone went through a lot of trouble to mark them." }
           ],
           "choices": [
             {
@@ -866,7 +868,8 @@
             },
             {
               "text": "You poisoned Ashworth.",
-              "nextNode": "poisoning"
+              "nextNode": "poisoning",
+              "requiredFlag": "poison_identified"
             },
             {
               "text": "Your grandfather was James Hale. This was never just about the theater.",
@@ -1167,6 +1170,21 @@
           ],
           "choices": [
             {
+              "text": "Vivian, I found Margaux's diary in the dressing room.",
+              "nextNode": "diary_reveal",
+              "requiredItem": "margaux_diary"
+            },
+            {
+              "text": "I found something in Margaux's trunk. I think it's yours.",
+              "nextNode": "locket_reveal",
+              "requiredItem": "margaux_locket"
+            },
+            {
+              "text": "The mirror in Margaux's dressing room — she wrote 'C.D.' on it. Does that mean anything to you?",
+              "nextNode": "mirror_accusation",
+              "requiredFlag": "margaux_accusation"
+            },
+            {
               "text": "How are you holding up?",
               "nextNode": "holding_up"
             },
@@ -1224,6 +1242,104 @@
           "lines": [
             { "speaker": "Vivian", "text": "Go, go. Solve the mystery. Save my theater. And Nancy — don't skip meals. You detectives always forget to eat. There are crackers in the concession stand. They're only slightly stale." }
           ]
+        },
+        {
+          "id": "diary_reveal",
+          "lines": [
+            { "speaker": "Vivian", "text": "Oh... oh, mon Dieu. I always hoped it survived. What does it say? Tell me — s'il te plaît." },
+            { "speaker": "Nancy", "text": "She suspected she was being poisoned. Long before the final night. 'The tea tastes wrong again,' she wrote." },
+            { "speaker": "Vivian", "text": "I knew it. I always knew it wasn't an accident." }
+          ],
+          "choices": [
+            {
+              "text": "She mentions someone with the initials 'C.D.' — does that mean anything to you?",
+              "nextNode": "cecilia_reveal",
+              "requiredItem": "margaux_diary"
+            },
+            {
+              "text": "Did Margaux have a lover? The diary mentions someone named 'J.'",
+              "nextNode": "lover_reveal",
+              "requiredItem": "margaux_diary"
+            },
+            {
+              "text": "I'll keep reading. There might be more.",
+              "nextNode": "start"
+            }
+          ]
+        },
+        {
+          "id": "cecilia_reveal",
+          "lines": [
+            { "speaker": "Vivian", "text": "C.D... Cecilia Drake. Margaux's understudy." },
+            { "speaker": "Vivian", "text": "She was young, ambitious, très talentueuse. Margaux adored her — took her under her wing. But Cecilia wanted more than mentorship. She wanted the role. She wanted... everything." },
+            { "speaker": "Nancy", "text": "And after Margaux died—" },
+            { "speaker": "Vivian", "text": "Cecilia took over Lady Ashford the very next night. The very next night, Nancy. She became a star. Built a forty-year career on the role she stole from a dead woman." },
+            { "speaker": "Vivian", "text": "She died in 1987. Celebrated. Beloved. While my Margaux was forgotten. C'est injuste. It's unbearable." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "learned_about_cecilia"
+        },
+        {
+          "id": "lover_reveal",
+          "lines": [
+            { "speaker": "Vivian", "text": "J? I... oui, yes. Margaux had a great love. Un grand amour. A man named James — James Hale. He was a stagehand here at the Monarch." },
+            { "speaker": "Nancy", "text": "Hale? As in Edwin Hale?" },
+            { "speaker": "Vivian", "text": "Edwin is James's grandson. That's why he's so... how shall I say... consumed by this theater, by Margaux's story. It's personal for him. His grandfather lost the love of his life on that stage." },
+            { "speaker": "Nancy", "text": "That changes everything." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "learned_about_hale_family"
+        },
+        {
+          "id": "locket_reveal",
+          "lines": [
+            { "speaker": "Vivian", "text": "..." },
+            { "speaker": "Vivian", "text": "That's... c'est moi. That's me. I was four years old." },
+            { "speaker": "Vivian", "text": "'To my little star.' Ma petite étoile. She called me that. Every time she held me. Every time." },
+            { "speaker": "Vivian", "text": "She kept it in the trunk. All these years, she... pardonne-moi... she locked it away because she knew. She knew she wouldn't be coming back." }
+          ],
+          "choices": [
+            {
+              "text": "She wanted to protect what mattered most.",
+              "nextNode": "locket_comfort"
+            },
+            {
+              "text": "Vivian — do you know who killed her?",
+              "nextNode": "locket_suspicion"
+            }
+          ]
+        },
+        {
+          "id": "locket_comfort",
+          "lines": [
+            { "speaker": "Nancy", "text": "She wanted to protect what mattered most." },
+            { "speaker": "Vivian", "text": "I've been waiting seventy years to know what happened to her. Soixante-dix ans. I've lived my whole life in this theater because I couldn't leave her behind." },
+            { "speaker": "Vivian", "text": "There are private archives in my office — Margaux's personal effects, letters, photographs. I've never let anyone touch them. Not once. Take whatever you need, ma chère." },
+            { "speaker": "Vivian", "text": "Don't let this building come down without the truth coming out. Je t'en prie. Please." }
+          ],
+          "triggerEvent": "vivian_full_trust"
+        },
+        {
+          "id": "locket_suspicion",
+          "lines": [
+            { "speaker": "Vivian", "text": "I was four years old when she died. I remember the screaming. I remember someone carrying me out of the theater." },
+            { "speaker": "Vivian", "text": "I've always suspected Cecilia. She was the understudy. She took the role. She never looked back. But I could never prove it." },
+            { "speaker": "Nancy", "text": "I'm going to find the proof. I promise." },
+            { "speaker": "Vivian", "text": "My office — there are private archives. Margaux's personal effects. Take whatever you need. Just bring me the truth." }
+          ],
+          "triggerEvent": "vivian_full_trust"
+        },
+        {
+          "id": "mirror_accusation",
+          "lines": [
+            { "speaker": "Vivian", "text": "C.D.... Margaux wrote that? On her own mirror?" },
+            { "speaker": "Nancy", "text": "In wax, hidden under the surface. She knew who was poisoning her and she left an accusation where only someone looking carefully would find it." },
+            { "speaker": "Vivian", "text": "Cecilia Drake. She — my godmother wrote the killer's initials on her mirror and nobody found them for a century. Mon Dieu. She was crying out for help and nobody heard her." },
+            { "speaker": "Nancy", "text": "I heard her, Vivian. Almost a hundred years late, but I heard her." },
+            { "speaker": "Vivian", "text": "Then make it count, Nancy. Make it count." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "learned_about_cecilia"
         }
       ]
     },
@@ -1242,7 +1358,7 @@
             {
               "text": "Your grandfather was James Hale — Margaux's lover.",
               "nextNode": "grandfather",
-              "requiredFlag": "learned_about_hale_family"
+              "requiredFlag": "saw_ghost"
             },
             {
               "text": "I found Margaux's diary. She knew she was being poisoned.",
@@ -1430,7 +1546,8 @@
             {
               "text": "Tell me who's in the basement and I'll focus on the poisoning.",
               "nextNode": "stella_reveals_edwin",
-              "triggerEvent": "stella_confession"
+              "triggerEvent": "stella_confession",
+              "requiredItem": "stella_records"
             },
             {
               "text": "Let's talk about something else.",

@@ -25,38 +25,37 @@ interface RoomDef {
   floor: 'upper' | 'main' | 'ground' | 'below';
   /** Minimum chapter required to ACCESS this room (can still be visible if discovered) */
   requiresChapter?: number;
+  /** Flag that must be set to ACCESS this room from the map */
+  requiresFlag?: string;
 }
 
 const ROOMS: RoomDef[] = [
   // Upper level — above the stage
-  { id: 'catwalk',          name: 'Catwalk',           fx: 0.30, fy: 0.12, floor: 'upper', requiresChapter: 3 },
-  { id: 'projection_booth', name: 'Projection Booth',  fx: 0.70, fy: 0.12, floor: 'upper' },
+  { id: 'catwalk',          name: 'Catwalk',           fx: 0.30, fy: 0.12, floor: 'upper', requiresChapter: 3, requiresFlag: 'catwalk_access' },
+  { id: 'projection_booth', name: 'Projection Booth',  fx: 0.70, fy: 0.12, floor: 'upper', requiresFlag: 'stella_backstage' },
 
   // Main level — the stage and wings
-  { id: 'backstage',        name: 'Backstage',         fx: 0.15, fy: 0.38, floor: 'main' },
+  { id: 'backstage',        name: 'Backstage',         fx: 0.15, fy: 0.38, floor: 'main',   requiresFlag: 'edwin_auditorium' },
   { id: 'auditorium',       name: 'Auditorium',        fx: 0.50, fy: 0.38, floor: 'main' },
-  { id: 'managers_office',  name: "Manager's Office",  fx: 0.85, fy: 0.38, floor: 'main' },
+  { id: 'managers_office',  name: "Manager's Office",  fx: 0.85, fy: 0.38, floor: 'main',   requiresChapter: 2 },
 
   // Ground level — front of house
-  { id: 'dressing_room',    name: 'Dressing Room',     fx: 0.28, fy: 0.64, floor: 'ground' },
+  { id: 'dressing_room',    name: 'Dressing Room',     fx: 0.28, fy: 0.64, floor: 'ground', requiresChapter: 2 },
   { id: 'lobby',            name: 'Grand Lobby',       fx: 0.68, fy: 0.64, floor: 'ground' },
 
   // Below stage
-  { id: 'basement',         name: 'Basement',          fx: 0.50, fy: 0.90, floor: 'below', requiresChapter: 4 },
+  { id: 'basement',         name: 'Basement',          fx: 0.50, fy: 0.90, floor: 'below',  requiresChapter: 4 },
 ];
 
-/** Connections between rooms shown as hallway lines */
+/** Connections between rooms shown as hallway lines (must match actual navigate/locked hotspots) */
 const CONNECTIONS: [string, string][] = [
-  ['catwalk', 'backstage'],
-  ['catwalk', 'auditorium'],
-  ['projection_booth', 'auditorium'],
-  ['projection_booth', 'managers_office'],
-  ['backstage', 'auditorium'],
-  ['backstage', 'dressing_room'],
-  ['auditorium', 'managers_office'],
-  ['auditorium', 'lobby'],
-  ['dressing_room', 'lobby'],
-  ['lobby', 'basement'],
+  ['catwalk', 'backstage'],          // cw_back <-> bs_catwalk_ladder
+  ['projection_booth', 'auditorium'], // pb_back <-> aud_projection_stairs
+  ['backstage', 'auditorium'],       // bs_back_aud <-> aud_backstage_door
+  ['backstage', 'basement'],         // bs_basement_door <-> bm_back
+  ['auditorium', 'dressing_room'],   // aud_dressing_door <-> dr_back
+  ['auditorium', 'lobby'],           // aud_back_lobby <-> lobby_staircase
+  ['lobby', 'managers_office'],      // lobby_managers_door <-> mo_back
 ];
 
 /** Floor labels for the cross-section diagram */
@@ -207,7 +206,9 @@ export class MapScene extends Phaser.Scene {
       const pos = getRoomPos(room);
       const isCurrentRoom = room.id === this.currentRoom;
       const isDiscovered = save.isRoomDiscovered(room.id);
-      const isLocked = room.requiresChapter !== undefined && chapter < room.requiresChapter;
+      const chapterLocked = room.requiresChapter !== undefined && chapter < room.requiresChapter;
+      const flagLocked = room.requiresFlag !== undefined && !save.getFlag(room.requiresFlag);
+      const isLocked = chapterLocked || flagLocked;
 
       const container = this.add.container(pos.x, pos.y);
       container.setDepth(contentDepth + 2);

@@ -23,7 +23,7 @@
           "height": 72,
           "label": "Concierge Desk",
           "type": "inspect",
-          "description": "An old concierge desk. There's a master key sitting on a brass hook and a note in shaky handwriting: 'Nancy — take the key. V.D.' Vivian's hand was trembling when she wrote this. She's more frightened than she's letting on."
+          "description": "An old concierge desk. There's a master key sitting on a brass hook and a note in shaky handwriting: 'Nancy — take the key. V.D.' Whoever wrote this was trembling. The ink smeared where the pen hesitated."
         },
         {
           "id": "lobby_key",
@@ -91,7 +91,7 @@
           "height": 115,
           "label": "Faded Poster",
           "type": "inspect",
-          "description": "A half-torn touring poster: 'BLACKMOOR PLAYERS present: The Penvellyn Curse — A Tale of Alchemy and Shadows.' There's pencil at the bottom: 'Brilliant. Almost too real. —M.F.' Margaux's handwriting. A play about alchemy... and later she'd be poisoned by an alchemical compound. 'Almost too real' is right, Margaux. Next to it, a smaller bill: 'Mystico the Magnificent — One Night Only!' with a cartoon magician in a top hat. Cute."
+          "description": "A half-torn touring poster: 'BLACKMOOR PLAYERS present: The Penvellyn Curse — A Tale of Alchemy and Shadows.' There's pencil at the bottom: 'Brilliant. Almost too real. —M.F.' Margaux's handwriting. A play about alchemy and poison. Given what happened to Margaux, 'almost too real' hits differently. Next to it, a smaller bill: 'Mystico the Magnificent — One Night Only!' with a cartoon magician in a top hat. Cute."
         },
         {
           "id": "lobby_vivian",
@@ -131,7 +131,8 @@
           "height": 233,
           "label": "Coat Check",
           "type": "inspect",
-          "description": "An old coat check — mothballs and empty hangers. Wait. There's a modern rain jacket on one hook. That doesn't belong here. The pockets have a granola bar wrapper and... a receipt from a chemical supply company. Dated last week. Someone bought antimony tartrate, glycol fog fluid, and UV-reactive paint. Paid cash — smart, no card trail. But they left the receipt in their pocket — not so smart. And the store is three blocks from Edwin's address. Antimony for poison, glycol for fog, UV paint for glowing. Whoever bought this was building a ghost AND planning to hurt someone. I'd better hang onto this information."
+          "description": "An old coat check — mothballs and empty hangers. Wait. There's a modern rain jacket on one hook. That doesn't belong here. The pockets have a granola bar wrapper and... a receipt from a chemical supply company. Dated last week. Someone bought antimony tartrate, glycol fog fluid, and UV-reactive paint. Paid cash — smart, no card trail. But they left the receipt in their pocket — not so smart. Antimony is a poison. Glycol is used in fog machines. UV paint makes things glow in the dark. Whoever bought this had a very specific plan. I'd better hang onto this information.",
+          "setsFlag": "found_chemical_receipt"
         },
         {
           "id": "lobby_wall_sconce",
@@ -230,6 +231,7 @@
           "height": 136,
           "label": "Seat G-12",
           "type": "inspect",
+          "showWhen": "edwin_auditorium",
           "description": "This is Edwin's regular seat — G-12. There's a folded note in the pocket, his handwriting: 'Lighting cue for Act III, Scene 4 — crimson wash, moonlight blue, center spot, crimson wash. She would have been standing HERE when the lights changed.' An arrow points to center stage. He's reconstructing the exact moment Margaux died. That's... incredibly thorough. Or incredibly personal."
         },
         {
@@ -448,7 +450,7 @@
           "height": 130,
           "label": "Bust & Props",
           "type": "inspect",
-          "description": "Rows of old costumes — velvet, silk, moth-eaten lace. But one white gown near the back makes the hair on my arms stand up. It's not dusty. The hem is damp. I check the label with slightly unsteady hands: 'Lady Ashford — Act III.' This is Margaux's costume from the night she died. And someone has been wearing it. Recently. The UV-reactive paint from that receipt, the fog machine residue, and now a freshly worn costume — whoever's playing ghost isn't improvising. They've been rehearsing."
+          "description": "Rows of old costumes — velvet, silk, moth-eaten lace. But one white gown near the back makes the hair on my arms stand up. It's not dusty. The hem is damp. I check the label with slightly unsteady hands: 'Lady Ashford — Act III.' This is Margaux's costume from the night she died. And someone has been wearing it. Recently. The fabric has a faint chemical smell and there's fog machine residue along the hem — whoever's playing ghost isn't improvising. They've been rehearsing."
         },
         {
           "id": "bs_rigging_ropes",
@@ -458,7 +460,7 @@
           "height": 166,
           "label": "Rigging Ropes",
           "type": "inspect",
-          "description": "Dozens of hemp ropes running up to the fly loft — each one moves a different piece of scenery. The counterweights are massive lead bricks on steel cables. Don't touch. But one rope catches my eye — it's new. Fresh hemp, not frayed like the others. The label reads 'TRAP CENTER' in neat, precise handwriting. I've seen that handwriting in the guest ledger. Edwin's."
+          "description": "Dozens of hemp ropes running up to the fly loft — each one moves a different piece of scenery. The counterweights are massive lead bricks on steel cables. Don't touch. But one rope catches my eye — it's new. Fresh hemp, not frayed like the others. The label reads 'TRAP CENTER' in neat, precise handwriting. Someone replaced this rope recently — and they labeled it like a professional. Or an obsessive."
         },
         {
           "id": "bs_basement_door",
@@ -524,7 +526,7 @@
           "label": "Stella's Lockbox",
           "type": "locked",
           "puzzleId": "lockbox_puzzle",
-          "description": "A metal lockbox shoved under Stella's work station. Four-digit combination lock. She doesn't want anyone getting into this. Given what I found on the call board, I have a pretty good idea what's inside. Four digits. Knowing Stella, it's probably something practical — a date, a dollar amount. Something she'd never forget."
+          "description": "A metal lockbox shoved under Stella's work station. Four rotating dials, each engraved with little theatrical symbols — masks, spotlights, curtains, roses, and more. She doesn't want anyone getting into this. I need to find the right combination of symbols. Knowing Stella, the answer is probably somewhere nearby."
         },
         {
           "id": "bs_table_lamp",
@@ -616,7 +618,7 @@
           "height": 369,
           "label": "Rose Vase",
           "type": "inspect",
-          "description": "A corsage of dried red roses preserved under glass. The card reads: 'Break a leg, darling — C.' Cecilia sent this to Margaux on the night of the final performance. 'Break a leg.' Wait — Cecilia sent the corsage AND the mirror says C.D. changed the goblet. She was right there, backstage, that night. She had access to the props. If Cecilia really did poison her, then this card is the coldest thing I've ever read. A goodbye disguised as a good luck wish."
+          "description": "A corsage of dried red roses preserved under glass. The card reads: 'Break a leg, darling — C.' Someone with the initial C sent this to Margaux on the night of the final performance. 'Break a leg.' Whoever C was, they were close to Margaux — close enough to be backstage that night. Close enough to have access to the props. 'Break a leg' feels like a cruel joke if C knew what was about to happen."
         },
         {
           "id": "dr_costume_hook",
@@ -626,7 +628,7 @@
           "height": 611,
           "label": "Hanging Costumes",
           "type": "inspect",
-          "description": "Hooks for Margaux's costumes — most are moth-eaten relics. But one hook is empty. The label reads 'Lady Ashford — Act III, The Crimson Veil.' The costume from her death scene. I saw it backstage — freshly worn, hem still damp. Someone took it from this room. Someone who wanted to become Margaux's ghost."
+          "description": "Hooks for Margaux's costumes — most are moth-eaten relics. But one hook is empty. The label reads 'Lady Ashford — Act III, The Crimson Veil.' The costume from her death scene is missing. Someone took it from this room. Someone who wanted to become Margaux's ghost."
         },
         {
           "id": "dr_photos",
@@ -636,7 +638,7 @@
           "height": 431,
           "label": "Wall Photos",
           "type": "inspect",
-          "description": "Framed photographs of Margaux in her roles — she was beautiful. Commanding. In one, she stands with a younger woman. The inscription reads: 'With my dear Cecilia, who will one day outshine us all.' The glass over Cecilia's face is cracked. Deliberately. Someone punched this. Someone who knew what Cecilia did."
+          "description": "Framed photographs of Margaux in her roles — she was beautiful. Commanding. In one, she stands with a younger woman. The inscription reads: 'With my dear C., who will one day outshine us all.' The glass over the younger woman's face is cracked. Deliberately. Someone punched this. Someone who knew what she did."
         },
         {
           "id": "dr_lamp",
@@ -687,6 +689,7 @@
           "height": 139,
           "label": "Old Book",
           "type": "inspect",
+          "setsFlag": "found_alchemy_book",
           "description": "Wedged behind the settee cushion — a leather-bound book: 'The Alchemist's Apprentice — A Study of Poisons and Their Remedies, 1890.' A bookplate reads: 'From the library of the Penvellyn Family, Blackmoor Manor.' I flip through dog-eared pages until I find it: a section on antimony compounds, annotated in Margaux's handwriting. 'These are my symptoms exactly.' She was researching her own poisoning. She figured it out, documented it, and still nobody helped her. That's heartbreaking."
         },
         {
@@ -708,6 +711,17 @@
           "label": "Theater Mask",
           "type": "inspect",
           "description": "A porcelain theater mask — comedy faces outward, but I turn it over and find the tragedy side. Scratched into the inner rim: 'For M. — the greatest actress who ever lived. —J.' There's J. again. He gave her this. Comedy and tragedy in one — that's a love letter from someone who understood her. I'm starting to think J. might be the key to this whole story."
+        },
+        {
+          "id": "dr_vivian_archive",
+          "x": 162,
+          "y": 290,
+          "width": 160,
+          "height": 120,
+          "label": "Vivian's Archive Box",
+          "type": "inspect",
+          "showWhen": "vivian_full_trust",
+          "description": "A box tucked in the corner — Vivian's private archive. She said I could look through Margaux's personal effects. Inside: bundles of letters tied with ribbon, playbills annotated in Margaux's hand, and a sealed envelope marked 'For Vivian — if something happens to me.' It was never opened. Vivian couldn't bring herself to read it. Inside is a single page in Margaux's handwriting: 'I know what C. has been putting in my tea. I can taste it. But I won't stop performing — this role is mine and I will die on that stage before I give it up. If you're reading this, ma petite étoile, then I did.' The bravest and most heartbreaking thing I've ever read."
         },
         {
           "id": "dr_back",
@@ -845,6 +859,17 @@
           "description": "A worn wooden stool where the projectionist once sat for hours. Decades of splinters and coffee rings mark its surface."
         },
         {
+          "id": "pb_film_decoded",
+          "x": 1094,
+          "y": 851,
+          "width": 143,
+          "height": 80,
+          "label": "Decoded Film",
+          "type": "inspect",
+          "showWhen": "film_decoded",
+          "description": "Now that the frames are in order, the sequence is devastating. Frame one: a toast on stage, the goblet is raised. Frame two: Margaux drinks. Frame three: she collapses. Frame four: a figure in the wings steps forward — the understudy, already in costume, already ready. She was prepared. She knew what was going to happen. This isn't a rehearsal gone wrong. It's a murder caught on film."
+        },
+        {
           "id": "pb_graffiti",
           "x": 1029,
           "y": 660,
@@ -852,7 +877,7 @@
           "height": 144,
           "label": "Wall Scratches",
           "type": "inspect",
-          "description": "Decades of scratched graffiti from bored projectionists — initials, dates, little drawings. One makes me stop: 'M.F. + J.H. 1927 ♥.' Margaux Fontaine and J.H. — so J.'s last name started with H. And below it, much newer: 'E.H. was here. For her.' E.H. Edwin Hale. His last name is Hale. J.H.... could J. have been a Hale too? In the corner, scratched with what looks like a key: 'SONNY JOON WAS HERE — THE TRUTH IS OUT THERE' surrounded by tiny alien doodles. Okay, that one I can't explain."
+          "description": "Decades of scratched graffiti from bored projectionists — initials, dates, little drawings. One makes me stop: 'M.F. + J.H. 1927 ♥.' Margaux Fontaine and J.H. — so J.'s last name started with H. And below it, much newer: 'E.H. was here. For her.' E.H. — someone with the same last initial as J.H. That's a coincidence I'm not comfortable ignoring. In the corner, scratched with what looks like a key: 'SONNY JOON WAS HERE — THE TRUTH IS OUT THERE' surrounded by tiny alien doodles. Okay, that one I can't explain."
         },
         {
           "id": "pb_back",
@@ -1026,8 +1051,8 @@
           "label": "Poisoned Teacup",
           "type": "locked",
           "puzzleId": "tea_analysis",
-          "description": "The teacup from Ashworth's poisoning — still sitting on his desk with crystalline residue at the bottom. The police left it here as 'not evidence enough.' But I have Margaux's alchemy book from the dressing room. If I compare the residue to the compounds described in her annotations, I can identify exactly what was used.",
-          "showWhen": "chapter_3"
+          "description": "The teacup from Ashworth's poisoning — still sitting on his desk with crystalline residue at the bottom. The police left it here as 'not evidence enough.' But that alchemy book from the dressing room has detailed annotations about compounds and their effects. If I compare the residue to what's described in those notes, I can identify exactly what was used.",
+          "showWhen": "found_alchemy_book"
         },
         {
           "id": "mo_back",
@@ -1148,7 +1173,7 @@
           "height": 140,
           "label": "Carved Initials",
           "type": "inspect",
-          "description": "Initials carved into the railing — decades of stagehands. One set stops me cold: 'M.F. ♥ J.H. — 1927.' The same initials from the projection booth. M.F. and J.H. came up here together, a hundred feet above the world. They carved their names where nobody would see. J.H. — James Hale. Edwin's grandfather. Margaux's secret lover was Edwin's grandfather. Edwin isn't just a historian. He's family. This whole investigation is personal for him. That changes everything."
+          "description": "Initials carved into the railing — decades of stagehands. One set stops me cold: 'M.F. ♥ J.H. — 1927.' M.F. and J.H. came up here together, a hundred feet above the world. They carved their names where nobody would see. Margaux and her mysterious J. This is the most intimate thing I've found yet. Whoever J.H. was, this wasn't casual."
         },
         {
           "id": "cw_back",
@@ -1185,7 +1210,7 @@
           "height": 150,
           "label": "Bottle Shelves",
           "type": "inspect",
-          "description": "Chemical bottles on a shelf — some labeled for the fog machine, but others are pharmaceutical compounds. I read the labels and my stomach drops. Antimony tartrate. The same substance from Margaux's alchemy book. Hold on — let me think. The alchemy book was in the dressing room. The chemical receipt was in the coat check. The dosage notes are in Edwin's handwriting. He found Margaux's research, identified the compound she was poisoned with, and then used the exact same poison on Ashworth. He used her own murder to commit his crime. A precise dose — they wanted to make someone sick, not kill them. But still."
+          "description": "Chemical bottles on a shelf — some labeled for the fog machine, but others are pharmaceutical compounds. I read the labels and my stomach drops. Antimony tartrate. The same compound used to poison people in the 1920s. And here it is, in a basement underneath the theater where someone was recently poisoned. A measuring syringe sits beside the bottle with careful dosage notes — whoever did this calculated a precise amount. Enough to make someone very sick, but not enough to kill. That's not rage. That's planning."
         },
         {
           "id": "bm_fog_controls",
@@ -1217,7 +1242,7 @@
           "height": 150,
           "label": "Stone Archway",
           "type": "inspect",
-          "description": "A section of the basement wall has been carefully dismantled — the mortar here is different from the rest, newer somehow. Someone noticed that inconsistency and pried it open. Inside the alcove: letters tied with ribbon, and a small vial with crystalline residue. The letters are between Cecilia Drake and a pharmacist, dated October 1928. Cecilia bricked up the evidence of her own crime in this wall, probably thinking no one would ever look. It stayed hidden for almost a century — until someone who'd been studying this building for fifteen years noticed the mortar didn't match."
+          "description": "A section of the basement wall has been carefully dismantled — the mortar here is different from the rest, newer somehow. Someone noticed that inconsistency and pried it open. Inside the alcove: letters tied with ribbon, and a small vial with crystalline residue. The letters are correspondence with a pharmacist, dated October 1928. Someone bricked up the evidence of their own crime in this wall, probably thinking no one would ever look. It stayed hidden for almost a century — until someone studying this building noticed the mortar didn't match."
         },
         {
           "id": "bm_cecilia_letter",
@@ -1270,7 +1295,8 @@
           "height": 120,
           "label": "Edwin Hale",
           "type": "talk",
-          "dialogueId": "edwin_confronted"
+          "dialogueId": "edwin_confronted",
+          "showWhen": "edwins_notebook"
         },
         {
           "id": "bm_old_crates",
@@ -1320,7 +1346,7 @@
           "height": 50,
           "label": "Sleeping Bag",
           "type": "inspect",
-          "description": "A sleeping bag, a camp stove, canned food — all neatly organized, because of course they are. And a neat stack of books — every single one about Margaux Fontaine, the Monarch Theatre, or theatrical special effects. Alphabetized by author. Even when living in a freezing basement eating cold soup and sleeping on concrete, Edwin Hale organizes his bibliography. I don't know if that's devotion or madness. Maybe there's no difference."
+          "description": "A sleeping bag, a camp stove, canned food — all neatly organized. And a neat stack of books — every single one about Margaux Fontaine, the Monarch Theatre, or theatrical special effects. Alphabetized by author. Even living in a freezing basement eating cold soup and sleeping on concrete, whoever's been down here organizes their bibliography. I don't know if that's devotion or madness. Maybe there's no difference."
         },
         {
           "id": "bm_blue_machine",
@@ -1330,7 +1356,7 @@
           "height": 60,
           "label": "Strange Device",
           "type": "inspect",
-          "description": "Something glows faintly blue in the corner. I step closer — it's a UV light source. The kind that makes luminescent paint glow in the dark. Of course. The white costume, the UV-reactive paint from the chemical receipt, this light. Under these conditions, the 'ghost' wouldn't just appear — it would glow. Otherworldly. Beautiful. Completely fake."
+          "description": "Something glows faintly blue in the corner. I step closer — it's a UV light source. The kind that makes luminescent paint glow in the dark. Combine this with a white costume and luminous paint, and you'd get something that doesn't just appear — it would glow. Otherworldly. Beautiful. Completely fake."
         },
         {
           "id": "bm_evidence_board",
