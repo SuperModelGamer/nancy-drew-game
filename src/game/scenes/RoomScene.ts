@@ -312,34 +312,8 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private showThoughtBubble(text: string): void {
-    const { width } = this.cameras.main.worldView;
-    const bubbleW = Math.min(700, width * 0.5);
-    const padding = 16;
-
-    const textObj = this.add.text(width / 2, 80, text, {
-      fontFamily: FONT,
-      fontSize: '20px',
-      fontStyle: 'italic',
-      color: TextColors.light,
-      wordWrap: { width: bubbleW - padding * 2 },
-      align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-
-    const bgH = textObj.height + padding * 2;
-    const bg = this.add.rectangle(width / 2, 80 + textObj.height / 2, bubbleW, bgH, 0x0a0a1a, 0.85);
-    bg.setStrokeStyle(1.5, Colors.gold, 0.4);
-    bg.setDepth(Depths.tooltip - 1);
-
-    // Fade in, hold, fade out
-    bg.setAlpha(0);
-    textObj.setAlpha(0);
-    this.tweens.add({ targets: [bg, textObj], alpha: 1, duration: 400 });
-    this.time.delayedCall(5000, () => {
-      this.tweens.add({
-        targets: [bg, textObj], alpha: 0, duration: 600,
-        onComplete: () => { bg.destroy(); textObj.destroy(); },
-      });
-    });
+    // Use the same description box style as hotspot clues for consistency
+    this.showDescription(text);
   }
 
   // Uniform cover scale + offset from 1920×1080 design space to viewport
