@@ -115,6 +115,9 @@ export class BootScene extends Phaser.Scene {
       'intro_stage_1928', 'intro_goblet', 'intro_stage_empty',
       'intro_exterior', 'intro_lobby_dark', 'intro_ghost',
       'intro_phone', 'intro_doors',
+      'intro_newspaper', 'intro_marquee_lights', 'intro_backstage',
+      'intro_poison_bottle', 'intro_demolition', 'intro_ghost_stage',
+      'intro_nancy_car',
     ];
     for (const key of introImages) {
       this.load.image(key, `assets/intro/${key}.png`);

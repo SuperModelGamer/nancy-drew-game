@@ -281,7 +281,7 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     // Text
     const { width, height } = this.cameras.main;
     const totalLines = slide.lines.length;
-    const lineHeight = 32;
+    const lineHeight = 44;
     const startY = height / 2 - (totalLines * lineHeight) / 2;
 
     if (slide.effect === 'typewriter') {
@@ -578,7 +578,7 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     return new Promise<void>((resolve) => {
       const line = lines[0] || '';
       const t = this.add.text(width / 2, startY + lineHeight, line, {
-        fontFamily: FONT, fontSize: '42px', color: TextColors.gold,
+        fontFamily: FONT, fontSize: '56px', color: TextColors.gold,
         fontStyle: 'italic', align: 'center',
       }).setOrigin(0.5).setAlpha(0).setDepth(5);
       this.currentTexts.push(t);
@@ -605,8 +605,8 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     else if (isStageDirection) { color = TextColors.goldDim; style = 'italic'; }
 
     return this.add.text(x, y, text, {
-      fontFamily: FONT, fontSize: '26px', color, fontStyle: style, align: 'center',
-      shadow: { offsetX: 0, offsetY: 2, color: '#000000', blur: 6, fill: true },
+      fontFamily: FONT, fontSize: '34px', color, fontStyle: style, align: 'center',
+      shadow: { offsetX: 0, offsetY: 3, color: '#000000', blur: 8, fill: true },
     }).setOrigin(0.5).setDepth(5);
   }
 

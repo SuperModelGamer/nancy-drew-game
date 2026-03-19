@@ -6,70 +6,106 @@ import { Colors, TextColors, FONT } from '../utils/constants';
 // ─── Intro Slides ────────────────────────────────────────────────────────────
 
 const INTRO_SLIDES: Slide[] = [
-  // ACT I: The Night of the Murder (1928)
+  // ── ACT I: The Night of the Murder (1928) ─────────────────────────────────
+
   {
     lines: [
       'October 31, 1928.',
-      '',
-      'The Monarch Theatre is packed to the rafters.',
-      'Every seat sold for the final performance of',
-      '"The Crimson Veil."',
     ],
-    effect: 'typewriter',
+    effect: 'dramatic',
     pauseAfter: 2000,
-    bgImage: 'intro_stage_1928',
-    bgAlpha: 0.65,
-    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -10 },
+    bgImage: 'intro_marquee_lights',
+    bgAlpha: 0.7,
+    camera: { scaleFrom: 1.0, scaleTo: 1.05, panY: -5 },
     audio: [
       { key: 'ambient_theater', volume: 0.3, loop: true },
     ],
   },
   {
     lines: [
-      'On stage, Margaux Fontaine raises the goblet.',
-      'The audience holds its breath.',
-      '',
-      'She drinks.',
-      '',
-      'She falls.',
-      '',
-      'The curtain drops for the last time.',
+      'The Monarch Theatre is packed to the rafters.',
+      'Every seat sold for the final performance',
+      'of "The Crimson Veil."',
     ],
     effect: 'typewriter',
     pauseAfter: 2500,
+    bgImage: 'intro_stage_1928',
+    bgAlpha: 0.65,
+    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -10 },
+  },
+  {
+    lines: [
+      'On stage, Margaux Fontaine raises the goblet.',
+      'The audience holds its breath.',
+    ],
+    effect: 'typewriter',
+    pauseAfter: 2000,
     bgImage: 'intro_goblet',
     bgAlpha: 0.55,
-    camera: { scaleFrom: 1.05, scaleTo: 1.2, panY: 5 },
+    camera: { scaleFrom: 1.05, scaleTo: 1.15, panY: 5 },
     audio: [
       { key: 'sfx_goblet', delay: 1500, volume: 0.5 },
-      { key: 'sfx_thud', delay: 4500, volume: 0.4 },
-    ],
-    effects: [
-      { type: 'screenShake', delay: 4500, duration: 300 },
     ],
   },
   {
     lines: [
-      'They called it a tragic accident.',
-      'Poison in a prop goblet — a terrible mistake.',
+      'She drinks.',
       '',
-      'But someone in that theater knew the truth.',
-      'And they took it to their grave.',
+      'She falls.',
     ],
     effect: 'fade',
+    pauseAfter: 2500,
+    bgImage: 'intro_goblet',
+    bgAlpha: 0.4,
+    camera: { scaleFrom: 1.15, scaleTo: 1.25, panY: 10 },
+    audio: [
+      { key: 'sfx_thud', delay: 1200, volume: 0.4 },
+    ],
+    effects: [
+      { type: 'screenShake', delay: 1200, duration: 400 },
+    ],
+  },
+  {
+    lines: [
+      'The curtain drops for the last time.',
+    ],
+    effect: 'dramatic',
     pauseAfter: 2500,
     bgImage: 'intro_stage_empty',
     bgAlpha: 0.5,
     camera: { scaleFrom: 1.0, scaleTo: 1.05, panX: -15 },
   },
+  {
+    lines: [
+      'They called it a tragic accident.',
+      'Poison in a prop goblet — a terrible mistake.',
+    ],
+    effect: 'fade',
+    pauseAfter: 2500,
+    bgImage: 'intro_newspaper',
+    bgAlpha: 0.55,
+    camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: -5 },
+  },
+  {
+    lines: [
+      'But someone in that theater knew the truth.',
+      'And they took it to their grave.',
+    ],
+    effect: 'typewriter',
+    pauseAfter: 2500,
+    bgImage: 'intro_backstage',
+    bgAlpha: 0.45,
+    camera: { scaleFrom: 1.0, scaleTo: 1.08, panX: 10 },
+  },
 
-  // ACT II: Present Day
+  // ── ACT II: Present Day ───────────────────────────────────────────────────
+
   {
     lines: [
       'Nearly a century later...',
     ],
     effect: 'dramatic',
-    pauseAfter: 2000,
+    pauseAfter: 2500,
     effects: [
       { type: 'flashWhite', delay: 0, duration: 400 },
     ],
@@ -77,10 +113,8 @@ const INTRO_SLIDES: Slide[] = [
   {
     lines: [
       'The Monarch Theatre stands condemned.',
-      'Developer Roland Ashworth plans to demolish it.',
-      '',
-      'Then he collapses at the concierge desk.',
-      'Poisoned — the same way Margaux died.',
+      'Developer Roland Ashworth plans to raze it',
+      'and build luxury condominiums.',
     ],
     effect: 'fade',
     pauseAfter: 2500,
@@ -88,16 +122,51 @@ const INTRO_SLIDES: Slide[] = [
     bgAlpha: 0.55,
     camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: -8 },
     fogIntensity: 0.08,
+  },
+  {
+    lines: [
+      'Then he collapses at the concierge desk.',
+      'Poisoned — the same way Margaux died.',
+    ],
+    effect: 'typewriter',
+    pauseAfter: 2500,
+    bgImage: 'intro_poison_bottle',
+    bgAlpha: 0.5,
+    camera: { scaleFrom: 1.0, scaleTo: 1.1, panY: 5 },
     effects: [
-      { type: 'screenShake', delay: 1400, duration: 400 },
+      { type: 'screenShake', delay: 800, duration: 400 },
     ],
   },
+  {
+    lines: [
+      'The demolition crew arrives in 48 hours.',
+      'The police have no leads.',
+    ],
+    effect: 'fade',
+    pauseAfter: 2500,
+    bgImage: 'intro_demolition',
+    bgAlpha: 0.5,
+    camera: { scaleFrom: 1.0, scaleTo: 1.05, panX: -10 },
+    fogIntensity: 0.06,
+  },
 
-  // ACT III: The Ghost
+  // ── ACT III: The Ghost ────────────────────────────────────────────────────
+
   {
     lines: [
       'And the ghost has returned.',
-      '',
+    ],
+    effect: 'dramatic',
+    pauseAfter: 2000,
+    bgImage: 'intro_ghost_stage',
+    bgAlpha: 0.45,
+    fogIntensity: 0.15,
+    effects: [
+      { type: 'ghostFlicker', delay: 300, duration: 4000 },
+    ],
+  },
+  {
+    lines: [
       'A figure in white on the empty stage.',
       'Footsteps where no one walks.',
       'A voice reciting lines from a play',
@@ -112,10 +181,10 @@ const INTRO_SLIDES: Slide[] = [
     audio: [
       { key: 'sfx_ghost_whisper', delay: 800, volume: 0.3 },
     ],
-    effects: [
-      { type: 'ghostFlicker', delay: 500, duration: 6000 },
-    ],
   },
+
+  // ── ACT IV: The Call ──────────────────────────────────────────────────────
+
   {
     lines: [
       'Vivian Delacroix — Margaux\'s goddaughter —',
@@ -132,12 +201,9 @@ const INTRO_SLIDES: Slide[] = [
       { key: 'sfx_phone_ring', delay: 1500, volume: 0.4 },
     ],
   },
-
-  // ACT IV: The Call
   {
     lines: [
       '"Nancy, please come quickly.',
-      'The demolition crew arrives tomorrow.',
       'Someone has been poisoned.',
       'And the ghost of Margaux Fontaine',
       'walks these halls again."',
@@ -148,17 +214,32 @@ const INTRO_SLIDES: Slide[] = [
     bgAlpha: 0.45,
     camera: { scaleFrom: 1.05, scaleTo: 1.12, panX: -5 },
   },
+
+  // ── ACT V: Arrival ────────────────────────────────────────────────────────
+
   {
     lines: [
-      'You push through the heavy front doors',
-      'of the Monarch Theatre.',
+      'You drive through the rain.',
+      'The Monarch looms ahead —',
+      'its marquee dark for the first time in decades.',
+    ],
+    effect: 'fade',
+    pauseAfter: 2500,
+    bgImage: 'intro_nancy_car',
+    bgAlpha: 0.55,
+    camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: -5 },
+    fogIntensity: 0.1,
+  },
+  {
+    lines: [
+      'You push through the heavy front doors.',
       '',
       'The lobby is dark.',
       'A single lamp burns at the concierge desk.',
       '',
       'Vivian is waiting.',
     ],
-    effect: 'fade',
+    effect: 'typewriter',
     pauseAfter: 2000,
     bgImage: 'intro_doors',
     bgAlpha: 0.55,
