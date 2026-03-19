@@ -895,6 +895,11 @@
       "id": "managers_office",
       "name": "Manager's Office",
       "description": "Ashworth's temporary headquarters — a modern laptop on an ornate mahogany desk, demolition blueprints pinned everywhere. There's a cot in the corner with rumpled sheets. He's been sleeping here since the poisoning. He looks pale and unwell, and the room has that stale, closed-in smell of someone who's afraid to leave.",
+      "altBackground": {
+        "key": "bg_managers_office_empty",
+        "showWhen": "ashworth_motive_revealed",
+        "description": "The office feels different without Ashworth looming in it. His cot is a mess of tangled sheets — he left in a hurry. The desk is still buried in papers, the laptop still open, but the man himself is gone. The room smells like cold coffee and fear. Whatever he's running from, it isn't just me."
+      },
       "hotspots": [
         {
           "id": "mo_desk",
@@ -914,7 +919,8 @@
           "height": 450,
           "label": "Roland Ashworth",
           "type": "talk",
-          "dialogueId": "ashworth_office"
+          "dialogueId": "ashworth_office",
+          "hideWhen": "ashworth_motive_revealed"
         },
         {
           "id": "mo_blueprints",

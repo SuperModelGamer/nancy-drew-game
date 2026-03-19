@@ -38,11 +38,18 @@ interface Hotspot {
   setsFlag?: string;
 }
 
+interface AltBackground {
+  key: string;
+  showWhen: string;
+  description?: string;
+}
+
 interface RoomData {
   id: string;
   name: string;
   description: string;
   background?: string;
+  altBackground?: AltBackground;
   hotspots: Hotspot[];
 }
 
@@ -83,7 +90,16 @@ export class RoomScene extends Phaser.Scene {
     }
 
     const rooms = roomsData.rooms as RoomData[];
-    this.currentRoom = rooms.find(r => r.id === roomId) || rooms[0];
+    this.currentRoom = { ...(rooms.find(r => r.id === roomId) || rooms[0]) };
+    // Override description when alt background is active
+    if (this.currentRoom.altBackground?.description) {
+      const alt = this.currentRoom.altBackground;
+      const save = SaveSystem.getInstance();
+      const dialogue = DialogueSystem.getInstance();
+      if (save.getFlag(alt.showWhen) || dialogue.hasTriggeredEvent(alt.showWhen)) {
+        this.currentRoom.description = alt.description!;
+      }
+    }
     SaveSystem.getInstance().setCurrentRoom(roomId);
   }
 
@@ -109,7 +125,17 @@ export class RoomScene extends Phaser.Scene {
     this.bgOffsetY = (gameH - 1080 * coverScale) / 2;
 
     // Room background — cover the viewport while preserving aspect ratio
-    const bgKey = `bg_${this.currentRoom.id}`;
+    // Check for alternate background based on game state
+    let bgKey = `bg_${this.currentRoom.id}`;
+    if (this.currentRoom.altBackground) {
+      const alt = this.currentRoom.altBackground;
+      const save = SaveSystem.getInstance();
+      const dialogue = DialogueSystem.getInstance();
+      const altActive = save.getFlag(alt.showWhen) || dialogue.hasTriggeredEvent(alt.showWhen);
+      if (altActive && this.textures.exists(alt.key)) {
+        bgKey = alt.key;
+      }
+    }
     if (this.textures.exists(bgKey)) {
       const bg = this.add.image(gameW / 2, gameH / 2, bgKey);
       const scaleX = gameW / bg.width;
