@@ -282,15 +282,34 @@ export class IntroScene extends BaseSlideScene {
     const videoHeight = this.video.height || this.video.displayHeight || 1080;
     const scaleX = width / videoWidth;
     const scaleY = height / videoHeight;
-    // Cover scale: fill the entire viewport (may crop edges, but no letterbox bars)
-    const coverScale = Math.max(scaleX, scaleY);
+    // Contain scale: fit the full video inside the viewport (may letterbox, but no cropping)
+    const containScale = Math.min(scaleX, scaleY);
 
-    this.video.setScale(coverScale);
+    this.video.setScale(containScale);
     this.video.setPosition(width / 2, height / 2);
 
-    // No letterbox bars needed with cover scaling
+    // Add letterbox bars if the video doesn't fill the full viewport
     this.videoLetterboxBars.forEach(bar => bar.destroy());
     this.videoLetterboxBars = [];
+
+    const scaledW = videoWidth * containScale;
+    const scaledH = videoHeight * containScale;
+
+    if (scaledW < width) {
+      // Pillarbox: vertical bars on left and right
+      const barW = Math.ceil((width - scaledW) / 2);
+      this.videoLetterboxBars.push(
+        this.add.rectangle(barW / 2, height / 2, barW, height, 0x000000).setDepth(50),
+        this.add.rectangle(width - barW / 2, height / 2, barW, height, 0x000000).setDepth(50),
+      );
+    } else if (scaledH < height) {
+      // Letterbox: horizontal bars on top and bottom
+      const barH = Math.ceil((height - scaledH) / 2);
+      this.videoLetterboxBars.push(
+        this.add.rectangle(width / 2, barH / 2, width, barH, 0x000000).setDepth(50),
+        this.add.rectangle(width / 2, height - barH / 2, width, barH, 0x000000).setDepth(50),
+      );
+    }
   }
 
   private endVideoPreroll(): void {
