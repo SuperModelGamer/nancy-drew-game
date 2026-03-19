@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
-import { SaveSystem } from '../systems/SaveSystem';
+import { SaveSystem, SaveData } from '../systems/SaveSystem';
+import { ChapterSystem } from '../systems/ChapterSystem';
 import { AuthManager } from '../systems/AuthManager';
 import { Colors, TextColors, FONT } from '../utils/constants';
+import roomsData from '../data/rooms.json';
 import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
 import { createAuthFormElements, submitAuthForm } from '../ui/AuthFormOverlay';
 import { drawCornerOrnament, drawDecoDivider, drawSunburst, drawGeoBorder, DecoColors } from '../utils/art-deco';
@@ -110,7 +112,23 @@ export class TitleScene extends Phaser.Scene {
     // Slot-aware: "Continue" opens slot picker, "New Investigation" opens slot picker for empty slot
     const hasAnySave = save.hasAnySave();
 
+    // ── Save preview card + Continue button ──
+    const menuTopY = decoY + 30;
+    let nextY = menuTopY;
+    let btnIndex = 0;
+
+    const saveData = hasAnySave ? save.peekSave() : null;
+
     if (hasAnySave) {
+      // Save preview card — room thumbnail, playtime, chapter
+      const cardY = nextY;
+      const cardH = 130;
+      this.createSavePreviewCard(menuX, cardY, btnDisplayW, cardH, saveData, btnIndex);
+
+      nextY += cardH + 12;
+      btnIndex++;
+
+      // Continue button directly below the card
       menuItems.push({
         label: 'Continue',
         textureKey: 'btn_continue',
@@ -155,14 +173,12 @@ export class TitleScene extends Phaser.Scene {
       action: () => this.showSettings(width, height),
     });
 
-    // Calculate menu position — start below the decorative line with comfortable gap
-    const menuTopY = decoY + 30;
-    const menuStartY = menuTopY + btnDisplayH / 2;
+    // Render menu buttons below the save card (or from the top if no save)
+    const menuStartY = nextY + btnDisplayH / 2;
 
-    // Render menu buttons with staggered fade-in
     menuItems.forEach((item, i) => {
       const y = menuStartY + i * (btnDisplayH + btnGap);
-      this.createMenuButton(menuX, y, btnDisplayW, btnDisplayH, item.label, item.textureKey, item.action, item.primary, item.subtitle, i);
+      this.createMenuButton(menuX, y, btnDisplayW, btnDisplayH, item.label, item.textureKey, item.action, item.primary, item.subtitle, btnIndex + i);
     });
 
     // ── Credits ──
@@ -586,6 +602,121 @@ export class TitleScene extends Phaser.Scene {
     });
 
     return container;
+  }
+
+  private createSavePreviewCard(
+    cx: number, topY: number, w: number, h: number,
+    saveData: SaveData | null, index: number,
+  ): void {
+    const container = this.add.container(cx, topY + h / 2);
+    container.setAlpha(0);
+
+    // Card background — dark with gold border, like Hollow Knight's save slot
+    const bg = this.add.rectangle(0, 0, w, h, 0x0a0918, 0.92);
+    bg.setStrokeStyle(1.5, Colors.gold, 0.4);
+    container.add(bg);
+
+    if (!saveData) {
+      container.add(this.add.text(0, 0, 'No save data', {
+        fontFamily: FONT, fontSize: '18px', color: TextColors.goldDim, fontStyle: 'italic',
+      }).setOrigin(0.5));
+    } else {
+      // Room thumbnail on the left
+      const thumbW = 180;
+      const thumbH = h - 20;
+      const thumbX = -w / 2 + 10 + thumbW / 2;
+      const bgKey = `bg_${saveData.currentRoom}`;
+
+      if (this.textures.exists(bgKey)) {
+        const thumb = this.add.image(thumbX, 0, bgKey);
+        // Scale to fit the thumbnail area (cover)
+        const imgW = thumb.width;
+        const imgH = thumb.height;
+        const scale = Math.max(thumbW / imgW, thumbH / imgH);
+        thumb.setScale(scale);
+        thumb.setPosition(thumbX, 0);
+
+        // Mask to clip the thumbnail to a rectangle
+        const maskShape = this.add.rectangle(thumbX, 0, thumbW, thumbH, 0xffffff);
+        maskShape.setVisible(false);
+        // Position mask in world space (container offset)
+        maskShape.setPosition(cx + thumbX, topY + h / 2);
+        const mask = maskShape.createGeometryMask();
+        thumb.setMask(mask);
+        container.add(thumb);
+
+        // Subtle border around thumbnail
+        const thumbBorder = this.add.rectangle(thumbX, 0, thumbW, thumbH);
+        thumbBorder.setStrokeStyle(1, Colors.gold, 0.3);
+        thumbBorder.setFillStyle(0x000000, 0);
+        container.add(thumbBorder);
+      }
+
+      // Text info to the right of the thumbnail
+      const textLeft = thumbX + thumbW / 2 + 20;
+      const textMaxW = w - thumbW - 50;
+
+      // Room name
+      const roomName = this.getRoomDisplayName(saveData.currentRoom);
+      container.add(this.add.text(textLeft, -h / 2 + 22, roomName, {
+        fontFamily: FONT, fontSize: '20px', color: '#e8c55a',
+        fontStyle: 'bold', wordWrap: { width: textMaxW },
+      }).setOrigin(0, 0));
+
+      // Chapter
+      const chapterTitle = ChapterSystem.getInstance().getChapterTitle(saveData.chapter);
+      container.add(this.add.text(textLeft, -h / 2 + 50, chapterTitle, {
+        fontFamily: FONT, fontSize: '16px', color: TextColors.light,
+        fontStyle: 'italic',
+      }).setOrigin(0, 0));
+
+      // Playtime
+      const playtime = this.formatPlaytime(saveData.playtimeMs || 0);
+      container.add(this.add.text(textLeft, h / 2 - 22, playtime, {
+        fontFamily: FONT, fontSize: '18px', color: TextColors.goldDim,
+      }).setOrigin(0, 1));
+
+      // Clues found (count journal entries as proxy)
+      const clueCount = (saveData.journal || []).length;
+      if (clueCount > 0) {
+        container.add(this.add.text(textLeft + textMaxW, h / 2 - 22, `${clueCount} clues`, {
+          fontFamily: FONT, fontSize: '16px', color: TextColors.goldDim, fontStyle: 'italic',
+        }).setOrigin(1, 1));
+      }
+    }
+
+    // Staggered entrance animation
+    const delay = index * 120;
+    this.tweens.add({
+      targets: container,
+      alpha: { from: 0, to: 1 },
+      y: { from: topY + h / 2 + 20, to: topY + h / 2 },
+      duration: 400,
+      delay: delay + 300,
+      ease: 'Power2',
+    });
+  }
+
+  private getRoomDisplayName(roomId: string): string {
+    const rooms = roomsData.rooms as { id: string; name: string }[];
+    const room = rooms.find(r => r.id === roomId);
+    if (!room) return roomId.replace(/_/g, ' ');
+    // Shorten names like "The Monarch Theatre — Grand Lobby" to just "Grand Lobby"
+    const parts = room.name.split(' — ');
+    return parts.length > 1 ? parts[parts.length - 1] : room.name;
+  }
+
+  private formatPlaytime(ms: number): string {
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    if (hours > 0) {
+      return `${hours}h ${minutes.toString().padStart(2, '0')}m`;
+    }
+    if (minutes > 0) {
+      return `${minutes}m`;
+    }
+    return '< 1m';
   }
 
   private startNewGame(): void {

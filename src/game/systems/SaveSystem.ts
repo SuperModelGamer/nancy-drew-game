@@ -9,6 +9,7 @@ export interface SaveData {
   timestamp: number;
   currentRoom: string;
   chapter: number;
+  playtimeMs: number;
   inventory: ReturnType<InventorySystem['toJSON']>;
   dialogue: ReturnType<DialogueSystem['toJSON']>;
   puzzles: ReturnType<PuzzleSystem['toJSON']>;
@@ -219,6 +220,8 @@ export class SaveSystem {
   private flags: Record<string, boolean | string> = {};
   private discoveredRooms: Set<string> = new Set(['lobby']);
   private listeners: Array<() => void> = [];
+  private playtimeMs = 0;
+  private sessionStartMs = 0;
 
   private localStorage = new LocalStorageBackend();
   private cloudBackend = new SupabaseBackend();
@@ -229,6 +232,34 @@ export class SaveSystem {
       SaveSystem.instance = new SaveSystem();
     }
     return SaveSystem.instance;
+  }
+
+  // ── Playtime tracking ──
+
+  /** Call when gameplay begins (entering a room scene) to start the session timer. */
+  startSession(): void {
+    this.sessionStartMs = Date.now();
+  }
+
+  /** Returns total playtime including the current session. */
+  getPlaytimeMs(): number {
+    if (this.sessionStartMs > 0) {
+      return this.playtimeMs + (Date.now() - this.sessionStartMs);
+    }
+    return this.playtimeMs;
+  }
+
+  /** Read save data from localStorage without loading it into game state. */
+  peekSave(): SaveData | null {
+    try {
+      const raw = localStorage.getItem(`nancy-drew-save-${this.activeSlot}`);
+      if (!raw) return null;
+      const data: SaveData = JSON.parse(raw);
+      if (data.version !== SAVE_VERSION) return null;
+      return data;
+    } catch {
+      return null;
+    }
   }
 
   // ── Slot management ──
@@ -356,6 +387,7 @@ export class SaveSystem {
       timestamp: Date.now(),
       currentRoom: this.currentRoom,
       chapter: this.chapter,
+      playtimeMs: this.getPlaytimeMs(),
       inventory: InventorySystem.getInstance().toJSON(),
       dialogue: DialogueSystem.getInstance().toJSON(),
       puzzles: PuzzleSystem.getInstance().toJSON(),
@@ -389,6 +421,8 @@ export class SaveSystem {
 
       this.currentRoom = data.currentRoom;
       this.chapter = data.chapter;
+      this.playtimeMs = data.playtimeMs || 0;
+      this.sessionStartMs = 0;
       this.journal = data.journal || [];
       this.flags = data.flags || {};
       this.discoveredRooms = new Set(data.discoveredRooms ?? ['lobby']);
@@ -423,6 +457,8 @@ export class SaveSystem {
     // Reset in-memory state so a new game starts clean
     this.currentRoom = 'lobby';
     this.chapter = 1;
+    this.playtimeMs = 0;
+    this.sessionStartMs = 0;
     this.journal = [];
     this.flags = {};
     this.discoveredRooms = new Set(['lobby']);
