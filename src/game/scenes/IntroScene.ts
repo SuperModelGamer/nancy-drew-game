@@ -176,6 +176,7 @@ export class IntroScene extends BaseSlideScene {
   private video: Phaser.GameObjects.Video | null = null;
   private videoSkipBtn: Phaser.GameObjects.Text | null = null;
   private videoOverlay: Phaser.GameObjects.Rectangle | null = null;
+  private videoLetterboxBars: Phaser.GameObjects.Rectangle[] = [];
   private videoPlaying = false;
 
   constructor() {
@@ -223,8 +224,9 @@ export class IntroScene extends BaseSlideScene {
     this.video.setDepth(50); // Above the blackout overlay, below the skip button
     this.video.setAlpha(0);
 
-    // Scale the video like the intro slides/backgrounds: fill the whole viewport
-    // and allow edge cropping so the preroll feels cinematic rather than letterboxed.
+    // Fit the video inside the viewport so we don't crop or zoom the preroll.
+    // The previous cover-scale behavior looked fine at 16:9, but it cropped the
+    // sides/top on other aspect ratios and made the intro feel over-zoomed.
     this.fitVideoToViewport();
 
     // "SKIP" button for the video
@@ -280,10 +282,33 @@ export class IntroScene extends BaseSlideScene {
     const videoHeight = this.video.height || this.video.displayHeight || 1080;
     const scaleX = width / videoWidth;
     const scaleY = height / videoHeight;
-    const coverScale = Math.max(scaleX, scaleY);
+    const containScale = Math.min(scaleX, scaleY);
 
-    this.video.setScale(coverScale);
+    this.video.setScale(containScale);
     this.video.setPosition(width / 2, height / 2);
+
+    const fittedWidth = videoWidth * containScale;
+    const fittedHeight = videoHeight * containScale;
+    const barAlpha = 0.92;
+
+    this.videoLetterboxBars.forEach(bar => bar.destroy());
+    this.videoLetterboxBars = [];
+
+    if (fittedHeight < height) {
+      const barHeight = (height - fittedHeight) / 2;
+      this.videoLetterboxBars.push(
+        this.add.rectangle(width / 2, barHeight / 2, width, barHeight, 0x000000, barAlpha).setDepth(50.5),
+        this.add.rectangle(width / 2, height - barHeight / 2, width, barHeight, 0x000000, barAlpha).setDepth(50.5),
+      );
+    }
+
+    if (fittedWidth < width) {
+      const barWidth = (width - fittedWidth) / 2;
+      this.videoLetterboxBars.push(
+        this.add.rectangle(barWidth / 2, height / 2, barWidth, height, 0x000000, barAlpha).setDepth(50.5),
+        this.add.rectangle(width - barWidth / 2, height / 2, barWidth, height, 0x000000, barAlpha).setDepth(50.5),
+      );
+    }
   }
 
   private endVideoPreroll(): void {
@@ -308,15 +333,21 @@ export class IntroScene extends BaseSlideScene {
       });
     }
 
-    // Fade out blackout overlay
-    if (this.videoOverlay) {
+    // Fade out overlay and letterboxing
+    const overlayTargets = [
+      ...(this.videoOverlay ? [this.videoOverlay] : []),
+      ...this.videoLetterboxBars,
+    ];
+    if (overlayTargets.length > 0) {
       this.tweens.add({
-        targets: this.videoOverlay,
+        targets: overlayTargets,
         fillAlpha: 0,
         duration: 800,
         onComplete: () => {
           this.videoOverlay?.destroy();
           this.videoOverlay = null;
+          this.videoLetterboxBars.forEach(bar => bar.destroy());
+          this.videoLetterboxBars = [];
         },
       });
     }
