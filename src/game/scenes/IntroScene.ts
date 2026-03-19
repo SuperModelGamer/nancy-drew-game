@@ -190,11 +190,10 @@ export class IntroScene extends BaseSlideScene {
   protected onSceneCreate(): void {
     initSceneCursor(this);
 
-    // If the video loaded successfully, play it before the slides
-    if (this.cache.video.exists('intro_monarch_video')) {
-      this.playVideoPreroll();
-    }
-    // Otherwise BaseSlideScene proceeds directly to slides
+    // Video preroll disabled — Phaser's Video game object doesn't report
+    // accurate dimensions before playback, causing the video to render
+    // zoomed/cropped. TODO: revisit with a native HTML <video> overlay.
+    // BaseSlideScene proceeds directly to the story slides.
   }
 
   protected getStageDirectionPrefixes(): string[] {
