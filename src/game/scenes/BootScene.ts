@@ -91,7 +91,7 @@ export class BootScene extends Phaser.Scene {
       ui_dossier_bg: 'dossier-bg',
       ui_dossier_header: 'dossier-header',
       ui_tabs: 'tabs',
-      ui_portrait_frame: 'portrait-frame',
+      ui_portrait_frame: 'frame',
       ui_info_card_bg: 'info-card-bg',
       ui_facts_panel_bg: 'facts-panel-bg',
       ui_facts_panel_bg_alt: 'facts-panel-bg-alt',
@@ -145,7 +145,7 @@ export class BootScene extends Phaser.Scene {
     const dlgAssets: Record<string, string> = {
       dlg_box: 'dialogue-box',
       dlg_nameplate: 'nameplate',
-      dlg_portrait_frame: 'portrait-frame-lg',
+      dlg_portrait_frame: '../frame',
       dlg_choice_btn: 'choice-btn',
       dlg_continue_arrow: 'continue-arrow',
     };
