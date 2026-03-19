@@ -21,6 +21,8 @@ export class PuzzleScene extends Phaser.Scene {
   private dialTexts: Phaser.GameObjects.Text[] = [];
   private dialCount = 3;
   private dialSeparator = '-';
+  private dialWrapValues: number[] = [];
+  private dialPadWidths: number[] = [];
 
   // Sequence puzzle state
   private sequenceInput: string[] = [];
@@ -68,6 +70,8 @@ export class PuzzleScene extends Phaser.Scene {
     // Reset all state
     this.dials = [];
     this.dialTexts = [];
+    this.dialWrapValues = [];
+    this.dialPadWidths = [];
     this.sequenceInput = [];
     this.sequenceButtons = [];
     this.textInput = '';
@@ -204,10 +208,13 @@ export class PuzzleScene extends Phaser.Scene {
   // ─── COMBINATION UI (trunk, office safe) ──────────────────────────────
 
   private buildCombinationUI(panelW: number, _panelH: number, answer: string): void {
-    const parts = answer.split('-');
+    const hasExplicitSeparators = answer.includes('-');
+    const parts = hasExplicitSeparators ? answer.split('-') : answer.split('');
     this.dialCount = parts.length;
-    this.dialSeparator = '-';
+    this.dialSeparator = hasExplicitSeparators ? '-' : '';
     this.dials = new Array(this.dialCount).fill(0);
+    this.dialWrapValues = parts.map(part => Math.max(10, 10 ** part.length));
+    this.dialPadWidths = parts.map(part => part.length);
 
     const dialSpacing = Math.min(120, (panelW - 120) / this.dialCount);
     const startX = -(this.dialCount - 1) * dialSpacing / 2;
@@ -265,7 +272,9 @@ export class PuzzleScene extends Phaser.Scene {
 
     // Submit button
     this.addSubmitButton(0, dialY + 150, () => {
-      const answer = this.dials.join(this.dialSeparator);
+      const answer = this.dials
+        .map((value, index) => String(value).padStart(this.dialPadWidths[index] || 1, '0'))
+        .join(this.dialSeparator);
       this.submitAnswer(answer);
     });
   }
@@ -902,6 +911,7 @@ export class PuzzleScene extends Phaser.Scene {
         this.handleInteractiveSolved();
       } else {
         UISounds.wrongAnswer();
+        PuzzleSystem.getInstance().registerAttempt(this.puzzleId);
         this.feedbackText.setColor('#ff6b6b');
         this.feedbackText.setText('Incorrect lighting sequence. Try again.');
         this.lightingSequence = [];
@@ -1102,6 +1112,7 @@ export class PuzzleScene extends Phaser.Scene {
         this.handleInteractiveSolved();
       } else {
         UISounds.wrongAnswer();
+        PuzzleSystem.getInstance().registerAttempt(this.puzzleId);
         this.feedbackText.setColor('#ff6b6b');
         this.feedbackText.setText('The frames are in the wrong order. Try again.');
 
@@ -1233,6 +1244,7 @@ export class PuzzleScene extends Phaser.Scene {
         this.handleInteractiveSolved();
       } else {
         UISounds.wrongAnswer();
+        PuzzleSystem.getInstance().registerAttempt(this.puzzleId);
         this.feedbackText.setColor('#ff6b6b');
         this.feedbackText.setText('Wrong symbol combination.');
 
@@ -1705,8 +1717,10 @@ export class PuzzleScene extends Phaser.Scene {
   }
 
   private changeDial(index: number, direction: number): void {
-    this.dials[index] = (this.dials[index] + direction + 100) % 100;
-    this.dialTexts[index].setText(String(this.dials[index]));
+    const wrapValue = this.dialWrapValues[index] || 10;
+    const padWidth = this.dialPadWidths[index] || 1;
+    this.dials[index] = (this.dials[index] + direction + wrapValue) % wrapValue;
+    this.dialTexts[index].setText(String(this.dials[index]).padStart(padWidth, '0'));
   }
 
   private updateSequenceDisplay(): void {
