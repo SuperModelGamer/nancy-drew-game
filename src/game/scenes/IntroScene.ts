@@ -214,22 +214,18 @@ export class IntroScene extends BaseSlideScene {
     // Pause the slide system — prevent clicks from advancing slides during video
     this.canSkip = false;
 
-    // Create video game object centered on screen
-    this.video = this.add.video(width / 2, height / 2, 'intro_monarch_video');
-    this.video.setDepth(50); // Above everything else
-    this.video.setAlpha(0);
-
-    // Scale video to cover the full screen (maintain aspect ratio)
-    const videoWidth = this.video.width || 1920;
-    const videoHeight = this.video.height || 1080;
-    const scaleX = width / videoWidth;
-    const scaleY = height / videoHeight;
-    const coverScale = Math.max(scaleX, scaleY);
-    this.video.setScale(coverScale);
-
     // Dark overlay behind video (covers any slide content)
     this.videoOverlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 1);
     this.videoOverlay.setDepth(49);
+
+    // Create video game object centered on screen
+    this.video = this.add.video(width / 2, height / 2, 'intro_monarch_video');
+    this.video.setDepth(50); // Above the blackout overlay, below the skip button
+    this.video.setAlpha(0);
+
+    // Scale the video like the intro slides/backgrounds: fill the whole viewport
+    // and allow edge cropping so the preroll feels cinematic rather than letterboxed.
+    this.fitVideoToViewport();
 
     // "SKIP" button for the video
     this.videoSkipBtn = this.add.text(width - 24, 24, 'SKIP \u25b8', {
@@ -276,6 +272,20 @@ export class IntroScene extends BaseSlideScene {
     });
   }
 
+  private fitVideoToViewport(): void {
+    if (!this.video) return;
+
+    const { width, height } = this.cameras.main;
+    const videoWidth = this.video.width || this.video.displayWidth || 1920;
+    const videoHeight = this.video.height || this.video.displayHeight || 1080;
+    const scaleX = width / videoWidth;
+    const scaleY = height / videoHeight;
+    const coverScale = Math.max(scaleX, scaleY);
+
+    this.video.setScale(coverScale);
+    this.video.setPosition(width / 2, height / 2);
+  }
+
   private endVideoPreroll(): void {
     if (!this.videoPlaying) return;
     this.videoPlaying = false;
@@ -298,7 +308,7 @@ export class IntroScene extends BaseSlideScene {
       });
     }
 
-    // Fade out overlay
+    // Fade out blackout overlay
     if (this.videoOverlay) {
       this.tweens.add({
         targets: this.videoOverlay,
