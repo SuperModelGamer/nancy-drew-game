@@ -39,6 +39,9 @@ export class BootScene extends Phaser.Scene {
       this.load.image(`bg_${room}`, `assets/backgrounds/${room}.png`);
     }
 
+    // Load alternate room backgrounds (state-dependent variants)
+    this.load.image('bg_managers_office_empty', 'assets/backgrounds/managers_office_empty.png');
+
     // Load title screen cover image, title graphic, and menu buttons
     this.load.image('cover', 'assets/cover.png');
     this.load.image('title_graphic', 'assets/title.png');
