@@ -83,6 +83,12 @@ export class PuzzleSystem {
     return this.puzzleAttempts.get(puzzleId) || 0;
   }
 
+  registerAttempt(puzzleId: string): number {
+    const attempts = (this.puzzleAttempts.get(puzzleId) || 0) + 1;
+    this.puzzleAttempts.set(puzzleId, attempts);
+    return attempts;
+  }
+
   toJSON(): { solvedPuzzles: string[] } {
     return { solvedPuzzles: [...this.solvedPuzzles] };
   }

@@ -417,22 +417,8 @@ export class DialogueSystem {
 
       const portraitGroup = this.scene.add.container(0, 0);
 
-      // Frame FIRST (behind) — the frame PNG has an opaque dark center
-      if (this.scene.textures.exists('dlg_portrait_frame')) {
-        const frame = this.scene.add.image(pfCenterX, pfCenterY, 'dlg_portrait_frame');
-        frame.setDisplaySize(pfDisplayW, pfDisplayH);
-        portraitGroup.add(frame);
-      } else {
-        const frameGfx = this.scene.add.graphics();
-        frameGfx.lineStyle(4, Colors.gold, 0.7);
-        frameGfx.strokeRoundedRect(
-          pfCenterX - pfDisplayW / 2, pfCenterY - pfDisplayH / 2,
-          pfDisplayW, pfDisplayH, 6
-        );
-        portraitGroup.add(frameGfx);
-      }
-
-      // Portrait image ON TOP of frame — fills the inner opening
+      // Portrait image sits inside the frame opening. Add it first so the
+      // decorative frame can render on top and actually frame the portrait.
       const innerFW = pfDisplayW - FRAME_BORDER * 2;
       const innerFH = pfDisplayH - FRAME_BORDER * 2;
       const portrait = this.scene.add.image(pfCenterX, pfCenterY, showPortraitKey);
@@ -453,6 +439,21 @@ export class DialogueSystem {
       }
 
       portraitGroup.add(portrait);
+
+      if (this.scene.textures.exists('dlg_portrait_frame')) {
+        const frame = this.scene.add.image(pfCenterX, pfCenterY, 'dlg_portrait_frame');
+        frame.setDisplaySize(pfDisplayW, pfDisplayH);
+        portraitGroup.add(frame);
+      } else {
+        const frameGfx = this.scene.add.graphics();
+        frameGfx.lineStyle(4, Colors.gold, 0.7);
+        frameGfx.strokeRoundedRect(
+          pfCenterX - pfDisplayW / 2, pfCenterY - pfDisplayH / 2,
+          pfDisplayW, pfDisplayH, 6
+        );
+        portraitGroup.add(frameGfx);
+      }
+
       this.container.add(portraitGroup);
 
       if (!this.portraitShownThisDialogue && !isDimmed) {
