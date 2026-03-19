@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
-import { SaveSystem, SlotSummary } from '../systems/SaveSystem';
-import { ChapterSystem } from '../systems/ChapterSystem';
+import { SaveSystem } from '../systems/SaveSystem';
 import { AuthManager } from '../systems/AuthManager';
 import { Colors, TextColors, FONT } from '../utils/constants';
 import { POINTER_CURSOR, initSceneCursor } from '../utils/cursors';
@@ -116,7 +115,15 @@ export class TitleScene extends Phaser.Scene {
         label: 'Continue',
         textureKey: 'btn_continue',
         primary: true,
-        action: () => this.showSlotPicker(width, height, 'load'),
+        action: () => {
+          save.load();
+          this.cameras.main.fadeOut(500, 0, 0, 0);
+          this.time.delayedCall(500, () => {
+            const roomId = save.getCurrentRoom() || 'lobby';
+            this.scene.start('RoomScene', { roomId });
+            this.scene.launch('UIScene');
+          });
+        },
       });
     }
 
@@ -124,7 +131,16 @@ export class TitleScene extends Phaser.Scene {
       label: hasAnySave ? 'New Investigation' : 'Begin Investigation',
       textureKey: 'btn_new_case',
       primary: !hasAnySave,
-      action: () => this.showSlotPicker(width, height, 'new'),
+      action: () => {
+        if (hasAnySave) {
+          this.showConfirmDialog(width, height, () => {
+            save.deleteSave();
+            this.startNewGame();
+          });
+        } else {
+          this.startNewGame();
+        }
+      },
     });
 
     menuItems.push({
@@ -425,222 +441,6 @@ export class TitleScene extends Phaser.Scene {
       duration: 600,
       ease: 'Power2',
     });
-  }
-
-  // ── Save Slot Picker ──
-
-  private async showSlotPicker(width: number, height: number, intent: 'load' | 'new'): Promise<void> {
-    const save = SaveSystem.getInstance();
-    const container = this.add.container(width / 2, height / 2);
-    container.setDepth(100);
-
-    const dimmer = this.add.rectangle(0, 0, width, height, Colors.darkBg, 0.8);
-    dimmer.setInteractive();
-    container.add(dimmer);
-
-    const panelW = 700;
-    const panelH = 500;
-    const box = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.97);
-    box.setStrokeStyle(2, Colors.gold, 0.7);
-    container.add(box);
-
-    const title = intent === 'load' ? 'Select Save Slot' : 'Choose a Slot';
-    const titleText = this.add.text(0, -210, title, {
-      fontFamily: FONT, fontSize: '30px', color: '#e8c55a', fontStyle: 'bold',
-    }).setOrigin(0.5);
-    container.add(titleText);
-
-    // Divider
-    const divGfx = this.add.graphics();
-    divGfx.lineStyle(1, Colors.gold, 0.3);
-    divGfx.lineBetween(-250, -180, 250, -180);
-    container.add(divGfx);
-
-    // Loading text
-    const loadingText = this.add.text(0, 0, 'Loading saves...', {
-      fontFamily: FONT, fontSize: '18px', color: TextColors.goldDim,
-    }).setOrigin(0.5);
-    container.add(loadingText);
-
-    // Fetch slot summaries
-    let slots: SlotSummary[];
-    try {
-      slots = await save.getSlotSummaries();
-    } catch {
-      slots = [
-        { slot: 0, timestamp: 0, chapter: 0, currentRoom: '', empty: true },
-        { slot: 1, timestamp: 0, chapter: 0, currentRoom: '', empty: true },
-        { slot: 2, timestamp: 0, chapter: 0, currentRoom: '', empty: true },
-      ];
-    }
-    loadingText.destroy();
-
-    // Render slot cards
-    const cardW = 580;
-    const cardH = 100;
-    const cardGap = 16;
-    const startY = -140;
-
-    slots.forEach((slot, i) => {
-      const cardY = startY + i * (cardH + cardGap);
-      this.createSlotCard(container, 0, cardY, cardW, cardH, slot, intent, () => {
-        container.destroy();
-      });
-    });
-
-    // Close button
-    const closeBg = this.add.rectangle(0, 200, 180, 54, Colors.sceneBg, 0.9);
-    closeBg.setStrokeStyle(1, Colors.gold, 0.5);
-    closeBg.setInteractive({ cursor: POINTER_CURSOR });
-    const closeText = this.add.text(0, 200, 'Cancel', {
-      fontFamily: FONT, fontSize: '20px', color: TextColors.gold,
-    }).setOrigin(0.5);
-    closeBg.on('pointerover', () => closeBg.setFillStyle(Colors.hoverBg));
-    closeBg.on('pointerout', () => closeBg.setFillStyle(Colors.sceneBg, 0.9));
-    closeBg.on('pointerdown', () => container.destroy());
-    container.add([closeBg, closeText]);
-  }
-
-  private createSlotCard(
-    parent: Phaser.GameObjects.Container,
-    x: number, y: number, w: number, h: number,
-    slot: SlotSummary,
-    intent: 'load' | 'new',
-    onClose: () => void,
-  ): void {
-    const save = SaveSystem.getInstance();
-    const { width, height } = this.cameras.main;
-
-    const cardBg = this.add.rectangle(x, y, w, h, 0x0e0d16, 0.85);
-    cardBg.setStrokeStyle(1, slot.empty ? 0x3a3a4a : Colors.gold, slot.empty ? 0.3 : 0.5);
-    parent.add(cardBg);
-
-    // Slot number label
-    const slotLabel = this.add.text(x - w / 2 + 24, y - 14, `Slot ${slot.slot + 1}`, {
-      fontFamily: FONT, fontSize: '20px', color: TextColors.gold,
-    }).setOrigin(0, 0.5);
-    parent.add(slotLabel);
-
-    if (slot.empty) {
-      const emptyText = this.add.text(x - w / 2 + 24, y + 14, 'Empty', {
-        fontFamily: FONT, fontSize: '16px', color: TextColors.muted, fontStyle: 'italic',
-      }).setOrigin(0, 0.5);
-      parent.add(emptyText);
-
-      if (intent === 'new') {
-        // "New Game" button for empty slots
-        const newBg = this.add.rectangle(x + w / 2 - 90, y, 140, 44, Colors.sceneBg, 0.9);
-        newBg.setStrokeStyle(1, Colors.gold, 0.5);
-        newBg.setInteractive({ cursor: POINTER_CURSOR });
-        const newText = this.add.text(x + w / 2 - 90, y, 'New Game', {
-          fontFamily: FONT, fontSize: '17px', color: TextColors.gold,
-        }).setOrigin(0.5);
-        newBg.on('pointerover', () => newBg.setFillStyle(Colors.hoverBg));
-        newBg.on('pointerout', () => newBg.setFillStyle(Colors.sceneBg, 0.9));
-        newBg.on('pointerdown', () => {
-          save.setActiveSlot(slot.slot);
-          save.deleteSave();
-          onClose();
-          this.startNewGame();
-        });
-        parent.add([newBg, newText]);
-      }
-    } else {
-      // Show save details
-      const chapter = ChapterSystem.getInstance().getChapterTitle(slot.chapter);
-      const chapterText = this.add.text(x - w / 2 + 24, y + 6, chapter, {
-        fontFamily: FONT, fontSize: '15px', color: TextColors.light, fontStyle: 'italic',
-      }).setOrigin(0, 0.5);
-      parent.add(chapterText);
-
-      // Timestamp
-      const timeStr = this.formatTimestamp(slot.timestamp);
-      const timeText = this.add.text(x - w / 2 + 24, y + 28, timeStr, {
-        fontFamily: FONT, fontSize: '13px', color: TextColors.muted,
-      }).setOrigin(0, 0.5);
-      parent.add(timeText);
-
-      // Room name
-      const roomText = this.add.text(x + 60, y - 14, slot.currentRoom.replace(/_/g, ' '), {
-        fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim,
-      }).setOrigin(0, 0.5);
-      parent.add(roomText);
-
-      if (intent === 'load') {
-        // Load button
-        const loadBg = this.add.rectangle(x + w / 2 - 90, y - 12, 140, 38, Colors.sceneBg, 0.9);
-        loadBg.setStrokeStyle(1, Colors.gold, 0.6);
-        loadBg.setInteractive({ cursor: POINTER_CURSOR });
-        const loadText = this.add.text(x + w / 2 - 90, y - 12, 'Load', {
-          fontFamily: FONT, fontSize: '17px', color: TextColors.gold,
-        }).setOrigin(0.5);
-        loadBg.on('pointerover', () => loadBg.setFillStyle(Colors.hoverBg));
-        loadBg.on('pointerout', () => loadBg.setFillStyle(Colors.sceneBg, 0.9));
-        loadBg.on('pointerdown', () => {
-          save.setActiveSlot(slot.slot);
-          save.load();
-          onClose();
-          this.cameras.main.fadeOut(500, 0, 0, 0);
-          this.time.delayedCall(500, () => {
-            const roomId = save.getCurrentRoom() || 'lobby';
-            this.scene.start('RoomScene', { roomId });
-            this.scene.launch('UIScene');
-          });
-        });
-        parent.add([loadBg, loadText]);
-
-        // Delete button
-        const delBg = this.add.rectangle(x + w / 2 - 90, y + 22, 140, 32, 0x1a0a0a, 0.6);
-        delBg.setStrokeStyle(1, Colors.error, 0.3);
-        delBg.setInteractive({ cursor: POINTER_CURSOR });
-        const delText = this.add.text(x + w / 2 - 90, y + 22, 'Delete', {
-          fontFamily: FONT, fontSize: '14px', color: TextColors.error,
-        }).setOrigin(0.5);
-        delBg.on('pointerover', () => delBg.setFillStyle(0x2a0a0a, 0.8));
-        delBg.on('pointerout', () => delBg.setFillStyle(0x1a0a0a, 0.6));
-        delBg.on('pointerdown', () => {
-          this.showConfirmDialog(width, height, () => {
-            save.setActiveSlot(slot.slot);
-            save.deleteSave();
-            this.scene.restart();
-          });
-        });
-        parent.add([delBg, delText]);
-      } else {
-        // "Overwrite" button for new game on occupied slot
-        const overBg = this.add.rectangle(x + w / 2 - 90, y, 140, 44, 0x1a0a0a, 0.7);
-        overBg.setStrokeStyle(1, Colors.error, 0.4);
-        overBg.setInteractive({ cursor: POINTER_CURSOR });
-        const overText = this.add.text(x + w / 2 - 90, y, 'Overwrite', {
-          fontFamily: FONT, fontSize: '16px', color: TextColors.error,
-        }).setOrigin(0.5);
-        overBg.on('pointerover', () => overBg.setFillStyle(0x2a0a0a, 0.8));
-        overBg.on('pointerout', () => overBg.setFillStyle(0x1a0a0a, 0.7));
-        overBg.on('pointerdown', () => {
-          this.showConfirmDialog(width, height, () => {
-            save.setActiveSlot(slot.slot);
-            save.deleteSave();
-            onClose();
-            this.startNewGame();
-          });
-        });
-        parent.add([overBg, overText]);
-      }
-    }
-  }
-
-  private formatTimestamp(ts: number): string {
-    if (!ts) return '';
-    const date = new Date(ts);
-    const now = Date.now();
-    const diff = now - ts;
-
-    if (diff < 60_000) return 'Just now';
-    if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
-    if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}h ago`;
-    if (diff < 604_800_000) return `${Math.floor(diff / 86_400_000)}d ago`;
-
-    return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   private drawDiamond(

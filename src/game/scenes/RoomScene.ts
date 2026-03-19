@@ -101,6 +101,8 @@ export class RoomScene extends Phaser.Scene {
       }
     }
     SaveSystem.getInstance().setCurrentRoom(roomId);
+    // Auto-save when entering a room
+    SaveSystem.getInstance().save();
   }
 
   create(): void {

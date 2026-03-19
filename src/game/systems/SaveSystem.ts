@@ -26,7 +26,7 @@ export interface SlotSummary {
 }
 
 const SAVE_VERSION = 1;
-const MAX_SLOTS = 3;
+const MAX_SLOTS = 1;
 
 // ─── Storage Backend Interface ───────────────────────────────────────────────
 
@@ -409,10 +409,7 @@ export class SaveSystem {
   }
 
   hasAnySave(): boolean {
-    for (let i = 0; i < MAX_SLOTS; i++) {
-      if (localStorage.getItem(`nancy-drew-save-${i}`) !== null) return true;
-    }
-    return false;
+    return this.hasSave();
   }
 
   deleteSave(): void {
