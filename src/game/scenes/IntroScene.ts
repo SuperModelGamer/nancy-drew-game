@@ -282,33 +282,15 @@ export class IntroScene extends BaseSlideScene {
     const videoHeight = this.video.height || this.video.displayHeight || 1080;
     const scaleX = width / videoWidth;
     const scaleY = height / videoHeight;
-    const containScale = Math.min(scaleX, scaleY);
+    // Cover scale: fill the entire viewport (may crop edges, but no letterbox bars)
+    const coverScale = Math.max(scaleX, scaleY);
 
-    this.video.setScale(containScale);
+    this.video.setScale(coverScale);
     this.video.setPosition(width / 2, height / 2);
 
-    const fittedWidth = videoWidth * containScale;
-    const fittedHeight = videoHeight * containScale;
-    const barAlpha = 0.92;
-
+    // No letterbox bars needed with cover scaling
     this.videoLetterboxBars.forEach(bar => bar.destroy());
     this.videoLetterboxBars = [];
-
-    if (fittedHeight < height) {
-      const barHeight = (height - fittedHeight) / 2;
-      this.videoLetterboxBars.push(
-        this.add.rectangle(width / 2, barHeight / 2, width, barHeight, 0x000000, barAlpha).setDepth(50.5),
-        this.add.rectangle(width / 2, height - barHeight / 2, width, barHeight, 0x000000, barAlpha).setDepth(50.5),
-      );
-    }
-
-    if (fittedWidth < width) {
-      const barWidth = (width - fittedWidth) / 2;
-      this.videoLetterboxBars.push(
-        this.add.rectangle(barWidth / 2, height / 2, barWidth, height, 0x000000, barAlpha).setDepth(50.5),
-        this.add.rectangle(width - barWidth / 2, height / 2, barWidth, height, 0x000000, barAlpha).setDepth(50.5),
-      );
-    }
   }
 
   private endVideoPreroll(): void {
