@@ -534,10 +534,10 @@ export abstract class BaseSlideScene extends Phaser.Scene {
           if (charIndex < line.length) {
             charIndex++;
             textObj.setText(line.substring(0, charIndex));
-            this.time.delayedCall(35, typeChar);
+            this.time.delayedCall(25, typeChar);
           } else {
             lineIndex++;
-            this.time.delayedCall(300, showNextLine);
+            this.time.delayedCall(150, showNextLine);
           }
         };
         typeChar();
@@ -567,7 +567,7 @@ export abstract class BaseSlideScene extends Phaser.Scene {
 
       textsToFade.forEach((t, i) => {
         this.tweens.add({
-          targets: t, alpha: 1, duration: 600, delay: i * 400,
+          targets: t, alpha: 1, duration: 400, delay: i * 250,
           onComplete: () => { if (i === textsToFade.length - 1) resolve(); },
         });
       });
