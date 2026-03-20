@@ -80,26 +80,39 @@ const INTRO_SLIDES: Slide[] = [
     lines: [
       'You push through the heavy doors',
       'of the Monarch Theatre.',
-      '',
+    ],
+    effect: 'typewriter',
+    pauseAfter: 300,
+    voiceover: 'vo_intro_18',
+    bgImage: 'intro_doors',
+    bgAlpha: 0.6,
+    camera: { scaleFrom: 1.0, scaleTo: 1.1, panY: -8 },
+    vignetteIntensity: 0.7,
+    letterbox: true,
+    audio: [
+      { key: 'proc:doorCreak', delay: 0, volume: 0.6 },
+    ],
+  },
+
+  // ── The Dark Lobby — what Nancy sees inside ────────────────────────────────
+
+  {
+    lines: [
       'The lobby is dark.',
       'A single lamp burns at the front desk.',
       '',
       'Vivian is waiting.',
     ],
-    effect: 'typewriter',
+    effect: 'fade',
     pauseAfter: 400,
-    voiceover: 'vo_intro_18',
-    bgImage: 'intro_doors',
-    bgAlpha: 0.6,
-    camera: { scaleFrom: 1.05, scaleTo: 1.18, panY: -12 },
-    fogIntensity: 0.08,
+    bgImage: 'intro_lobby_dark',
+    bgAlpha: 0.5,
+    camera: { scaleFrom: 1.0, scaleTo: 1.06, panX: -5 },
+    fogIntensity: 0.1,
     vignetteIntensity: 0.8,
     letterbox: true,
     audio: [
-      { key: 'proc:doorCreak', delay: 0, volume: 0.6 },
-    ],
-    effects: [
-      { type: 'screenShake', delay: 0, duration: 400 },
+      { key: 'proc:ghostDrone', delay: 500, volume: 0.15 },
     ],
   },
 ];
