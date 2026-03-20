@@ -9,27 +9,8 @@ import { Colors, TextColors, FONT } from '../utils/constants';
 // through gameplay cinematics as the player explores different rooms.
 
 const INTRO_SLIDES: Slide[] = [
-  // ── The Call ────────────────────────────────────────────────────────────────
+  // ── The Call (cold open — action first) ─────────────────────────────────────
 
-  {
-    lines: [
-      'Vivian Delacroix has lived in the',
-      'Monarch her entire life.',
-      'Margaux\'s goddaughter.',
-      'The last person who still remembers.',
-    ],
-    effect: 'fade',
-    pauseAfter: 800,
-    voiceover: 'vo_intro_15',
-    bgImage: 'intro_phone',
-    bgAlpha: 0.5,
-    camera: { scaleFrom: 1.0, scaleTo: 1.06, panX: 10 },
-    vignetteIntensity: 0.6,
-    letterbox: true,
-    audio: [
-      { key: 'proc:phoneRing', delay: 200, volume: 0.4 },
-    ],
-  },
   {
     lines: [
       '"Nancy — someone has been poisoned.',
@@ -40,12 +21,34 @@ const INTRO_SLIDES: Slide[] = [
       'Please. You\'re the only one I trust."',
     ],
     effect: 'typewriter',
-    pauseAfter: 800,
+    pauseAfter: 300,
     voiceover: 'vo_intro_16',
     bgImage: 'intro_phone',
     bgAlpha: 0.4,
-    camera: { scaleFrom: 1.06, scaleTo: 1.14, panX: -8 },
+    camera: { scaleFrom: 1.0, scaleTo: 1.1, panX: -8 },
     vignetteIntensity: 0.7,
+    letterbox: true,
+    audio: [
+      { key: 'proc:phoneRing', delay: 0, volume: 0.4 },
+    ],
+  },
+
+  // ── Context — who called and why it matters ─────────────────────────────────
+
+  {
+    lines: [
+      'Vivian Delacroix has lived in the',
+      'Monarch her entire life.',
+      'Margaux\'s goddaughter.',
+      'The last person who still remembers.',
+    ],
+    effect: 'fade',
+    pauseAfter: 300,
+    voiceover: 'vo_intro_15',
+    bgImage: 'intro_newspaper',
+    bgAlpha: 0.6,
+    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -6 },
+    vignetteIntensity: 0.5,
     letterbox: true,
   },
 
@@ -58,7 +61,7 @@ const INTRO_SLIDES: Slide[] = [
       'A ghost that shouldn\'t exist.',
     ],
     effect: 'fade',
-    pauseAfter: 800,
+    pauseAfter: 300,
     voiceover: 'vo_intro_17',
     bgImage: 'intro_nancy_car',
     bgAlpha: 0.55,
@@ -70,6 +73,9 @@ const INTRO_SLIDES: Slide[] = [
       { key: 'proc:heartbeat', delay: 200, volume: 0.3 },
     ],
   },
+
+  // ── The Doors — Nancy pushes through ────────────────────────────────────────
+
   {
     lines: [
       'You push through the heavy doors',
@@ -81,16 +87,19 @@ const INTRO_SLIDES: Slide[] = [
       'Vivian is waiting.',
     ],
     effect: 'typewriter',
-    pauseAfter: 800,
+    pauseAfter: 400,
     voiceover: 'vo_intro_18',
     bgImage: 'intro_doors',
-    bgAlpha: 0.55,
-    camera: { scaleFrom: 1.0, scaleTo: 1.1, panY: -8 },
-    fogIntensity: 0.05,
-    vignetteIntensity: 0.6,
+    bgAlpha: 0.6,
+    camera: { scaleFrom: 1.05, scaleTo: 1.18, panY: -12 },
+    fogIntensity: 0.08,
+    vignetteIntensity: 0.8,
     letterbox: true,
     audio: [
-      { key: 'proc:doorCreak', delay: 200, volume: 0.5 },
+      { key: 'proc:doorCreak', delay: 0, volume: 0.6 },
+    ],
+    effects: [
+      { type: 'screenShake', delay: 0, duration: 400 },
     ],
   },
 ];
