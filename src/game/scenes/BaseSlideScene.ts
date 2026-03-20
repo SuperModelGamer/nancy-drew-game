@@ -53,8 +53,12 @@ export interface Slide {
   bgAlpha?: number;
   camera?: CameraMotion;
   fogIntensity?: number;
+  vignetteIntensity?: number;
+  letterbox?: boolean;
   audio?: AudioCue[];
   effects?: SlideEffect[];
+  /** Voiceover audio key. Slide won't auto-advance until VO finishes (or pauseAfter, whichever is longer). */
+  voiceover?: string;
 }
 
 // ─── Procedural sound dispatch ───────────────────────────────────────────────
@@ -117,6 +121,9 @@ export abstract class BaseSlideScene extends Phaser.Scene {
   protected ghostOverlay: Phaser.GameObjects.Rectangle | null = null;
   private bgDarken!: Phaser.GameObjects.Rectangle;
   private activeSounds: Phaser.Sound.BaseSound[] = [];
+  private vignetteOverlay!: Phaser.GameObjects.Graphics;
+  private letterboxTop!: Phaser.GameObjects.Rectangle;
+  private letterboxBottom!: Phaser.GameObjects.Rectangle;
 
   // ─── Abstract / overridable ──────────────────────────────────────────────
 
@@ -174,6 +181,17 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     // Fog overlay
     this.fogOverlay = this.add.rectangle(width / 2, height / 2, width, height, Colors.fog, 0);
     this.fogOverlay.setDepth(3);
+
+    // Vignette overlay (radial darkening at edges)
+    this.vignetteOverlay = this.createVignetteGraphics(width, height);
+    this.vignetteOverlay.setDepth(3.5);
+    this.vignetteOverlay.setAlpha(0);
+
+    // Cinematic letterbox bars
+    this.letterboxTop = this.add.rectangle(width / 2, 0, width, 0, 0x000000, 1);
+    this.letterboxTop.setOrigin(0.5, 0).setDepth(9);
+    this.letterboxBottom = this.add.rectangle(width / 2, height, width, 0, 0x000000, 1);
+    this.letterboxBottom.setOrigin(0.5, 1).setDepth(9);
 
     // Dust particles
     this.createDustParticles();
@@ -236,6 +254,25 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     }
   }
 
+  // ─── Vignette ──────────────────────────────────────────────────────────
+
+  private createVignetteGraphics(width: number, height: number): Phaser.GameObjects.Graphics {
+    const g = this.add.graphics();
+    // Draw concentric rectangles with increasing opacity toward edges
+    const steps = 12;
+    for (let i = 0; i < steps; i++) {
+      const t = i / steps;
+      const inset = t * Math.min(width, height) * 0.35;
+      const alpha = (1 - t) * 0.25;
+      g.fillStyle(0x000000, alpha);
+      g.fillRect(0, 0, width, inset);                              // top
+      g.fillRect(0, height - inset, width, inset);                  // bottom
+      g.fillRect(0, 0, inset, height);                              // left
+      g.fillRect(width - inset, 0, inset, height);                  // right
+    }
+    return g;
+  }
+
   // ─── Input ───────────────────────────────────────────────────────────────
 
   private handleClick(): void {
@@ -272,8 +309,21 @@ export abstract class BaseSlideScene extends Phaser.Scene {
       this.tweens.add({ targets: this.fogOverlay, fillAlpha: slide.fogIntensity, duration: 1500 });
     }
 
+    // Vignette
+    const vigTarget = slide.vignetteIntensity ?? 0;
+    this.tweens.add({ targets: this.vignetteOverlay, alpha: vigTarget, duration: 1200 });
+
+    // Letterbox
+    const { height: lbHeight } = this.cameras.main;
+    const barH = slide.letterbox ? Math.round(lbHeight * 0.08) : 0;
+    this.tweens.add({ targets: this.letterboxTop, displayHeight: barH, duration: 800, ease: 'Cubic.easeInOut' });
+    this.tweens.add({ targets: this.letterboxBottom, displayHeight: barH, duration: 800, ease: 'Cubic.easeInOut' });
+
     // Audio
     this.triggerAudio(slide);
+
+    // Voiceover — start playing and track when it ends
+    const voiceoverDone = this.playVoiceover(slide);
 
     // Effects
     this.triggerEffects(slide);
@@ -281,7 +331,7 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     // Text
     const { width, height } = this.cameras.main;
     const totalLines = slide.lines.length;
-    const lineHeight = 32;
+    const lineHeight = 44;
     const startY = height / 2 - (totalLines * lineHeight) / 2;
 
     if (slide.effect === 'typewriter') {
@@ -294,12 +344,13 @@ export abstract class BaseSlideScene extends Phaser.Scene {
 
     this.isAnimating = false;
 
-    // After text finishes (naturally or via click), pause then auto-advance.
-    // Reset abortSlide so the pause timer runs even if user clicked to rush text.
+    // After text finishes, wait for BOTH pauseAfter AND voiceover to complete.
+    // This ensures the slide stays visible as long as the VO is playing.
     this.abortSlide = false;
-    await this.wait(slide.pauseAfter || 2000);
+    const pausePromise = this.wait(slide.pauseAfter || 2000);
+    await Promise.all([pausePromise, voiceoverDone]);
 
-    // Auto-advance to next slide after pause completes
+    // Auto-advance to next slide after both complete
     if (!this.abortSlide) {
       this.nextSlide();
     }
@@ -395,6 +446,25 @@ export abstract class BaseSlideScene extends Phaser.Scene {
       s.destroy();
     }
     this.activeSounds = [];
+  }
+
+  // ─── Voiceover ──────────────────────────────────────────────────────────
+
+  private playVoiceover(slide: Slide): Promise<void> {
+    if (!slide.voiceover) return Promise.resolve();
+
+    // If the VO audio file isn't loaded, skip gracefully
+    if (!this.cache.audio.exists(slide.voiceover)) return Promise.resolve();
+
+    return new Promise<void>((resolve) => {
+      const vo = this.sound.add(slide.voiceover!, { volume: 0.85 });
+      vo.play();
+      this.activeSounds.push(vo);
+
+      vo.on('complete', () => resolve());
+      // Safety: resolve after 30s max in case 'complete' never fires
+      this.time.delayedCall(30000, () => resolve());
+    });
   }
 
   // ─── Effects ─────────────────────────────────────────────────────────────
@@ -534,10 +604,10 @@ export abstract class BaseSlideScene extends Phaser.Scene {
           if (charIndex < line.length) {
             charIndex++;
             textObj.setText(line.substring(0, charIndex));
-            this.time.delayedCall(35, typeChar);
+            this.time.delayedCall(25, typeChar);
           } else {
             lineIndex++;
-            this.time.delayedCall(300, showNextLine);
+            this.time.delayedCall(150, showNextLine);
           }
         };
         typeChar();
@@ -567,7 +637,7 @@ export abstract class BaseSlideScene extends Phaser.Scene {
 
       textsToFade.forEach((t, i) => {
         this.tweens.add({
-          targets: t, alpha: 1, duration: 600, delay: i * 400,
+          targets: t, alpha: 1, duration: 400, delay: i * 250,
           onComplete: () => { if (i === textsToFade.length - 1) resolve(); },
         });
       });
@@ -578,7 +648,7 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     return new Promise<void>((resolve) => {
       const line = lines[0] || '';
       const t = this.add.text(width / 2, startY + lineHeight, line, {
-        fontFamily: FONT, fontSize: '42px', color: TextColors.gold,
+        fontFamily: FONT, fontSize: '56px', color: TextColors.gold,
         fontStyle: 'italic', align: 'center',
       }).setOrigin(0.5).setAlpha(0).setDepth(5);
       this.currentTexts.push(t);
@@ -605,8 +675,8 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     else if (isStageDirection) { color = TextColors.goldDim; style = 'italic'; }
 
     return this.add.text(x, y, text, {
-      fontFamily: FONT, fontSize: '26px', color, fontStyle: style, align: 'center',
-      shadow: { offsetX: 0, offsetY: 2, color: '#000000', blur: 6, fill: true },
+      fontFamily: FONT, fontSize: '34px', color, fontStyle: style, align: 'center',
+      shadow: { offsetX: 0, offsetY: 3, color: '#000000', blur: 8, fill: true },
     }).setOrigin(0.5).setDepth(5);
   }
 

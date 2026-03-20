@@ -115,6 +115,9 @@ export class BootScene extends Phaser.Scene {
       'intro_stage_1928', 'intro_goblet', 'intro_stage_empty',
       'intro_exterior', 'intro_lobby_dark', 'intro_ghost',
       'intro_phone', 'intro_doors',
+      'intro_newspaper', 'intro_marquee_lights', 'intro_backstage',
+      'intro_poison_bottle', 'intro_demolition', 'intro_ghost_stage',
+      'intro_nancy_car',
     ];
     for (const key of introImages) {
       this.load.image(key, `assets/intro/${key}.png`);
@@ -137,6 +140,17 @@ export class BootScene extends Phaser.Scene {
     };
     for (const [key, paths] of Object.entries(introAudio)) {
       this.load.audio(key, paths);
+    }
+
+    // Load intro voiceover narration (gracefully skipped if files don't exist)
+    const voSlides = [
+      'vo_intro_01', 'vo_intro_02', 'vo_intro_03', 'vo_intro_04', 'vo_intro_05',
+      'vo_intro_06', 'vo_intro_07', 'vo_intro_08', 'vo_intro_09', 'vo_intro_10',
+      'vo_intro_11', 'vo_intro_12', 'vo_intro_13', 'vo_intro_14', 'vo_intro_15',
+      'vo_intro_16', 'vo_intro_17', 'vo_intro_18',
+    ];
+    for (const key of voSlides) {
+      this.load.audio(key, [`assets/vo/intro/${key}.mp3`, `assets/vo/intro/${key}.ogg`]);
     }
 
     // Load ambient audio for room soundscapes (optional — procedural fallback exists)
