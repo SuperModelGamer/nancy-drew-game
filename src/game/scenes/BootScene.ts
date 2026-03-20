@@ -147,7 +147,7 @@ export class BootScene extends Phaser.Scene {
       'vo_intro_01', 'vo_intro_02', 'vo_intro_03', 'vo_intro_04', 'vo_intro_05',
       'vo_intro_06', 'vo_intro_07', 'vo_intro_08', 'vo_intro_09', 'vo_intro_10',
       'vo_intro_11', 'vo_intro_12', 'vo_intro_13', 'vo_intro_14', 'vo_intro_15',
-      'vo_intro_16', 'vo_intro_17',
+      'vo_intro_16', 'vo_intro_17', 'vo_intro_18',
     ];
     for (const key of voSlides) {
       this.load.audio(key, [`assets/vo/intro/${key}.mp3`, `assets/vo/intro/${key}.ogg`]);
