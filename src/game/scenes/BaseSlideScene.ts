@@ -57,6 +57,8 @@ export interface Slide {
   letterbox?: boolean;
   audio?: AudioCue[];
   effects?: SlideEffect[];
+  /** Voiceover audio key. Slide won't auto-advance until VO finishes (or pauseAfter, whichever is longer). */
+  voiceover?: string;
 }
 
 // ─── Procedural sound dispatch ───────────────────────────────────────────────
@@ -320,6 +322,9 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     // Audio
     this.triggerAudio(slide);
 
+    // Voiceover — start playing and track when it ends
+    const voiceoverDone = this.playVoiceover(slide);
+
     // Effects
     this.triggerEffects(slide);
 
@@ -339,12 +344,13 @@ export abstract class BaseSlideScene extends Phaser.Scene {
 
     this.isAnimating = false;
 
-    // After text finishes (naturally or via click), pause then auto-advance.
-    // Reset abortSlide so the pause timer runs even if user clicked to rush text.
+    // After text finishes, wait for BOTH pauseAfter AND voiceover to complete.
+    // This ensures the slide stays visible as long as the VO is playing.
     this.abortSlide = false;
-    await this.wait(slide.pauseAfter || 2000);
+    const pausePromise = this.wait(slide.pauseAfter || 2000);
+    await Promise.all([pausePromise, voiceoverDone]);
 
-    // Auto-advance to next slide after pause completes
+    // Auto-advance to next slide after both complete
     if (!this.abortSlide) {
       this.nextSlide();
     }
@@ -440,6 +446,25 @@ export abstract class BaseSlideScene extends Phaser.Scene {
       s.destroy();
     }
     this.activeSounds = [];
+  }
+
+  // ─── Voiceover ──────────────────────────────────────────────────────────
+
+  private playVoiceover(slide: Slide): Promise<void> {
+    if (!slide.voiceover) return Promise.resolve();
+
+    // If the VO audio file isn't loaded, skip gracefully
+    if (!this.cache.audio.exists(slide.voiceover)) return Promise.resolve();
+
+    return new Promise<void>((resolve) => {
+      const vo = this.sound.add(slide.voiceover!, { volume: 0.85 });
+      vo.play();
+      this.activeSounds.push(vo);
+
+      vo.on('complete', () => resolve());
+      // Safety: resolve after 30s max in case 'complete' never fires
+      this.time.delayedCall(30000, () => resolve());
+    });
   }
 
   // ─── Effects ─────────────────────────────────────────────────────────────
