@@ -6,45 +6,59 @@ import { Colors, TextColors, FONT } from '../utils/constants';
 // ─── Intro Slides ────────────────────────────────────────────────────────────
 
 const INTRO_SLIDES: Slide[] = [
-  // ── ACT I: The Night of the Murder (1928) ─────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════════════
+  //  ACT I — HALLOWEEN NIGHT, 1928
+  // ══════════════════════════════════════════════════════════════════════════
 
   {
     lines: [
-      'October 31, 1928.',
+      'Halloween, 1928.',
     ],
     effect: 'dramatic',
-    pauseAfter: 1500,
+    pauseAfter: 1800,
     bgImage: 'intro_marquee_lights',
-    bgAlpha: 0.7,
-    camera: { scaleFrom: 1.0, scaleTo: 1.05, panY: -5 },
+    bgTint: 0xddb87a,
+    bgAlpha: 0.75,
+    camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: -8 },
+    vignetteIntensity: 0.8,
+    letterbox: true,
     audio: [
-      { key: 'ambient_theater', volume: 0.3, loop: true },
+      { key: 'proc:theaterDrone', volume: 0.3 },
     ],
   },
   {
     lines: [
-      'The Monarch Theatre is packed to the rafters.',
-      'Every seat sold for the final performance',
+      'Every seat in the Monarch Theatre is taken.',
+      'Standing room only for the final night',
       'of "The Crimson Veil."',
     ],
     effect: 'typewriter',
-    pauseAfter: 1500,
+    pauseAfter: 1400,
     bgImage: 'intro_stage_1928',
-    bgAlpha: 0.65,
-    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -10 },
+    bgTint: 0xddb87a,
+    bgAlpha: 0.6,
+    camera: { scaleFrom: 1.0, scaleTo: 1.1, panY: -12 },
+    vignetteIntensity: 0.6,
+    letterbox: true,
   },
   {
     lines: [
-      'On stage, Margaux Fontaine raises the goblet.',
-      'The audience holds its breath.',
+      'The star, Margaux Fontaine,',
+      'raises a golden goblet to her lips.',
     ],
     effect: 'typewriter',
     pauseAfter: 1200,
     bgImage: 'intro_goblet',
+    bgTint: 0xddb87a,
     bgAlpha: 0.55,
-    camera: { scaleFrom: 1.05, scaleTo: 1.15, panY: 5 },
+    camera: { scaleFrom: 1.0, scaleTo: 1.15, panY: 8 },
+    vignetteIntensity: 0.7,
+    letterbox: true,
+    effects: [
+      { type: 'spotlight', delay: 200, duration: 3000 },
+    ],
     audio: [
-      { key: 'sfx_goblet', delay: 1000, volume: 0.5 },
+      { key: 'proc:gobletClink', delay: 800, volume: 0.5 },
     ],
   },
   {
@@ -52,201 +66,276 @@ const INTRO_SLIDES: Slide[] = [
       'She drinks.',
       '',
       'She falls.',
+      '',
+      'This time, she doesn\'t get up.',
     ],
     effect: 'fade',
-    pauseAfter: 1800,
+    pauseAfter: 2000,
     bgImage: 'intro_goblet',
-    bgAlpha: 0.4,
-    camera: { scaleFrom: 1.15, scaleTo: 1.25, panY: 10 },
+    bgTint: 0xddb87a,
+    bgAlpha: 0.35,
+    camera: { scaleFrom: 1.15, scaleTo: 1.3, panY: 15 },
+    vignetteIntensity: 0.9,
+    letterbox: true,
     audio: [
-      { key: 'sfx_thud', delay: 800, volume: 0.4 },
+      { key: 'proc:bodyThud', delay: 1000, volume: 0.5 },
     ],
     effects: [
-      { type: 'screenShake', delay: 800, duration: 400 },
+      { type: 'screenShake', delay: 1000, duration: 500 },
+      { type: 'heartbeat', delay: 1200, duration: 2500 },
     ],
   },
   {
     lines: [
-      'The curtain drops for the last time.',
+      'The curtain falls for the last time.',
     ],
     effect: 'dramatic',
-    pauseAfter: 1500,
+    pauseAfter: 1800,
     bgImage: 'intro_stage_empty',
-    bgAlpha: 0.5,
-    camera: { scaleFrom: 1.0, scaleTo: 1.05, panX: -15 },
+    bgTint: 0xddb87a,
+    bgAlpha: 0.45,
+    camera: { scaleFrom: 1.0, scaleTo: 1.05, panX: -10 },
+    vignetteIntensity: 0.8,
+    letterbox: true,
   },
   {
     lines: [
-      'They called it a tragic accident.',
-      'Poison in a prop goblet — a terrible mistake.',
+      'The papers call it a tragic accident.',
+      'Poison in a prop goblet.',
+      'A terrible mistake.',
     ],
     effect: 'fade',
     pauseAfter: 1500,
     bgImage: 'intro_newspaper',
-    bgAlpha: 0.55,
-    camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: -5 },
+    bgAlpha: 0.6,
+    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -6 },
+    vignetteIntensity: 0.5,
+    letterbox: true,
   },
   {
     lines: [
-      'But someone in that theater knew the truth.',
-      'And they took it to their grave.',
+      'But someone in the audience that night',
+      'knew exactly what happened.',
+      '',
+      'And they never said a word.',
     ],
     effect: 'typewriter',
-    pauseAfter: 1500,
+    pauseAfter: 1800,
     bgImage: 'intro_backstage',
     bgAlpha: 0.45,
-    camera: { scaleFrom: 1.0, scaleTo: 1.08, panX: 10 },
+    camera: { scaleFrom: 1.0, scaleTo: 1.1, panX: 12 },
+    vignetteIntensity: 0.7,
+    letterbox: true,
+    audio: [
+      { key: 'proc:ghostDrone', delay: 500, volume: 0.2 },
+    ],
   },
 
-  // ── ACT II: Present Day ───────────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════════════
+  //  ACT II — PRESENT DAY
+  // ══════════════════════════════════════════════════════════════════════════
 
   {
     lines: [
-      'Nearly a century later...',
+      'Ninety-seven years later.',
     ],
     effect: 'dramatic',
     pauseAfter: 1800,
+    letterbox: true,
+    vignetteIntensity: 0.5,
     effects: [
-      { type: 'flashWhite', delay: 0, duration: 400 },
+      { type: 'flashWhite', delay: 0, duration: 500 },
     ],
   },
   {
     lines: [
-      'The Monarch Theatre stands condemned.',
-      'Developer Roland Ashworth plans to raze it',
-      'and build luxury condominiums.',
+      'The Monarch sits condemned.',
+      'Three days from demolition.',
+      'A developer named Roland Ashworth',
+      'plans to tear it down for condominiums.',
     ],
     effect: 'fade',
     pauseAfter: 1500,
-    bgImage: 'intro_exterior',
+    bgImage: 'intro_demolition',
     bgAlpha: 0.55,
     camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: -8 },
     fogIntensity: 0.08,
+    vignetteIntensity: 0.6,
+    letterbox: true,
   },
   {
     lines: [
-      'Then he collapses at the concierge desk.',
-      'Poisoned — the same way Margaux died.',
+      'But last night, Ashworth collapsed.',
+      'Poisoned.',
+      'The same method. The same symptoms.',
+      'The same theater.',
     ],
     effect: 'typewriter',
-    pauseAfter: 1500,
+    pauseAfter: 1800,
     bgImage: 'intro_poison_bottle',
     bgAlpha: 0.5,
-    camera: { scaleFrom: 1.0, scaleTo: 1.1, panY: 5 },
+    camera: { scaleFrom: 1.0, scaleTo: 1.12, panY: 5 },
+    vignetteIntensity: 0.8,
+    letterbox: true,
     effects: [
-      { type: 'screenShake', delay: 800, duration: 400 },
+      { type: 'screenShake', delay: 600, duration: 400 },
+      { type: 'heartbeat', delay: 800, duration: 3000 },
     ],
   },
   {
     lines: [
-      'The demolition crew arrives in 48 hours.',
-      'The police have no leads.',
-    ],
-    effect: 'fade',
-    pauseAfter: 1200,
-    bgImage: 'intro_demolition',
-    bgAlpha: 0.5,
-    camera: { scaleFrom: 1.0, scaleTo: 1.05, panX: -10 },
-    fogIntensity: 0.06,
-  },
-
-  // ── ACT III: The Ghost ────────────────────────────────────────────────────
-
-  {
-    lines: [
-      'And the ghost has returned.',
+      'Someone is copying a murder',
+      'that was never solved.',
     ],
     effect: 'dramatic',
     pauseAfter: 1500,
-    bgImage: 'intro_ghost_stage',
-    bgAlpha: 0.45,
-    fogIntensity: 0.15,
-    effects: [
-      { type: 'ghostFlicker', delay: 300, duration: 3000 },
+    bgImage: 'intro_poison_bottle',
+    bgAlpha: 0.35,
+    camera: { scaleFrom: 1.12, scaleTo: 1.2, panY: 8 },
+    vignetteIntensity: 0.9,
+    letterbox: true,
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════
+  //  ACT III — THE GHOST
+  // ══════════════════════════════════════════════════════════════════════════
+
+  {
+    lines: [
+      'And something else is wrong.',
+    ],
+    effect: 'fade',
+    pauseAfter: 1200,
+    fogIntensity: 0.12,
+    vignetteIntensity: 0.7,
+    letterbox: true,
+    audio: [
+      { key: 'proc:eerieWhistle', delay: 200, volume: 0.3 },
     ],
   },
   {
     lines: [
       'A figure in white on the empty stage.',
-      'Footsteps where no one walks.',
-      'A voice reciting lines from a play',
-      'that ended in murder.',
+      'Footsteps in locked corridors.',
+      'A voice whispering lines',
+      'from a play that ended in death.',
     ],
     effect: 'typewriter',
+    pauseAfter: 1800,
+    bgImage: 'intro_ghost_stage',
+    bgAlpha: 0.45,
+    camera: { scaleFrom: 1.0, scaleTo: 1.1, panY: 5 },
+    fogIntensity: 0.18,
+    vignetteIntensity: 0.8,
+    letterbox: true,
+    effects: [
+      { type: 'ghostFlicker', delay: 300, duration: 4000 },
+      { type: 'spotlight', delay: 600, duration: 3000 },
+    ],
+    audio: [
+      { key: 'proc:ghostWhisper', delay: 800, volume: 0.3 },
+    ],
+  },
+  {
+    lines: [
+      'The ghost of Margaux Fontaine',
+      'walks the Monarch again.',
+    ],
+    effect: 'dramatic',
     pauseAfter: 1500,
     bgImage: 'intro_ghost',
     bgAlpha: 0.5,
-    camera: { scaleFrom: 1.0, scaleTo: 1.1, panY: 5 },
+    camera: { scaleFrom: 1.0, scaleTo: 1.08, panX: -8 },
     fogIntensity: 0.15,
-    audio: [
-      { key: 'sfx_ghost_whisper', delay: 800, volume: 0.3 },
+    vignetteIntensity: 0.9,
+    letterbox: true,
+    effects: [
+      { type: 'ghostFlicker', delay: 200, duration: 3000 },
     ],
   },
 
-  // ── ACT IV: The Call ──────────────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════════════
+  //  ACT IV — THE CALL
+  // ══════════════════════════════════════════════════════════════════════════
 
   {
     lines: [
-      'Vivian Delacroix — Margaux\'s goddaughter —',
-      'has lived in the Monarch her entire life.',
-      '',
-      'She\'s the one who called you.',
+      'Vivian Delacroix has lived in the',
+      'Monarch her entire life.',
+      'Margaux\'s goddaughter.',
+      'The last person who still remembers.',
     ],
     effect: 'fade',
-    pauseAfter: 1200,
-    bgImage: 'intro_phone',
-    bgAlpha: 0.5,
-    camera: { scaleFrom: 1.0, scaleTo: 1.05, panX: 10 },
-    audio: [
-      { key: 'sfx_phone_ring', delay: 1000, volume: 0.4 },
-    ],
-  },
-  {
-    lines: [
-      '"Nancy, please come quickly.',
-      'Someone has been poisoned.',
-      'And the ghost of Margaux Fontaine',
-      'walks these halls again."',
-    ],
-    effect: 'typewriter',
     pauseAfter: 1500,
     bgImage: 'intro_phone',
-    bgAlpha: 0.45,
-    camera: { scaleFrom: 1.05, scaleTo: 1.12, panX: -5 },
+    bgAlpha: 0.5,
+    camera: { scaleFrom: 1.0, scaleTo: 1.06, panX: 10 },
+    vignetteIntensity: 0.6,
+    letterbox: true,
+    audio: [
+      { key: 'proc:phoneRing', delay: 1200, volume: 0.4 },
+    ],
+  },
+  {
+    lines: [
+      '"Nancy — someone has been poisoned.',
+      'The police won\'t listen.',
+      'The wrecking crew comes in three days.',
+      'And something is haunting this theater.',
+      '',
+      'Please. You\'re the only one I trust."',
+    ],
+    effect: 'typewriter',
+    pauseAfter: 1800,
+    bgImage: 'intro_phone',
+    bgAlpha: 0.4,
+    camera: { scaleFrom: 1.06, scaleTo: 1.14, panX: -8 },
+    vignetteIntensity: 0.7,
+    letterbox: true,
   },
 
-  // ── ACT V: Arrival ────────────────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════════════
+  //  ACT V — ARRIVAL
+  // ══════════════════════════════════════════════════════════════════════════
 
   {
     lines: [
-      'You drive through the rain.',
-      'The Monarch looms ahead —',
-      'its marquee dark for the first time in decades.',
+      'Seventy-two hours.',
+      'A copycat poisoner. A condemned building.',
+      'A ghost that shouldn\'t exist.',
     ],
     effect: 'fade',
     pauseAfter: 1500,
     bgImage: 'intro_nancy_car',
     bgAlpha: 0.55,
-    camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: -5 },
+    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -6 },
     fogIntensity: 0.1,
+    vignetteIntensity: 0.7,
+    letterbox: true,
+    audio: [
+      { key: 'proc:heartbeat', delay: 200, volume: 0.3 },
+    ],
   },
   {
     lines: [
-      'You push through the heavy front doors.',
+      'You push through the heavy doors',
+      'of the Monarch Theatre.',
       '',
       'The lobby is dark.',
-      'A single lamp burns at the concierge desk.',
+      'A single lamp burns at the front desk.',
       '',
       'Vivian is waiting.',
     ],
     effect: 'typewriter',
-    pauseAfter: 1200,
+    pauseAfter: 1500,
     bgImage: 'intro_doors',
     bgAlpha: 0.55,
-    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -5 },
+    camera: { scaleFrom: 1.0, scaleTo: 1.1, panY: -8 },
     fogIntensity: 0.05,
+    vignetteIntensity: 0.6,
+    letterbox: true,
     audio: [
-      { key: 'sfx_door_creak', delay: 200, volume: 0.5 },
+      { key: 'proc:doorCreak', delay: 200, volume: 0.5 },
     ],
   },
 ];

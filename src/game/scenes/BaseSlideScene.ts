@@ -53,6 +53,8 @@ export interface Slide {
   bgAlpha?: number;
   camera?: CameraMotion;
   fogIntensity?: number;
+  vignetteIntensity?: number;
+  letterbox?: boolean;
   audio?: AudioCue[];
   effects?: SlideEffect[];
 }
@@ -117,6 +119,9 @@ export abstract class BaseSlideScene extends Phaser.Scene {
   protected ghostOverlay: Phaser.GameObjects.Rectangle | null = null;
   private bgDarken!: Phaser.GameObjects.Rectangle;
   private activeSounds: Phaser.Sound.BaseSound[] = [];
+  private vignetteOverlay!: Phaser.GameObjects.Graphics;
+  private letterboxTop!: Phaser.GameObjects.Rectangle;
+  private letterboxBottom!: Phaser.GameObjects.Rectangle;
 
   // ─── Abstract / overridable ──────────────────────────────────────────────
 
@@ -174,6 +179,17 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     // Fog overlay
     this.fogOverlay = this.add.rectangle(width / 2, height / 2, width, height, Colors.fog, 0);
     this.fogOverlay.setDepth(3);
+
+    // Vignette overlay (radial darkening at edges)
+    this.vignetteOverlay = this.createVignetteGraphics(width, height);
+    this.vignetteOverlay.setDepth(3.5);
+    this.vignetteOverlay.setAlpha(0);
+
+    // Cinematic letterbox bars
+    this.letterboxTop = this.add.rectangle(width / 2, 0, width, 0, 0x000000, 1);
+    this.letterboxTop.setOrigin(0.5, 0).setDepth(9);
+    this.letterboxBottom = this.add.rectangle(width / 2, height, width, 0, 0x000000, 1);
+    this.letterboxBottom.setOrigin(0.5, 1).setDepth(9);
 
     // Dust particles
     this.createDustParticles();
@@ -236,6 +252,25 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     }
   }
 
+  // ─── Vignette ──────────────────────────────────────────────────────────
+
+  private createVignetteGraphics(width: number, height: number): Phaser.GameObjects.Graphics {
+    const g = this.add.graphics();
+    // Draw concentric rectangles with increasing opacity toward edges
+    const steps = 12;
+    for (let i = 0; i < steps; i++) {
+      const t = i / steps;
+      const inset = t * Math.min(width, height) * 0.35;
+      const alpha = (1 - t) * 0.25;
+      g.fillStyle(0x000000, alpha);
+      g.fillRect(0, 0, width, inset);                              // top
+      g.fillRect(0, height - inset, width, inset);                  // bottom
+      g.fillRect(0, 0, inset, height);                              // left
+      g.fillRect(width - inset, 0, inset, height);                  // right
+    }
+    return g;
+  }
+
   // ─── Input ───────────────────────────────────────────────────────────────
 
   private handleClick(): void {
@@ -271,6 +306,16 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     if (slide.fogIntensity !== undefined) {
       this.tweens.add({ targets: this.fogOverlay, fillAlpha: slide.fogIntensity, duration: 1500 });
     }
+
+    // Vignette
+    const vigTarget = slide.vignetteIntensity ?? 0;
+    this.tweens.add({ targets: this.vignetteOverlay, alpha: vigTarget, duration: 1200 });
+
+    // Letterbox
+    const { height: lbHeight } = this.cameras.main;
+    const barH = slide.letterbox ? Math.round(lbHeight * 0.08) : 0;
+    this.tweens.add({ targets: this.letterboxTop, displayHeight: barH, duration: 800, ease: 'Cubic.easeInOut' });
+    this.tweens.add({ targets: this.letterboxBottom, displayHeight: barH, duration: 800, ease: 'Cubic.easeInOut' });
 
     // Audio
     this.triggerAudio(slide);
