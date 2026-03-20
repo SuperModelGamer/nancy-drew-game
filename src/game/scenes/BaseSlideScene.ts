@@ -457,7 +457,7 @@ export abstract class BaseSlideScene extends Phaser.Scene {
     if (!this.cache.audio.exists(slide.voiceover)) return Promise.resolve();
 
     return new Promise<void>((resolve) => {
-      const vo = this.sound.add(slide.voiceover!, { volume: 0.85 });
+      const vo = this.sound.add(slide.voiceover!, { volume: 0.85, rate: 1.10 });
       vo.play();
       this.activeSounds.push(vo);
 
