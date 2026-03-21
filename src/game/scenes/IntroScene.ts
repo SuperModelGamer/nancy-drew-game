@@ -94,25 +94,25 @@ const INTRO_SLIDES: Slide[] = [
     ],
   },
 
-  // ── The Hand — Nancy pushes into the lobby ──────────────────────────────────
+  // ── The Hand — Nancy reaches for the theater doors ──────────────────────────
 
   {
     lines: [
-      'You push through the heavy doors.',
-      'A single lamp burns at the front desk.',
+      'You push through the heavy doors',
+      'of the Monarch Theatre.',
       '',
       'Vivian is waiting.',
     ],
-    effect: 'fade',
+    effect: 'typewriter',
     pauseAfter: 400,
-    bgImage: 'intro_lobby_dark',
-    bgAlpha: 0.55,
-    camera: { scaleFrom: 1.0, scaleTo: 1.08, panX: -5 },
+    bgImage: 'intro_hand_door',
+    bgAlpha: 0.6,
+    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -5 },
     fogIntensity: 0.1,
     vignetteIntensity: 0.8,
     letterbox: true,
     audio: [
-      { key: 'proc:doorCreak', delay: 0, volume: 0.5 },
+      { key: 'proc:doorCreak', delay: 0, volume: 0.6 },
       { key: 'proc:ghostDrone', delay: 500, volume: 0.15 },
     ],
   },
