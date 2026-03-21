@@ -74,14 +74,14 @@ const INTRO_SLIDES: Slide[] = [
     ],
   },
 
-  // ── The Doors — Nancy pushes through ────────────────────────────────────────
+  // ── The Flashlight — Nancy outside the Monarch ──────────────────────────────
 
   {
     lines: [
-      'You push through the heavy doors',
-      'of the Monarch Theatre.',
+      'The Monarch Theatre.',
+      'Condemned. Fenced off. Waiting.',
     ],
-    effect: 'typewriter',
+    effect: 'fade',
     pauseAfter: 300,
     voiceover: 'vo_intro_18',
     bgImage: 'intro_doors',
@@ -94,20 +94,20 @@ const INTRO_SLIDES: Slide[] = [
     ],
   },
 
-  // ── The Dark Lobby — what Nancy sees inside ────────────────────────────────
+  // ── The Hand — the mystery that started it all ─────────────────────────────
 
   {
     lines: [
-      'The lobby is dark.',
-      'A single lamp burns at the front desk.',
+      'A death on stage. A poisoned goblet.',
+      'A ghost that won\'t rest.',
       '',
-      'Vivian is waiting.',
+      'And no one left who remembers the truth.',
     ],
     effect: 'fade',
     pauseAfter: 400,
-    bgImage: 'intro_lobby_dark',
-    bgAlpha: 0.5,
-    camera: { scaleFrom: 1.0, scaleTo: 1.06, panX: -5 },
+    bgImage: 'intro_goblet',
+    bgAlpha: 0.55,
+    camera: { scaleFrom: 1.0, scaleTo: 1.08, panX: -5 },
     fogIntensity: 0.1,
     vignetteIntensity: 0.8,
     letterbox: true,
