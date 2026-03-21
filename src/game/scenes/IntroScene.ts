@@ -94,24 +94,25 @@ const INTRO_SLIDES: Slide[] = [
     ],
   },
 
-  // ── The Hand — the mystery that started it all ─────────────────────────────
+  // ── The Hand — Nancy pushes into the lobby ──────────────────────────────────
 
   {
     lines: [
-      'A death on stage. A poisoned goblet.',
-      'A ghost that won\'t rest.',
+      'You push through the heavy doors.',
+      'A single lamp burns at the front desk.',
       '',
-      'And no one left who remembers the truth.',
+      'Vivian is waiting.',
     ],
     effect: 'fade',
     pauseAfter: 400,
-    bgImage: 'intro_goblet',
+    bgImage: 'intro_lobby_dark',
     bgAlpha: 0.55,
     camera: { scaleFrom: 1.0, scaleTo: 1.08, panX: -5 },
     fogIntensity: 0.1,
     vignetteIntensity: 0.8,
     letterbox: true,
     audio: [
+      { key: 'proc:doorCreak', delay: 0, volume: 0.5 },
       { key: 'proc:ghostDrone', delay: 500, volume: 0.15 },
     ],
   },
