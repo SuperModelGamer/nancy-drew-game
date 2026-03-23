@@ -6,31 +6,31 @@ const TRANSITIONS: Record<number, { title: string; subtitle: string; time: strin
     title: 'Act I',
     subtitle: 'The Invitation',
     time: 'Night 1 — 9:00 PM',
-    description: 'The Monarch Theatre stands dark against the city skyline.\nA single light burns in the lobby window.\nNancy Drew pushes through the heavy front doors.',
+    description: 'The Monarch Theatre stands dark against the city skyline.\nA single light burns in the lobby window.\nI push through the heavy front doors, and the smell of a century hits me — velvet, dust, and something faintly like roses.',
   },
   2: {
     title: 'Act II',
     subtitle: 'Behind the Curtain',
     time: 'Night 1 — 11:30 PM',
-    description: 'The theater grows quieter as midnight approaches.\nShadows lengthen in the auditorium.\nSomewhere below the stage, machinery hums.',
+    description: 'The theater grows quieter as midnight approaches.\nTwo people have been poisoned in this building. Same method. Nearly a century apart.\nSomewhere below the stage, machinery hums — and I don\'t think it\'s supposed to.',
   },
   3: {
     title: 'Act III',
-    subtitle: "The Ghost's Secret",
+    subtitle: 'The Ghost\'s Secret',
     time: 'Day 2 — 2:00 AM',
-    description: 'The fog machine activates on its own.\nFootsteps echo where no one walks.\nThe truth is hidden in plain sight.',
+    description: 'I\'ve been in this theater for five hours and I\'ve already seen a ghost.\nOr someone who wants me to think I have.\nThe fog machine, the costumes, the whispered lines — someone is performing, and I\'m the audience.',
   },
   4: {
     title: 'Act IV',
     subtitle: 'Beneath the Stage',
     time: 'Day 2 — 6:00 AM',
-    description: 'Dawn light filters through dusty windows.\nThe basement key feels heavy in Nancy\'s pocket.\nIt\'s time to go below.',
+    description: 'Dawn light filters through dusty windows, but it doesn\'t reach the basement.\nThe key feels heavy in my pocket. Every clue has led here.\nWhatever truth the Monarch is hiding, it\'s waiting below the stage.',
   },
   5: {
     title: 'Act V',
     subtitle: 'The Final Curtain',
     time: 'Day 2 — 8:00 AM',
-    description: 'The demolition crew arrives in twelve hours.\nEdwin Hale waits in the basement.\nEvery secret leads here.',
+    description: 'The demolition crew arrives in twelve hours.\nI know who poisoned Ashworth. I know who\'s been playing ghost.\nNow I have to decide what to do about it.',
   },
 };
 
