@@ -226,18 +226,21 @@ export class RoomScene extends Phaser.Scene {
     ambientAudio.setScene(this);
     ambientAudio.enterRoom(this.currentRoom.id);
 
-    // Start lobby background music (auto-plays default track on first lobby entry)
-    if (this.currentRoom.id === 'lobby') {
-      const music = MusicSystem.getInstance();
-      if (!music.isPlaying()) {
-        music.play();
-      }
-    } else {
-      // Stop lobby music when leaving for other rooms
-      const music = MusicSystem.getInstance();
-      if (music.isPlaying()) {
-        music.stop();
-      }
+    // Play background music in every room — track changes by room for atmosphere
+    const ROOM_MUSIC: Record<string, string> = {
+      lobby: 'chandelier_dreams',
+      auditorium: 'midnight_theatre',
+      backstage: 'velvet_curtain',
+      dressing_room: 'gaslight',
+      projection_booth: 'empty_stage',
+      managers_office: 'velvet_curtain',
+      catwalk: 'empty_stage',
+      basement: 'gaslight',
+    };
+    const music = MusicSystem.getInstance();
+    const targetTrack = ROOM_MUSIC[this.currentRoom.id] || 'midnight_theatre';
+    if (!music.isPlaying() || music.getCurrentTrack()?.id !== targetTrack) {
+      music.play(targetTrack);
     }
 
     // Hotspot editor toggle (Shift+Q)

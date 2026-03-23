@@ -1412,7 +1412,7 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(0.5, 0));
     y += 10;
 
-    this.settingsContent.add(this.add.text(cx, y + 22, 'Background music for the lobby', {
+    this.settingsContent.add(this.add.text(cx, y + 22, 'Preview and select background music', {
       fontFamily: FONT, fontSize: '13px', color: '#7a6a5a', fontStyle: 'italic',
     }).setOrigin(0.5, 0));
     y += 50;
