@@ -101,7 +101,7 @@ export class IntroScene extends Phaser.Scene {
     this.videoEl.style.cssText = `
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
       background: #000;
     `;
 
