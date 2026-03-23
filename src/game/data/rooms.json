@@ -389,7 +389,8 @@
           "height": 183,
           "label": "Back to Lobby",
           "type": "navigate",
-          "targetRoom": "lobby"
+          "targetRoom": "lobby",
+          "showWhen": "edwin_auditorium"
         },
         {
           "id": "aud_threatening_note",
@@ -399,7 +400,7 @@
           "height": 167,
           "label": "Crumpled Paper",
           "type": "inspect",
-          "showWhen": "learned_about_missing_props",
+          "showWhen": "chapter_3",
           "setsFlag": "saw_threatening_note",
           "description": "A crumpled note on the stage floor. I smooth it out: 'I know what you've been doing in the basement. Stop now or I go to the police. — S.M.' S.M. — Stella Morrow. So Stella knows about the basement activity. She's been watching whoever is down there. But she didn't go to the police, and she didn't tell me. Why protect someone she's threatening?"
         }
@@ -475,7 +476,8 @@
           "label": "Effects Manual",
           "type": "pickup",
           "itemId": "effects_manual",
-          "onceOnly": true
+          "onceOnly": true,
+          "showWhen": "learned_ghost_rumors"
         },
         {
           "id": "bs_prop_table",
@@ -571,6 +573,7 @@
           "label": "Stella's Lockbox",
           "type": "locked",
           "puzzleId": "lockbox_puzzle",
+          "showWhen": "learned_about_missing_props",
           "description": "A metal lockbox shoved under Stella's work station. Four rotating dials, each engraved with little theatrical symbols — masks, spotlights, curtains, roses, and more. She doesn't want anyone getting into this. I need to find the right combination of symbols. Knowing Stella, the answer is probably somewhere nearby."
         },
         {
@@ -602,7 +605,8 @@
           "height": 163,
           "label": "Back to Auditorium",
           "type": "navigate",
-          "targetRoom": "auditorium"
+          "targetRoom": "auditorium",
+          "showWhen": "stella_backstage"
         }
       ]
     },
@@ -664,6 +668,7 @@
           "type": "pickup",
           "itemId": "margaux_diary",
           "onceOnly": true,
+          "showWhen": "learned_1928_murder",
           "description": "Inside the drawer: a leather-bound diary with M.F. embossed in gold on the cover."
         },
         {
@@ -755,6 +760,7 @@
           "height": 139,
           "label": "Old Book",
           "type": "inspect",
+          "showWhen": "chapter_3",
           "setsFlag": "found_alchemy_book",
           "description": "Wedged behind the settee cushion — a leather-bound book: 'The Alchemist's Apprentice — A Study of Poisons and Their Remedies, 1890.' A bookplate reads: 'From the library of the Penvellyn Family, Blackmoor Manor.' I flip through dog-eared pages until I find it: a section on antimony compounds, annotated in Margaux's handwriting. 'These are my symptoms exactly.' She was researching her own poisoning. She figured it out, documented it, and still nobody helped her. That's heartbreaking."
         },
@@ -887,7 +893,8 @@
           "type": "pickup",
           "description": "The original script of 'The Crimson Veil' — the annotations in the margins are in old red ink. Someone circled specific letters throughout the stage directions. That's deliberate. If I read them in order, they might spell something. I should take this with me.",
           "itemId": "annotated_script",
-          "onceOnly": true
+          "onceOnly": true,
+          "showWhen": "learned_about_crimson_veil"
         },
         {
           "id": "pb_script_cipher",
@@ -1022,7 +1029,7 @@
           "type": "pickup",
           "itemId": "blueprints",
           "onceOnly": true,
-          "showWhen": "learned_about_basement_intruder",
+          "showWhen": "chapter_3",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1093,6 +1100,7 @@
           "type": "locked",
           "description": "A modern wall safe behind a painting of the theater. It has an electronic keypad.",
           "puzzleId": "office_safe_puzzle",
+          "showWhen": "learned_copycat_poisoning",
           "hideWhen": "ashworth_motive_revealed"
         },
         {

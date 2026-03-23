@@ -29,6 +29,15 @@ interface RoomDef {
   requiresFlag?: string;
 }
 
+/**
+ * Rooms that require a key interaction before the player can leave.
+ * Prevents backtracking (via map or doors) before meeting critical characters.
+ */
+const EXIT_REQUIREMENTS: Record<string, { flag: string; hint: string }> = {
+  auditorium: { flag: 'edwin_auditorium', hint: 'I should look around and talk to everyone before leaving.' },
+  backstage:  { flag: 'stella_backstage',  hint: 'I should introduce myself to the stage manager first.' },
+};
+
 const ROOMS: RoomDef[] = [
   // Upper level — above the stage
   { id: 'catwalk',          name: 'Catwalk',           fx: 0.30, fy: 0.12, floor: 'upper', requiresChapter: 3, requiresFlag: 'catwalk_access' },
@@ -521,11 +530,46 @@ export class MapScene extends Phaser.Scene {
   }
 
   private navigateToRoom(roomId: string): void {
+    // Block leaving the current room if a key interaction hasn't happened yet
+    const exitReq = EXIT_REQUIREMENTS[this.currentRoom];
+    if (exitReq && !SaveSystem.getInstance().getFlag(exitReq.flag)) {
+      this.showExitBlockedHint(exitReq.hint);
+      return;
+    }
+
     UISounds.doorTransition();
     this.scene.stop();
     const roomScene = this.scene.get('RoomScene') as RoomSceneRef;
     playCurtainClose(roomScene, () => {
       roomScene.scene.restart({ roomId });
+    });
+  }
+
+  private showExitBlockedHint(hint: string): void {
+    // Prevent stacking multiple hints
+    if (this.scene.get('MapScene')?.data?.get('hintShowing')) return;
+    this.data.set('hintShowing', true);
+
+    const { width, height } = this.cameras.main;
+    const hintText = this.add.text(width / 2, height * 0.85, hint, {
+      fontFamily: FONT,
+      fontSize: '20px',
+      color: TextColors.goldDim,
+      fontStyle: 'italic',
+      align: 'center',
+      wordWrap: { width: width * 0.6 },
+    }).setOrigin(0.5).setAlpha(0).setDepth(Depths.mapContent + 10);
+
+    this.tweens.add({
+      targets: hintText,
+      alpha: 1,
+      duration: 400,
+      hold: 2000,
+      yoyo: true,
+      onComplete: () => {
+        hintText.destroy();
+        this.data.set('hintShowing', false);
+      },
     });
   }
 }

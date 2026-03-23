@@ -435,7 +435,8 @@
             {
               "text": "I found your lockbox. $4,200 in sold props — is that for your mother's medical bills?",
               "nextNode": "lockbox_confronted",
-              "requiredItem": "stella_records"
+              "requiredItem": "stella_records",
+              "requiredFlag": "saw_ghost"
             },
             {
               "text": "I'm not accusing you. Tell me about the effects system.",
@@ -492,7 +493,8 @@
               "text": "Tell me who's in the basement and I'll focus on the poisoning.",
               "nextNode": "stella_reveals_edwin",
               "triggerEvent": "stella_confession",
-              "requiredItem": "stella_records"
+              "requiredItem": "stella_records",
+              "requiredFlag": "saw_ghost"
             },
             {
               "text": "Let's talk about the effects system first.",
@@ -1511,7 +1513,8 @@
             {
               "text": "I found your lockbox. $4,200 in sold props — is that for your mother's medical bills?",
               "nextNode": "lockbox_confronted",
-              "requiredItem": "stella_records"
+              "requiredItem": "stella_records",
+              "requiredFlag": "saw_ghost"
             },
             {
               "text": "You seem stressed.",
@@ -1547,7 +1550,8 @@
               "text": "Tell me who's in the basement and I'll focus on the poisoning.",
               "nextNode": "stella_reveals_edwin",
               "triggerEvent": "stella_confession",
-              "requiredItem": "stella_records"
+              "requiredItem": "stella_records",
+              "requiredFlag": "saw_ghost"
             },
             {
               "text": "Let's talk about something else.",

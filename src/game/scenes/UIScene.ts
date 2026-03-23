@@ -10,6 +10,7 @@ import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
 import { drawChevronTab, drawCornerOrnament, drawDecoDivider, drawSunburst, drawGeoBorder, DecoColors } from '../utils/art-deco';
 import { AuthManager } from '../systems/AuthManager';
+import { MusicSystem, MUSIC_TRACKS } from '../systems/MusicSystem';
 import { createAuthFormElements, submitAuthForm } from '../ui/AuthFormOverlay';
 
 // Height of the bottom toolbar strip (buttons + chapter label)
@@ -1345,6 +1346,139 @@ export class UIScene extends Phaser.Scene {
     divGfx.lineStyle(1, 0x5a4a3a, 0.2);
     divGfx.lineBetween(cx - sliderW / 2, y, cx + sliderW / 2, y);
     this.settingsContent.add(divGfx);
+    y += 30;
+
+    // ── Music Volume ──
+    this.settingsContent.add(this.add.text(cx, y, 'MUSIC VOLUME', {
+      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontStyle: 'bold', letterSpacing: 4,
+    }).setOrigin(0.5, 0));
+    y += 40;
+
+    const mSliderW = sliderW;
+    const mSliderX = cx - mSliderW / 2;
+    const mSliderH = 8;
+    const currentMusicVol = UISounds.getMusicVolume();
+
+    const mTrackBg = this.add.rectangle(cx, y, mSliderW, mSliderH, 0x3a2a1a, 0.3);
+    mTrackBg.setStrokeStyle(1, 0x5a4a3a, 0.3);
+    this.settingsContent.add(mTrackBg);
+
+    const mFillW = mSliderW * currentMusicVol;
+    const mFill = this.add.rectangle(mSliderX + mFillW / 2, y, mFillW, mSliderH, TAB_GOLD, 0.6);
+    this.settingsContent.add(mFill);
+
+    const mThumbX = mSliderX + mSliderW * currentMusicVol;
+    const mThumb = this.add.circle(mThumbX, y, 14, TAB_GOLD, 0.9);
+    mThumb.setStrokeStyle(2, 0x3a2a1a, 0.4);
+    this.settingsContent.add(mThumb);
+
+    const mVolLabel = this.add.text(cx, y + 28, `${Math.round(currentMusicVol * 100)}%`, {
+      fontFamily: FONT, fontSize: '22px', color: TAB_GOLD_STR, fontStyle: 'bold',
+    }).setOrigin(0.5, 0);
+    this.settingsContent.add(mVolLabel);
+
+    const mSliderZone = this.add.rectangle(cx, y, mSliderW + 28, 44, 0x000000, 0);
+    mSliderZone.setInteractive({ draggable: false, cursor: POINTER_CURSOR });
+    this.settingsContent.add(mSliderZone);
+
+    const updateMusicSlider = (pointerX: number) => {
+      const pct = Phaser.Math.Clamp((pointerX - mSliderX) / mSliderW, 0, 1);
+      UISounds.setMusicVolume(pct);
+      mFill.setDisplaySize(mSliderW * pct, mSliderH);
+      mFill.setPosition(mSliderX + (mSliderW * pct) / 2, y);
+      mThumb.setPosition(mSliderX + mSliderW * pct, y);
+      mVolLabel.setText(`${Math.round(pct * 100)}%`);
+      MusicSystem.getInstance().updateVolume();
+    };
+
+    let mDragging = false;
+    mSliderZone.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      mDragging = true;
+      updateMusicSlider(pointer.x);
+      UISounds.click();
+    });
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (mDragging) updateMusicSlider(pointer.x);
+    });
+    this.input.on('pointerup', () => { mDragging = false; });
+
+    y += 80;
+
+    // ── Music Track Selector ──
+    this.settingsContent.add(this.add.text(cx, y, 'MUSIC TRACK', {
+      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontStyle: 'bold', letterSpacing: 4,
+    }).setOrigin(0.5, 0));
+    y += 10;
+
+    this.settingsContent.add(this.add.text(cx, y + 22, 'Background music for the lobby', {
+      fontFamily: FONT, fontSize: '13px', color: '#7a6a5a', fontStyle: 'italic',
+    }).setOrigin(0.5, 0));
+    y += 50;
+
+    const currentTrackId = UISounds.getMusicTrack();
+    const trackBtnW = Math.min(usableW - 20, 420);
+    const trackBtnH = 46;
+    const trackGap = 8;
+
+    for (const track of MUSIC_TRACKS) {
+      const isActive = track.id === currentTrackId;
+      const tbg = this.add.rectangle(cx, y + trackBtnH / 2, trackBtnW, trackBtnH,
+        isActive ? TAB_GOLD : 0x3a2a1a, isActive ? 0.6 : 0.15);
+      tbg.setStrokeStyle(1.5, TAB_GOLD, isActive ? 0.8 : 0.2);
+      tbg.setInteractive({ cursor: POINTER_CURSOR });
+      this.settingsContent.add(tbg);
+
+      // Track name
+      const tName = this.add.text(cx - trackBtnW / 2 + 20, y + trackBtnH / 2, track.name, {
+        fontFamily: FONT, fontSize: '16px',
+        color: isActive ? '#2a1a0a' : TAB_GOLD_STR,
+        fontStyle: isActive ? 'bold' : 'normal',
+      }).setOrigin(0, 0.5);
+      this.settingsContent.add(tName);
+
+      // Track description
+      const tDesc = this.add.text(cx + trackBtnW / 2 - 20, y + trackBtnH / 2, track.description, {
+        fontFamily: FONT, fontSize: '12px',
+        color: isActive ? '#4a3a2a' : '#7a6a5a',
+        fontStyle: 'italic',
+      }).setOrigin(1, 0.5);
+      this.settingsContent.add(tDesc);
+
+      // Playing indicator
+      if (isActive) {
+        const indicator = this.add.text(cx - trackBtnW / 2 + 8, y + trackBtnH / 2, '\u266A', {
+          fontFamily: FONT, fontSize: '18px', color: '#2a1a0a',
+        }).setOrigin(0.5);
+        this.settingsContent.add(indicator);
+        tName.setX(cx - trackBtnW / 2 + 28);
+      }
+
+      tbg.on('pointerdown', () => {
+        UISounds.setMusicTrack(track.id);
+        UISounds.click();
+        const music = MusicSystem.getInstance();
+        music.play(track.id);
+        this.refreshSettingsContent();
+      });
+      tbg.on('pointerover', () => {
+        if (track.id !== UISounds.getMusicTrack()) tbg.setFillStyle(0x3a2a1a, 0.3);
+      });
+      tbg.on('pointerout', () => {
+        if (track.id !== UISounds.getMusicTrack()) tbg.setFillStyle(0x3a2a1a, 0.15);
+      });
+
+      y += trackBtnH + trackGap;
+    }
+
+    y += 20;
+
+    // ── Divider ──
+    const divGfxMusic = this.add.graphics();
+    divGfxMusic.lineStyle(1, 0x5a4a3a, 0.2);
+    divGfxMusic.lineBetween(cx - sliderW / 2, y, cx + sliderW / 2, y);
+    this.settingsContent.add(divGfxMusic);
     y += 30;
 
     // ── Text Speed ──
