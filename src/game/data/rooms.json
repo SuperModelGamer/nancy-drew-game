@@ -4,6 +4,20 @@
       "id": "lobby",
       "name": "The Monarch Theatre — Grand Lobby",
       "description": "The grand lobby of the Monarch Theatre. A dusty chandelier hangs above cracked marble floors, and faded playbills line every wall. The brass ticket booth sits dark and empty. It smells like old velvet and forgotten glamour in here — the kind of place that used to matter to people. I can see why someone would fight to save it.",
+      "altBackgrounds": [
+        {
+          "key": "bg_lobby_after_ghost",
+          "showWhen": "saw_ghost",
+          "priority": 1,
+          "description": "The lobby feels different now. The chandelier sways slightly — there's no draft. The playbills on the walls seem to watch me. After what I saw on that stage, every shadow in this building has a new meaning."
+        },
+        {
+          "key": "bg_lobby_vivian_gone",
+          "showWhen": "chapter_3",
+          "priority": 2,
+          "description": "Vivian's chair by the ticket booth is empty. She's retreated to the dressing room — closer to Margaux's things, closer to the truth. The lobby feels abandoned now, like the theater is holding its breath."
+        }
+      ],
       "hotspots": [
         {
           "id": "lobby_ticket_booth",
@@ -58,6 +72,7 @@
           "height": 145,
           "label": "Chandelier",
           "type": "inspect",
+          "clueImage": "clue_lobby_chandelier",
           "description": "A massive crystal chandelier — most of the prisms are dark, but a few still catch the light and scatter tiny rainbows across the marble. Hold on. One of the chain links is shinier than the rest. That's a recent repair. Someone's been maintaining this chandelier. In a building that's supposed to be condemned? That doesn't add up."
         },
         {
@@ -182,6 +197,20 @@
       "id": "auditorium",
       "name": "The Monarch Theatre — Auditorium",
       "description": "The auditorium takes my breath away. Rows of velvet seats descend toward a grand stage, its crimson curtain drawn shut. The air is thick and still — like the room is holding its breath. A single ghost light burns at center stage. The silence in here is the kind you can feel pressing against your ears. Something creaks in the balcony above. I look up. Nothing. But the hair on my arms is standing straight up.",
+      "altBackgrounds": [
+        {
+          "key": "bg_auditorium_ghost_aftermath",
+          "showWhen": "saw_ghost",
+          "priority": 1,
+          "description": "The auditorium looks the same, but it doesn't feel the same. The ghost light flickers where it was steady before. There's a faint haze near the stage — residual fog? Or just my imagination working overtime. The scent of old roses lingers. I keep glancing at the spot where she vanished."
+        },
+        {
+          "key": "bg_auditorium_lights_on",
+          "showWhen": "chapter_3",
+          "priority": 2,
+          "description": "Someone turned on the house lights. The auditorium looks smaller, more mundane — exposed pipes in the ceiling, worn patches on the velvet seats, dust motes floating in the fluorescent glare. Without the shadows, the magic is gone. But so is the fear."
+        }
+      ],
       "hotspots": [
         {
           "id": "aud_stage",
@@ -191,6 +220,7 @@
           "height": 106,
           "label": "The Stage",
           "type": "inspect",
+          "clueImage": "clue_aud_stage",
           "description": "This is where it happened. Right here on this stage, Margaux Fontaine drank from a poisoned goblet and collapsed in front of a full house. October 31st, 1928. A single ghost light burns at center stage — theater people say it keeps spirits at peace. Standing here, looking out at all those empty seats... I'm not sure it's working."
         },
         {
@@ -379,6 +409,20 @@
       "id": "backstage",
       "name": "The Monarch Theatre — Backstage",
       "description": "Backstage is a maze of rigging ropes, costume racks, and stacked set pieces. It smells like sawdust and old paint. Somewhere in the shadows, something mechanical is humming — a low, steady pulse I can feel through the floorboards. A draft moves through here that shouldn't exist — the air shifts like someone just walked past me. I'm not alone back here.",
+      "altBackgrounds": [
+        {
+          "key": "bg_backstage_fog_active",
+          "showWhen": "saw_ghost",
+          "priority": 1,
+          "description": "The fog machine is still leaking. Thin wisps curl along the floor between the costume racks, making everything look like a half-remembered dream. The mechanical humming is louder now — someone turned it up, or it never turned off."
+        },
+        {
+          "key": "bg_backstage_stella_gone",
+          "showWhen": "stella_confession",
+          "priority": 2,
+          "description": "Stella's workstation is cleared out. Her clipboard is gone, her coffee mug, the lockbox — all of it. She left in a hurry. A single prop rose sits on her chair, like an apology. The backstage feels emptier without her sharp presence organizing the chaos."
+        }
+      ],
       "hotspots": [
         {
           "id": "bs_work_table",
@@ -398,6 +442,7 @@
           "height": 169,
           "label": "Fog Machine",
           "type": "inspect",
+          "clueImage": "clue_bs_fog_machine",
           "description": "An industrial fog machine — old, but someone's kept it in working order. The fluid reservoir is half-empty and the nozzle is still damp. I touch it. Wet. This was used within the last day or two. And the brand label has been scratched off. Why would someone hide what kind of fog machine they're using? Unless the fluid is... specialized."
         },
         {
@@ -565,6 +610,26 @@
       "id": "dressing_room",
       "name": "Margaux's Dressing Room",
       "description": "Time stopped in this room in 1928. Margaux's vanity mirror is still surrounded by lightbulbs — half of them dead — reflecting dusty perfume bottles and a dried corsage. A velvet settee sits beneath moth-eaten costumes. It smells like old powder and roses. She never came back to clean up. She never came back at all. The lights flicker when I step inside — just once — and then hold steady. Probably the wiring. Probably.",
+      "altBackgrounds": [
+        {
+          "key": "bg_dressing_room_trunk_open",
+          "showWhen": "margaux_locket",
+          "priority": 1,
+          "description": "Margaux's trunk sits open now, the locket gone from its velvet cradle. The room feels lighter — like something that was waiting was finally released. The vanity mirror catches a reflection of the open trunk and for a moment, in the dusty glass, I swear I see someone standing behind me. When I turn, there's no one there. Just the scent of roses, stronger than before."
+        },
+        {
+          "key": "bg_dressing_room_mirror_revealed",
+          "showWhen": "margaux_accusation",
+          "priority": 2,
+          "description": "The wax letters on the mirror are visible now — C.D. — shining in the vanity lights like an accusation that's waited nearly a century to be read. Margaux wrote her killer's initials on this mirror knowing she might not survive to say the name aloud. The room feels charged, electric. Someone's secret has been exposed."
+        },
+        {
+          "key": "bg_dressing_room_passage_found",
+          "showWhen": "passage_mapped",
+          "priority": 3,
+          "description": "The heating vent panel hangs open, revealing the dark mouth of the hidden passage behind the wall. Cool air breathes from the tunnel, carrying the smell of dust and old stone. This is how Edwin moved through the building unseen — from the basement to this room, ghosting through walls. The dressing room will never feel the same."
+        }
+      ],
       "hotspots": [
         {
           "id": "dr_vanity",
@@ -574,6 +639,7 @@
           "height": 156,
           "label": "Margaux's Vanity",
           "type": "inspect",
+          "clueImage": "clue_dr_vanity",
           "description": "Margaux's vanity. Her name is still painted on the mirror in faded gold letters. The lightbulbs around the frame are mostly dead, but two still glow, warm and amber. There are dried roses, an empty perfume bottle, and a hairbrush with dark strands still caught in the bristles. Almost a hundred years, and her hair is still here. It feels wrong to touch anything. But I have to."
         },
         {
@@ -739,6 +805,14 @@
       "id": "projection_booth",
       "name": "Projection Booth",
       "description": "A cramped booth above the auditorium, packed with old projectors and film canisters. Diego Reyes has wedged a writing desk between the equipment — papers and coffee cups everywhere. It's cozy in a chaotic way. He's made himself at home up here, which means he hears everything that happens in the theater below.",
+      "altBackgrounds": [
+        {
+          "key": "bg_projection_booth_diego_working",
+          "showWhen": "annotated_script_found",
+          "priority": 1,
+          "description": "Diego has spread the annotated script across his desk, weighted down with film canisters. He's circled things, drawn arrows, stuck Post-it notes everywhere. The old projectors throw warm light across his scattered research. He's as deep into this mystery as I am."
+        }
+      ],
       "hotspots": [
         {
           "id": "pb_projector",
@@ -895,11 +969,14 @@
       "id": "managers_office",
       "name": "Manager's Office",
       "description": "Ashworth's temporary headquarters — a modern laptop on an ornate mahogany desk, demolition blueprints pinned everywhere. There's a cot in the corner with rumpled sheets. He's been sleeping here since the poisoning. He looks pale and unwell, and the room has that stale, closed-in smell of someone who's afraid to leave.",
-      "altBackground": {
-        "key": "bg_managers_office_empty",
-        "showWhen": "ashworth_motive_revealed",
-        "description": "The office feels different without Ashworth looming in it. His cot is a mess of tangled sheets — he left in a hurry. The desk is still buried in papers, the laptop still open, but the man himself is gone. The room smells like cold coffee and fear. Whatever he's running from, it isn't just me."
-      },
+      "altBackgrounds": [
+        {
+          "key": "bg_managers_office_empty",
+          "showWhen": "ashworth_motive_revealed",
+          "priority": 1,
+          "description": "The office feels different without Ashworth looming in it. His cot is a mess of tangled sheets — he left in a hurry. The desk is still buried in papers, the laptop still open, but the man himself is gone. The room smells like cold coffee and fear. Whatever he's running from, it isn't just me."
+        }
+      ],
       "hotspots": [
         {
           "id": "mo_desk",
@@ -931,6 +1008,7 @@
           "height": 110,
           "label": "Blueprints",
           "type": "inspect",
+          "clueImage": "clue_mo_blueprints",
           "description": "Demolition blueprints for the Monarch. But someone has drawn all over them in red pen — hidden passages, sealed rooms, a tunnel network beneath the stage. This isn't demolition planning. This is exploration. And the handwriting... small, precise, meticulous. That's Edwin's handwriting. What are Edwin's notes doing on Ashworth's blueprints?",
           "hideWhen": "ashworth_motive_revealed"
         },
@@ -966,6 +1044,7 @@
           "height": 45,
           "label": "Teacup",
           "type": "pickup",
+          "clueImage": "clue_mo_teacup",
           "description": "A porcelain teacup with dried residue at the bottom. I lean close — there's a faint metallic smell. Whatever Ashworth drank, the evidence is still right here. I should take this. Carefully.",
           "itemId": "poisoned_teacup",
           "onceOnly": true,
@@ -1172,6 +1251,14 @@
       "id": "catwalk",
       "name": "The Catwalk",
       "description": "Oh, this is high. A narrow metal walkway suspended above the stage — the grating flexes under my feet and I can see straight down through it. Lighting rigs hang at eye level. The ghost light flickers far below like a distant star. Every step I take echoes off the walls. Don't look down, Nancy. Don't look down.",
+      "altBackgrounds": [
+        {
+          "key": "bg_catwalk_lights_active",
+          "showWhen": "edwins_notebook",
+          "priority": 1,
+          "description": "The lighting board is still warm from the sequence I triggered. Colors wash across the stage below in slow cycles — red, blue, white — like the theater remembering its final performance. Edwin's notebook is gone from its hiding place. The catwalk feels less threatening now. Just high."
+        }
+      ],
       "hotspots": [
         {
           "id": "cw_lights",
@@ -1293,6 +1380,26 @@
       "id": "basement",
       "name": "Beneath the Stage",
       "description": "The air changes the moment I step off the stairs — cold, damp, heavy. A cavernous space stretches out beneath the stage. Massive trapdoor mechanisms loom in the shadows and old set pieces lean against the walls like sleeping giants. Something drips in the dark. A pipe groans overhead. Every instinct I have is telling me to go back up those stairs. But in the far corner, a work lamp casts a warm circle of light over something that definitely wasn't here in 1928. My pulse quickens. I think I've found what I've been looking for.",
+      "altBackgrounds": [
+        {
+          "key": "bg_basement_discovered",
+          "showWhen": "learned_about_basement_intruder",
+          "priority": 1,
+          "description": "Now that I know what to look for, I can see Edwin's presence everywhere. Fresh scratches on the trapdoor mechanism. A tidy stack of research binders by the work lamp. A thermos of tea — still warm. He was just here. He might still be close."
+        },
+        {
+          "key": "bg_basement_passage_open",
+          "showWhen": "passage_mapped",
+          "priority": 2,
+          "description": "The hidden passage entrance gapes open in the far wall — a dark rectangle barely wide enough for a person. Cool air flows from it carrying the smell of plaster dust and age. The passage network is real, and it explains everything. How the 'ghost' appeared and vanished. How Edwin moved unseen."
+        },
+        {
+          "key": "bg_basement_edwin_caught",
+          "showWhen": "case_closed",
+          "priority": 3,
+          "description": "Edwin's workshop is dark now. The work lamp is off, the research binders packed up. The fog machine sits silent, its controls cold. It's just a basement again — concrete and pipes and old machinery. The ghosts are gone. All of them."
+        }
+      ],
       "hotspots": [
         {
           "id": "bm_workshop",
@@ -1324,6 +1431,7 @@
           "type": "pickup",
           "itemId": "fog_machine_part",
           "onceOnly": true,
+          "clueImage": "clue_bm_fog_controls",
           "description": "A remote control system wired to the fog machines upstairs. Modified so one person can operate everything — fog, lights, and trapdoor, all from down here. The timing sequences are labeled in careful handwriting: 'Entrance,' 'The Walk,' 'Vanish.' Three acts of a one-man show. The ghost was never supernatural. It was a performance."
         },
         {
@@ -1334,6 +1442,7 @@
           "height": 80,
           "label": "Trapdoor Mechanism",
           "type": "inspect",
+          "clueImage": "clue_bm_trapdoor",
           "description": "The original trapdoor mechanism — recently oiled, silent as a whisper. I test the pulley. A person could ride this from the basement to center stage in seconds. Up through the floor, into the light, and back down before anyone realizes what happened. This is how the ghost appeared. This is how the ghost vanished. Elegant. Terrifying. And absolutely premeditated."
         },
         {

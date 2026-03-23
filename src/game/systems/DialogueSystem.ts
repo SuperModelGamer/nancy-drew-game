@@ -9,6 +9,8 @@ import { UISounds } from '../utils/sounds';
 interface DialogueLine {
   speaker: string;
   text: string;
+  /** Optional voiceover audio key (loaded in BootScene, e.g. "vo_vivian_intro_01") */
+  vo?: string;
 }
 
 interface DialogueChoice {
@@ -126,6 +128,9 @@ export class DialogueSystem {
   private fullLineText = '';
   private dialogueTextObj: Phaser.GameObjects.Text | null = null;
   private textMaskGfx: Phaser.GameObjects.Graphics | null = null;
+
+  // VO playback state
+  private currentVO: Phaser.Sound.BaseSound | null = null;
 
   // Track current speaker for entrance animations
   private lastSpeaker = '';
@@ -383,6 +388,15 @@ export class DialogueSystem {
     this.fullLineText = line.text;
     this.startTypewriter();
 
+    // ── 4b. Voiceover playback ──
+    this.stopVO();
+    if (line.vo && this.scene.cache.audio.exists(line.vo)) {
+      try {
+        this.currentVO = this.scene.sound.add(line.vo, { volume: UISounds.getVolume() * 0.9 });
+        this.currentVO.play();
+      } catch { /* VO optional — silently skip */ }
+    }
+
     // ── 5. Continue arrow (inside bottom border area) ──
     const continueY = innerBottom + Math.round((boxTop + boxH - innerBottom) / 2);
     const continueX = innerRight - 4;
@@ -601,6 +615,14 @@ export class DialogueSystem {
     this.stopTypewriter();
     if (this.dialogueTextObj) {
       this.dialogueTextObj.setText(this.fullLineText);
+    }
+  }
+
+  /** Stop any currently playing voiceover audio. */
+  private stopVO(): void {
+    if (this.currentVO) {
+      try { this.currentVO.destroy(); } catch { /* ok */ }
+      this.currentVO = null;
     }
   }
 
@@ -955,6 +977,7 @@ export class DialogueSystem {
     }
 
     this.stopTypewriter();
+    this.stopVO();
     this.active = false;
     this.currentDialogue = null;
     this.lastSpeaker = '';

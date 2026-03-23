@@ -36,12 +36,16 @@ interface Hotspot {
   showWhen?: string;
   hideWhen?: string;
   setsFlag?: string;
+  /** Texture key for a close-up image shown alongside the inspection description */
+  clueImage?: string;
 }
 
 interface AltBackground {
   key: string;
   showWhen: string;
   description?: string;
+  /** Priority — higher number wins when multiple alternates are active (default 0) */
+  priority?: number;
 }
 
 interface RoomData {
@@ -49,7 +53,10 @@ interface RoomData {
   name: string;
   description: string;
   background?: string;
+  /** Single alt background (legacy support) */
   altBackground?: AltBackground;
+  /** Multiple alt backgrounds — checked in priority order, highest active one wins */
+  altBackgrounds?: AltBackground[];
   hotspots: Hotspot[];
 }
 
@@ -92,13 +99,9 @@ export class RoomScene extends Phaser.Scene {
     const rooms = roomsData.rooms as RoomData[];
     this.currentRoom = { ...(rooms.find(r => r.id === roomId) || rooms[0]) };
     // Override description when alt background is active
-    if (this.currentRoom.altBackground?.description) {
-      const alt = this.currentRoom.altBackground;
-      const save = SaveSystem.getInstance();
-      const dialogue = DialogueSystem.getInstance();
-      if (save.getFlag(alt.showWhen) || dialogue.hasTriggeredEvent(alt.showWhen)) {
-        this.currentRoom.description = alt.description!;
-      }
+    const activeAlt = this.getActiveAltBackground();
+    if (activeAlt?.description) {
+      this.currentRoom.description = activeAlt.description;
     }
     SaveSystem.getInstance().setCurrentRoom(roomId);
     SaveSystem.getInstance().startSession();
@@ -128,16 +131,11 @@ export class RoomScene extends Phaser.Scene {
     this.bgOffsetY = (gameH - 1080 * coverScale) / 2;
 
     // Room background — cover the viewport while preserving aspect ratio
-    // Check for alternate background based on game state
+    // Check for alternate background based on game state (supports multiple alternates)
     let bgKey = `bg_${this.currentRoom.id}`;
-    if (this.currentRoom.altBackground) {
-      const alt = this.currentRoom.altBackground;
-      const save = SaveSystem.getInstance();
-      const dialogue = DialogueSystem.getInstance();
-      const altActive = save.getFlag(alt.showWhen) || dialogue.hasTriggeredEvent(alt.showWhen);
-      if (altActive && this.textures.exists(alt.key)) {
-        bgKey = alt.key;
-      }
+    const activeAlt = this.getActiveAltBackground();
+    if (activeAlt && this.textures.exists(activeAlt.key)) {
+      bgKey = activeAlt.key;
     }
     if (this.textures.exists(bgKey)) {
       const bg = this.add.image(gameW / 2, gameH / 2, bgKey);
@@ -450,6 +448,27 @@ export class RoomScene extends Phaser.Scene {
     }
   }
 
+  /** Resolve the highest-priority active alt background for the current room. */
+  private getActiveAltBackground(): AltBackground | null {
+    const save = SaveSystem.getInstance();
+    const dialogue = DialogueSystem.getInstance();
+    const isActive = (flag: string) =>
+      save.getFlag(flag) || dialogue.hasTriggeredEvent(flag) ||
+      (flag.startsWith('chapter_') && this.checkChapterCondition(flag));
+
+    // Collect all alt background candidates (legacy single + array)
+    const candidates: AltBackground[] = [];
+    if (this.currentRoom.altBackground) candidates.push(this.currentRoom.altBackground);
+    if (this.currentRoom.altBackgrounds) candidates.push(...this.currentRoom.altBackgrounds);
+
+    // Filter to active ones, sort by priority descending
+    const active = candidates
+      .filter(alt => isActive(alt.showWhen))
+      .sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
+
+    return active[0] ?? null;
+  }
+
   private checkChapterCondition(condition: string): boolean {
     const match = condition.match(/^chapter_(\d+)$/);
     if (!match) return false;
@@ -504,7 +523,7 @@ export class RoomScene extends Phaser.Scene {
 
     switch (hotspot.type) {
       case 'inspect':
-        this.showDescription(hotspot.description || 'Nothing noteworthy.');
+        this.showDescription(hotspot.description || 'Nothing noteworthy.', undefined, hotspot.clueImage);
         // Always mark as examined so clue counter tracks it
         SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
         if (hotspot.onceOnly) {
@@ -677,7 +696,7 @@ export class RoomScene extends Phaser.Scene {
     }
   }
 
-  private showDescription(text: string, onDismiss?: () => void): void {
+  private showDescription(text: string, onDismiss?: () => void, imageKey?: string): void {
     const { width, height } = this.cameras.main.worldView;
 
     // Destroy previous description box and clean up its listeners
@@ -697,12 +716,32 @@ export class RoomScene extends Phaser.Scene {
     const gfx = this.add.graphics();
     container.add(gfx);
 
+    // ── Clue investigation image (displayed left of text when available) ──
+    const hasImage = imageKey && this.textures.exists(imageKey);
+    const imageWidth = hasImage ? Math.min(width * 0.3, 380) : 0;
+    const contentCenterX = hasImage ? width / 2 + imageWidth / 2 + 10 : width / 2;
+    const imageCenterX = hasImage ? width / 2 - (width * 0.65 - imageWidth) / 2 - 10 : 0;
+
+    if (hasImage) {
+      const img = this.add.image(imageCenterX, height * 0.48, imageKey!);
+      // Scale to fit the allocated width while maintaining aspect ratio
+      const imgScale = Math.min(imageWidth / img.width, (height * 0.5) / img.height);
+      img.setScale(imgScale);
+      // Gold frame border around the image
+      const frameW = img.width * imgScale + 8;
+      const frameH = img.height * imgScale + 8;
+      const frame = this.add.rectangle(imageCenterX, height * 0.48, frameW, frameH);
+      frame.setStrokeStyle(2, Colors.gold, 0.6);
+      frame.setFillStyle(0x000000, 0);
+      container.add([frame, img]);
+    }
+
     // Decorative divider above text
-    drawDecoDivider(gfx, width / 2, height * 0.45 - 20, width * 0.35, DecoColors.gold, 0.5);
+    drawDecoDivider(gfx, contentCenterX, height * 0.45 - 20, width * 0.35, DecoColors.gold, 0.5);
 
     // Description text — centered, cream/light italic with glow shadow
-    const maxTextW = Math.min(width * 0.65, 800);
-    const textObj = this.add.text(width / 2, height * 0.5, text, {
+    const maxTextW = hasImage ? Math.min(width * 0.35, 500) : Math.min(width * 0.65, 800);
+    const textObj = this.add.text(contentCenterX, height * 0.5, text, {
       fontFamily: FONT,
       fontSize: '26px',
       color: DecoTextColors.cream,
@@ -723,7 +762,7 @@ export class RoomScene extends Phaser.Scene {
 
     // Decorative divider below text
     const dividerBelowY = textObj.y + textObj.height / 2 + 20;
-    drawDecoDivider(gfx, width / 2, dividerBelowY, width * 0.35, DecoColors.gold, 0.5);
+    drawDecoDivider(gfx, contentCenterX, dividerBelowY, width * 0.35, DecoColors.gold, 0.5);
 
     // Fade in
     clickZone.setAlpha(0);

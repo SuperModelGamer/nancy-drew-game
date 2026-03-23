@@ -12,6 +12,7 @@ import { EvidenceBoardScene } from './game/scenes/EvidenceBoardScene';
 import { ChapterTransitionScene } from './game/scenes/ChapterTransitionScene';
 import { IntroScene } from './game/scenes/IntroScene';
 import { CinematicScene } from './game/scenes/CinematicScene';
+import { VideoCinematicScene } from './game/scenes/VideoCinematicScene';
 import { HotspotEditorScene } from './game/scenes/HotspotEditorScene';
 import { AuthManager } from './game/systems/AuthManager';
 import { SaveSystem } from './game/systems/SaveSystem';
@@ -30,7 +31,7 @@ const config: Phaser.Types.Core.GameConfig = {
       height: 270,
     },
   },
-  scene: [BootScene, TitleScene, IntroScene, CinematicScene, RoomScene, UIScene, PuzzleScene, ScriptedEventScene, SuspectScene, MapScene, EndingScene, EvidenceBoardScene, ChapterTransitionScene, HotspotEditorScene],
+  scene: [BootScene, TitleScene, IntroScene, CinematicScene, VideoCinematicScene, RoomScene, UIScene, PuzzleScene, ScriptedEventScene, SuspectScene, MapScene, EndingScene, EvidenceBoardScene, ChapterTransitionScene, HotspotEditorScene],
   input: {
     activePointers: 2,
   },

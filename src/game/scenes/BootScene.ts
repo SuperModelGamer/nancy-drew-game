@@ -40,7 +40,50 @@ export class BootScene extends Phaser.Scene {
     }
 
     // Load alternate room backgrounds (state-dependent variants)
-    this.load.image('bg_managers_office_empty', 'assets/backgrounds/managers_office_empty.png');
+    // Each room can have multiple perspectives/states triggered by story progression.
+    // Format: bg_{roomId}_{variant} → assets/backgrounds/{roomId}_{variant}.png
+    const altBackgrounds: Record<string, string[]> = {
+      managers_office: ['empty'],
+      lobby: ['night', 'after_ghost', 'vivian_gone'],
+      auditorium: ['ghost_aftermath', 'lights_on', 'empty_stage'],
+      backstage: ['ransacked', 'fog_active', 'stella_gone'],
+      dressing_room: ['trunk_open', 'mirror_revealed', 'passage_found'],
+      projection_booth: ['diego_working', 'film_scattered'],
+      catwalk: ['lights_active', 'notebook_found'],
+      basement: ['discovered', 'edwin_caught', 'passage_open'],
+    };
+    for (const [room, variants] of Object.entries(altBackgrounds)) {
+      for (const variant of variants) {
+        this.load.image(`bg_${room}_${variant}`, `assets/backgrounds/${room}_${variant}.png`);
+      }
+    }
+
+    // Load puzzle illustration backgrounds (shown behind puzzle modals)
+    // Format: puzzle_{puzzleId} → assets/puzzles/{puzzleId}.png
+    const puzzleIds = [
+      'trunk_puzzle', 'script_cipher', 'lighting_sequence', 'evidence_board',
+      'mirror_puzzle', 'film_puzzle', 'lockbox_puzzle', 'office_safe_puzzle',
+      'passage_navigation', 'tea_analysis',
+    ];
+    for (const id of puzzleIds) {
+      this.load.image(`puzzle_${id}`, `assets/puzzles/${id}.png`);
+    }
+
+    // Load clue investigation close-up images (shown alongside inspect descriptions)
+    // Format: clue_{hotspotId} → assets/clues/{hotspotId}.png
+    const clueImages = [
+      'lobby_chandelier', 'lobby_ticket_booth', 'lobby_playbills',
+      'aud_stage', 'aud_curtain', 'aud_seats',
+      'bs_fog_machine', 'bs_rigging', 'bs_costume_rack',
+      'dr_vanity', 'dr_mirror', 'dr_trunk', 'dr_flowers',
+      'pb_projector', 'pb_film', 'pb_scratches',
+      'mo_desk', 'mo_blueprints', 'mo_teacup', 'mo_safe',
+      'cw_lights', 'cw_railing', 'cw_notebook',
+      'bm_trapdoor', 'bm_fog_controls', 'bm_costume', 'bm_passage',
+    ];
+    for (const id of clueImages) {
+      this.load.image(`clue_${id}`, `assets/clues/${id}.png`);
+    }
 
     // Load title screen cover image, title graphic, and menu buttons
     this.load.image('cover', 'assets/cover.png');
@@ -184,12 +227,45 @@ export class BootScene extends Phaser.Scene {
       this.load.image(key, `assets/cinematics/${filename}.png`);
     }
 
-    // Suppress load errors for optional intro/cinematic assets (images + audio)
+    // Load dialogue voiceover audio files (optional — dialogue works without VO)
+    // Format: vo_{dialogueId}_{lineIndex} → assets/vo/dialogue/{dialogueId}_{lineIndex}.mp3
+    // VO files are loaded on-demand per dialogue, but we pre-load key conversations
+    const voDialogues = [
+      'vivian_intro', 'vivian_diary', 'vivian_locket',
+      'edwin_auditorium', 'edwin_confronted',
+      'ashworth_office', 'stella_backstage', 'stella_passages',
+      'diego_booth', 'phone_calls',
+    ];
+    for (const dlgId of voDialogues) {
+      // Load up to 20 lines per dialogue (unused ones silently fail)
+      for (let i = 1; i <= 20; i++) {
+        const padded = String(i).padStart(2, '0');
+        const key = `vo_${dlgId}_${padded}`;
+        this.load.audio(key, [
+          `assets/vo/dialogue/${dlgId}_${padded}.mp3`,
+          `assets/vo/dialogue/${dlgId}_${padded}.ogg`,
+        ]);
+      }
+    }
+
+    // Load video cinematics (optional — game degrades to slide-based cinematics)
+    const videoCinematics = [
+      'cinematic_ghost_reveal', 'cinematic_confession', 'cinematic_ending_justice',
+      'cinematic_ending_exposure', 'cinematic_ending_mercy',
+    ];
+    for (const key of videoCinematics) {
+      this.load.video(key, `assets/cinematics/${key}.mp4`, true);
+    }
+
+    // Suppress load errors for optional assets (images, audio, video)
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       if (file.key.startsWith('intro_') || file.key.startsWith('sfx_') ||
           file.key.startsWith('ambient_') || file.key.startsWith('music_') ||
           file.key.startsWith('amb_') || file.key.startsWith('cine_') ||
           file.key.startsWith('ui_') || file.key.startsWith('dlg_') ||
+          file.key.startsWith('vo_') || file.key.startsWith('puzzle_') ||
+          file.key.startsWith('clue_') || file.key.startsWith('bg_') ||
+          file.key.startsWith('cinematic_') ||
           file.key === 'intro_monarch_video') {
         // Silently ignore — scenes work without these assets
         return;

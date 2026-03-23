@@ -104,8 +104,18 @@ export class PuzzleScene extends Phaser.Scene {
     const { width, height } = this.cameras.main;
     initSceneCursor(this);
 
-    // Dark overlay
-    this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
+    // Dark overlay — use puzzle illustration as background if available
+    const puzzleImageKey = `puzzle_${this.puzzleId}`;
+    const hasPuzzleImage = this.textures.exists(puzzleImageKey);
+    if (hasPuzzleImage) {
+      // Full-screen puzzle illustration with dark tint overlay
+      const puzzleBg = this.add.image(width / 2, height / 2, puzzleImageKey);
+      const bgScale = Math.max(width / puzzleBg.width, height / puzzleBg.height);
+      puzzleBg.setScale(bgScale).setDepth(Depths.puzzleOverlay - 1);
+      this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.6);
+    } else {
+      this.overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.7);
+    }
     this.overlay.setInteractive(); // block clicks through
     this.overlay.setDepth(Depths.puzzleOverlay);
 
@@ -115,7 +125,7 @@ export class PuzzleScene extends Phaser.Scene {
     this.panel = this.add.container(width / 2, height / 2);
     this.panel.setDepth(Depths.puzzleContent);
 
-    const bg = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, 0.97);
+    const bg = this.add.rectangle(0, 0, panelW, panelH, Colors.panelBg, hasPuzzleImage ? 0.92 : 0.97);
     bg.setStrokeStyle(2, Colors.gold, 0.8);
     this.panel.add(bg);
 
