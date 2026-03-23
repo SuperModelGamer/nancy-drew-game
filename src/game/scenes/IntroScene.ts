@@ -124,10 +124,10 @@ export class IntroScene extends BaseSlideScene {
   protected onSceneCreate(): void {
     initSceneCursor(this);
 
-    // Video preroll disabled — Phaser's Video game object doesn't report
-    // accurate dimensions before playback, causing the video to render
-    // zoomed/cropped. TODO: revisit with a native HTML <video> overlay.
-    // BaseSlideScene proceeds directly to the story slides.
+    // Play the ElevenLabs intro cinematic video before story slides
+    if (this.textures.exists('intro_monarch_video') || this.cache.video.exists('intro_monarch_video')) {
+      this.playVideoPreroll();
+    }
   }
 
   protected getStageDirectionPrefixes(): string[] {
