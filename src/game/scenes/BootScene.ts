@@ -214,7 +214,7 @@ export class BootScene extends Phaser.Scene {
     }
 
     // Load intro cinematic video (optional — intro degrades gracefully to slides only)
-    this.load.video('intro_monarch_video', 'assets/cinematics/Monarch.mp4', true);
+    this.load.video('intro_monarch_video', 'assets/cinematics/ElevenLabs_Nancy_Drew_Intro_1.mp4', true);
 
     // Load cinematic slide backgrounds (optional — cinematics degrade gracefully without images)
     const cinematicImages: Record<string, string> = {
