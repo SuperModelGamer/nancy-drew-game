@@ -387,16 +387,211 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 
 ---
 
-## 11. AUDIO (future)
+## 11. AUDIO
 
-| Type | Examples | Format |
-|------|----------|--------|
-| Ambience | Empty theater echo, distant creaking, wind through old building, rain on roof | Looping MP3 |
-| UI sounds | Button click, item pickup, puzzle unlock, journal open | Short MP3 |
-| Music | Title theme (dramatic piano), investigation theme (tension strings), ghost theme (eerie), resolution | Looping MP3 |
-| Theater sounds | Curtain movement, spotlight hum, audience ghost whispers, old projector whir | Context MP3 |
+### Audio Systems (Built)
 
-Audio is **not required for MVP** but the system should support it from the start (Phaser's audio manager handles this natively).
+| System | Status | Details |
+|--------|--------|---------|
+| **Procedural UI SFX** | Done | 25+ synthesized sound effects via Web Audio API (clicks, chimes, drones, stings) |
+| **Ambient Audio System** | Done | Per-room layered audio: primary loop + secondary loop + procedural textures. Crossfades between rooms |
+| **Cinematic Audio** | Done | Music, SFX, and VO playback during slide-based cinematics |
+| **Dialogue VO** | Done (infrastructure) | Per-line voiceover support in dialogue system. Plays `vo` key from dialogue data |
+
+### Procedural SFX Library (`sounds.ts`)
+
+| Category | Sounds |
+|----------|--------|
+| **UI Interaction** | click, hover, panelOpen, dialogueTick, mapOpen |
+| **Items & Discovery** | itemPickup, keyJingle, drawerOpen, pageTurn, discoveryReveal, photoSnap |
+| **Puzzles** | puzzleSolve, wrongAnswer, safeDial, lockTumbler, evidencePlace |
+| **Atmosphere** | ghostDrone, ghostDroneLong, ghostWhisper, eerieWhistle, shimmer, suspicionSting |
+| **Theater** | curtainPull, spotlightClick, fogMachineHiss, trapDoorCreak, theaterDrone |
+| **Cinematic** | gobletClink, bodyThud, phoneRing, doorCreak, heartbeat, lightSurge, poisonBubble |
+| **Writing** | journalWrite, typewriterKey |
+
+### Room Ambient Audio Config
+
+| Room | Primary Loop | Secondary Loop | Procedural Layers |
+|------|-------------|----------------|-------------------|
+| Lobby | Abandoned building echo | — | Low drone (85Hz) |
+| Auditorium | Horror ambient | — | Drone (65Hz) + periodic creak |
+| Backstage | Abandoned building 2 | Wood creak | Electrical hum |
+| Dressing Room | Horror ambient | — | Hum + vanity mirror tick |
+| Projection Booth | Electrical hum | — | Projector tick (800Hz) + hum |
+| Manager's Office | Abandoned building | Clock tick | Low hum |
+| Catwalk | Metal ambience | — | Wind + metal creak |
+| Basement | Creepy ambient | Water drip | Low drone (50Hz) + drip |
+
+### Audio File Needs
+
+| Type | Examples | Format | Directory |
+|------|----------|--------|-----------|
+| Ambience | Room-specific atmospheric loops | Looping MP3/OGG | `assets/audio/` |
+| UI sounds | Real-world versions of procedural SFX (optional upgrade) | Short MP3 | `assets/audio/sfx/` |
+| Music | Title theme, investigation theme, ghost theme, resolution theme | Looping MP3 | `assets/audio/music/` |
+| Dialogue VO | Per-line voice acting for all 10 dialogue trees | MP3/OGG | `assets/vo/dialogue/` |
+| Cinematic VO | Narrator voice for intro/cinematics (18 slides done) | MP3 | `assets/vo/intro/` |
+
+### Dialogue VO Naming Convention
+
+Files: `assets/vo/dialogue/{dialogueId}_{lineNumber}.mp3`
+
+Example: `vivian_intro_01.mp3`, `vivian_intro_02.mp3`, etc.
+
+In `dialogue.json`, add `"vo": "vo_vivian_intro_01"` to any line that has recorded audio. The system gracefully skips missing VO files.
+
+---
+
+## 11b. VISUAL ENHANCEMENT SYSTEMS
+
+### Multi-Perspective Room Backgrounds
+
+Each room supports **multiple alternate backgrounds** that activate based on story progression. This creates a sense that the world is changing as the player investigates.
+
+```json
+{
+  "altBackgrounds": [
+    {
+      "key": "bg_lobby_after_ghost",
+      "showWhen": "saw_ghost",
+      "priority": 1,
+      "description": "Updated room description when this background is active."
+    },
+    {
+      "key": "bg_lobby_vivian_gone",
+      "showWhen": "chapter_3",
+      "priority": 2,
+      "description": "Higher priority backgrounds override lower ones."
+    }
+  ]
+}
+```
+
+**Rules:**
+- Higher `priority` wins when multiple backgrounds are active simultaneously
+- Each alt background can override the room's entry description
+- Triggered by any valid flag, dialogue event, or `chapter_N` condition
+- Falls back to the base background if image files don't exist yet
+
+### Room Alt Background Manifest
+
+| Room | Variant | Trigger | Priority | Visual Change |
+|------|---------|---------|----------|--------------|
+| **Lobby** | after_ghost | `saw_ghost` | 1 | Chandelier swaying, shadows deeper |
+| **Lobby** | vivian_gone | `chapter_3` | 2 | Vivian's chair empty, lobby abandoned |
+| **Auditorium** | ghost_aftermath | `saw_ghost` | 1 | Residual fog, flickering ghost light |
+| **Auditorium** | lights_on | `chapter_3` | 2 | House lights on, mundane exposed |
+| **Backstage** | fog_active | `saw_ghost` | 1 | Fog machine leaking, hazy atmosphere |
+| **Backstage** | stella_gone | `stella_confession` | 2 | Workstation cleared, prop rose on chair |
+| **Dressing Room** | trunk_open | `margaux_locket` | 1 | Open trunk, lighter mood |
+| **Dressing Room** | mirror_revealed | `margaux_accusation` | 2 | C.D. visible on mirror |
+| **Dressing Room** | passage_found | `passage_mapped` | 3 | Hidden passage entrance visible |
+| **Projection Booth** | diego_working | `annotated_script_found` | 1 | Script spread across desk |
+| **Manager's Office** | empty | `ashworth_motive_revealed` | 1 | Ashworth gone, messy cot |
+| **Catwalk** | lights_active | `edwins_notebook` | 1 | Lighting sequence cycling on stage |
+| **Basement** | discovered | `learned_about_basement_intruder` | 1 | Edwin's presence visible |
+| **Basement** | passage_open | `passage_mapped` | 2 | Hidden passage entrance gaping |
+| **Basement** | edwin_caught | `case_closed` | 3 | Workshop dark, everything packed up |
+
+### Asset Creation Guide: Alt Backgrounds
+
+Files: `assets/backgrounds/{roomId}_{variant}.png` (1920x1080, PNG)
+
+Each variant should depict the **same room from the same angle** but with visual changes:
+- Characters present/absent (e.g., Ashworth in bed vs. empty cot)
+- Lighting changes (house lights on vs. ghost light only)
+- Environmental changes (fog, open trunk, revealed passage)
+- Mood shifts (more/fewer shadows, warmer/cooler palette)
+
+### Puzzle Illustration Backgrounds
+
+Each puzzle modal can display a themed background image behind the UI panel. This adds atmosphere and visual context to puzzle-solving.
+
+Files: `assets/puzzles/{puzzleId}.png` (1920x1080 or larger, PNG)
+
+| Puzzle | Suggested Illustration |
+|--------|----------------------|
+| trunk_puzzle | Close-up of Margaux's antique trunk with brass fittings |
+| script_cipher | The annotated Crimson Veil script pages with red-circled letters |
+| lighting_sequence | The catwalk lighting board with colored switches |
+| mirror_puzzle | Margaux's vanity mirror with foggy glass and wax traces |
+| film_puzzle | Light table with scattered film frames and magnifying glass |
+| lockbox_puzzle | Stella's metal lockbox with theatrical symbol dials |
+| office_safe_puzzle | Wall safe behind a displaced painting |
+| passage_navigation | Blueprint overlay of the theater's hidden passages |
+| tea_analysis | Chemistry setup with teacup, reagents, and microscope |
+| evidence_board | Cork board with red string, photos, and newspaper clippings |
+
+### Clue Investigation Close-Up Images
+
+Key hotspots can display a close-up image alongside their inspection text. This creates a "zoom-in" detective moment when examining important evidence.
+
+In `rooms.json`, add `"clueImage": "clue_{hotspotId}"` to any inspect/pickup hotspot.
+
+Files: `assets/clues/{hotspotId}.png` (min 600x600, PNG)
+
+| Clue Image | Hotspot | Suggested Content |
+|-----------|---------|------------------|
+| clue_lobby_chandelier | Chandelier | Close-up of the shiny replacement chain link |
+| clue_aud_stage | The Stage | Ghost light burning on the empty stage |
+| clue_bs_fog_machine | Fog Machine | Damp nozzle with half-empty reservoir |
+| clue_dr_vanity | Margaux's Vanity | Vanity mirror with faded gold letters and lightbulbs |
+| clue_mo_blueprints | Blueprints | Red-pen annotations over demolition plans |
+| clue_mo_teacup | Teacup | Porcelain cup with metallic residue |
+| clue_bm_fog_controls | Fog Machine Controls | Modified remote with handwritten labels |
+| clue_bm_trapdoor | Trapdoor Mechanism | Freshly oiled pulleys and counterweights |
+
+### Video Cinematic System
+
+Full-screen video cutscenes can replace or supplement slide-based cinematics. The `VideoCinematicScene` supports:
+- MP4/WebM playback with cover-fit scaling
+- Optional subtitle tracks with timed display
+- Skip button (appears after 1.5s) + Escape key
+- Completion callbacks (set flags, add journal entries)
+- Graceful fallback — if video file is missing, transitions directly to target scene
+
+```typescript
+this.scene.start('VideoCinematicScene', {
+  videoKey: 'cinematic_ghost_reveal',
+  targetScene: 'RoomScene',
+  targetData: { roomId: 'basement', skipCinematic: true },
+  subtitles: [
+    { time: 0, text: 'The Monarch Theatre, 1928.' },
+    { time: 3.5, text: 'On the night of the final performance...' },
+  ],
+  onComplete: { setFlag: 'saw_full_ghost_reveal' },
+});
+```
+
+Files: `assets/cinematics/{videoKey}.mp4` (1080p preferred, H.264)
+
+| Video | Trigger | Content |
+|-------|---------|---------|
+| cinematic_ghost_reveal | Ghost sighting climax | Full ghost sequence with fog, figure, vanish |
+| cinematic_confession | Edwin confrontation | Edwin's confession in the basement |
+| cinematic_ending_justice | Ending A chosen | Police arrest, theater uncertain |
+| cinematic_ending_exposure | Ending B chosen | Press conference, theater saved |
+| cinematic_ending_mercy | Ending C chosen | Edwin walks away, Nancy conflicted |
+
+---
+
+## 11c. DIFFICULTY MODES (Future)
+
+### Junior Detective / Senior Detective
+
+The hint infrastructure already supports tiered hint delivery. A difficulty toggle would control:
+- **Junior Detective:** Task checklist visible, hints appear after 1 failed attempt, phone calls give more explicit guidance
+- **Senior Detective:** No task list, hints appear after 3 failed attempts, phone calls are more cryptic
+- Plot and puzzles remain identical across modes
+
+### Second Chance System (Future)
+
+If fail states are ever added (e.g., getting caught by Edwin, time-sensitive events):
+- **"The good news is..."** — restart from just before the failure point
+- **"The bad news is..."** — brief explanation of what went wrong
+- Unlimited uses, no penalty
+- Classic Her Interactive pattern beloved by the fanbase
 
 ---
 
@@ -407,15 +602,17 @@ Audio is **not required for MVP** but the system should support it from the star
 | System | Status | Notes |
 |--------|--------|-------|
 | Phaser + TS + Vite scaffold | Done | Builds clean |
-| BootScene (loading) | Done | Minimal — ready for asset preloading |
+| BootScene (loading) | Done | Asset preloading with graceful fallback for missing files |
 | TitleScene | Done | Title, subtitle, start button, fade |
-| RoomScene | Done | Hotspot rendering, all 5 types, room transitions |
+| RoomScene | Done | Hotspot rendering, all 5 types, room transitions, multi-alt backgrounds |
 | UIScene | Done | Inventory panel, journal button (placeholder) |
 | InventorySystem | Done | Add, remove, select, serialize |
-| DialogueSystem | Done | Lines, branching choices, conditions, events |
+| DialogueSystem | Done | Lines, branching choices, conditions, events, per-line VO playback |
 | PuzzleSystem | Done | Answer checking, clue retrieval, serialize |
 | SaveSystem | Done | Full save/load to localStorage |
-| rooms.json (all 8 rooms) | Done | 8 rooms, 95+ hotspots incl. atmospheric/conditional |
+| AmbientAudioSystem | Done | Per-room layered audio with crossfade transitions |
+| VideoCinematicScene | Done | Full-screen video cutscenes with subtitles and skip |
+| rooms.json (all 8 rooms) | Done | 8 rooms, 95+ hotspots, 15 alt backgrounds across all rooms |
 | items.json | Done | 16 items (12 key, 3 optional, 1 red herring) |
 | dialogue.json | Done | 10 dialogue trees with conditional branches (requiredItem/requiredFlag) |
 | puzzles.json | Done | 10 puzzles with progressive hint system |
@@ -465,14 +662,26 @@ Audio is **not required for MVP** but the system should support it from the star
 | 39 | Player guidance — secret passage guidance in basement | Done |
 | 40 | hideWhen support for room hotspots (inverse of showWhen, hides hotspot when flag is set) | Done |
 | 41 | showWhen/hideWhen on talk hotspots — NPCs appear/disappear based on story progress | Done |
+| 42 | Multi-alt background system (multiple perspectives per room, priority-based) | Done |
+| 43 | 15 alt backgrounds across all 8 rooms with story-driven triggers | Done |
+| 44 | Puzzle illustration backgrounds (themed images behind puzzle modals) | Done |
+| 45 | Clue investigation close-up images (displayed alongside inspect text) | Done |
+| 46 | Expanded procedural SFX library (25+ sounds: page turn, safe dial, key jingle, etc.) | Done |
+| 47 | Dialogue voiceover infrastructure (per-line VO playback with graceful fallback) | Done |
+| 48 | VideoCinematicScene (full-screen video cutscenes with subtitles, skip, fallback) | Done |
+| 49 | Asset pipeline: BootScene loads alt backgrounds, puzzle images, clue images, dialogue VO, video cinematics | Done |
 
 ### What Needs Building (in priority order)
 
 | # | Task | Scope | Depends on |
 |---|------|-------|------------|
-| 1 | **Audio integration** | Ambience + UI sounds (UISounds stubs exist) | Phaser audio |
-| 2 | **Mobile touch testing** | Tap target tuning, responsive layout QA | Everything |
-| 3 | **Hotspot placement tuning** | Lobby hotspots need repositioning for viewfinder viewport | Art assets |
+| 1 | **Art asset creation** | Alt background images, puzzle illustrations, clue close-ups | Image generation |
+| 2 | **Dialogue VO recording** | Voice acting for 10 dialogue trees (~200 lines) | Audio recording |
+| 3 | **Video cinematics** | 5 video cutscenes (ghost reveal, confession, 3 endings) | Video production |
+| 4 | **Music tracks** | Title theme, investigation theme, ghost theme, resolution | Audio composition |
+| 5 | **Hotspot placement tuning** | Lobby hotspots need repositioning for viewfinder viewport | Art assets |
+| 6 | **Mobile touch testing** | Tap target tuning, responsive layout QA | Everything |
+| 7 | **Difficulty mode toggle** | Junior/Senior Detective switch in settings | UI work |
 
 ---
 
@@ -541,6 +750,287 @@ On failure, show feedback. Keep it mobile-friendly.
 
 Run npm run build when done. Summarize all changes.
 ```
+
+---
+
+---
+
+## 16. ASSET TRACKER
+
+Complete inventory of all assets — what exists, what needs to be created. Updated as assets are completed.
+
+Legend: ✅ = exists | ❌ = needs creation | 🔧 = procedural fallback exists (works without file)
+
+### 16a. Room Backgrounds (1920×1080 PNG)
+
+| File | Key | Status |
+|------|-----|--------|
+| `assets/backgrounds/lobby.png` | bg_lobby | ✅ |
+| `assets/backgrounds/auditorium.png` | bg_auditorium | ✅ |
+| `assets/backgrounds/backstage.png` | bg_backstage | ✅ |
+| `assets/backgrounds/dressing_room.png` | bg_dressing_room | ✅ |
+| `assets/backgrounds/projection_booth.png` | bg_projection_booth | ✅ |
+| `assets/backgrounds/managers_office.png` | bg_managers_office | ✅ |
+| `assets/backgrounds/catwalk.png` | bg_catwalk | ✅ |
+| `assets/backgrounds/basement.png` | bg_basement | ✅ |
+
+### 16b. Alt Backgrounds (1920×1080 PNG) — Story Progression Variants
+
+| File | Key | Trigger Flag | Status |
+|------|-----|-------------|--------|
+| `assets/backgrounds/lobby_after_ghost.png` | bg_lobby_after_ghost | saw_ghost | ❌ |
+| `assets/backgrounds/lobby_vivian_gone.png` | bg_lobby_vivian_gone | chapter_3 | ❌ |
+| `assets/backgrounds/auditorium_ghost_aftermath.png` | bg_auditorium_ghost_aftermath | saw_ghost | ❌ |
+| `assets/backgrounds/auditorium_lights_on.png` | bg_auditorium_lights_on | chapter_3 | ❌ |
+| `assets/backgrounds/backstage_fog_active.png` | bg_backstage_fog_active | saw_ghost | ❌ |
+| `assets/backgrounds/backstage_stella_gone.png` | bg_backstage_stella_gone | stella_confession | ❌ |
+| `assets/backgrounds/dressing_room_trunk_open.png` | bg_dressing_room_trunk_open | margaux_locket | ❌ |
+| `assets/backgrounds/dressing_room_mirror_revealed.png` | bg_dressing_room_mirror_revealed | margaux_accusation | ❌ |
+| `assets/backgrounds/dressing_room_passage_found.png` | bg_dressing_room_passage_found | passage_mapped | ❌ |
+| `assets/backgrounds/projection_booth_diego_working.png` | bg_projection_booth_diego_working | annotated_script_found | ❌ |
+| `assets/backgrounds/managers_office_empty.png` | bg_managers_office_empty | ashworth_motive_revealed | ✅ |
+| `assets/backgrounds/catwalk_lights_active.png` | bg_catwalk_lights_active | edwins_notebook | ❌ |
+| `assets/backgrounds/basement_discovered.png` | bg_basement_discovered | learned_about_basement_intruder | ❌ |
+| `assets/backgrounds/basement_passage_open.png` | bg_basement_passage_open | passage_mapped | ❌ |
+| `assets/backgrounds/basement_edwin_caught.png` | bg_basement_edwin_caught | case_closed | ❌ |
+
+**GPT generation prompts:** See `docs/alt-background-prompts.md`
+
+### 16c. Puzzle Illustration Backgrounds (1920×1080 PNG)
+
+| File | Key | Status |
+|------|-----|--------|
+| `assets/puzzles/trunk_puzzle.png` | puzzle_trunk_puzzle | ❌ 🔧 |
+| `assets/puzzles/script_cipher.png` | puzzle_script_cipher | ❌ 🔧 |
+| `assets/puzzles/lighting_sequence.png` | puzzle_lighting_sequence | ❌ 🔧 |
+| `assets/puzzles/evidence_board.png` | puzzle_evidence_board | ❌ 🔧 |
+| `assets/puzzles/mirror_puzzle.png` | puzzle_mirror_puzzle | ❌ 🔧 |
+| `assets/puzzles/film_puzzle.png` | puzzle_film_puzzle | ❌ 🔧 |
+| `assets/puzzles/lockbox_puzzle.png` | puzzle_lockbox_puzzle | ❌ 🔧 |
+| `assets/puzzles/office_safe_puzzle.png` | puzzle_office_safe_puzzle | ❌ 🔧 |
+| `assets/puzzles/passage_navigation.png` | puzzle_passage_navigation | ❌ 🔧 |
+| `assets/puzzles/tea_analysis.png` | puzzle_tea_analysis | ❌ 🔧 |
+
+### 16d. Clue Close-Up Images (min 600×600 PNG)
+
+| File | Key | Hotspot | Status |
+|------|-----|---------|--------|
+| `assets/clues/lobby_chandelier.png` | clue_lobby_chandelier | Chandelier | ❌ 🔧 |
+| `assets/clues/lobby_ticket_booth.png` | clue_lobby_ticket_booth | Ticket Booth | ❌ 🔧 |
+| `assets/clues/lobby_playbills.png` | clue_lobby_playbills | Playbills | ❌ 🔧 |
+| `assets/clues/aud_stage.png` | clue_aud_stage | The Stage | ❌ 🔧 |
+| `assets/clues/aud_curtain.png` | clue_aud_curtain | Curtain | ❌ 🔧 |
+| `assets/clues/aud_seats.png` | clue_aud_seats | Audience Seats | ❌ 🔧 |
+| `assets/clues/bs_fog_machine.png` | clue_bs_fog_machine | Fog Machine | ❌ 🔧 |
+| `assets/clues/bs_rigging.png` | clue_bs_rigging | Rigging | ❌ 🔧 |
+| `assets/clues/bs_costume_rack.png` | clue_bs_costume_rack | Costume Rack | ❌ 🔧 |
+| `assets/clues/dr_vanity.png` | clue_dr_vanity | Margaux's Vanity | ❌ 🔧 |
+| `assets/clues/dr_mirror.png` | clue_dr_mirror | Mirror | ❌ 🔧 |
+| `assets/clues/dr_trunk.png` | clue_dr_trunk | Trunk | ❌ 🔧 |
+| `assets/clues/dr_flowers.png` | clue_dr_flowers | Flowers | ❌ 🔧 |
+| `assets/clues/pb_projector.png` | clue_pb_projector | Projector | ❌ 🔧 |
+| `assets/clues/pb_film.png` | clue_pb_film | Film Frames | ❌ 🔧 |
+| `assets/clues/pb_scratches.png` | clue_pb_scratches | Scratches | ❌ 🔧 |
+| `assets/clues/mo_desk.png` | clue_mo_desk | Desk | ❌ 🔧 |
+| `assets/clues/mo_blueprints.png` | clue_mo_blueprints | Blueprints | ❌ 🔧 |
+| `assets/clues/mo_teacup.png` | clue_mo_teacup | Teacup | ❌ 🔧 |
+| `assets/clues/mo_safe.png` | clue_mo_safe | Safe | ❌ 🔧 |
+| `assets/clues/cw_lights.png` | clue_cw_lights | Lighting Rig | ❌ 🔧 |
+| `assets/clues/cw_railing.png` | clue_cw_railing | Railing | ❌ 🔧 |
+| `assets/clues/cw_notebook.png` | clue_cw_notebook | Notebook | ❌ 🔧 |
+| `assets/clues/bm_trapdoor.png` | clue_bm_trapdoor | Trapdoor | ❌ 🔧 |
+| `assets/clues/bm_fog_controls.png` | clue_bm_fog_controls | Fog Controls | ❌ 🔧 |
+| `assets/clues/bm_costume.png` | clue_bm_costume | Ghost Costume | ❌ 🔧 |
+| `assets/clues/bm_passage.png` | clue_bm_passage | Passage | ❌ 🔧 |
+
+### 16e. Character Portraits (PNG)
+
+| File | Key | Status |
+|------|-----|--------|
+| `assets/portraits/vivian.png` | portrait_vivian | ✅ |
+| `assets/portraits/edwin.png` | portrait_edwin | ✅ |
+| `assets/portraits/ashworth.png` | portrait_ashworth | ✅ |
+| `assets/portraits/stella.png` | portrait_stella | ✅ |
+| `assets/portraits/diego.png` | portrait_diego | ✅ |
+
+### 16f. Item Icons (PNG)
+
+| File | Key | Item | Status |
+|------|-----|------|--------|
+| `assets/items/nicekey.png` | item_icon_master_key | Master Key | ✅ |
+| `assets/items/mglass.png` | item_icon_magnifying_glass | Magnifying Glass | ✅ |
+| `assets/items/1928page.png` | item_icon_playbill_1928 | 1928 Playbill | ✅ |
+| `assets/items/stageeffects.png` | item_icon_effects_manual | Effects Manual | ✅ |
+| `assets/items/leatherbook.png` | item_icon_margaux_diary | Margaux's Diary | ✅ |
+| `assets/items/Scroll.png` | item_icon_annotated_script | Annotated Script | ✅ |
+| `assets/items/Teacup.png` | item_icon_poisoned_teacup | Poisoned Teacup | ✅ |
+| `assets/items/Page3.png` | item_icon_blueprints | Blueprints | ✅ |
+| `assets/items/Key.png` | item_icon_basement_key | Basement Key | ✅ |
+| `assets/items/EH Book.png` | item_icon_edwins_notebook | Edwin's Notebook | ✅ |
+| `assets/items/Machine.png` | item_icon_fog_machine_part | Fog Machine Part | ✅ |
+| `assets/items/Letter.png` | item_icon_cecilia_letter | Cecilia's Letter | ✅ |
+| `assets/items/Clipboard.png` | item_icon_stella_records | Stella's Records | ✅ |
+| `assets/items/Briefcase.png` | item_icon_ashworth_files | Ashworth Files | ✅ |
+| `assets/items/Page.png` | item_icon_chemical_receipt | Chemical Receipt | ✅ |
+| `assets/items/Locket.png` | item_icon_margaux_locket | Margaux's Locket | ✅ |
+
+### 16g. UI Components (PNG)
+
+| File | Key | Status |
+|------|-----|--------|
+| `assets/ui/toolbar-bg.png` | ui_toolbar_bg | ✅ |
+| `assets/ui/toolbar-btn.png` | ui_toolbar_btn | ✅ |
+| `assets/ui/close-btn.png` | ui_close_btn | ✅ |
+| `assets/ui/dossier-bg.png` | ui_dossier_bg | ✅ |
+| `assets/ui/dossier-header.png` | ui_dossier_header | ✅ |
+| `assets/ui/tabs.png` | ui_tabs | ✅ |
+| `assets/ui/frame.png` | ui_portrait_frame | ✅ |
+| `assets/ui/info-card-bg.png` | ui_info_card_bg | ✅ |
+| `assets/ui/facts-panel-bg.png` | ui_facts_panel_bg | ✅ |
+| `assets/ui/facts-panel-bg-alt.png` | ui_facts_panel_bg_alt | ✅ |
+| `assets/ui/progress-fill.png` | ui_progress_fill | ✅ |
+| `assets/ui/progress-track.png` | ui_progress_track | ✅ |
+| `assets/ui/knob.png` | ui_knob | ✅ |
+| `assets/ui/chip-bg.png` | ui_chip_bg | ✅ |
+| `assets/ui/bullet-discovered.png` | ui_bullet_discovered | ✅ |
+| `assets/ui/bullet-undiscovered.png` | ui_bullet_undiscovered | ✅ |
+| `assets/ui/divider-gold.png` | ui_divider_gold | ✅ |
+| `assets/ui/dialogue/dialogue-box.png` | dlg_box | ✅ |
+| `assets/ui/dialogue/nameplate.png` | dlg_nameplate | ✅ |
+| `assets/ui/dialogue/choice-btn.png` | dlg_choice_btn | ✅ |
+| `assets/ui/dialogue/continue-arrow.png` | dlg_continue_arrow | ✅ |
+| `assets/ui/map/*.png` | map_{room} (×8) | ✅ |
+| `assets/cover.png` | cover | ✅ |
+| `assets/title.png` | title_graphic | ✅ |
+| `assets/continue.png` | btn_continue | ✅ |
+| `assets/New case.png` | btn_new_case | ✅ |
+| `assets/howto.png` | btn_howto | ✅ |
+| `assets/settings.png` | btn_settings | ✅ |
+
+### 16h. Intro / Cinematic Images (PNG)
+
+| File | Key | Status |
+|------|-----|--------|
+| `assets/intro/intro_stage_1928.png` | intro_stage_1928 | ✅ |
+| `assets/intro/intro_goblet.png` | intro_goblet | ✅ |
+| `assets/intro/intro_stage_empty.png` | intro_stage_empty | ✅ |
+| `assets/intro/intro_exterior.png` | intro_exterior | ✅ |
+| `assets/intro/intro_lobby_dark.png` | intro_lobby_dark | ✅ |
+| `assets/intro/intro_ghost.png` | intro_ghost | ✅ |
+| `assets/intro/intro_phone.png` | intro_phone | ✅ |
+| `assets/intro/intro_doors.png` | intro_doors | ✅ |
+| `assets/intro/intro_newspaper.png` | intro_newspaper | ✅ |
+| `assets/intro/intro_marquee_lights.png` | intro_marquee_lights | ✅ |
+| `assets/intro/intro_backstage.png` | intro_backstage | ✅ |
+| `assets/intro/intro_poison_bottle.png` | intro_poison_bottle | ✅ |
+| `assets/intro/intro_demolition.png` | intro_demolition | ✅ |
+| `assets/intro/intro_ghost_stage.png` | intro_ghost_stage | ✅ |
+| `assets/intro/intro_nancy_car.png` | intro_nancy_car | ✅ |
+| `assets/cinematics/ghost-fog.png` | cine_ghost_fog | ✅ |
+| `assets/cinematics/ghost-figure.png` | cine_ghost_figure | ✅ |
+| `assets/cinematics/ghost-face.png` | cine_ghost_face | ✅ |
+| `assets/cinematics/ghost-empty-stage.png` | cine_ghost_empty | ✅ |
+
+### 16i. Video Cinematics (MP4, 1080p H.264)
+
+| File | Key | Content | Status |
+|------|-----|---------|--------|
+| `assets/cinematics/Monarch.mp4` | intro_monarch_video | Intro theater establishing shot | ✅ |
+| `assets/cinematics/cinematic_ghost_reveal.mp4` | cinematic_ghost_reveal | Ghost sighting climax | ❌ 🔧 |
+| `assets/cinematics/cinematic_confession.mp4` | cinematic_confession | Edwin's basement confession | ❌ 🔧 |
+| `assets/cinematics/cinematic_ending_justice.mp4` | cinematic_ending_justice | Ending A — police arrest | ❌ 🔧 |
+| `assets/cinematics/cinematic_ending_exposure.mp4` | cinematic_ending_exposure | Ending B — press conference | ❌ 🔧 |
+| `assets/cinematics/cinematic_ending_mercy.mp4` | cinematic_ending_mercy | Ending C — Edwin walks away | ❌ 🔧 |
+
+### 16j. Audio — Ambient / Room Soundscapes
+
+| File | Key | Room | Status |
+|------|-----|------|--------|
+| `assets/audio/ambient_horror.ogg` | ambient_theater | General theater | ✅ |
+| `assets/audio/abandoned_building.mp3` | amb_lobby | Lobby | ✅ |
+| `assets/audio/horror_ambient.mp3` | amb_auditorium | Auditorium | ✅ |
+| `assets/audio/wood_creak.ogg` | amb_backstage | Backstage | ✅ |
+| `assets/audio/clock_tick.ogg` | amb_dressing_room | Dressing Room | ✅ |
+| `assets/audio/electrical_hum.wav` | amb_projection_booth | Projection Booth | ✅ |
+| `assets/audio/abandoned_building2.mp3` | amb_managers_office | Manager's Office | ✅ |
+| `assets/audio/metal_ambience.wav` | amb_catwalk | Catwalk | ✅ |
+| `assets/audio/water_drip.wav` | amb_basement | Basement | ✅ |
+| `assets/audio/machinery_hum.ogg` | amb_basement_alt | Basement (alt) | ✅ |
+| `assets/audio/creepy_ambient.mp3` | cine_ambient_ghost | Cinematic ghost audio | ✅ |
+| `assets/audio/ghost_whisper.wav` | sfx_ghost_whisper | Ghost whisper SFX | ✅ |
+
+### 16k. Audio — Sound Effects
+
+| Sound | Source | Status |
+|-------|--------|--------|
+| click, success, fail, pickup, unlock | Procedural (Web Audio API) | ✅ 🔧 |
+| doorOpen, doorClose, ghostWhisper, paperRustle, drawerSlide | Procedural | ✅ 🔧 |
+| chapterGong, suspense, dialogueOpen, dialogueClose | Procedural | ✅ 🔧 |
+| pageTurn, safeDial, keyJingle, curtainPull, drawerOpen | Procedural | ✅ 🔧 |
+| evidencePlace, suspicionSting, journalWrite, photoSnap | Procedural | ✅ 🔧 |
+| discoveryReveal, typewriterKey, lockTumbler, mapOpen | Procedural | ✅ 🔧 |
+| fogMachineHiss, spotlightClick, trapDoorCreak, poisonBubble | Procedural | ✅ 🔧 |
+| sfx_goblet | File-based | ❌ 🔧 |
+| sfx_thud | File-based | ❌ 🔧 |
+| sfx_phone_ring | File-based | ❌ 🔧 |
+| sfx_heartbeat | File-based | ❌ 🔧 |
+
+### 16l. Audio — Music
+
+| File | Key | Usage | Status |
+|------|-----|-------|--------|
+| `audio/music_intro.mp3` | music_intro | Intro cinematic | ❌ |
+| Title theme | — | Title screen | ❌ |
+| Investigation theme | — | Gameplay exploration | ❌ |
+| Ghost/tension theme | — | Ghost encounters | ❌ |
+| Resolution theme | — | Ending cinematics | ❌ |
+
+### 16m. Audio — Voice Over
+
+| Category | Files | Status |
+|----------|-------|--------|
+| Intro narration (18 slides) | `assets/vo/intro/vo_intro_01–18.mp3` | ✅ |
+| Dialogue: vivian_intro (up to 20 lines) | `assets/vo/dialogue/vivian_intro_01–20.mp3` | ❌ |
+| Dialogue: vivian_diary | `assets/vo/dialogue/vivian_diary_01–20.mp3` | ❌ |
+| Dialogue: vivian_locket | `assets/vo/dialogue/vivian_locket_01–20.mp3` | ❌ |
+| Dialogue: edwin_auditorium | `assets/vo/dialogue/edwin_auditorium_01–20.mp3` | ❌ |
+| Dialogue: edwin_confronted | `assets/vo/dialogue/edwin_confronted_01–20.mp3` | ❌ |
+| Dialogue: ashworth_office | `assets/vo/dialogue/ashworth_office_01–20.mp3` | ❌ |
+| Dialogue: stella_backstage | `assets/vo/dialogue/stella_backstage_01–20.mp3` | ❌ |
+| Dialogue: stella_passages | `assets/vo/dialogue/stella_passages_01–20.mp3` | ❌ |
+| Dialogue: diego_booth | `assets/vo/dialogue/diego_booth_01–20.mp3` | ❌ |
+| Dialogue: phone_calls | `assets/vo/dialogue/phone_calls_01–20.mp3` | ❌ |
+
+### 16n. Asset Summary
+
+| Category | Total | Exists | Missing | Has Fallback |
+|----------|-------|--------|---------|-------------|
+| Room backgrounds | 8 | 8 | 0 | — |
+| Alt backgrounds | 15 | 1 | 14 | Yes (base bg) |
+| Puzzle illustrations | 10 | 0 | 10 | Yes (dark overlay) |
+| Clue close-ups | 27 | 0 | 27 | Yes (text only) |
+| Character portraits | 5 | 5 | 0 | — |
+| Item icons | 16 | 16 | 0 | — |
+| UI components | 25+ | 25+ | 0 | — |
+| Intro/cinematic images | 19 | 19 | 0 | — |
+| Video cinematics | 6 | 1 | 5 | Yes (slides) |
+| Ambient audio | 12 | 12 | 0 | — |
+| SFX (procedural) | 25+ | 25+ | 0 | — |
+| SFX (file-based) | 4 | 0 | 4 | Yes (procedural) |
+| Music tracks | 5 | 0 | 5 | No |
+| Intro VO | 18 | 18 | 0 | — |
+| Dialogue VO | ~200 lines | 0 | ~200 | Yes (text only) |
+| **TOTALS** | **~395** | **~130** | **~265** | — |
+
+### Priority Creation Order
+
+1. **Alt backgrounds (14)** — Biggest visual impact for story progression feel
+2. **Clue close-ups (8 priority + 19 others)** — Enhances detective investigation moments
+3. **Puzzle illustrations (10)** — Improves puzzle atmosphere
+4. **Music tracks (5)** — Essential for mood and polish
+5. **Video cinematics (5)** — Premium polish for key story moments
+6. **Dialogue VO (~200 lines)** — Full voice acting pass
+7. **File-based SFX (4)** — Minor, procedural fallbacks work well
 
 ---
 

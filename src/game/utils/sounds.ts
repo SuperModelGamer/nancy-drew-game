@@ -277,4 +277,127 @@ export const UISounds = {
     setTimeout(() => playTone(1800, 0.7, 'sine', 0.02), 200);
     setTimeout(() => playTone(2200, 0.4, 'triangle', 0.015), 350);
   },
+
+  // ─── Additional Interaction SFX ──────────────────────────────────────────
+
+  /** Page turn — soft paper rustle with high-frequency texture */
+  pageTurn(): void {
+    playNoise(0.15, 0.06, { freq: 3000, Q: 1.5 });
+    setTimeout(() => playNoise(0.1, 0.04, { freq: 4000, Q: 2 }), 50);
+    playTone(1500, 0.08, 'sine', 0.02, 800);
+  },
+
+  /** Safe dial click — precise metallic tick */
+  safeDial(): void {
+    playTone(3500, 0.025, 'square', 0.08);
+    setTimeout(() => playTone(2800, 0.02, 'square', 0.04), 15);
+  },
+
+  /** Key jingle — bright metallic shimmer */
+  keyJingle(): void {
+    playTone(3200, 0.08, 'triangle', 0.06);
+    setTimeout(() => playTone(3800, 0.06, 'triangle', 0.05), 40);
+    setTimeout(() => playTone(4200, 0.05, 'triangle', 0.04), 80);
+    setTimeout(() => playTone(3000, 0.07, 'triangle', 0.03), 120);
+  },
+
+  /** Curtain pull — fabric swoosh */
+  curtainPull(): void {
+    playNoise(0.4, 0.06, { freq: 600, Q: 0.8 });
+    playTone(250, 0.35, 'sine', 0.03, 120);
+    setTimeout(() => playNoise(0.2, 0.03, { freq: 800, Q: 1.2 }), 200);
+  },
+
+  /** Drawer open — wood slide with soft thunk */
+  drawerOpen(): void {
+    playTone(180, 0.15, 'sawtooth', 0.04, 100);
+    playNoise(0.1, 0.04, { freq: 500, Q: 1 });
+    setTimeout(() => playTone(120, 0.08, 'sine', 0.06), 130);
+  },
+
+  /** Evidence placed — satisfying confirmation thud */
+  evidencePlace(): void {
+    playTone(300, 0.12, 'sine', 0.08);
+    playNoise(0.06, 0.05, { freq: 400, Q: 1.5 });
+    setTimeout(() => playTone(450, 0.15, 'triangle', 0.05), 60);
+  },
+
+  /** Suspicion sting — tense two-note dissonance */
+  suspicionSting(): void {
+    playTone(220, 0.4, 'sine', 0.06);
+    setTimeout(() => playTone(233, 0.35, 'sine', 0.05), 50);
+    setTimeout(() => playTone(185, 0.5, 'triangle', 0.03), 200);
+  },
+
+  /** Journal write — pen scratch with paper texture */
+  journalWrite(): void {
+    playNoise(0.08, 0.03, { freq: 2500, Q: 3 });
+    setTimeout(() => playNoise(0.06, 0.025, { freq: 3000, Q: 2.5 }), 60);
+    setTimeout(() => playNoise(0.07, 0.02, { freq: 2200, Q: 3 }), 120);
+  },
+
+  /** Photograph snap — camera shutter click */
+  photoSnap(): void {
+    playTone(4000, 0.015, 'square', 0.1);
+    setTimeout(() => playNoise(0.03, 0.06, { freq: 5000, Q: 2 }), 10);
+    setTimeout(() => playTone(3000, 0.02, 'square', 0.05), 25);
+  },
+
+  /** Discovery reveal — rising chime for finding important clues */
+  discoveryReveal(): void {
+    playTone(440, 0.2, 'triangle', 0.08);     // A4
+    setTimeout(() => playTone(554, 0.2, 'triangle', 0.07), 100); // C#5
+    setTimeout(() => playTone(659, 0.25, 'triangle', 0.08), 200); // E5
+    setTimeout(() => playTone(880, 0.4, 'sine', 0.06), 350);     // A5
+  },
+
+  /** Typewriter key — for dialogue with real weight */
+  typewriterKey(): void {
+    playTone(2800, 0.02, 'square', 0.04);
+    playNoise(0.015, 0.03, { freq: 4000, Q: 3 });
+  },
+
+  /** Combination lock tumbler — chunky mechanical click */
+  lockTumbler(): void {
+    playTone(500, 0.04, 'square', 0.09);
+    setTimeout(() => playTone(350, 0.03, 'square', 0.06), 20);
+    playNoise(0.03, 0.05, { freq: 800, Q: 2 });
+  },
+
+  /** Map open — paper unfold with gentle swoosh */
+  mapOpen(): void {
+    playNoise(0.2, 0.04, { freq: 1500, Q: 1 });
+    playTone(800, 0.15, 'sine', 0.02, 400);
+    setTimeout(() => playNoise(0.15, 0.03, { freq: 2000, Q: 1.5 }), 100);
+  },
+
+  /** Fog machine hiss — atmospheric steam burst */
+  fogMachineHiss(): void {
+    playNoise(0.8, 0.05, { freq: 2000, Q: 0.5 });
+    setTimeout(() => playNoise(0.6, 0.04, { freq: 3000, Q: 0.8 }), 200);
+    playTone(150, 0.6, 'sine', 0.02, 80);
+  },
+
+  /** Spotlight click — theater light switching on */
+  spotlightClick(): void {
+    playTone(3000, 0.02, 'square', 0.1);
+    setTimeout(() => playTone(120, 0.3, 'sawtooth', 0.04, 100), 30);
+    setTimeout(() => playTone(60, 0.5, 'sine', 0.03), 100);
+  },
+
+  /** Trap door creak — heavy wooden mechanism */
+  trapDoorCreak(): void {
+    playTone(200, 0.6, 'sawtooth', 0.05, 80);
+    setTimeout(() => playTone(150, 0.4, 'sawtooth', 0.04, 60), 200);
+    setTimeout(() => playTone(100, 0.3, 'sine', 0.06, 50), 500);
+    playNoise(0.2, 0.03, { freq: 300, Q: 1 });
+  },
+
+  /** Poison bubble — sinister liquid gurgle */
+  poisonBubble(): void {
+    playTone(200, 0.15, 'sine', 0.04, 280);
+    setTimeout(() => playTone(250, 0.12, 'sine', 0.03, 310), 100);
+    setTimeout(() => playTone(180, 0.18, 'sine', 0.04, 260), 250);
+    playNoise(0.3, 0.02, { freq: 400, Q: 2 });
+  },
 };
