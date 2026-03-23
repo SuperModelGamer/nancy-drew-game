@@ -1,300 +1,161 @@
 import Phaser from 'phaser';
-import { BaseSlideScene, Slide } from './BaseSlideScene';
-import { initSceneCursor, POINTER_CURSOR } from '../utils/cursors';
-import { Colors, TextColors, FONT } from '../utils/constants';
+import { FONT } from '../utils/constants';
 
-// ─── Intro Slides ────────────────────────────────────────────────────────────
-// Short, punchy intro: Vivienne's call → Nancy arrives at the theater.
-// The full backstory (1928 murder, copycat poisoning, ghost rumors) is revealed
-// through gameplay cinematics as the player explores different rooms.
-
-const INTRO_SLIDES: Slide[] = [
-  // ── The Call (cold open — action first) ─────────────────────────────────────
-
-  {
-    lines: [
-      '"Nancy — someone has been poisoned.',
-      'The police won\'t listen.',
-      'The wrecking crew comes in three days.',
-      'And something is haunting this theater.',
-      '',
-      'Please. You\'re the only one I trust."',
-    ],
-    effect: 'typewriter',
-    pauseAfter: 300,
-    voiceover: 'vo_intro_16',
-    bgImage: 'intro_phone',
-    bgAlpha: 0.4,
-    camera: { scaleFrom: 1.0, scaleTo: 1.1, panX: -8 },
-    vignetteIntensity: 0.7,
-    letterbox: true,
-    audio: [
-      { key: 'proc:phoneRing', delay: 0, volume: 0.4 },
-    ],
-  },
-
-  // ── Context — who called and why it matters ─────────────────────────────────
-
-  {
-    lines: [
-      'Vivian Delacroix has lived in the',
-      'Monarch her entire life.',
-      'Margaux\'s goddaughter.',
-      'The last person who still remembers.',
-    ],
-    effect: 'fade',
-    pauseAfter: 300,
-    voiceover: 'vo_intro_15',
-    bgImage: 'intro_newspaper',
-    bgAlpha: 0.6,
-    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -6 },
-    vignetteIntensity: 0.5,
-    letterbox: true,
-  },
-
-  // ── Arrival ─────────────────────────────────────────────────────────────────
-
-  {
-    lines: [
-      'Seventy-two hours.',
-      'A copycat poisoner. A condemned building.',
-      'A ghost that shouldn\'t exist.',
-    ],
-    effect: 'fade',
-    pauseAfter: 300,
-    voiceover: 'vo_intro_17',
-    bgImage: 'intro_nancy_car',
-    bgAlpha: 0.55,
-    camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -6 },
-    fogIntensity: 0.1,
-    vignetteIntensity: 0.7,
-    letterbox: true,
-    audio: [
-      { key: 'proc:heartbeat', delay: 200, volume: 0.3 },
-    ],
-  },
-
-  // ── The Doors — Nancy pushes through ────────────────────────────────────────
-
-  {
-    lines: [
-      'You push through the heavy doors',
-      'of the Monarch Theatre.',
-      '',
-      'The lobby is dark.',
-      'A single lamp burns at the front desk.',
-      '',
-      'Vivian is waiting.',
-    ],
-    effect: 'typewriter',
-    pauseAfter: 400,
-    voiceover: 'vo_intro_18',
-    bgImage: 'intro_doors',
-    bgAlpha: 0.6,
-    camera: { scaleFrom: 1.05, scaleTo: 1.18, panY: -12 },
-    fogIntensity: 0.08,
-    vignetteIntensity: 0.8,
-    letterbox: true,
-    audio: [
-      { key: 'proc:doorCreak', delay: 0, volume: 0.6 },
-    ],
-    effects: [
-      { type: 'screenShake', delay: 0, duration: 400 },
-    ],
-  },
-];
-
-// ─── IntroScene ──────────────────────────────────────────────────────────────
-
-export class IntroScene extends BaseSlideScene {
-  private video: Phaser.GameObjects.Video | null = null;
-  private videoSkipBtn: Phaser.GameObjects.Text | null = null;
-  private videoOverlay: Phaser.GameObjects.Rectangle | null = null;
-  private videoLetterboxBars: Phaser.GameObjects.Rectangle[] = [];
-  private videoPlaying = false;
+/**
+ * IntroScene — plays the ElevenLabs intro cinematic as a native HTML <video>
+ * element overlaid on the Phaser canvas. This bypasses Phaser's broken video
+ * system entirely for reliable 1920×1080 playback.
+ *
+ * After the video ends (or is skipped), transitions to RoomScene + UIScene.
+ */
+export class IntroScene extends Phaser.Scene {
+  private videoEl: HTMLVideoElement | null = null;
+  private skipBtn: HTMLButtonElement | null = null;
+  private container: HTMLDivElement | null = null;
 
   constructor() {
     super({ key: 'IntroScene' });
   }
 
-  protected getSlides(): Slide[] {
-    return INTRO_SLIDES;
-  }
+  create(): void {
+    // Black background behind everything
+    const { width, height } = this.cameras.main;
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000);
 
-  protected onSceneCreate(): void {
-    initSceneCursor(this);
-
-    // Play the ElevenLabs intro cinematic video before story slides
-    if (this.textures.exists('intro_monarch_video') || this.cache.video.exists('intro_monarch_video')) {
-      this.playVideoPreroll();
+    // Get the Phaser canvas to position the video over it
+    const canvas = this.game.canvas;
+    const parent = canvas.parentElement;
+    if (!parent) {
+      this.startGame();
+      return;
     }
+
+    // Create a container div that matches the canvas position exactly
+    this.container = document.createElement('div');
+    this.container.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+      z-index: 10;
+    `;
+    parent.style.position = 'relative';
+    parent.appendChild(this.container);
+
+    // Create native HTML video element
+    this.videoEl = document.createElement('video');
+    this.videoEl.src = 'assets/cinematics/ElevenLabs_Nancy_Drew_Intro_1.mp4';
+    this.videoEl.playsInline = true;
+    this.videoEl.preload = 'auto';
+    this.videoEl.style.cssText = `
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    `;
+
+    this.container.appendChild(this.videoEl);
+
+    // Skip button (HTML so it sits above the video)
+    this.skipBtn = document.createElement('button');
+    this.skipBtn.textContent = 'SKIP ▸';
+    this.skipBtn.style.cssText = `
+      position: absolute;
+      top: 16px;
+      right: 24px;
+      background: none;
+      border: 1px solid rgba(201, 168, 76, 0.4);
+      color: rgba(201, 168, 76, 0.7);
+      font-family: ${FONT};
+      font-size: 18px;
+      letter-spacing: 2px;
+      padding: 6px 16px;
+      cursor: pointer;
+      z-index: 11;
+      opacity: 0;
+      transition: opacity 1.5s ease, color 0.2s, border-color 0.2s;
+    `;
+    this.skipBtn.addEventListener('mouseenter', () => {
+      if (this.skipBtn) {
+        this.skipBtn.style.color = 'rgba(201, 168, 76, 1)';
+        this.skipBtn.style.borderColor = 'rgba(201, 168, 76, 0.8)';
+      }
+    });
+    this.skipBtn.addEventListener('mouseleave', () => {
+      if (this.skipBtn) {
+        this.skipBtn.style.color = 'rgba(201, 168, 76, 0.7)';
+        this.skipBtn.style.borderColor = 'rgba(201, 168, 76, 0.4)';
+      }
+    });
+    this.skipBtn.addEventListener('click', () => this.endVideo());
+    this.container.appendChild(this.skipBtn);
+
+    // Show skip button after 1.5s
+    setTimeout(() => {
+      if (this.skipBtn) this.skipBtn.style.opacity = '1';
+    }, 1500);
+
+    // ESC to skip
+    const escHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        document.removeEventListener('keydown', escHandler);
+        this.endVideo();
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+
+    // Play the video
+    this.videoEl.play().catch(() => {
+      // Autoplay blocked (e.g., no user interaction yet) — skip to game
+      this.endVideo();
+    });
+
+    // When video ends naturally
+    this.videoEl.addEventListener('ended', () => this.endVideo());
   }
 
-  protected getStageDirectionPrefixes(): string[] {
-    return ['On stage', 'She ', 'You ', 'A '];
+  private endVideo(): void {
+    if (!this.container) return; // Already cleaned up
+
+    // Fade out
+    this.container.style.transition = 'opacity 0.6s ease';
+    this.container.style.opacity = '0';
+
+    setTimeout(() => {
+      this.cleanup();
+      this.startGame();
+    }, 600);
   }
 
-  protected onTransitionComplete(): void {
+  private cleanup(): void {
+    if (this.videoEl) {
+      this.videoEl.pause();
+      this.videoEl.removeAttribute('src');
+      this.videoEl.load(); // Release memory
+      this.videoEl = null;
+    }
+    if (this.container) {
+      this.container.remove();
+      this.container = null;
+    }
+    this.skipBtn = null;
+  }
+
+  private startGame(): void {
     this.scene.start('RoomScene', { roomId: 'lobby' });
     this.scene.launch('UIScene');
   }
 
-  // ─── Video Pre-roll ────────────────────────────────────────────────────────
-
-  private playVideoPreroll(): void {
-    const { width, height } = this.cameras.main;
-    this.videoPlaying = true;
-
-    // Pause the slide system — prevent clicks from advancing slides during video
-    this.canSkip = false;
-
-    // Dark overlay behind video (covers any slide content)
-    this.videoOverlay = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 1);
-    this.videoOverlay.setDepth(49);
-
-    // Create video game object centered on screen
-    this.video = this.add.video(width / 2, height / 2, 'intro_monarch_video');
-    this.video.setDepth(50); // Above the blackout overlay, below the skip button
-    this.video.setAlpha(0);
-
-    // Fit the video inside the viewport so we don't crop or zoom the preroll.
-    // The previous cover-scale behavior looked fine at 16:9, but it cropped the
-    // sides/top on other aspect ratios and made the intro feel over-zoomed.
-    this.fitVideoToViewport();
-
-    // "SKIP" button for the video
-    this.videoSkipBtn = this.add.text(width - 24, 24, 'SKIP \u25b8', {
-      fontFamily: FONT, fontSize: '21px', color: TextColors.goldDim, letterSpacing: 2,
-    }).setOrigin(1, 0).setAlpha(0).setDepth(51);
-    this.videoSkipBtn.setInteractive({ cursor: POINTER_CURSOR });
-    this.videoSkipBtn.on('pointerover', () => this.videoSkipBtn?.setColor(TextColors.gold));
-    this.videoSkipBtn.on('pointerout', () => this.videoSkipBtn?.setColor(TextColors.goldDim));
-    this.videoSkipBtn.on('pointerdown', () => this.endVideoPreroll());
-
-    // Show skip button after a short delay
-    this.tweens.add({ targets: this.videoSkipBtn, alpha: 0.7, duration: 1500, delay: 1500 });
-
-    // Fade video in and play
-    this.tweens.add({
-      targets: this.video,
-      alpha: 1,
-      duration: 800,
-      onComplete: () => {
-        if (!this.video) return;
-        this.video.play(false); // false = don't loop
-
-        // When video ends naturally, transition to slides
-        this.video.on('complete', () => {
-          this.endVideoPreroll();
-        });
-      },
-    });
-
-    // Allow clicking anywhere (except skip button area) to skip video too
-    const videoClickHandler = (pointer: Phaser.Input.Pointer) => {
-      if (!this.videoPlaying) return;
-      // Ignore clicks near the skip button
-      if (pointer.x > width - 80 && pointer.y < 50) return;
-      // Require at least 2 seconds of video before click-to-skip works
-      if (this.video && this.video.getCurrentTime() < 2) return;
-      this.endVideoPreroll();
-    };
-    this.input.on('pointerdown', videoClickHandler);
-
-    // ESC to skip video
-    this.input.keyboard?.on('keydown-ESC', () => {
-      if (this.videoPlaying) this.endVideoPreroll();
-    });
+  shutdown(): void {
+    this.cleanup();
   }
 
-  private fitVideoToViewport(): void {
-    if (!this.video) return;
-
-    const { width, height } = this.cameras.main;
-    const videoWidth = this.video.width || this.video.displayWidth || 1920;
-    const videoHeight = this.video.height || this.video.displayHeight || 1080;
-    const scaleX = width / videoWidth;
-    const scaleY = height / videoHeight;
-    // Contain scale: fit the full video inside the viewport (may letterbox, but no cropping)
-    const containScale = Math.min(scaleX, scaleY);
-
-    this.video.setScale(containScale);
-    this.video.setPosition(width / 2, height / 2);
-
-    // Add letterbox bars if the video doesn't fill the full viewport
-    this.videoLetterboxBars.forEach(bar => bar.destroy());
-    this.videoLetterboxBars = [];
-
-    const scaledW = videoWidth * containScale;
-    const scaledH = videoHeight * containScale;
-
-    if (scaledW < width) {
-      // Pillarbox: vertical bars on left and right
-      const barW = Math.ceil((width - scaledW) / 2);
-      this.videoLetterboxBars.push(
-        this.add.rectangle(barW / 2, height / 2, barW, height, 0x000000).setDepth(50),
-        this.add.rectangle(width - barW / 2, height / 2, barW, height, 0x000000).setDepth(50),
-      );
-    } else if (scaledH < height) {
-      // Letterbox: horizontal bars on top and bottom
-      const barH = Math.ceil((height - scaledH) / 2);
-      this.videoLetterboxBars.push(
-        this.add.rectangle(width / 2, barH / 2, width, barH, 0x000000).setDepth(50),
-        this.add.rectangle(width / 2, height - barH / 2, width, barH, 0x000000).setDepth(50),
-      );
-    }
-  }
-
-  private endVideoPreroll(): void {
-    if (!this.videoPlaying) return;
-    this.videoPlaying = false;
-
-    const { width, height } = this.cameras.main;
-
-    // Fade out video
-    if (this.video) {
-      this.tweens.add({
-        targets: this.video,
-        alpha: 0,
-        duration: 600,
-        onComplete: () => {
-          if (this.video) {
-            this.video.stop();
-            this.video.destroy();
-            this.video = null;
-          }
-        },
-      });
-    }
-
-    // Fade out overlay and letterboxing
-    const overlayTargets = [
-      ...(this.videoOverlay ? [this.videoOverlay] : []),
-      ...this.videoLetterboxBars,
-    ];
-    if (overlayTargets.length > 0) {
-      this.tweens.add({
-        targets: overlayTargets,
-        fillAlpha: 0,
-        duration: 800,
-        onComplete: () => {
-          this.videoOverlay?.destroy();
-          this.videoOverlay = null;
-          this.videoLetterboxBars.forEach(bar => bar.destroy());
-          this.videoLetterboxBars = [];
-        },
-      });
-    }
-
-    // Remove skip button
-    if (this.videoSkipBtn) {
-      this.videoSkipBtn.destroy();
-      this.videoSkipBtn = null;
-    }
-
-    // Re-enable slide system after video fades out
-    this.time.delayedCall(900, () => {
-      this.canSkip = true;
-    });
+  destroy(): void {
+    this.cleanup();
   }
 }

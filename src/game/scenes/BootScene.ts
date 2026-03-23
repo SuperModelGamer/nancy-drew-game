@@ -213,8 +213,8 @@ export class BootScene extends Phaser.Scene {
       this.load.image(key, `assets/ui/dialogue/${filename}.png`);
     }
 
-    // Load intro cinematic video (optional — intro degrades gracefully to slides only)
-    this.load.video('intro_monarch_video', 'assets/cinematics/ElevenLabs_Nancy_Drew_Intro_1.mp4', true);
+    // Intro cinematic video is played via native HTML <video> in IntroScene
+    // (bypasses Phaser's broken video system for reliable 1920×1080 playback)
 
     // Load cinematic slide backgrounds (optional — cinematics degrade gracefully without images)
     const cinematicImages: Record<string, string> = {
@@ -265,8 +265,7 @@ export class BootScene extends Phaser.Scene {
           file.key.startsWith('ui_') || file.key.startsWith('dlg_') ||
           file.key.startsWith('vo_') || file.key.startsWith('puzzle_') ||
           file.key.startsWith('clue_') || file.key.startsWith('bg_') ||
-          file.key.startsWith('cinematic_') ||
-          file.key === 'intro_monarch_video') {
+          file.key.startsWith('cinematic_')) {
         // Silently ignore — scenes work without these assets
         return;
       }
