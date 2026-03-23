@@ -26,24 +26,21 @@ interface SubtitleCue {
 // ── Subtitle track for the intro cinematic narration ──────────────────────────
 // Timings are approximate — adjust after watching the final video.
 const INTRO_SUBTITLES: SubtitleCue[] = [
-  { time: 1.0,  text: 'The Monarch Theatre, 1928.' },
-  { time: 4.5,  text: 'On the night of the final performance of "The Crimson Veil"...' },
-  { time: 9.0,  text: 'Every seat was taken. Standing room only.' },
-  { time: 13.0, text: 'The star, Margaux Fontaine, raised a golden goblet to her lips.' },
-  { time: 18.0, text: 'She drank. She fell. She never got up.' },
-  { time: 22.5, text: 'The curtain fell for the last time.' },
-  { time: 26.0, text: 'The papers called it a tragic accident. Poison in a prop goblet.' },
-  { time: 31.0, text: 'But someone in the audience that night knew exactly what happened.' },
-  { time: 35.5, text: 'And they never said a word.' },
-  { time: 40.0, text: 'Ninety-seven years later...' },
-  { time: 43.5, text: 'The Monarch sits condemned. Three days from demolition.' },
-  { time: 48.0, text: 'But last night, developer Roland Ashworth collapsed. Poisoned.' },
-  { time: 53.0, text: 'The same method. The same symptoms. The same theatre.' },
-  { time: 58.0, text: 'Someone is copying a murder that was never solved.' },
-  { time: 63.0, text: 'And something else is wrong.' },
-  { time: 66.0, text: 'A figure in white on the empty stage. Footsteps in locked corridors.' },
-  { time: 71.0, text: 'The ghost of Margaux Fontaine walks the Monarch again.' },
-  { time: 76.0, text: '' }, // clear subtitles at end
+  { time: 0.0,  text: 'The Monarch sits condemned.' },
+  { time: 4.0,  text: 'Three days from demolition.' },
+  { time: 7.0,  text: 'A developer named Roland Ashworth plans to tear it down for condominiums.' },
+  { time: 12.0, text: 'Nancy, someone has been poisoned. The police won\'t listen.' },
+  { time: 17.0, text: 'The wrecking crew comes in three days.' },
+  { time: 20.0, text: 'And something is haunting this theatre.' },
+  { time: 23.0, text: 'Please, there is only one I trust.' },
+  { time: 29.0, text: 'Someone is copying a murder that was never solved.' },
+  { time: 33.0, text: 'A copycat poison.' },
+  { time: 35.0, text: 'A condemned building.' },
+  { time: 37.0, text: 'A ghost that shouldn\'t exist.' },
+  { time: 40.0, text: 'She pushed through the heavy doors of the Monarch Theatre.' },
+  { time: 44.0, text: 'The dark, dusty stairs wind from the side entrance to the Grand Lobby.' },
+  { time: 49.0, text: 'Vivian is waiting.' },
+  { time: 51.0, text: '' },
 ];
 
 const GOLD = 'rgba(201, 168, 76,';
