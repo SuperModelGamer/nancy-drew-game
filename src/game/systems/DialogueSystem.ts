@@ -507,7 +507,7 @@ export class DialogueSystem {
       ? totalLeft + pfDisplayW / 2           // centered under portrait
       : dlgBoxLeft + dlgBoxW / 2;            // centered above dialogue box
     const nameplateY = hasPortrait
-      ? boxBottom - npH / 2 + 4              // overlaid on portrait's bottom edge
+      ? boxBottom - npH / 2 - 10             // overlaid on portrait's bottom edge
       : boxTop - 4;                          // above dialogue box (no portrait)
 
     // Size nameplate so text fits inside its gold borders
