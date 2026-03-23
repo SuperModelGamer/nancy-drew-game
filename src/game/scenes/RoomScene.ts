@@ -15,6 +15,7 @@ import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 import { UISounds } from '../utils/sounds';
 import { AmbientAudioSystem } from '../systems/AmbientAudioSystem';
+import { MusicSystem } from '../systems/MusicSystem';
 import { playCurtainClose } from '../utils/transitions';
 import { getCinematicForRoom } from './CinematicScene';
 
@@ -224,6 +225,20 @@ export class RoomScene extends Phaser.Scene {
     const ambientAudio = AmbientAudioSystem.getInstance();
     ambientAudio.setScene(this);
     ambientAudio.enterRoom(this.currentRoom.id);
+
+    // Start lobby background music (auto-plays default track on first lobby entry)
+    if (this.currentRoom.id === 'lobby') {
+      const music = MusicSystem.getInstance();
+      if (!music.isPlaying()) {
+        music.play();
+      }
+    } else {
+      // Stop lobby music when leaving for other rooms
+      const music = MusicSystem.getInstance();
+      if (music.isPlaying()) {
+        music.stop();
+      }
+    }
 
     // Hotspot editor toggle (Shift+Q)
     this.input.keyboard!.on('keydown-Q', (event: KeyboardEvent) => {

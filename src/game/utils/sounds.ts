@@ -14,6 +14,12 @@ let textSpeedPreset: TextSpeedPreset = (localStorage.getItem('nd_text_speed') as
 /** Whether ambient particles are enabled. */
 let particlesEnabled = localStorage.getItem('nd_particles') !== 'off';
 
+/** Music volume (independent of master SFX volume). 0 = muted, 1 = full. */
+let musicVolume = parseFloat(localStorage.getItem('nd_music_volume') ?? '0.5');
+
+/** Selected music track ID for lobby background music. */
+let musicTrack = localStorage.getItem('nd_music_track') ?? 'midnight_theatre';
+
 function getCtx(): AudioContext | null {
   if (!audioCtx) {
     try {
@@ -135,6 +141,20 @@ export const UISounds = {
   setParticlesEnabled(on: boolean): void {
     particlesEnabled = on;
     localStorage.setItem('nd_particles', on ? 'on' : 'off');
+  },
+
+  /** Music volume (0–1). Independent of master SFX volume. Persisted to localStorage. */
+  getMusicVolume(): number { return musicVolume; },
+  setMusicVolume(v: number): void {
+    musicVolume = Math.max(0, Math.min(1, v));
+    localStorage.setItem('nd_music_volume', musicVolume.toString());
+  },
+
+  /** Selected music track ID. Persisted to localStorage. */
+  getMusicTrack(): string { return musicTrack; },
+  setMusicTrack(id: string): void {
+    musicTrack = id;
+    localStorage.setItem('nd_music_track', id);
   },
 
   // Soft click for button presses and hotspot interaction
