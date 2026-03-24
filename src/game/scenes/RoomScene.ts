@@ -974,7 +974,8 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private playCurtainOpen(onComplete: () => void): void {
-    const { width, height } = this.cameras.main.worldView;
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
     const curtainColor = 0x4a0a0a; // deep crimson
 
     const left = this.add.rectangle(width / 4, height / 2, width / 2, height, curtainColor, 1);
