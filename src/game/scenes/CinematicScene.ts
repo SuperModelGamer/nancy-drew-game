@@ -48,25 +48,8 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
     id: 'the_murder_of_1928',
     triggerRoom: 'auditorium',
     triggerFlag: '',
-    videoKey: 'cinematic_murder_1928',
-    videoSubtitles: [
-      { time: 1.0,  text: 'The auditorium takes my breath away.' },
-      { time: 4.0,  text: 'Even abandoned, even condemned — you can feel what this place was.' },
-      { time: 8.5,  text: 'A thousand red velvet seats face the stage. The curtain hangs in tatters, but the gold fringe still catches the light.' },
-      { time: 15.0, text: 'This is where it happened. Halloween night, 1928.' },
-      { time: 19.0, text: 'The final performance of "The Crimson Veil." Every seat was filled.' },
-      { time: 24.0, text: 'Margaux Fontaine was the star. They say she lit up the room just by walking on stage.' },
-      { time: 30.0, text: 'That night, in Act Three, she raised a golden goblet to her lips.' },
-      { time: 35.0, text: 'She drank. She stumbled.' },
-      { time: 38.0, text: 'The audience thought it was part of the show.' },
-      { time: 41.5, text: 'It wasn\'t.' },
-      { time: 44.0, text: 'The official report called it a tragic accident. Arsenic in a prop goblet.' },
-      { time: 49.0, text: 'But ninety-seven years later, no one has ever explained how arsenic got into a theater prop.' },
-      { time: 55.0, text: 'Someone in this audience knew the truth.' },
-      { time: 58.5, text: 'And they took it to their grave.' },
-      { time: 62.0, text: '...Or did they?' },
-      { time: 65.0, text: '' },
-    ],
+    videoKey: 'Cutscene01_lobby2auditorium',
+    videoSubtitles: [],
     slides: [
       {
         lines: [
