@@ -250,6 +250,7 @@ export class UIScene extends Phaser.Scene {
   private borderProgressBar!: Phaser.GameObjects.Graphics;
   private borderProgressPct!: Phaser.GameObjects.Text;
   private borderChapterText!: Phaser.GameObjects.Text;
+  private borderQuestHintText!: Phaser.GameObjects.Text;
 
   private createRightInfoPanel(
     rpX: number, rpW: number, rpCx: number, fTop: number, toolbarTop: number,
@@ -268,7 +269,7 @@ export class UIScene extends Phaser.Scene {
 
     // ─── Layout: vertically center content within panel ───
     // Total content height estimate for balanced spacing
-    const totalContentH = 620; // approximate height of all elements
+    const totalContentH = 740; // approximate height of all elements + quest hint
     let y = fTop + Math.max(pad, (panelH - totalContentH) / 2);
 
     // ── Chapter indicator ──
@@ -380,7 +381,26 @@ export class UIScene extends Phaser.Scene {
       fontFamily: FONT, fontSize: '10px', color: TextColors.goldDim,
       align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 28;
+    y += 24;
+
+    // ── Art deco divider before quest hint ──
+    drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2, DecoColors.gold, 0.25);
+    y += 20;
+
+    // ── Quest Hint / Objective ──
+    this.add.text(contentX, y, 'OBJECTIVE', {
+      fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+      letterSpacing: 3, align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 18;
+
+    this.borderQuestHintText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '13px', color: '#d4c5a0',
+      fontStyle: 'italic', align: 'center',
+      wordWrap: { width: rpW - pad * 2 - 4 },
+      lineSpacing: 3,
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 90; // reserve space for hint text
 
     // ── Art deco divider before gear ──
     drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2 - 10, DecoColors.gold, 0.2);
@@ -532,6 +552,58 @@ export class UIScene extends Phaser.Scene {
       const pct = totalClues > 0 ? Math.round((foundClues / totalClues) * 100) : 0;
       this.borderProgressPct.setText(`${pct}%`);
     }
+
+    // Quest hint
+    if (this.borderQuestHintText) {
+      this.borderQuestHintText.setText(this.getQuestHint());
+    }
+  }
+
+  // ─── Quest Hint System ──────────────────────────────────────────────────────
+
+  private static readonly QUEST_HINTS: { check: (s: SaveSystem, i: InventorySystem) => boolean; hint: string }[] = [
+    // Chapter 1
+    { check: (s) => s.getChapter() === 1 && !s.getFlag('learned_about_margaux'),
+      hint: 'Talk to Vivian in the lobby. She knows this theater better than anyone.' },
+    { check: (s) => s.getChapter() === 1 && !s.getFlag('learned_about_crimson_veil'),
+      hint: 'Find Edwin in the auditorium. He may know about The Crimson Veil.' },
+    { check: (s) => s.getChapter() === 1 && !!s.getFlag('learned_about_margaux') && !!s.getFlag('learned_about_crimson_veil'),
+      hint: 'Explore the theater thoroughly. Every room has secrets.' },
+    // Chapter 2
+    { check: (s, i) => s.getChapter() === 2 && !i.hasItem('margaux_diary'),
+      hint: 'Find Margaux\u2019s diary. Her dressing room hasn\u2019t been touched since 1928.' },
+    { check: (s) => s.getChapter() === 2 && !s.getFlag('learned_about_cecilia'),
+      hint: 'Someone named C. keeps appearing. Find out who Cecilia was.' },
+    { check: (s) => s.getChapter() === 2 && !s.getFlag('basement_key_location'),
+      hint: 'There must be a way into the basement. Someone here knows where the key is.' },
+    { check: (s) => s.getChapter() === 2,
+      hint: 'Getting closer. Keep searching \u2014 every room has secrets.' },
+    // Chapter 3
+    { check: (s, i) => s.getChapter() === 3 && !i.hasItem('basement_key'),
+      hint: 'Retrieve the basement key from its hiding place.' },
+    { check: (s) => s.getChapter() === 3 && !s.getFlag('saw_ghost'),
+      hint: 'Someone is staging a ghost. Catch them in the act.' },
+    { check: (s) => s.getChapter() === 3,
+      hint: 'The pieces are coming together. Find the key, open the trunk, and prove the ghost is fake.' },
+    // Chapter 4
+    { check: (s) => s.getChapter() === 4 && !s.getFlag('edwin_personal_revealed'),
+      hint: 'Go beneath the stage and confront whoever is behind this.' },
+    { check: (s, i) => s.getChapter() === 4 && !i.hasItem('cecilia_letter'),
+      hint: 'Find Cecilia\u2019s letter. The truth about 1928 is down here.' },
+    { check: (s) => s.getChapter() === 4,
+      hint: 'Edwin is hiding something. Get him to confess.' },
+    // Chapter 5
+    { check: (s) => s.getChapter() === 5,
+      hint: 'The case is solved. Decide: justice, exposure, or mercy.' },
+  ];
+
+  private getQuestHint(): string {
+    const save = SaveSystem.getInstance();
+    const inventory = InventorySystem.getInstance();
+    for (const entry of UIScene.QUEST_HINTS) {
+      if (entry.check(save, inventory)) return entry.hint;
+    }
+    return '';
   }
 
   // ─── Toggle methods ──────────────────────────────────────────────────────────
