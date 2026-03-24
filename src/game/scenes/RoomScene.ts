@@ -475,6 +475,57 @@ export class RoomScene extends Phaser.Scene {
       container.add([bg, label]);
       container.setSize(w, h);
 
+      // Tutorial glow for phone hotspot — guide new players to answer the ringing phone
+      if (hotspot.id === 'lobby_phone' && !save.getFlag('phone_glow_shown')) {
+        const glowRadius = Math.max(w, h) * 0.8;
+        const glow = this.add.circle(0, 0, glowRadius, 0xc9a84c, 0.12);
+        glow.setBlendMode(Phaser.BlendModes.ADD);
+        container.add(glow);
+        container.sendToBack(glow);
+
+        // Pulsing glow ring
+        const ring = this.add.circle(0, 0, glowRadius * 0.7);
+        ring.setStrokeStyle(2, 0xe8c55a, 0.4);
+        ring.setFillStyle(0x000000, 0);
+        container.add(ring);
+        container.sendToBack(ring);
+
+        this.tweens.add({
+          targets: glow,
+          alpha: { from: 0.08, to: 0.25 },
+          scaleX: { from: 0.9, to: 1.1 },
+          scaleY: { from: 0.9, to: 1.1 },
+          duration: 1200,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+        this.tweens.add({
+          targets: ring,
+          alpha: { from: 0.2, to: 0.5 },
+          scaleX: { from: 0.95, to: 1.05 },
+          scaleY: { from: 0.95, to: 1.05 },
+          duration: 1200,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+          delay: 200,
+        });
+
+        // Remove glow on first click
+        bg.once('pointerdown', () => {
+          save.setFlag('phone_glow_shown', true);
+          this.tweens.killTweensOf(glow);
+          this.tweens.killTweensOf(ring);
+          this.tweens.add({
+            targets: [glow, ring],
+            alpha: 0,
+            duration: 300,
+            onComplete: () => { glow.destroy(); ring.destroy(); },
+          });
+        });
+      }
+
       // Get cursor for this hotspot type
       const hoverCursor = this.getHotspotCursor(hotspot.type);
 
