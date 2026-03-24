@@ -445,8 +445,22 @@ export abstract class BaseSlideScene extends Phaser.Scene {
 
   protected stopAllSounds(): void {
     for (const s of this.activeSounds) {
-      if (s.isPlaying) s.stop();
-      s.destroy();
+      if (s.isPlaying) {
+        // Fade out over 300ms instead of abrupt stop
+        try {
+          this.tweens.add({
+            targets: s,
+            volume: 0,
+            duration: 300,
+            onComplete: () => { try { s.destroy(); } catch { /* ok */ } },
+          });
+        } catch {
+          // Scene may be shutting down — fall back to immediate stop
+          try { s.stop(); s.destroy(); } catch { /* ok */ }
+        }
+      } else {
+        try { s.destroy(); } catch { /* ok */ }
+      }
     }
     this.activeSounds = [];
   }

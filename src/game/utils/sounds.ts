@@ -119,11 +119,32 @@ function playSFX(key: string, volume = 0.5): void {
   });
 }
 
-/** Stop all currently playing SFX clones — call on scene transitions. */
+/** Fade out an HTMLAudioElement over the given duration (ms), then pause & reset it. */
+function fadeOutAudio(sound: HTMLAudioElement, duration = 300): void {
+  const startVol = sound.volume;
+  if (startVol <= 0) { sound.pause(); sound.currentTime = 0; return; }
+  const steps = 15;
+  const interval = duration / steps;
+  const decrement = startVol / steps;
+  let step = 0;
+  const timer = window.setInterval(() => {
+    step++;
+    if (step >= steps || sound.paused) {
+      sound.volume = 0;
+      sound.pause();
+      sound.currentTime = 0;
+      window.clearInterval(timer);
+      return;
+    }
+    sound.volume = Math.max(0, startVol - decrement * step);
+  }, interval);
+}
+
+/** Stop all currently playing SFX clones — call on scene transitions.
+ *  Fades out over ~300ms for a smooth transition. */
 function stopAllSFX(): void {
   for (const sound of activeClones) {
-    sound.pause();
-    sound.currentTime = 0;
+    fadeOutAudio(sound, 300);
   }
   activeClones.clear();
   // Also stop managed phone ringing
@@ -132,8 +153,7 @@ function stopAllSFX(): void {
     phoneRingTimer = null;
   }
   if (phoneRingSound) {
-    phoneRingSound.pause();
-    phoneRingSound.currentTime = 0;
+    fadeOutAudio(phoneRingSound, 300);
     phoneRingSound = null;
   }
 }
@@ -252,15 +272,14 @@ export const UISounds = {
     phoneRingTimer = setInterval(ring, 4000);
   },
 
-  /** Stop ambient phone ringing. */
+  /** Stop ambient phone ringing (fades out). */
   phoneRingStop(): void {
     if (phoneRingTimer) {
       clearInterval(phoneRingTimer);
       phoneRingTimer = null;
     }
     if (phoneRingSound) {
-      phoneRingSound.pause();
-      phoneRingSound.currentTime = 0;
+      fadeOutAudio(phoneRingSound, 300);
       phoneRingSound = null;
     }
   },
