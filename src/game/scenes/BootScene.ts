@@ -248,6 +248,8 @@ export class BootScene extends Phaser.Scene {
 
     // Load video cinematics (optional — game degrades to slide-based cinematics)
     const videoCinematics = [
+      'Cutscene01_lobby2auditorium', 'cinematic_copycat', 'cinematic_ghost_rumors',
+      'cinematic_ghost_sighting',
       'cinematic_ghost_reveal', 'cinematic_confession', 'cinematic_ending_justice',
       'cinematic_ending_exposure', 'cinematic_ending_mercy',
     ];
@@ -263,7 +265,7 @@ export class BootScene extends Phaser.Scene {
           file.key.startsWith('ui_') || file.key.startsWith('dlg_') ||
           file.key.startsWith('vo_') || file.key.startsWith('puzzle_') ||
           file.key.startsWith('clue_') || file.key.startsWith('bg_') ||
-          file.key.startsWith('cinematic_')) {
+          file.key.startsWith('cinematic_') || file.key.startsWith('Cutscene')) {
         // Silently ignore — scenes work without these assets
         return;
       }
