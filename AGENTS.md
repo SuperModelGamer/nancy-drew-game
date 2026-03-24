@@ -67,7 +67,7 @@ The game is **~90% feature complete and fully playable from start to finish** wi
 ## Key technical details
 
 ### Viewfinder layout
-The game art is 1920×1080 (16:9). `computeViewfinderLayout()` in `src/game/utils/constants.ts` calculates uniform scaling to fit above the toolbar while preserving aspect ratio. The layout has a thin left border (12px), the scaled game image (~1650px wide), and a thick right info panel (~258px). The camera viewport spans the full width to avoid clipping — UIScene draws over the empty space.
+The game art is 1920×1080 (16:9). `computeViewfinderLayout()` in `src/game/utils/constants.ts` computes a full-screen viewport with thin 6px borders. The game view fills nearly the entire canvas above the bottom toolbar. A floating semi-transparent HUD overlay in the top-right corner shows room name, stats, objective, and audio/settings controls. UIScene runs as a parallel overlay scene.
 
 ### Cursor system
 Custom PNG cursors in `src/game/utils/cursors.ts`. Each hotspot type has a dedicated cursor. When an item is equipped, `createItemCursor()` renders the item's Phaser texture to a canvas and generates a CSS cursor data URL.

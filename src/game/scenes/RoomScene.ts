@@ -175,13 +175,13 @@ export class RoomScene extends Phaser.Scene {
       this.createHotspots();
     }
 
-    // Selected item indicator (top-right)
-    this.selectedItemIndicator = this.add.text(gameW - 20, 20, '', {
+    // Selected item indicator (top-left, avoids HUD overlay in top-right)
+    this.selectedItemIndicator = this.add.text(20, 20, '', {
       fontFamily: FONT,
       fontSize: '16px',
       color: TextColors.gold,
       fontStyle: 'italic',
-    }).setOrigin(1, 0).setDepth(90);
+    }).setOrigin(0, 0).setDepth(90);
     this.updateSelectedItemIndicator();
 
     // Listen for inventory selection changes
