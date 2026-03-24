@@ -69,6 +69,7 @@ export class RoomScene extends Phaser.Scene {
   private _descriptionDismissKey: ((event: KeyboardEvent) => void) | null = null;
   private usedHotspots: Set<string> = new Set();
   private selectedItemIndicator!: Phaser.GameObjects.Text;
+  private questHintText!: Phaser.GameObjects.Text;
   private glowCursor: string = Cursors.inspect; // fallback until glow loads
 
   constructor() {
@@ -175,10 +176,21 @@ export class RoomScene extends Phaser.Scene {
       this.createHotspots();
     }
 
-    // Selected item indicator (top-right)
+    // Quest hint (top-right) — shows current objective
+    this.questHintText = this.add.text(gameW - 20, 20, '', {
+      fontFamily: FONT,
+      fontSize: '17px',
+      color: '#d4c5a0',
+      fontStyle: 'italic',
+      wordWrap: { width: 320 },
+      align: 'right',
+    }).setOrigin(1, 0).setDepth(90).setAlpha(0.85);
+    this.updateQuestHint();
+
+    // Selected item indicator (below quest hint)
     this.selectedItemIndicator = this.add.text(gameW - 20, 20, '', {
       fontFamily: FONT,
-      fontSize: '20px',
+      fontSize: '16px',
       color: TextColors.gold,
       fontStyle: 'italic',
     }).setOrigin(1, 0).setDepth(90);
@@ -704,14 +716,75 @@ export class RoomScene extends Phaser.Scene {
 
   private updateSelectedItemIndicator(): void {
     const selected = InventorySystem.getInstance().getSelectedItem();
+    // Position below quest hint
+    const hintBottom = this.questHintText.y + this.questHintText.height + 8;
+    this.selectedItemIndicator.setY(hintBottom);
     if (selected) {
       const item = itemsData.items.find(i => i.id === selected);
       const displayName = item?.name || selected;
       this.selectedItemIndicator.setText(`Using: ${displayName}`);
-      this.selectedItemIndicator.setAlpha(1);
+      this.selectedItemIndicator.setAlpha(0.7);
     } else {
       this.selectedItemIndicator.setText('');
     }
+  }
+
+  // ─── Quest Hint System ──────────────────────────────────────────────────────
+  // Shows a contextual Nancy Drew objective in the top-right corner
+
+  private static readonly QUEST_HINTS: { check: (s: SaveSystem, i: InventorySystem) => boolean; hint: string }[] = [
+    // Chapter 1 — early exploration
+    { check: (s) => s.getChapter() === 1 && !s.getFlag('learned_about_margaux'),
+      hint: 'I should talk to Vivian in the lobby. She knows this theater better than anyone.' },
+    { check: (s) => s.getChapter() === 1 && !s.getFlag('learned_about_crimson_veil'),
+      hint: 'Edwin might know more about The Crimson Veil. I should find him in the auditorium.' },
+    { check: (s) => s.getChapter() === 1 && !!s.getFlag('learned_about_margaux') && !!s.getFlag('learned_about_crimson_veil'),
+      hint: 'I\u2019ve heard about Margaux and the play. Time to explore the theater more thoroughly.' },
+
+    // Chapter 2 — investigating deeper
+    { check: (s, i) => s.getChapter() === 2 && !i.hasItem('margaux_diary'),
+      hint: 'I need to find Margaux\u2019s diary. Her dressing room hasn\u2019t been touched since 1928.' },
+    { check: (s) => s.getChapter() === 2 && !s.getFlag('learned_about_cecilia'),
+      hint: 'Someone named C. keeps coming up. I need to find out who Cecilia was.' },
+    { check: (s) => s.getChapter() === 2 && !s.getFlag('basement_key_location'),
+      hint: 'There must be a way into the basement. Someone here knows where the key is.' },
+    { check: (s) => s.getChapter() === 2,
+      hint: 'I\u2019m getting closer. Keep searching \u2014 every room has secrets.' },
+
+    // Chapter 3 — puzzles and ghost
+    { check: (s, i) => s.getChapter() === 3 && !i.hasItem('basement_key'),
+      hint: 'I know where the basement key is hidden. Time to retrieve it.' },
+    { check: (s) => s.getChapter() === 3 && !s.getFlag('saw_ghost'),
+      hint: 'Someone is staging a ghost in this theater. I need to catch them in the act.' },
+    { check: (s) => s.getChapter() === 3 && !PuzzleSystem.getInstance().isSolved('trunk_puzzle'),
+      hint: 'Margaux\u2019s trunk has a combination lock. The answer must be connected to her.' },
+    { check: (s) => s.getChapter() === 3,
+      hint: 'The pieces are coming together. I need the basement key, the trunk, and proof of the ghost.' },
+
+    // Chapter 4 — beneath the stage
+    { check: (s) => s.getChapter() === 4 && !s.getFlag('edwin_personal_revealed'),
+      hint: 'It\u2019s time to go beneath the stage and confront whoever is behind this.' },
+    { check: (s, i) => s.getChapter() === 4 && !i.hasItem('cecilia_letter'),
+      hint: 'I need to find Cecilia\u2019s letter. The truth about 1928 is down here somewhere.' },
+    { check: (s) => s.getChapter() === 4,
+      hint: 'Edwin has been hiding something. I need to get him to confess.' },
+
+    // Chapter 5 — endgame
+    { check: (s) => s.getChapter() === 5,
+      hint: 'The case is solved. Now I have to decide \u2014 justice, exposure, or mercy.' },
+  ];
+
+  private updateQuestHint(): void {
+    const save = SaveSystem.getInstance();
+    const inventory = InventorySystem.getInstance();
+
+    for (const entry of RoomScene.QUEST_HINTS) {
+      if (entry.check(save, inventory)) {
+        this.questHintText.setText(entry.hint);
+        return;
+      }
+    }
+    this.questHintText.setText('');
   }
 
   private showDescription(text: string, onDismiss?: () => void, imageKey?: string): void {
