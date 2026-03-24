@@ -68,6 +68,10 @@ const SFX_MANIFEST: Record<string, string> = {
 const audioCache = new Map<string, HTMLAudioElement>();
 let preloaded = false;
 
+// Managed phone ringing state
+let phoneRingTimer: ReturnType<typeof setInterval> | null = null;
+let phoneRingSound: HTMLAudioElement | null = null;
+
 /** Preload all SFX files. Call once during boot. */
 export function preloadSFX(): Promise<void> {
   if (preloaded) return Promise.resolve();
@@ -199,8 +203,43 @@ export const UISounds = {
   /** Ghostly whisper texture */
   ghostWhisper(): void { playSFX('ghostWhisper', 0.4); },
 
-  /** Old rotary phone ring */
+  /** Old rotary phone ring — single shot */
   phoneRing(): void { playSFX('phoneRing', 0.6); },
+
+  /** Start ambient phone ringing — plays 2 rings then pauses, repeating.
+   *  Call phoneRingStop() to cancel. */
+  phoneRingStart(): void {
+    // Already ringing
+    if (phoneRingTimer) return;
+
+    const ring = () => {
+      if (masterVolume <= 0) return;
+      const path = SFX_MANIFEST['phoneRing'];
+      if (!path) return;
+      const cached = audioCache.get(path);
+      if (!cached) return;
+      phoneRingSound = cached.cloneNode(true) as HTMLAudioElement;
+      phoneRingSound.volume = Math.min(1, 0.35 * masterVolume);
+      phoneRingSound.play().catch(() => {});
+    };
+
+    // Ring once now, then repeat every 4 seconds (short ring + silence gap)
+    ring();
+    phoneRingTimer = setInterval(ring, 4000);
+  },
+
+  /** Stop ambient phone ringing. */
+  phoneRingStop(): void {
+    if (phoneRingTimer) {
+      clearInterval(phoneRingTimer);
+      phoneRingTimer = null;
+    }
+    if (phoneRingSound) {
+      phoneRingSound.pause();
+      phoneRingSound.currentTime = 0;
+      phoneRingSound = null;
+    }
+  },
 
   /** Door creak — old wooden door */
   doorCreak(): void { playSFX('doorCreak', 0.5); },
