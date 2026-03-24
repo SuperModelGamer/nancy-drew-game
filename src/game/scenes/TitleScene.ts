@@ -29,6 +29,13 @@ export class TitleScene extends Phaser.Scene {
     // Initialize auth manager
     AuthManager.getInstance().init();
 
+    // Guest users should never see leftover save data from previous sessions.
+    // Clear any persisted saves if auth is available but user is not signed in.
+    const auth = AuthManager.getInstance();
+    if (auth.isAvailable() && !auth.isSignedIn() && save.hasAnySave()) {
+      save.deleteSave();
+    }
+
     // ── Cover image background ──
     this.cameras.main.setBackgroundColor('#0a0a0f');
     if (this.textures.exists('cover')) {
@@ -195,7 +202,6 @@ export class TitleScene extends Phaser.Scene {
     this.cameras.main.fadeIn(1000, 0, 0, 0);
 
     // Auto-show auth dialog if not signed in
-    const auth = AuthManager.getInstance();
     if (auth.isAvailable() && !auth.isSignedIn()) {
       this.time.delayedCall(1200, () => {
         this.showAuthDialog(width, height);
@@ -735,56 +741,151 @@ export class TitleScene extends Phaser.Scene {
   private showHowToPlay(width: number, height: number): void {
     const container = this.add.container(width / 2, height / 2);
     container.setDepth(100);
+    container.setAlpha(0);
 
-    const dimmer = this.add.rectangle(0, 0, width, height, Colors.darkBg, 0.8);
+    // Full-screen dimmer
+    const dimmer = this.add.rectangle(0, 0, width, height, 0x02010a, 0.88);
     dimmer.setInteractive();
     container.add(dimmer);
 
-    const box = this.add.rectangle(0, 0, 780, 510, Colors.panelBg, 0.97);
-    box.setStrokeStyle(2, Colors.gold, 0.7);
+    // Panel
+    const panelW = 720;
+    const panelH = 620;
+
+    // Outer decorative border
+    const outerFrame = this.add.graphics();
+    outerFrame.lineStyle(1, Colors.gold, 0.18);
+    outerFrame.strokeRect(-panelW / 2 - 10, -panelH / 2 - 10, panelW + 20, panelH + 20);
+    container.add(outerFrame);
+
+    const box = this.add.rectangle(0, 0, panelW, panelH, 0x0a0918, 0.97);
+    box.setStrokeStyle(2, Colors.gold, 0.55);
     container.add(box);
 
-    const titleText = this.add.text(0, -140, 'How to Play', {
-      fontFamily: FONT,
-      fontSize: '33px',
-      color: '#e8c55a',
-      fontStyle: 'bold',
+    // Inner border
+    const innerFrame = this.add.graphics();
+    innerFrame.lineStyle(1, Colors.gold, 0.15);
+    innerFrame.strokeRect(-panelW / 2 + 8, -panelH / 2 + 8, panelW - 16, panelH - 16);
+    container.add(innerFrame);
+
+    // Corner ornaments
+    const cornerGfx = this.add.graphics();
+    drawCornerOrnament(cornerGfx, -panelW / 2 + 2, -panelH / 2 + 2, 30, 'tl', Colors.gold, 0.4);
+    drawCornerOrnament(cornerGfx, panelW / 2 - 2, -panelH / 2 + 2, 30, 'tr', Colors.gold, 0.4);
+    drawCornerOrnament(cornerGfx, -panelW / 2 + 2, panelH / 2 - 2, 30, 'bl', Colors.gold, 0.4);
+    drawCornerOrnament(cornerGfx, panelW / 2 - 2, panelH / 2 - 2, 30, 'br', Colors.gold, 0.4);
+    container.add(cornerGfx);
+
+    // Header
+    const headerLabel = this.add.text(0, -panelH / 2 + 40, '— DETECTIVE\'S HANDBOOK —', {
+      fontFamily: FONT, fontSize: '15px', color: TextColors.goldDim, letterSpacing: 5,
+    }).setOrigin(0.5);
+    container.add(headerLabel);
+
+    const titleText = this.add.text(0, -panelH / 2 + 76, 'How to Play', {
+      fontFamily: FONT, fontSize: '36px', color: '#e8c55a', fontStyle: 'italic',
     }).setOrigin(0.5);
     container.add(titleText);
 
-    const helpLines = [
-      'Click or tap highlighted areas to investigate.',
-      'Pick up items and select them from your inventory.',
-      'Use items on locked objects to progress.',
-      'Talk to suspects to gather clues.',
-      'Solve puzzles to unlock new areas.',
-      'Check your journal (J) for clues and progress.',
-      'Open the map (M) to travel between locations.',
+    // Divider under title
+    const divGfx = this.add.graphics();
+    drawDecoDivider(divGfx, 0, -panelH / 2 + 106, 400, Colors.gold, 0.3);
+    container.add(divGfx);
+
+    // Tips with icons — left-aligned with consistent layout
+    const tips = [
+      { icon: '\u{1F50D}', label: 'Investigate', desc: 'Click glowing hotspots to examine objects and discover clues.' },
+      { icon: '\u{1F5E3}', label: 'Interrogate', desc: 'Talk to suspects — their stories may hold contradictions.' },
+      { icon: '\u{1F392}', label: 'Inventory', desc: 'Pick up items and select them to use on objects in the world.' },
+      { icon: '\u{1F9E9}', label: 'Puzzles', desc: 'Solve puzzles by combining clues from different sources.' },
+      { icon: '\u{1F4D3}', label: 'Journal  (J)', desc: 'Review your discoveries, clues, and case progress.' },
+      { icon: '\u{1F5FA}', label: 'Map  (M)', desc: 'Travel between rooms in the theater.' },
     ];
 
-    const helpText = this.add.text(0, -10, helpLines.join('\n\n'), {
-      fontFamily: FONT,
-      fontSize: '21px',
-      color: TextColors.light,
-      align: 'center',
-      lineSpacing: 2,
-      wordWrap: { width: 440 },
-    }).setOrigin(0.5);
-    container.add(helpText);
+    const startY = -panelH / 2 + 135;
+    const rowH = 66;
+    const iconX = -panelW / 2 + 55;
+    const labelX = -panelW / 2 + 100;
+    const descX = -panelW / 2 + 100;
 
-    // Close button
-    const closeBg = this.add.rectangle(0, 210, 180, 66, Colors.sceneBg, 0.9);
-    closeBg.setStrokeStyle(1, Colors.gold, 0.5);
+    tips.forEach((tip, i) => {
+      const y = startY + i * rowH;
+
+      // Icon
+      container.add(this.add.text(iconX, y + 6, tip.icon, {
+        fontSize: '24px',
+      }).setOrigin(0.5, 0));
+
+      // Label (bold gold)
+      container.add(this.add.text(labelX, y, tip.label, {
+        fontFamily: FONT, fontSize: '20px', color: '#e8c55a', fontStyle: 'bold',
+      }).setOrigin(0, 0));
+
+      // Description
+      container.add(this.add.text(descX, y + 26, tip.desc, {
+        fontFamily: FONT, fontSize: '17px', color: TextColors.light,
+        wordWrap: { width: panelW - 130 },
+      }).setOrigin(0, 0));
+
+      // Subtle separator line between rows (except after last)
+      if (i < tips.length - 1) {
+        const sepGfx = this.add.graphics();
+        sepGfx.lineStyle(1, Colors.gold, 0.08);
+        sepGfx.lineBetween(-panelW / 2 + 40, y + rowH - 4, panelW / 2 - 40, y + rowH - 4);
+        container.add(sepGfx);
+      }
+    });
+
+    // Close button — art deco styled
+    const btnY = panelH / 2 - 55;
+    const btnW = 240;
+    const btnH = 56;
+
+    const closeBtnOuterGfx = this.add.graphics();
+    closeBtnOuterGfx.lineStyle(1, Colors.gold, 0.2);
+    closeBtnOuterGfx.strokeRect(-btnW / 2 - 4, btnY - btnH / 2 - 4, btnW + 8, btnH + 8);
+    container.add(closeBtnOuterGfx);
+
+    const closeBg = this.add.rectangle(0, btnY, btnW, btnH, 0x0e0d1e, 0.9);
+    closeBg.setStrokeStyle(1.5, Colors.gold, 0.6);
     closeBg.setInteractive({ cursor: POINTER_CURSOR });
-    const closeText = this.add.text(0, 210, 'Close', {
-      fontFamily: FONT,
-      fontSize: '24px',
-      color: TextColors.gold,
+    const closeText = this.add.text(0, btnY, 'CLOSE', {
+      fontFamily: FONT, fontSize: '20px', color: TextColors.gold, letterSpacing: 3,
     }).setOrigin(0.5);
-    closeBg.on('pointerover', () => closeBg.setFillStyle(Colors.hoverBg));
-    closeBg.on('pointerout', () => closeBg.setFillStyle(Colors.sceneBg, 0.9));
-    closeBg.on('pointerdown', () => container.destroy());
-    container.add([closeBg, closeText]);
+
+    // Diamond accents
+    const closeDecoGfx = this.add.graphics();
+    this.drawDiamond(closeDecoGfx, -btnW / 2 + 14, btnY, 3.5, Colors.gold, 0.4);
+    this.drawDiamond(closeDecoGfx, btnW / 2 - 14, btnY, 3.5, Colors.gold, 0.4);
+    container.add([closeBg, closeText, closeDecoGfx]);
+
+    closeBg.on('pointerover', () => {
+      closeBg.setFillStyle(0x1a1a3e, 1);
+      closeBg.setStrokeStyle(1.5, Colors.gold, 1);
+    });
+    closeBg.on('pointerout', () => {
+      closeBg.setFillStyle(0x0e0d1e, 0.9);
+      closeBg.setStrokeStyle(1.5, Colors.gold, 0.6);
+    });
+    closeBg.on('pointerdown', () => {
+      this.tweens.add({
+        targets: container, alpha: 0, duration: 300,
+        onComplete: () => container.destroy(),
+      });
+    });
+
+    // Click dimmer to close
+    dimmer.on('pointerdown', () => {
+      this.tweens.add({
+        targets: container, alpha: 0, duration: 300,
+        onComplete: () => container.destroy(),
+      });
+    });
+
+    // Fade in
+    this.tweens.add({
+      targets: container, alpha: { from: 0, to: 1 }, duration: 400, ease: 'Power2',
+    });
   }
 
   private showSettings(width: number, height: number): void {
