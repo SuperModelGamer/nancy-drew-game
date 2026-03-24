@@ -121,15 +121,15 @@ export const UI_BAR_RESERVED = 124; // TOOLBAR_H (112) + BOTTOM_MARGIN (12)
 //  │ toolbar (FRAME_BOTTOM)                │
 //  └──────────────────────────────────────┘
 
-export const FRAME_TOP = 28;
+export const FRAME_TOP = 6;
 export const FRAME_BOTTOM = 124; // toolbar + margin
-export const FRAME_LEFT = 12;   // thin left border
-export const RIGHT_PANEL_W = 260; // fixed width for the right info panel
+export const FRAME_LEFT = 6;    // thin border
+export const RIGHT_PANEL_W = 0; // no sidebar — full-screen game view with floating HUD
 
 /** Compute the viewfinder layout from the canvas dimensions (1920×1080). */
 export function computeViewfinderLayout(canvasW: number, canvasH: number) {
   const availH = canvasH - FRAME_TOP - FRAME_BOTTOM;
-  const gameW = canvasW - FRAME_LEFT - RIGHT_PANEL_W;  // game area width in pixels
+  const gameW = canvasW - FRAME_LEFT * 2;  // symmetric thin borders, full-width game area
 
   return {
     zoom: 1,                              // no zoom — viewport = game area
@@ -139,8 +139,8 @@ export function computeViewfinderLayout(canvasW: number, canvasH: number) {
     viewportH: availH,                    // exact game area height
     renderedW: gameW,
     leftMargin: FRAME_LEFT,
-    rightPanelX: FRAME_LEFT + gameW,      // where the right panel starts
-    rightPanelW: RIGHT_PANEL_W,
+    rightPanelX: canvasW,                 // no panel — off-screen
+    rightPanelW: 0,
     topMargin: FRAME_TOP,
     bottomMargin: FRAME_BOTTOM,
   };
