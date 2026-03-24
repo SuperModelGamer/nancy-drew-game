@@ -273,18 +273,18 @@ export class UIScene extends Phaser.Scene {
 
     // ── Chapter indicator ──
     this.borderChapterText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue,
+      fontFamily: FONT, fontSize: '13px', color: TextColors.mutedBlue,
       letterSpacing: 4, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 24;
 
     // ── Room name ──
     this.borderRoomNameText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '18px', color: '#c9a84c',
+      fontFamily: FONT, fontSize: '22px', color: '#c9a84c',
       fontStyle: 'bold', align: 'center', letterSpacing: 2,
       wordWrap: { width: rpW - pad * 2 },
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 44;
+    y += 50;
 
     // ── Art deco divider ──
     drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2, DecoColors.gold, 0.3);
@@ -292,26 +292,26 @@ export class UIScene extends Phaser.Scene {
 
     // ── ITEMS IN ROOM ──
     this.add.text(contentX, y, 'ITEMS IN ROOM', {
-      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue,
+      fontFamily: FONT, fontSize: '13px', color: TextColors.mutedBlue,
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 20;
 
     this.borderItemCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '28px', color: '#c9a84c',
+      fontFamily: FONT, fontSize: '32px', color: '#c9a84c',
       fontStyle: 'bold', align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 42;
 
     // ── PLACES TO CHECK ──
     this.add.text(contentX, y, 'PLACES TO CHECK', {
-      fontFamily: FONT, fontSize: '11px', color: '#c9a84c',
+      fontFamily: FONT, fontSize: '13px', color: '#c9a84c',
       letterSpacing: 2, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 20;
 
     this.borderRoomClueCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '24px', color: '#c9a84c',
+      fontFamily: FONT, fontSize: '28px', color: '#c9a84c',
       fontStyle: 'bold', align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 38;
@@ -323,13 +323,13 @@ export class UIScene extends Phaser.Scene {
 
     // ── ITEMS TOTAL ──
     this.add.text(contentX, y, 'ITEMS TOTAL', {
-      fontFamily: FONT, fontSize: '11px', color: '#ffffff',
+      fontFamily: FONT, fontSize: '13px', color: '#ffffff',
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 20;
 
     this.borderTotalItemCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '22px', color: '#ffffff',
+      fontFamily: FONT, fontSize: '26px', color: '#ffffff',
       align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 36;
@@ -341,20 +341,20 @@ export class UIScene extends Phaser.Scene {
 
     // ── CLUES TOTAL ──
     this.add.text(contentX, y, 'CLUES TOTAL', {
-      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue,
+      fontFamily: FONT, fontSize: '13px', color: TextColors.mutedBlue,
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 20;
 
     this.borderClueCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '24px', color: '#8a9aaa',
+      fontFamily: FONT, fontSize: '28px', color: '#8a9aaa',
       align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 38;
 
     // ── PROGRESS ──
     this.add.text(contentX, y, 'PROGRESS', {
-      fontFamily: FONT, fontSize: '10px', color: TextColors.mutedBlue,
+      fontFamily: FONT, fontSize: '13px', color: TextColors.mutedBlue,
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 20;
@@ -375,7 +375,7 @@ export class UIScene extends Phaser.Scene {
 
     y += barH + 6;
     this.borderProgressPct = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '11px', color: TextColors.goldDim,
+      fontFamily: FONT, fontSize: '13px', color: TextColors.goldDim,
       align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 22;
@@ -386,13 +386,13 @@ export class UIScene extends Phaser.Scene {
 
     // ── OBJECTIVE ──
     this.add.text(contentX, y, '\u2756  OBJECTIVE  \u2756', {
-      fontFamily: FONT, fontSize: '11px', color: '#c9a84c',
+      fontFamily: FONT, fontSize: '14px', color: '#c9a84c',
       letterSpacing: 2, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 24;
 
     this.borderQuestHintText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '15px', color: '#eed9a0',
+      fontFamily: FONT, fontSize: '18px', color: '#f0e0b8',
       fontStyle: 'italic', align: 'center',
       wordWrap: { width: rpW - pad * 2 + 4 },
       lineSpacing: 5,
@@ -408,14 +408,14 @@ export class UIScene extends Phaser.Scene {
     const musicSys = MusicSystem.getInstance();
 
     // Audio toggle (bell icon)
-    const audioBtn = this.add.text(contentX - 34, controlsY, '\u{1F514}', {
-      fontSize: '36px', color: TextColors.mutedBlue,
+    const audioBtn = this.add.text(contentX - 42, controlsY, '\u{1F50A}', {
+      fontSize: '42px', color: TextColors.mutedBlue,
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     audioBtn.setInteractive({ cursor: POINTER_CURSOR });
 
     const updateAudioIcon = () => {
       const muted = UISounds.getMusicVolume() <= 0;
-      audioBtn.setText(muted ? '\u{1F515}' : '\u{1F514}');
+      audioBtn.setText(muted ? '\u{1F507}' : '\u{1F50A}');
       audioBtn.setColor(muted ? '#4a4a5a' : TextColors.mutedBlue);
     };
     updateAudioIcon();
@@ -437,8 +437,8 @@ export class UIScene extends Phaser.Scene {
     });
 
     // Settings gear
-    const gearBtn = this.add.text(contentX + 34, controlsY, '\u2699', {
-      fontSize: '40px', color: TextColors.mutedBlue,
+    const gearBtn = this.add.text(contentX + 42, controlsY, '\u2699', {
+      fontSize: '46px', color: TextColors.mutedBlue,
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     gearBtn.setInteractive({ cursor: POINTER_CURSOR, hitArea: new Phaser.Geom.Rectangle(-12, -8, 64, 64), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
     gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));

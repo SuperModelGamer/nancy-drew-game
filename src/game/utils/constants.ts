@@ -124,7 +124,7 @@ export const UI_BAR_RESERVED = 124; // TOOLBAR_H (112) + BOTTOM_MARGIN (12)
 export const FRAME_TOP = 28;
 export const FRAME_BOTTOM = 124; // toolbar + margin
 export const FRAME_LEFT = 12;   // thin left border
-export const RIGHT_PANEL_W = 200; // fixed width for the right info panel
+export const RIGHT_PANEL_W = 260; // fixed width for the right info panel
 
 /** Compute the viewfinder layout from the canvas dimensions (1920×1080). */
 export function computeViewfinderLayout(canvasW: number, canvasH: number) {
