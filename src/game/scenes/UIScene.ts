@@ -242,9 +242,9 @@ export class UIScene extends Phaser.Scene {
   private createFloatingHUD(canvasW: number, fTop: number, _toolbarTop: number): void {
     const HUD_W = 280;
     const HUD_PAD = 16;
-    const HUD_MARGIN = 14;
-    const hudX = canvasW - HUD_W - HUD_MARGIN;
-    const hudY = fTop + HUD_MARGIN;
+    // Anchored flush to the frame edge — no floating margin
+    const hudX = canvasW - HUD_W - 6; // 6 = FRAME_LEFT border width
+    const hudY = fTop;
     const hudCx = HUD_W / 2;
 
     this.hudContainer = this.add.container(hudX, hudY).setDepth(Depths.tooltip);
