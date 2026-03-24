@@ -1,18 +1,15 @@
 /**
  * VideoCinematicScene — plays full-screen video cutscenes (.mp4/.webm).
  *
- * Supports optional subtitle tracks, skip functionality, and graceful
- * fallback when video files are missing (skips to target scene).
+ * Uses a native HTML <video> element overlaid on the Phaser canvas (same
+ * approach as IntroScene) for reliable, glitch-free fullscreen playback.
+ * Supports skip (button + ESC) and a red-curtain close transition.
  *
  * Usage:
  *   this.scene.start('VideoCinematicScene', {
- *     videoKey: 'cinematic_ghost_reveal',
+ *     videoKey: 'Cutscene01_lobby2auditorium',
  *     targetScene: 'RoomScene',
- *     targetData: { roomId: 'basement', skipCinematic: true },
- *     subtitles: [
- *       { time: 0, text: 'The Monarch Theatre, 1928.' },
- *       { time: 3.5, text: 'On the night of the final performance...' },
- *     ],
+ *     targetData: { roomId: 'auditorium', skipCinematic: true },
  *     onComplete?: { setFlag?: string; addJournal?: string },
  *   });
  */
@@ -21,23 +18,14 @@ import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { MusicSystem } from '../systems/MusicSystem';
 import { AmbientAudioSystem } from '../systems/AmbientAudioSystem';
-import { UISounds } from '../utils/sounds';
-import { FONT } from '../utils/constants';
 
-interface Subtitle {
-  /** Time in seconds when this subtitle appears */
-  time: number;
-  /** Subtitle text to display */
-  text: string;
-  /** Duration in seconds (default: auto until next subtitle or 4s) */
-  duration?: number;
-}
+const GOLD = 'rgba(201, 168, 76,';
 
 interface VideoCinematicData {
   videoKey: string;
   targetScene: string;
   targetData?: Record<string, unknown>;
-  subtitles?: Subtitle[];
+  subtitles?: unknown[];          // kept for interface compat — ignored
   onComplete?: {
     setFlag?: string;
     addJournal?: string;
@@ -46,10 +34,11 @@ interface VideoCinematicData {
 
 export class VideoCinematicScene extends Phaser.Scene {
   private videoData!: VideoCinematicData;
-  private video!: Phaser.GameObjects.Video;
-  private subtitleText!: Phaser.GameObjects.Text;
-  private subtitleBg!: Phaser.GameObjects.Rectangle;
-  private completed = false;
+  private videoEl: HTMLVideoElement | null = null;
+  private skipBtn: HTMLButtonElement | null = null;
+  private container: HTMLDivElement | null = null;
+  private escHandler: ((e: KeyboardEvent) => void) | null = null;
+  private ended = false;
 
   constructor() {
     super({ key: 'VideoCinematicScene' });
@@ -57,117 +46,128 @@ export class VideoCinematicScene extends Phaser.Scene {
 
   init(data: VideoCinematicData): void {
     this.videoData = data;
-    this.completed = false;
+    this.ended = false;
   }
 
   create(): void {
-    const { width, height } = this.cameras.main;
-
-    // Check if video exists — fallback to target scene if not
-    if (!this.textures.exists(this.videoData.videoKey) && !this.cache.video.exists(this.videoData.videoKey)) {
-      this.finishAndTransition();
-      return;
-    }
-
     // Hide UIScene during video
     if (this.scene.isActive('UIScene')) {
       this.scene.setVisible(false, 'UIScene');
       this.scene.setActive(false, 'UIScene');
     }
-    // Stop background music and ambient audio so they don't overlap video audio
+
+    // Stop background music and ambient audio — video has its own audio track
     MusicSystem.getInstance().stop();
     AmbientAudioSystem.getInstance().stopAll();
 
-    // Black background
-    this.add.rectangle(width / 2, height / 2, width, height, 0x000000).setDepth(0);
+    // Black background behind everything
+    const { width, height } = this.cameras.main;
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000);
 
-    // Video player — fill screen
-    try {
-      this.video = this.add.video(width / 2, height / 2, this.videoData.videoKey);
-      const videoScale = Math.max(width / this.video.width, height / this.video.height);
-      this.video.setScale(videoScale);
-      this.video.setDepth(1);
-      this.video.play();
-
-      // When video ends naturally, transition
-      this.video.on('complete', () => {
-        this.finishAndTransition();
-      });
-    } catch {
-      // Video playback failed — skip
+    // Get the Phaser canvas to position the video over it
+    const canvas = this.game.canvas;
+    const parent = canvas.parentElement;
+    if (!parent) {
       this.finishAndTransition();
       return;
     }
 
-    // Subtitle overlay
-    this.subtitleBg = this.add.rectangle(width / 2, height - 80, width, 60, 0x000000, 0.7);
-    this.subtitleBg.setDepth(2).setAlpha(0);
+    // Create a container div that covers the full canvas area
+    this.container = document.createElement('div');
+    this.container.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 10;
+      overflow: hidden;
+    `;
+    parent.style.position = 'relative';
+    parent.appendChild(this.container);
 
-    this.subtitleText = this.add.text(width / 2, height - 80, '', {
-      fontFamily: FONT,
-      fontSize: '28px',
-      color: '#ffffff',
-      align: 'center',
-      wordWrap: { width: width * 0.8 },
-    }).setOrigin(0.5).setDepth(3).setAlpha(0);
+    // Create native HTML video element — fills entire screen at 1920x1080
+    this.videoEl = document.createElement('video');
+    this.videoEl.src = `assets/cinematics/${this.videoData.videoKey}.mp4`;
+    this.videoEl.playsInline = true;
+    this.videoEl.preload = 'auto';
+    this.videoEl.style.cssText = `
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: cover;
+    `;
+    this.container.appendChild(this.videoEl);
 
-    // Schedule subtitles
-    if (this.videoData.subtitles) {
-      for (let i = 0; i < this.videoData.subtitles.length; i++) {
-        const sub = this.videoData.subtitles[i];
-        const nextSub = this.videoData.subtitles[i + 1];
-        const duration = sub.duration ?? (nextSub ? nextSub.time - sub.time : 4);
-
-        this.time.delayedCall(sub.time * 1000, () => {
-          this.showSubtitle(sub.text, duration);
-        });
+    // Skip button — gold, matching IntroScene exactly
+    this.skipBtn = document.createElement('button');
+    this.skipBtn.textContent = 'SKIP \u25B6';
+    this.skipBtn.style.cssText = `
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      background: none;
+      border: 1px solid ${GOLD} 0.4);
+      color: ${GOLD} 0.7);
+      font-family: 'Crimson Text', 'Georgia', serif;
+      font-size: 18px;
+      letter-spacing: 2px;
+      padding: 6px 16px;
+      cursor: pointer;
+      z-index: 13;
+      opacity: 0;
+      transition: opacity 1.5s ease, color 0.2s, border-color 0.2s;
+    `;
+    this.skipBtn.addEventListener('mouseenter', () => {
+      if (this.skipBtn) {
+        this.skipBtn.style.color = `${GOLD} 1)`;
+        this.skipBtn.style.borderColor = `${GOLD} 0.8)`;
       }
-    }
+    });
+    this.skipBtn.addEventListener('mouseleave', () => {
+      if (this.skipBtn) {
+        this.skipBtn.style.color = `${GOLD} 0.7)`;
+        this.skipBtn.style.borderColor = `${GOLD} 0.4)`;
+      }
+    });
+    this.skipBtn.addEventListener('click', () => this.endVideo());
+    this.container.appendChild(this.skipBtn);
 
-    // Skip button — appears after 1.5 seconds
-    this.time.delayedCall(1500, () => {
-      const skipBtn = this.add.text(width - 30, 30, 'SKIP ▸▸', {
-        fontFamily: FONT,
-        fontSize: '18px',
-        color: '#888888',
-        backgroundColor: '#00000080',
-        padding: { x: 12, y: 6 },
-      }).setOrigin(1, 0).setDepth(10);
-      skipBtn.setInteractive({ cursor: 'pointer' });
-      skipBtn.on('pointerover', () => skipBtn.setColor('#ffffff'));
-      skipBtn.on('pointerout', () => skipBtn.setColor('#888888'));
-      skipBtn.on('pointerdown', () => {
-        UISounds.click();
-        this.finishAndTransition();
-      });
+    // Show skip button after 1.5s
+    setTimeout(() => {
+      if (this.skipBtn) this.skipBtn.style.opacity = '1';
+    }, 1500);
+
+    // ESC to skip
+    this.escHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        document.removeEventListener('keydown', this.escHandler!);
+        this.endVideo();
+      }
+    };
+    document.addEventListener('keydown', this.escHandler);
+
+    // Play the video
+    this.videoEl.play().catch(() => {
+      // Autoplay blocked — skip to target scene
+      this.endVideo();
     });
 
-    // Also allow Escape to skip
-    this.input.keyboard!.on('keydown-ESC', () => {
-      this.finishAndTransition();
-    });
+    // When video ends naturally
+    this.videoEl.addEventListener('ended', () => this.endVideo());
   }
 
-  private showSubtitle(text: string, duration: number): void {
-    this.subtitleText.setText(text);
-    this.tweens.add({ targets: [this.subtitleText, this.subtitleBg], alpha: 1, duration: 300 });
-    this.time.delayedCall(duration * 1000, () => {
-      this.tweens.add({ targets: [this.subtitleText, this.subtitleBg], alpha: 0, duration: 300 });
-    });
-  }
+  private endVideo(): void {
+    if (this.ended) return;
+    this.ended = true;
 
-  private finishAndTransition(): void {
-    if (this.completed) return;
-    this.completed = true;
-
-    // Cancel all pending subtitle timers and tweens
-    this.time.removeAllEvents();
-    this.tweens.killAll();
-
-    // Stop any SFX that might be playing
-    UISounds.stopAll();
-
-    // Apply completion effects
+    // Apply completion effects (flags, journal)
     if (this.videoData.onComplete) {
       const save = SaveSystem.getInstance();
       if (this.videoData.onComplete.setFlag) {
@@ -178,8 +178,82 @@ export class VideoCinematicScene extends Phaser.Scene {
       }
     }
 
-    // Stop video
-    try { this.video?.stop(); } catch { /* ok */ }
+    if (!this.container) {
+      this.finishAndTransition();
+      return;
+    }
+
+    // Red curtain close effect — two crimson panels slide in from left and right
+    const curtainStyle = `
+      position: absolute;
+      top: 0;
+      width: 52%;
+      height: 100%;
+      background: linear-gradient(90deg, #2a0505 0%, #4a0a0a 40%, #5a1010 60%, #4a0a0a 100%);
+      z-index: 14;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    `;
+
+    const leftCurtain = document.createElement('div');
+    leftCurtain.style.cssText = curtainStyle + 'left: 0; transform: translateX(-100%);';
+
+    const rightCurtain = document.createElement('div');
+    rightCurtain.style.cssText = curtainStyle + 'right: 0; transform: translateX(100%);';
+
+    // Gold fringe line on inner edge of each curtain
+    const fringeStyle = `
+      position: absolute;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(201,168,76,0.6) 0%, rgba(201,168,76,0.3) 50%, rgba(201,168,76,0.6) 100%);
+    `;
+    const fringeL = document.createElement('div');
+    fringeL.style.cssText = fringeStyle + 'right: 0;';
+    leftCurtain.appendChild(fringeL);
+
+    const fringeR = document.createElement('div');
+    fringeR.style.cssText = fringeStyle + 'left: 0;';
+    rightCurtain.appendChild(fringeR);
+
+    this.container.appendChild(leftCurtain);
+    this.container.appendChild(rightCurtain);
+
+    // Trigger the slide-in animation
+    requestAnimationFrame(() => {
+      leftCurtain.style.transform = 'translateX(0)';
+      rightCurtain.style.transform = 'translateX(0)';
+    });
+
+    // After curtains close, clean up and transition
+    setTimeout(() => {
+      this.cleanup();
+      this.finishAndTransition();
+    }, 900);
+  }
+
+  private cleanup(): void {
+    // Remove ESC handler
+    if (this.escHandler) {
+      document.removeEventListener('keydown', this.escHandler);
+      this.escHandler = null;
+    }
+
+    if (this.videoEl) {
+      this.videoEl.pause();
+      this.videoEl.removeAttribute('src');
+      this.videoEl.load(); // Release memory
+      this.videoEl = null;
+    }
+    if (this.container) {
+      this.container.remove();
+      this.container = null;
+    }
+    this.skipBtn = null;
+  }
+
+  private finishAndTransition(): void {
+    this.cleanup();
 
     // Restore UIScene
     if (this.scene.manager.getScene('UIScene')) {
@@ -188,10 +262,14 @@ export class VideoCinematicScene extends Phaser.Scene {
       this.scene.bringToTop('UIScene');
     }
 
-    // Fade to black then transition
-    this.cameras.main.fadeOut(500, 0, 0, 0);
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start(this.videoData.targetScene, this.videoData.targetData || {});
-    });
+    this.scene.start(this.videoData.targetScene, this.videoData.targetData || {});
+  }
+
+  shutdown(): void {
+    this.cleanup();
+  }
+
+  destroy(): void {
+    this.cleanup();
   }
 }

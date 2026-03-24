@@ -27,10 +27,8 @@ interface CinematicEvent {
   id: string;
   triggerRoom: string;
   triggerFlag: string;
-  /** If set, checks for this video key — plays via VideoCinematicScene if the asset exists. */
+  /** If set, plays via VideoCinematicScene (native HTML video). */
   videoKey?: string;
-  /** Subtitles for the video version (used with VideoCinematicScene). */
-  videoSubtitles?: Array<{ time: number; text: string; duration?: number }>;
   slides: Slide[];
   onComplete?: {
     setFlag?: string;
@@ -49,162 +47,7 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
     triggerRoom: 'auditorium',
     triggerFlag: '',
     videoKey: 'Cutscene01_lobby2auditorium',
-    videoSubtitles: [],
-    slides: [
-      {
-        lines: [
-          'The auditorium takes my breath away.',
-          '',
-          'Even abandoned, even condemned —',
-          'you can feel what this place was.',
-        ],
-        effect: 'fade',
-        pauseAfter: 800,
-        voiceover: 'vo_intro_01',
-        bgImage: 'intro_marquee_lights',
-        bgAlpha: 0.7,
-        camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: -8 },
-        vignetteIntensity: 0.8,
-        letterbox: true,
-        audio: [
-          { key: 'ambient_theater', volume: 0.3, loop: true },
-        ],
-      },
-      {
-        lines: [
-          'A thousand red velvet seats face the stage.',
-          'The curtain hangs in tatters,',
-          'but the gold fringe still catches the light.',
-        ],
-        effect: 'typewriter',
-        pauseAfter: 800,
-        voiceover: 'vo_intro_02',
-        bgImage: 'intro_stage_1928',
-        bgAlpha: 0.65,
-        camera: { scaleFrom: 1.0, scaleTo: 1.1, panY: -12 },
-        vignetteIntensity: 0.6,
-        letterbox: true,
-      },
-      {
-        lines: [
-          'This is where it happened.',
-          'Halloween night, 1928.',
-          'The final performance of "The Crimson Veil."',
-        ],
-        effect: 'dramatic',
-        pauseAfter: 800,
-        voiceover: 'vo_intro_03',
-        bgImage: 'intro_stage_1928',
-        bgAlpha: 0.55,
-        camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -6 },
-        vignetteIntensity: 0.7,
-        letterbox: true,
-      },
-      {
-        lines: [
-          'Margaux Fontaine was the star.',
-          'They say she lit up the room',
-          'just by walking on stage.',
-        ],
-        effect: 'fade',
-        pauseAfter: 800,
-        voiceover: 'vo_intro_04',
-        bgImage: 'intro_goblet',
-        bgAlpha: 0.55,
-        camera: { scaleFrom: 1.0, scaleTo: 1.15, panY: 8 },
-        vignetteIntensity: 0.7,
-        letterbox: true,
-        effects: [
-          { type: 'spotlight', delay: 200, duration: 3000 },
-        ],
-      },
-      {
-        lines: [
-          'That night, in Act Three,',
-          'she raised a golden goblet to her lips.',
-          '',
-          'She drank. She stumbled.',
-        ],
-        effect: 'typewriter',
-        pauseAfter: 800,
-        voiceover: 'vo_intro_05',
-        bgImage: 'intro_goblet',
-        bgAlpha: 0.45,
-        camera: { scaleFrom: 1.0, scaleTo: 1.12, panY: 5 },
-        vignetteIntensity: 0.8,
-        letterbox: true,
-        audio: [
-          { key: 'sfx_goblet', delay: 800, volume: 0.5 },
-        ],
-      },
-      {
-        lines: [
-          'The audience thought it was part of the show.',
-          '',
-          'It wasn\'t.',
-        ],
-        effect: 'fade',
-        pauseAfter: 800,
-        voiceover: 'vo_intro_06',
-        bgImage: 'intro_goblet',
-        bgAlpha: 0.35,
-        camera: { scaleFrom: 1.12, scaleTo: 1.3, panY: 15 },
-        vignetteIntensity: 0.9,
-        letterbox: true,
-        audio: [
-          { key: 'sfx_thud', delay: 1000, volume: 0.5 },
-        ],
-        effects: [
-          { type: 'screenShake', delay: 1000, duration: 500 },
-          { type: 'heartbeat', delay: 1200, duration: 2500 },
-        ],
-      },
-      {
-        lines: [
-          'The official report called it a tragic accident.',
-          'Arsenic in a prop goblet.',
-        ],
-        effect: 'fade',
-        pauseAfter: 800,
-        voiceover: 'vo_intro_07',
-        bgImage: 'intro_newspaper',
-        bgAlpha: 0.6,
-        camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -6 },
-        vignetteIntensity: 0.5,
-        letterbox: true,
-      },
-      {
-        lines: [
-          'But ninety-seven years later,',
-          'no one has ever explained how arsenic',
-          'got into a theater prop.',
-          '',
-          'Someone in this audience knew the truth.',
-          'And they took it to their grave.',
-        ],
-        effect: 'typewriter',
-        pauseAfter: 800,
-        bgImage: 'intro_backstage',
-        bgAlpha: 0.45,
-        camera: { scaleFrom: 1.0, scaleTo: 1.1, panX: 12 },
-        vignetteIntensity: 0.7,
-        letterbox: true,
-        audio: [
-          { key: 'proc:ghostDrone', delay: 500, volume: 0.2 },
-        ],
-      },
-      {
-        lines: [
-          '...Or did they?',
-        ],
-        effect: 'dramatic',
-        pauseAfter: 1200,
-        bgImage: 'intro_backstage',
-        bgAlpha: 0.3,
-        vignetteIntensity: 0.9,
-        letterbox: true,
-      },
-    ],
+    slides: [],
     onComplete: {
       setFlag: 'learned_1928_murder',
       addJournal: 'The auditorium where Margaux Fontaine died on stage in 1928. Arsenic in a prop goblet — the papers called it an accident, but no one ever explained how poison got into a theater prop. Someone in the audience knew the truth.',
@@ -221,21 +64,6 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
     triggerRoom: 'managers_office',
     triggerFlag: '',
     videoKey: 'cinematic_copycat',
-    videoSubtitles: [
-      { time: 1.0,  text: 'The manager\'s office still smells like cigars and old paper.' },
-      { time: 5.0,  text: 'Roland Ashworth\'s briefcase sits on the desk, half-packed. Demolition blueprints are pinned to the wall.' },
-      { time: 11.0, text: 'This is where they found him. Last night. Slumped over this desk.' },
-      { time: 16.0, text: 'Poisoned.' },
-      { time: 18.5, text: 'The police report says he complained of dizziness at nine. By 9:30, he couldn\'t stand.' },
-      { time: 24.0, text: 'They rushed him to River Heights General. He survived — barely.' },
-      { time: 29.0, text: 'The toxicology results sent a chill down my spine.' },
-      { time: 33.0, text: 'Not just poison. The same poison. The same concentration. The same delivery method.' },
-      { time: 39.0, text: 'Someone studied Margaux Fontaine\'s death down to the last detail.' },
-      { time: 44.0, text: 'And they recreated it. Here. In the same theater. Ninety-seven years to the day.' },
-      { time: 50.0, text: 'This isn\'t a coincidence. This is a message.' },
-      { time: 54.0, text: 'But who is it meant for?' },
-      { time: 57.0, text: '' },
-    ],
     slides: [
       {
         lines: [
@@ -357,22 +185,6 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
     triggerRoom: 'backstage',
     triggerFlag: '',
     videoKey: 'cinematic_ghost_rumors',
-    videoSubtitles: [
-      { time: 1.0,  text: 'Backstage at the Monarch is a maze of ropes, pulleys, and faded memories.' },
-      { time: 6.0,  text: 'Costumes from decades of performances hang like ghosts on their racks.' },
-      { time: 10.5, text: 'The air smells like sawdust and greasepaint.' },
-      { time: 14.0, text: 'But something feels wrong. The hairs on my arms are standing up.' },
-      { time: 19.0, text: 'Vivian told me the crew has been talking. Strange things happening after dark.' },
-      { time: 24.0, text: 'Lights turning on in empty rooms. Footsteps above the stage when no one\'s on the catwalk.' },
-      { time: 30.0, text: 'And then there\'s the figure.' },
-      { time: 33.0, text: 'A woman in white, standing center stage under the ghost light.' },
-      { time: 37.5, text: 'They\'ve seen her three times this week.' },
-      { time: 41.0, text: '"The ghost of Margaux Fontaine," they whisper. "She\'s come back for the final show."' },
-      { time: 47.0, text: 'I don\'t believe in ghosts.' },
-      { time: 50.0, text: 'But I believe someone wants the people in this theater to be afraid.' },
-      { time: 55.0, text: 'The question is — why?' },
-      { time: 58.0, text: '' },
-    ],
     slides: [
       {
         lines: [
@@ -494,25 +306,6 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
     triggerRoom: 'auditorium',
     triggerFlag: 'seen_event_ghost_rumors',
     videoKey: 'cinematic_ghost_sighting',
-    videoSubtitles: [
-      { time: 1.0,  text: 'I came back to the auditorium to check the rigging. Something about the spotlight controls didn\'t add up.' },
-      { time: 7.0,  text: 'That\'s when the lights went out.' },
-      { time: 10.0, text: 'Not all at once — they dimmed, slowly, like someone was turning a dial.' },
-      { time: 15.0, text: 'Then I saw her.' },
-      { time: 18.0, text: 'A figure in white, standing center stage. Perfectly still.' },
-      { time: 22.5, text: 'A pale light fell around her like a halo.' },
-      { time: 26.0, text: 'My heart was pounding so loud I was sure she could hear it.' },
-      { time: 30.0, text: 'She turned toward me.' },
-      { time: 33.0, text: 'For one impossible second, I saw her face. High cheekbones. Dark eyes.' },
-      { time: 38.0, text: 'The face from a hundred old playbills. Margaux Fontaine.' },
-      { time: 43.0, text: 'The lights surged. I threw my hand over my eyes.' },
-      { time: 47.0, text: 'When I looked again, the stage was empty. Just the ghost light, burning alone.' },
-      { time: 53.0, text: 'But I could smell something. Faint. Unmistakable.' },
-      { time: 57.0, text: 'Old roses.' },
-      { time: 60.0, text: 'Ghost or hoax — someone is going to a lot of trouble to haunt this theater.' },
-      { time: 65.0, text: 'And I\'m going to find out who.' },
-      { time: 68.0, text: '' },
-    ],
     slides: [
       {
         lines: [
@@ -710,13 +503,12 @@ export class CinematicScene extends BaseSlideScene {
     this.targetRoom = data.targetRoom;
     this.eventCompleted = false;
 
-    // If a video version exists, redirect to VideoCinematicScene
-    if (event.videoKey && this.game.cache?.video?.exists(event.videoKey)) {
+    // If a video version exists, redirect to VideoCinematicScene (native HTML video)
+    if (event.videoKey) {
       this.scene.start('VideoCinematicScene', {
         videoKey: event.videoKey,
         targetScene: 'RoomScene',
         targetData: { roomId: data.targetRoom, skipCinematic: true },
-        subtitles: event.videoSubtitles ?? [],
         onComplete: event.onComplete,
       });
       return;
