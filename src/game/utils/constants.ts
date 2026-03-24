@@ -122,7 +122,7 @@ export const UI_BAR_RESERVED = 124; // TOOLBAR_H (112) + BOTTOM_MARGIN (12)
 //  └──────────────────────────────────────┘
 
 export const FRAME_TOP = 6;
-export const FRAME_BOTTOM = 124; // toolbar + margin
+export const FRAME_BOTTOM = 6; // thin border — toolbar is now a collapsible overlay
 export const FRAME_LEFT = 6;    // thin border
 export const RIGHT_PANEL_W = 0; // no sidebar — full-screen game view with floating HUD
 
