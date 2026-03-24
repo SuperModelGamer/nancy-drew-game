@@ -389,26 +389,61 @@ export class UIScene extends Phaser.Scene {
 
     // ── Quest Hint / Objective ──
     this.add.text(contentX, y, 'OBJECTIVE', {
-      fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+      fontFamily: FONT, fontSize: '10px', color: TextColors.mutedBlue,
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 18;
+    y += 20;
 
     this.borderQuestHintText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '13px', color: '#d4c5a0',
+      fontFamily: FONT, fontSize: '16px', color: '#e8d8b0',
       fontStyle: 'italic', align: 'center',
-      wordWrap: { width: rpW - pad * 2 - 4 },
-      lineSpacing: 3,
+      wordWrap: { width: rpW - pad * 2 },
+      lineSpacing: 5,
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 90; // reserve space for hint text
+    y += 100; // reserve space for hint text
 
-    // ── Art deco divider before gear ──
+    // ── Art deco divider before controls ──
     drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2 - 10, DecoColors.gold, 0.2);
-    y += 26;
+    y += 22;
 
-    // ── Settings gear (enlarged, below counters) ──
-    const gearBtn = this.add.text(contentX, y, '⚙', {
-      fontSize: '48px', color: TextColors.mutedBlue,
+    // ── Audio toggle + Settings gear (side by side) ──
+    const controlsY = y;
+    const musicSys = MusicSystem.getInstance();
+
+    // Audio toggle (chime icon)
+    const audioBtn = this.add.text(contentX - 32, controlsY, '\u{1F514}', {
+      fontSize: '32px', color: TextColors.mutedBlue,
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    audioBtn.setInteractive({ cursor: POINTER_CURSOR });
+
+    const updateAudioIcon = () => {
+      const muted = UISounds.getMusicVolume() <= 0;
+      audioBtn.setText(muted ? '\u{1F515}' : '\u{1F514}');
+      audioBtn.setColor(muted ? '#4a4a5a' : TextColors.mutedBlue);
+    };
+    updateAudioIcon();
+
+    audioBtn.on('pointerover', () => audioBtn.setColor(TextColors.gold));
+    audioBtn.on('pointerout', () => updateAudioIcon());
+    audioBtn.on('pointerdown', () => {
+      UISounds.click();
+      const currentVol = UISounds.getMusicVolume();
+      if (currentVol > 0) {
+        // Mute — store previous volume and set to 0
+        audioBtn.setData('prevVol', currentVol);
+        UISounds.setMusicVolume(0);
+      } else {
+        // Unmute — restore previous volume
+        const prev = (audioBtn.getData('prevVol') as number) || 0.5;
+        UISounds.setMusicVolume(prev);
+      }
+      musicSys.updateVolume();
+      updateAudioIcon();
+    });
+
+    // Settings gear
+    const gearBtn = this.add.text(contentX + 32, controlsY, '⚙', {
+      fontSize: '36px', color: TextColors.mutedBlue,
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     gearBtn.setInteractive({ cursor: POINTER_CURSOR, hitArea: new Phaser.Geom.Rectangle(-8, -8, 64, 64), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
     gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));

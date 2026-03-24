@@ -3,11 +3,11 @@
  * arpeggiated patterns, and delay effects for a 1920s theater mystery.
  *
  * Each track features:
- *  - Chord progressions that cycle with smooth frequency glide (pad layer)
+ *  - Chord progressions that crossfade cleanly (no pitch sliding)
  *  - Piano-like arpeggiated patterns following the current chord
  *  - Sub-bass following the chord root
  *  - Delay effect for spatial depth and reverb
- *  - Vibrato and filter modulation for organic movement
+ *  - Subtle vibrato and filter modulation for organic movement
  *
  * Tracks:
  *  - Chandelier Dreams: Elegant jazz arpeggios (lobby)
@@ -76,17 +76,17 @@ export const MUSIC_TRACKS: MusicTrackDef[] = [
       [196.0, 247.0, 293.7, 349.2],  // G7
     ],
     chordDuration: 8,
-    arpInterval: 380,
+    arpInterval: 340,
     padWave: 'triangle',
-    padVolume: 0.06,
-    arpVolume: 0.055,
-    bassVolume: 0.045,
-    filterCutoff: 2200,
+    padVolume: 0.04,
+    arpVolume: 0.07,
+    bassVolume: 0.035,
+    filterCutoff: 2400,
     delayTime: 0.33,
-    delayFeedback: 0.25,
-    delayMix: 0.18,
+    delayFeedback: 0.18,
+    delayMix: 0.14,
     vibratoRate: 4.5,
-    vibratoDepth: 4,
+    vibratoDepth: 1.5,
   },
   {
     id: 'midnight_theatre',
@@ -103,17 +103,17 @@ export const MUSIC_TRACKS: MusicTrackDef[] = [
       [164.8, 207.7, 247.0, 293.7],  // E7
     ],
     chordDuration: 10,
-    arpInterval: 500,
+    arpInterval: 450,
     padWave: 'sine',
-    padVolume: 0.07,
-    arpVolume: 0.04,
-    bassVolume: 0.05,
-    filterCutoff: 1200,
-    delayTime: 0.45,
-    delayFeedback: 0.30,
-    delayMix: 0.25,
+    padVolume: 0.045,
+    arpVolume: 0.06,
+    bassVolume: 0.04,
+    filterCutoff: 1400,
+    delayTime: 0.4,
+    delayFeedback: 0.2,
+    delayMix: 0.18,
     vibratoRate: 3.5,
-    vibratoDepth: 5,
+    vibratoDepth: 2,
   },
   {
     id: 'velvet_curtain',
@@ -130,17 +130,17 @@ export const MUSIC_TRACKS: MusicTrackDef[] = [
       [146.8, 174.6, 220.0, 261.6],  // Dm7
     ],
     chordDuration: 9,
-    arpInterval: 350,
+    arpInterval: 320,
     padWave: 'triangle',
-    padVolume: 0.06,
-    arpVolume: 0.05,
-    bassVolume: 0.04,
-    filterCutoff: 1600,
+    padVolume: 0.04,
+    arpVolume: 0.065,
+    bassVolume: 0.03,
+    filterCutoff: 1800,
     delayTime: 0.28,
-    delayFeedback: 0.20,
-    delayMix: 0.15,
+    delayFeedback: 0.15,
+    delayMix: 0.12,
     vibratoRate: 4.0,
-    vibratoDepth: 4,
+    vibratoDepth: 1.5,
   },
   {
     id: 'gaslight',
@@ -157,17 +157,17 @@ export const MUSIC_TRACKS: MusicTrackDef[] = [
       [164.8, 196.0, 247.0, 293.7],  // Em7
     ],
     chordDuration: 12,
-    arpInterval: 600,
+    arpInterval: 550,
     padWave: 'sine',
-    padVolume: 0.055,
-    arpVolume: 0.045,
-    bassVolume: 0.04,
-    filterCutoff: 1000,
-    delayTime: 0.50,
-    delayFeedback: 0.35,
-    delayMix: 0.30,
+    padVolume: 0.035,
+    arpVolume: 0.06,
+    bassVolume: 0.03,
+    filterCutoff: 1100,
+    delayTime: 0.45,
+    delayFeedback: 0.22,
+    delayMix: 0.2,
     vibratoRate: 3.0,
-    vibratoDepth: 6,
+    vibratoDepth: 2,
   },
   {
     id: 'empty_stage',
@@ -184,17 +184,17 @@ export const MUSIC_TRACKS: MusicTrackDef[] = [
       [196.0, 233.1, 293.7, 349.2],  // Gm7
     ],
     chordDuration: 11,
-    arpInterval: 520,
+    arpInterval: 480,
     padWave: 'sine',
-    padVolume: 0.06,
-    arpVolume: 0.04,
-    bassVolume: 0.045,
-    filterCutoff: 900,
-    delayTime: 0.55,
-    delayFeedback: 0.35,
-    delayMix: 0.30,
+    padVolume: 0.04,
+    arpVolume: 0.055,
+    bassVolume: 0.035,
+    filterCutoff: 1000,
+    delayTime: 0.5,
+    delayFeedback: 0.22,
+    delayMix: 0.2,
     vibratoRate: 2.8,
-    vibratoDepth: 6,
+    vibratoDepth: 2.5,
   },
 ];
 
@@ -341,45 +341,20 @@ export class MusicSystem {
     this.filterNode.connect(this.dryGain);
     this.filterNode.connect(this.delayNode); // send to delay too
 
-    // ── Slow filter sweep LFO for organic movement ──
+    // ── Subtle filter sweep LFO (very gentle movement) ──
     this.filterLFO = ctx.createOscillator();
     this.filterLFO.type = 'sine';
-    this.filterLFO.frequency.setValueAtTime(0.04, now);
+    this.filterLFO.frequency.setValueAtTime(0.03, now);
     this.filterLFOGain = ctx.createGain();
-    this.filterLFOGain.gain.setValueAtTime(track.filterCutoff * 0.25, now);
+    this.filterLFOGain.gain.setValueAtTime(track.filterCutoff * 0.1, now);
     this.filterLFO.connect(this.filterLFOGain);
     this.filterLFOGain.connect(this.filterNode.frequency);
     this.filterLFO.start(now);
 
     // ── Pad voices (4 voices × 2 detuned oscillators for chorus) ──
-    const chord = track.chords[0];
-    for (let i = 0; i < 4; i++) {
-      const freq = chord[i] ?? chord[0];
+    this.createPadVoices(ctx, track, track.chords[0], now);
 
-      const osc1 = ctx.createOscillator();
-      osc1.type = track.padWave;
-      osc1.frequency.setValueAtTime(freq, now);
-      osc1.detune.setValueAtTime(-7, now);
-
-      const osc2 = ctx.createOscillator();
-      osc2.type = track.padWave;
-      osc2.frequency.setValueAtTime(freq, now);
-      osc2.detune.setValueAtTime(7, now);
-
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(track.padVolume, now);
-
-      osc1.connect(gain);
-      osc2.connect(gain);
-      gain.connect(this.filterNode);
-
-      osc1.start(now);
-      osc2.start(now);
-
-      this.padVoices.push({ osc1, osc2, gain });
-    }
-
-    // ── Vibrato LFO for pads ──
+    // ── Vibrato LFO for pads (subtle) ──
     this.vibratoLFO = ctx.createOscillator();
     this.vibratoLFO.type = 'sine';
     this.vibratoLFO.frequency.setValueAtTime(track.vibratoRate, now);
@@ -395,19 +370,61 @@ export class MusicSystem {
     // ── Bass (root note one octave below chord, bypasses filter for clarity) ──
     this.bassOsc = ctx.createOscillator();
     this.bassOsc.type = 'sine';
-    this.bassOsc.frequency.setValueAtTime(chord[0] / 2, now);
+    this.bassOsc.frequency.setValueAtTime(track.chords[0][0] / 2, now);
     this.bassGain = ctx.createGain();
     this.bassGain.gain.setValueAtTime(track.bassVolume, now);
     this.bassOsc.connect(this.bassGain);
     this.bassGain.connect(this.masterGain);
     this.bassOsc.start(now);
 
-    // ── Fade in over 3 seconds ──
-    this.masterGain.gain.linearRampToValueAtTime(musicVol, now + 3);
+    // ── Fade in over 2.5 seconds ──
+    this.masterGain.gain.linearRampToValueAtTime(musicVol, now + 2.5);
 
     // ── Start chord progression and arpeggiator ──
     this.scheduleChordChange(track);
     this.scheduleArpNote(track);
+  }
+
+  /** Create pad oscillator voices for a chord */
+  private createPadVoices(
+    ctx: AudioContext, track: MusicTrackDef, chord: number[], now: number, fadeIn = false,
+  ): void {
+    for (let i = 0; i < 4; i++) {
+      const freq = chord[i] ?? chord[0];
+
+      const osc1 = ctx.createOscillator();
+      osc1.type = track.padWave;
+      osc1.frequency.setValueAtTime(freq, now);
+      osc1.detune.setValueAtTime(-3, now);
+
+      const osc2 = ctx.createOscillator();
+      osc2.type = track.padWave;
+      osc2.frequency.setValueAtTime(freq, now);
+      osc2.detune.setValueAtTime(3, now);
+
+      const gain = ctx.createGain();
+      if (fadeIn) {
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(track.padVolume, now + 1.5);
+      } else {
+        gain.gain.setValueAtTime(track.padVolume, now);
+      }
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(this.filterNode!);
+
+      // Connect vibrato if available
+      if (this.vibratoGain) {
+        this.vibratoGain.connect(osc1.detune);
+        this.vibratoGain.connect(osc2.detune);
+      }
+
+      osc1.start(now);
+      osc2.start(now);
+
+      this.padVoices.push({ osc1, osc2, gain });
+    }
   }
 
   // ── Chord progression ─────────────────────────────────────────────────
@@ -420,39 +437,59 @@ export class MusicSystem {
     }, track.chordDuration * 1000);
   }
 
+  /** Crossfade to the next chord — no pitch sliding */
   private advanceChord(track: MusicTrackDef): void {
-    if (!this.playing || !this.audioCtx) return;
+    const ctx = this.audioCtx;
+    if (!this.playing || !ctx || !this.filterNode) return;
 
     this.chordIndex = (this.chordIndex + 1) % track.chords.length;
     const chord = track.chords[this.chordIndex];
-    const now = this.audioCtx.currentTime;
-    const glide = 3; // seconds — smooth portamento between chords
+    const now = ctx.currentTime;
+    const fadeTime = 1.5;
 
-    // Glide pad voices to new chord tones
-    for (let i = 0; i < this.padVoices.length; i++) {
-      const freq = chord[i] ?? chord[0];
+    // Fade out old pad voices
+    const oldVoices = [...this.padVoices];
+    for (const v of oldVoices) {
       try {
-        this.padVoices[i].osc1.frequency.linearRampToValueAtTime(freq, now + glide);
-        this.padVoices[i].osc2.frequency.linearRampToValueAtTime(freq, now + glide);
-      } catch { /* oscillator may have stopped */ }
-    }
-
-    // Glide bass to new root (one octave below chord root)
-    if (this.bassOsc) {
-      try {
-        this.bassOsc.frequency.linearRampToValueAtTime(chord[0] / 2, now + glide);
+        v.gain.gain.setValueAtTime(v.gain.gain.value, now);
+        v.gain.gain.linearRampToValueAtTime(0.001, now + fadeTime);
       } catch { /* ok */ }
     }
 
-    // Reset arp index so it starts fresh on new chord
+    // Schedule cleanup of old voices after fade completes
+    setTimeout(() => {
+      for (const v of oldVoices) {
+        try { v.osc1.stop(); } catch { /* ok */ }
+        try { v.osc1.disconnect(); } catch { /* ok */ }
+        try { v.osc2.stop(); } catch { /* ok */ }
+        try { v.osc2.disconnect(); } catch { /* ok */ }
+        try { v.gain.disconnect(); } catch { /* ok */ }
+      }
+    }, (fadeTime + 0.3) * 1000);
+
+    // Create new pad voices at new chord frequencies (fade in)
+    this.padVoices = [];
+    this.createPadVoices(ctx, track, chord, now, true);
+
+    // Crossfade bass to new root
+    if (this.bassOsc && this.bassGain) {
+      const newBassFreq = chord[0] / 2;
+      // Quick fade out, snap frequency, fade back in
+      this.bassGain.gain.setValueAtTime(this.bassGain.gain.value, now);
+      this.bassGain.gain.linearRampToValueAtTime(0.001, now + 0.15);
+      this.bassOsc.frequency.setValueAtTime(newBassFreq, now + 0.15);
+      this.bassGain.gain.linearRampToValueAtTime(track.bassVolume, now + 0.3);
+    }
+
+    // Reset arp index for new chord
     this.arpIndex = 0;
   }
 
   // ── Arpeggiator ───────────────────────────────────────────────────────
 
   private scheduleArpNote(track: MusicTrackDef): void {
-    // Slight timing jitter (±10%) for human feel
-    const jitter = track.arpInterval * (0.9 + Math.random() * 0.2);
+    // Slight timing jitter (±8%) for human feel
+    const jitter = track.arpInterval * (0.92 + Math.random() * 0.16);
     this.arpTimerId = window.setTimeout(() => {
       if (!this.playing) return;
       this.playArpNote(track);
@@ -474,46 +511,59 @@ export class MusicSystem {
     const freq = arpUp[noteIdx] ?? arpUp[0];
     this.arpIndex++;
 
-    // 18% chance to rest — creates breathing room
-    if (Math.random() < 0.18) return;
+    // 15% chance to rest — creates breathing room
+    if (Math.random() < 0.15) return;
 
     const now = ctx.currentTime;
-    // Velocity variation (±30%) for dynamics
-    const velocity = track.arpVolume * (0.7 + Math.random() * 0.6);
+    // Velocity variation (±25%) for dynamics
+    const velocity = track.arpVolume * (0.75 + Math.random() * 0.5);
 
-    // Piano-like tone: fundamental + 2nd harmonic (octave)
+    // Piano-like tone: fundamental + 2nd harmonic (octave) + 3rd harmonic
     const osc = ctx.createOscillator();
     osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, now);
 
-    const harm = ctx.createOscillator();
-    harm.type = 'sine';
-    harm.frequency.setValueAtTime(freq * 2, now);
+    const harm2 = ctx.createOscillator();
+    harm2.type = 'sine';
+    harm2.frequency.setValueAtTime(freq * 2, now);
+
+    const harm3 = ctx.createOscillator();
+    harm3.type = 'sine';
+    harm3.frequency.setValueAtTime(freq * 3, now);
 
     // Piano envelope: fast attack, moderate decay, gentle release
     const noteGain = ctx.createGain();
     noteGain.gain.setValueAtTime(0.001, now);
-    noteGain.gain.linearRampToValueAtTime(velocity, now + 0.008);          // attack
-    noteGain.gain.exponentialRampToValueAtTime(velocity * 0.35, now + 0.12); // initial decay
-    noteGain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);          // release
+    noteGain.gain.linearRampToValueAtTime(velocity, now + 0.005);            // crisp attack
+    noteGain.gain.exponentialRampToValueAtTime(velocity * 0.4, now + 0.08);  // hammer decay
+    noteGain.gain.exponentialRampToValueAtTime(velocity * 0.15, now + 0.6);  // sustain decay
+    noteGain.gain.exponentialRampToValueAtTime(0.001, now + 2.0);            // release
 
-    // 2nd harmonic at 15% (adds brightness without harshness)
-    const harmGain = ctx.createGain();
-    harmGain.gain.setValueAtTime(0.15, now);
+    // Harmonics for brightness (piano-like timbre)
+    const harm2Gain = ctx.createGain();
+    harm2Gain.gain.setValueAtTime(0.12, now);  // octave harmonic
+    const harm3Gain = ctx.createGain();
+    harm3Gain.gain.setValueAtTime(0.04, now);  // 3rd harmonic (subtle brightness)
 
     osc.connect(noteGain);
-    harm.connect(harmGain);
-    harmGain.connect(noteGain);
+    harm2.connect(harm2Gain);
+    harm2Gain.connect(noteGain);
+    harm3.connect(harm3Gain);
+    harm3Gain.connect(noteGain);
     noteGain.connect(this.filterNode);
 
     osc.start(now);
-    harm.start(now);
-    osc.stop(now + 3);
-    harm.stop(now + 3);
+    harm2.start(now);
+    harm3.start(now);
+    osc.stop(now + 2.5);
+    harm2.stop(now + 2.5);
+    harm3.stop(now + 2.5);
 
     osc.onended = () => {
-      try { osc.disconnect(); harm.disconnect(); noteGain.disconnect(); harmGain.disconnect(); }
-      catch { /* already cleaned up */ }
+      try { osc.disconnect(); harm2.disconnect(); harm3.disconnect(); }
+      catch { /* ok */ }
+      try { noteGain.disconnect(); harm2Gain.disconnect(); harm3Gain.disconnect(); }
+      catch { /* ok */ }
     };
   }
 
