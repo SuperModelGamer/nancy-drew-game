@@ -91,6 +91,11 @@ export class UIScene extends Phaser.Scene {
   private toolbarContainer!: Phaser.GameObjects.Container;  // expandable info section
   private bottomBarContainer!: Phaser.GameObjects.Container; // always-visible button bar
   private menuToggleLabel!: Phaser.GameObjects.Text;
+  private bottomBarHidden = false;
+  private autoHideTimer: Phaser.Time.TimerEvent | null = null;
+  private volumeSliderContainer: Phaser.GameObjects.Container | null = null;
+  private volumeSliderFill: Phaser.GameObjects.Graphics | null = null;
+  private updateAudioIcon: (() => void) | null = null;
 
   constructor() {
     super({ key: 'UIScene' });
@@ -161,6 +166,23 @@ export class UIScene extends Phaser.Scene {
       InventorySystem.getInstance().offChange(onInventoryChange);
       SaveSystem.getInstance().offChange(onSaveChange);
     });
+
+    // Auto-hide bottom bar after 5s of inactivity — show on mouse near bottom
+    this.resetAutoHideTimer();
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      const canvasH = this.cameras.main.height;
+      // If mouse is in the bottom 120px zone, reset the timer (show bar)
+      if (pointer.y > canvasH - 120) {
+        this.resetAutoHideTimer();
+      }
+    });
+    // Any click on the bottom bar area resets the timer
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      const canvasH = this.cameras.main.height;
+      if (pointer.y > canvasH - BOTTOM_BAR_H - 40) {
+        this.resetAutoHideTimer();
+      }
+    });
   }
 
   // ─── Combined bottom panel (HUD stats + action buttons) ─────────────────
@@ -196,9 +218,39 @@ export class UIScene extends Phaser.Scene {
     drawCornerOrnament(barBgGfx, canvasW - 8, 8, 12, 'tr', DecoColors.gold, 0.3);
     this.bottomBarContainer.add(barBgGfx);
 
-    // Menu toggle label at top center of bar
-    this.menuToggleLabel = this.add.text(canvasW / 2, 14, '\u25B2 MENU', {
-      fontFamily: FONT, fontSize: '14px', color: '#c9a84c',
+    // Menu toggle — folio tab shape protruding above the bar
+    const menuTabW = 160;
+    const menuTabH = 32;
+    const menuTabY = -menuTabH / 2 + 2; // sits above the bar top edge
+
+    const menuTabGfx = this.add.graphics();
+    const drawMenuTab = (hover: boolean) => {
+      menuTabGfx.clear();
+      // Folio tab shape — rounded trapezoid
+      const cx = canvasW / 2;
+      const halfW = menuTabW / 2;
+      const halfNarrow = halfW - 12; // narrower at top
+      menuTabGfx.fillStyle(DecoColors.navy, 0.96);
+      menuTabGfx.beginPath();
+      menuTabGfx.moveTo(cx - halfW, menuTabY + menuTabH); // bottom-left
+      menuTabGfx.lineTo(cx - halfNarrow, menuTabY + 4);    // top-left (angled)
+      menuTabGfx.lineTo(cx + halfNarrow, menuTabY + 4);    // top-right (angled)
+      menuTabGfx.lineTo(cx + halfW, menuTabY + menuTabH); // bottom-right
+      menuTabGfx.closePath();
+      menuTabGfx.fillPath();
+      menuTabGfx.lineStyle(1.5, DecoColors.gold, hover ? 0.8 : 0.4);
+      menuTabGfx.beginPath();
+      menuTabGfx.moveTo(cx - halfW, menuTabY + menuTabH);
+      menuTabGfx.lineTo(cx - halfNarrow, menuTabY + 4);
+      menuTabGfx.lineTo(cx + halfNarrow, menuTabY + 4);
+      menuTabGfx.lineTo(cx + halfW, menuTabY + menuTabH);
+      menuTabGfx.strokePath();
+    };
+    drawMenuTab(false);
+    this.bottomBarContainer.add(menuTabGfx);
+
+    this.menuToggleLabel = this.add.text(canvasW / 2, menuTabY + menuTabH / 2 + 2, '\u25B2 MENU', {
+      fontFamily: FONT, fontSize: '16px', color: '#c9a84c',
       fontStyle: 'bold', letterSpacing: 4,
     }).setOrigin(0.5);
     this.bottomBarContainer.add(this.menuToggleLabel);
@@ -208,17 +260,17 @@ export class UIScene extends Phaser.Scene {
     let menuGlowElements: Phaser.GameObjects.GameObject[] = [];
     if (!hasOpenedMenu) {
       // Outer wide glow
-      const outerGlow = this.add.rectangle(canvasW / 2, 14, 320, 34, 0xc9a84c, 0.12);
+      const outerGlow = this.add.rectangle(canvasW / 2, menuTabY + menuTabH / 2 + 2, 320, 34, 0xc9a84c, 0.12);
       outerGlow.setBlendMode(Phaser.BlendModes.ADD);
       this.bottomBarContainer.add(outerGlow);
 
       // Inner bright glow
-      const innerGlow = this.add.rectangle(canvasW / 2, 14, 200, 26, 0xe8c55a, 0.2);
+      const innerGlow = this.add.rectangle(canvasW / 2, menuTabY + menuTabH / 2 + 2, 200, 26, 0xe8c55a, 0.2);
       innerGlow.setBlendMode(Phaser.BlendModes.ADD);
       this.bottomBarContainer.add(innerGlow);
 
       // Pulsing hint text below the MENU label
-      const hintText = this.add.text(canvasW / 2, 34, 'Click here to open your tools', {
+      const hintText = this.add.text(canvasW / 2, menuTabY + menuTabH + 6, 'Click here to open your tools', {
         fontFamily: FONT, fontSize: '13px', color: '#e8c55a',
         fontStyle: 'italic',
       }).setOrigin(0.5);
@@ -245,7 +297,7 @@ export class UIScene extends Phaser.Scene {
       // Gentle bounce on the MENU label itself
       this.tweens.add({
         targets: this.menuToggleLabel,
-        y: { from: 14, to: 10 },
+        y: { from: menuTabY + menuTabH / 2 + 2, to: menuTabY + menuTabH / 2 - 2 },
         duration: 800,
         yoyo: true,
         repeat: -1,
@@ -255,8 +307,7 @@ export class UIScene extends Phaser.Scene {
       menuGlowElements = [outerGlow, innerGlow, hintText];
     }
 
-    const tabHitW = 220;
-    const tabHit = this.add.rectangle(canvasW / 2, 14, tabHitW, 24, 0x000000, 0);
+    const tabHit = this.add.rectangle(canvasW / 2, menuTabY + menuTabH / 2 + 2, menuTabW, menuTabH, 0x000000, 0);
     tabHit.setInteractive({ cursor: POINTER_CURSOR });
     tabHit.on('pointerdown', () => {
       UISounds.click();
@@ -265,7 +316,7 @@ export class UIScene extends Phaser.Scene {
       // Stop the glow hint after first click
       if (menuGlowElements.length > 0) {
         this.tweens.killTweensOf(this.menuToggleLabel);
-        this.menuToggleLabel.setY(14); // Reset to original position
+        this.menuToggleLabel.setY(menuTabY + menuTabH / 2 + 2);
         menuGlowElements.forEach(el => {
           this.tweens.killTweensOf(el);
           el.destroy();
@@ -274,8 +325,8 @@ export class UIScene extends Phaser.Scene {
         SaveSystem.getInstance().setFlag('opened_menu', true);
       }
     });
-    tabHit.on('pointerover', () => this.menuToggleLabel.setColor('#ffe0a0'));
-    tabHit.on('pointerout', () => this.menuToggleLabel.setColor('#c9a84c'));
+    tabHit.on('pointerover', () => { this.menuToggleLabel.setColor('#ffe0a0'); drawMenuTab(true); });
+    tabHit.on('pointerout', () => { this.menuToggleLabel.setColor('#c9a84c'); drawMenuTab(false); });
     this.bottomBarContainer.add(tabHit);
 
     // ── Action buttons + audio/settings ──
@@ -285,36 +336,79 @@ export class UIScene extends Phaser.Scene {
     const btnSpacing = Math.min(vf.renderedW / 7, 260);
     const btnCenterX = canvasW / 2;
 
-    // Audio toggle (left of buttons)
+    // Audio toggle (left of buttons) + volume slider
     const musicSys = MusicSystem.getInstance();
-    const audioBtn = this.add.text(btnCenterX - btnSpacing * 2.3, btnCenterY, '\u{1F50A}', {
+    const audioBtnX = btnCenterX - btnSpacing * 2.3;
+    const audioBtn = this.add.text(audioBtnX, btnCenterY, '\u{1F50A}', {
       fontSize: '44px',
     }).setOrigin(0.5, 0.5);
     audioBtn.setInteractive({ cursor: POINTER_CURSOR });
 
     const updateAudioIcon = () => {
-      const muted = UISounds.getMusicVolume() <= 0;
+      const vol = UISounds.getVolume();
+      const muted = vol <= 0;
       audioBtn.setText(muted ? '\u{1F507}' : '\u{1F50A}');
       audioBtn.setColor(muted ? '#4a4a5a' : '#8a8a9a');
+      this.updateVolumeSlider();
     };
+    this.updateAudioIcon = updateAudioIcon;
     updateAudioIcon();
 
     audioBtn.on('pointerover', () => audioBtn.setColor(TextColors.gold));
     audioBtn.on('pointerout', () => updateAudioIcon());
     audioBtn.on('pointerdown', () => {
       UISounds.click();
-      const currentVol = UISounds.getMusicVolume();
+      const currentVol = UISounds.getVolume();
       if (currentVol > 0) {
         audioBtn.setData('prevVol', currentVol);
+        UISounds.setVolume(0);
         UISounds.setMusicVolume(0);
       } else {
-        const prev = (audioBtn.getData('prevVol') as number) || 0.5;
+        const prev = (audioBtn.getData('prevVol') as number) || 0.8;
+        UISounds.setVolume(prev);
         UISounds.setMusicVolume(prev);
       }
       musicSys.updateVolume();
       updateAudioIcon();
     });
     this.bottomBarContainer.add(audioBtn);
+
+    // Volume slider (horizontal bar right of speaker icon)
+    const sliderX = audioBtnX + 32;
+    const sliderW = 80;
+    const sliderH = 8;
+    this.volumeSliderContainer = this.add.container(0, btnCenterY);
+
+    // Slider track background
+    const sliderTrack = this.add.graphics();
+    sliderTrack.fillStyle(0x1a1a2e, 0.8);
+    sliderTrack.fillRoundedRect(sliderX, -sliderH / 2, sliderW, sliderH, 4);
+    sliderTrack.lineStyle(1, DecoColors.gold, 0.3);
+    sliderTrack.strokeRoundedRect(sliderX, -sliderH / 2, sliderW, sliderH, 4);
+    this.volumeSliderContainer.add(sliderTrack);
+
+    // Slider fill
+    this.volumeSliderFill = this.add.graphics();
+    this.volumeSliderFill.setData('sliderX', sliderX);
+    this.volumeSliderContainer.add(this.volumeSliderFill);
+    this.updateVolumeSlider();
+
+    // Slider hit area (slightly taller for easy dragging)
+    const sliderHit = this.add.rectangle(sliderX + sliderW / 2, 0, sliderW + 12, 28, 0x000000, 0);
+    sliderHit.setInteractive({ cursor: POINTER_CURSOR, draggable: true });
+    const setVolumeFromPointer = (pointerX: number) => {
+      const localX = pointerX - this.bottomBarContainer.x;
+      const pct = Phaser.Math.Clamp((localX - sliderX) / sliderW, 0, 1);
+      UISounds.setVolume(pct);
+      UISounds.setMusicVolume(pct);
+      musicSys.updateVolume();
+      updateAudioIcon();
+    };
+    sliderHit.on('pointerdown', (pointer: Phaser.Input.Pointer) => setVolumeFromPointer(pointer.x));
+    sliderHit.on('drag', (pointer: Phaser.Input.Pointer, _dragX: number, _dragY: number) => setVolumeFromPointer(pointer.x));
+    this.volumeSliderContainer.add(sliderHit);
+
+    this.bottomBarContainer.add(this.volumeSliderContainer);
 
     // 4 action buttons (centered)
     const buttons = [
@@ -523,7 +617,7 @@ export class UIScene extends Phaser.Scene {
         targets: this.toolbarContainer,
         y: barTop - this.panelH,
         duration: 300,
-        ease: 'Back.easeOut',
+        ease: 'Cubic.easeOut',  // smooth slide up without overshoot
       });
     } else {
       if (this.evidenceOpen) this.closeEvidence();
@@ -535,6 +629,68 @@ export class UIScene extends Phaser.Scene {
         ease: 'Power2',
         onComplete: () => { if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false); },
       });
+    }
+  }
+
+  /** Reset auto-hide timer — call whenever the user interacts with the toolbar area. */
+  private resetAutoHideTimer(): void {
+    if (this.autoHideTimer) {
+      this.autoHideTimer.remove(false);
+      this.autoHideTimer = null;
+    }
+    // Show the bar if it was hidden
+    if (this.bottomBarHidden) {
+      this.showBottomBar();
+    }
+    // Start a new 5-second timer
+    this.autoHideTimer = this.time.delayedCall(5000, () => {
+      // Only auto-hide if toolbar is collapsed and no panels are open
+      if (!this.toolbarExpanded && !this.evidenceOpen && !this.journalOpen && !this.settingsOpen) {
+        this.hideBottomBar();
+      }
+    });
+  }
+
+  private hideBottomBar(): void {
+    if (this.bottomBarHidden) return;
+    this.bottomBarHidden = true;
+    const canvasH = this.cameras.main.height;
+    this.tweens.killTweensOf(this.bottomBarContainer);
+    this.tweens.add({
+      targets: this.bottomBarContainer,
+      y: canvasH,          // slide completely off-screen
+      duration: 400,
+      ease: 'Power2',
+    });
+  }
+
+  private showBottomBar(): void {
+    if (!this.bottomBarHidden) return;
+    this.bottomBarHidden = false;
+    const canvasH = this.cameras.main.height;
+    const barTop = canvasH - BOTTOM_BAR_H;
+    this.tweens.killTweensOf(this.bottomBarContainer);
+    this.tweens.add({
+      targets: this.bottomBarContainer,
+      y: barTop,
+      duration: 300,
+      ease: 'Cubic.easeOut',
+    });
+  }
+
+  /** Update the volume slider fill bar to match current volume. */
+  private updateVolumeSlider(): void {
+    if (!this.volumeSliderFill) return;
+    const vol = UISounds.getVolume();
+    const sliderW = 80;
+    const sliderH = 8;
+    const sliderX = (this.volumeSliderFill.getData('sliderX') as number) || 0;
+
+    this.volumeSliderFill.clear();
+    if (vol > 0) {
+      const fillW = Math.max(2, sliderW * vol);
+      this.volumeSliderFill.fillStyle(DecoColors.gold, 0.7);
+      this.volumeSliderFill.fillRoundedRect(sliderX, -sliderH / 2, fillW, sliderH, 4);
     }
   }
 
