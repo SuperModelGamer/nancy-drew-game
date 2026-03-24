@@ -103,26 +103,24 @@ export const Sizes = {
   toolbarY: 40, // offset from bottom
 } as const;
 
-// Total height reserved at the bottom for the UI toolbar bar (toolbar + margin).
-// Used by RoomScene to clip its camera viewport above the bar.
-export const UI_BAR_RESERVED = 124; // TOOLBAR_H (112) + BOTTOM_MARGIN (12)
-
 // ─── Viewfinder Frame Layout ───
-// The game fills the area between the frame borders and the right info panel.
+// The game fills the area between the frame borders.
 // No camera zoom — the viewport IS the game area and content is placed directly
 // in viewport-pixel coordinates.
 //
 //  ┌──────────────── 1920 ────────────────┐
 //  │ top border (FRAME_TOP)                │
-//  │ ┌───┌─────────────────┐──right──┐    │
-//  │ │   │  game viewport  │  info   │    │
-//  │ │   │  (no zoom)      │  panel  │    │
-//  │ │   └─────────────────┘─────────┘    │
-//  │ toolbar (FRAME_BOTTOM)                │
+//  │ ┌──────────────────────────────┐      │
+//  │ │      game viewport           │      │
+//  │ │      (no zoom)               │      │
+//  │ │                              │      │
+//  │ └──────────────────────────────┘      │
+//  │ bottom bar — always-visible toolbar   │
 //  └──────────────────────────────────────┘
 
 export const FRAME_TOP = 6;
-export const FRAME_BOTTOM = 6; // thin border — toolbar is now a collapsible overlay
+export const BOTTOM_BAR_H = 106;  // permanent bottom toolbar (buttons always visible)
+export const FRAME_BOTTOM = BOTTOM_BAR_H; // viewport clips above the bar
 export const FRAME_LEFT = 6;    // thin border
 export const RIGHT_PANEL_W = 0; // no sidebar — full-screen game view with floating HUD
 
