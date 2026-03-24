@@ -203,21 +203,56 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(0.5);
     this.bottomBarContainer.add(this.menuToggleLabel);
 
-    // Pulsing glow hint for first-time players — draws attention to the MENU toggle
+    // Prominent glow hint for first-time players — draws attention to the MENU toggle
     const hasOpenedMenu = SaveSystem.getInstance().getFlag('opened_menu');
-    let menuGlow: Phaser.GameObjects.Rectangle | null = null;
+    let menuGlowElements: Phaser.GameObjects.GameObject[] = [];
     if (!hasOpenedMenu) {
-      menuGlow = this.add.rectangle(canvasW / 2, 14, 180, 22, 0xc9a84c, 0.15);
-      menuGlow.setBlendMode(Phaser.BlendModes.ADD);
-      this.bottomBarContainer.add(menuGlow);
+      // Outer wide glow
+      const outerGlow = this.add.rectangle(canvasW / 2, 14, 320, 34, 0xc9a84c, 0.12);
+      outerGlow.setBlendMode(Phaser.BlendModes.ADD);
+      this.bottomBarContainer.add(outerGlow);
+
+      // Inner bright glow
+      const innerGlow = this.add.rectangle(canvasW / 2, 14, 200, 26, 0xe8c55a, 0.2);
+      innerGlow.setBlendMode(Phaser.BlendModes.ADD);
+      this.bottomBarContainer.add(innerGlow);
+
+      // Pulsing hint text below the MENU label
+      const hintText = this.add.text(canvasW / 2, 34, 'Click here to open your tools', {
+        fontFamily: FONT, fontSize: '13px', color: '#e8c55a',
+        fontStyle: 'italic',
+      }).setOrigin(0.5);
+      this.bottomBarContainer.add(hintText);
+
+      // Pulse the glows and hint text
       this.tweens.add({
-        targets: menuGlow,
-        alpha: { from: 0.08, to: 0.3 },
-        duration: 1200,
+        targets: [outerGlow, innerGlow],
+        alpha: '+=0.25',
+        duration: 1000,
         yoyo: true,
         repeat: -1,
         ease: 'Sine.easeInOut',
       });
+      this.tweens.add({
+        targets: hintText,
+        alpha: { from: 0.5, to: 1 },
+        duration: 1000,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+
+      // Gentle bounce on the MENU label itself
+      this.tweens.add({
+        targets: this.menuToggleLabel,
+        y: { from: 14, to: 10 },
+        duration: 800,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+
+      menuGlowElements = [outerGlow, innerGlow, hintText];
     }
 
     const tabHitW = 220;
@@ -228,10 +263,14 @@ export class UIScene extends Phaser.Scene {
       this.toggleToolbar();
       this.menuToggleLabel.setText(this.toolbarExpanded ? '\u25BC MENU' : '\u25B2 MENU');
       // Stop the glow hint after first click
-      if (menuGlow) {
-        this.tweens.killTweensOf(menuGlow);
-        menuGlow.destroy();
-        menuGlow = null;
+      if (menuGlowElements.length > 0) {
+        this.tweens.killTweensOf(this.menuToggleLabel);
+        this.menuToggleLabel.setY(14); // Reset to original position
+        menuGlowElements.forEach(el => {
+          this.tweens.killTweensOf(el);
+          el.destroy();
+        });
+        menuGlowElements = [];
         SaveSystem.getInstance().setFlag('opened_menu', true);
       }
     });
