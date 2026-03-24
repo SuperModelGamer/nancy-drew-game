@@ -160,6 +160,13 @@ export class VideoCinematicScene extends Phaser.Scene {
     if (this.completed) return;
     this.completed = true;
 
+    // Cancel all pending subtitle timers and tweens
+    this.time.removeAllEvents();
+    this.tweens.killAll();
+
+    // Stop any SFX that might be playing
+    UISounds.stopAll();
+
     // Apply completion effects
     if (this.videoData.onComplete) {
       const save = SaveSystem.getInstance();

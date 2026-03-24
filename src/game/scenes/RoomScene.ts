@@ -70,6 +70,7 @@ export class RoomScene extends Phaser.Scene {
   private usedHotspots: Set<string> = new Set();
   private selectedItemIndicator!: Phaser.GameObjects.Text;
   private glowCursor: string = Cursors.inspect; // fallback until glow loads
+  private phoneRinging = false;
 
   constructor() {
     super({ key: 'RoomScene' });
@@ -87,6 +88,9 @@ export class RoomScene extends Phaser.Scene {
     if (!data.skipCinematic) {
       const cinematic = getCinematicForRoom(roomId);
       if (cinematic) {
+        // Stop all audio before handing off to the cinematic scene
+        UISounds.stopAll();
+        MusicSystem.getInstance().stop();
         // Flag prevents create() from running room setup on a missing currentRoom
         this.redirectingToCinematic = true;
         this.scene.start('CinematicScene', {
@@ -248,6 +252,32 @@ export class RoomScene extends Phaser.Scene {
         music.play(targetTrack);
       }
     }
+
+    // Ambient phone ringing in lobby — starts after talking to Vivian, stops on pickup
+    this.phoneRinging = false;
+    if (this.currentRoom.id === 'lobby') {
+      const save = SaveSystem.getInstance();
+      const talkedToVivian = save.getFlag('vivian_intro');
+      const phoneAnswered = save.getFlag('used_hotspot_lobby_phone');
+      const phoneDone = save.getFlag('called_ned');
+      if (talkedToVivian && !phoneAnswered && !phoneDone) {
+        // Delay the first ring so it feels like it starts after you arrive
+        this.time.delayedCall(1500, () => {
+          if (!this.phoneRinging && !save.getFlag('used_hotspot_lobby_phone')) {
+            this.phoneRinging = true;
+            UISounds.phoneRingStart();
+          }
+        });
+      }
+    }
+
+    // Stop phone ringing on scene shutdown (room transition)
+    this.events.once('shutdown', () => {
+      if (this.phoneRinging) {
+        UISounds.phoneRingStop();
+        this.phoneRinging = false;
+      }
+    });
 
     // Hotspot editor toggle (Shift+Q)
     this.input.keyboard!.on('keydown-Q', (event: KeyboardEvent) => {
@@ -597,6 +627,11 @@ export class RoomScene extends Phaser.Scene {
 
       case 'talk':
         if (hotspot.dialogueId) {
+          // Stop ambient phone ringing when picking up the phone
+          if (this.phoneRinging && /phone/i.test(hotspot.label || '')) {
+            UISounds.phoneRingStop();
+            this.phoneRinging = false;
+          }
           // Mark as examined so clue counter tracks it
           SaveSystem.getInstance().setFlag('used_hotspot_' + hotspot.id, true);
           // Hide all hotspot labels so they don't show through the dialogue overlay
@@ -638,7 +673,7 @@ export class RoomScene extends Phaser.Scene {
     if (/safe|lock|padlock/i.test(label)) { UISounds.safeDial(); return; }
     if (/key/i.test(label)) { UISounds.keyJingle(); return; }
     if (/lamp|light|spotlight|switch/i.test(label)) { UISounds.spotlightClick(); return; }
-    if (/phone/i.test(label)) { UISounds.phoneRing(); return; }
+    if (/phone/i.test(label)) { UISounds.click(); return; } // picking up receiver
     if (/photo|portrait|picture|painting/i.test(label)) { UISounds.photoSnap(); return; }
     if (/fog|machine|pipe/i.test(label)) { UISounds.fogMachineHiss(); return; }
     if (/map/i.test(label)) { UISounds.mapOpen(); return; }
@@ -1128,6 +1163,8 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private navigateToRoom(roomId: string): void {
+    // Stop all SFX so they don't bleed into the next room
+    UISounds.stopAll();
     UISounds.doorTransition();
     SaveSystem.getInstance().setCurrentRoom(roomId);
     SaveSystem.getInstance().save();

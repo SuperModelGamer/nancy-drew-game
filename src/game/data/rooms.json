@@ -168,6 +168,7 @@
           "label": "Lobby Phone",
           "type": "talk",
           "dialogueId": "phone_calls",
+          "showWhen": "vivian_intro",
           "hideWhen": "called_ned"
         },
         {

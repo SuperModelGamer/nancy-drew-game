@@ -203,6 +203,23 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(0.5);
     this.bottomBarContainer.add(this.menuToggleLabel);
 
+    // Pulsing glow hint for first-time players — draws attention to the MENU toggle
+    const hasOpenedMenu = SaveSystem.getInstance().getFlag('opened_menu');
+    let menuGlow: Phaser.GameObjects.Rectangle | null = null;
+    if (!hasOpenedMenu) {
+      menuGlow = this.add.rectangle(canvasW / 2, 14, 180, 22, 0xc9a84c, 0.15);
+      menuGlow.setBlendMode(Phaser.BlendModes.ADD);
+      this.bottomBarContainer.add(menuGlow);
+      this.tweens.add({
+        targets: menuGlow,
+        alpha: { from: 0.08, to: 0.3 },
+        duration: 1200,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
+
     const tabHitW = 220;
     const tabHit = this.add.rectangle(canvasW / 2, 14, tabHitW, 24, 0x000000, 0);
     tabHit.setInteractive({ cursor: POINTER_CURSOR });
@@ -210,6 +227,13 @@ export class UIScene extends Phaser.Scene {
       UISounds.click();
       this.toggleToolbar();
       this.menuToggleLabel.setText(this.toolbarExpanded ? '\u25BC MENU' : '\u25B2 MENU');
+      // Stop the glow hint after first click
+      if (menuGlow) {
+        this.tweens.killTweensOf(menuGlow);
+        menuGlow.destroy();
+        menuGlow = null;
+        SaveSystem.getInstance().setFlag('opened_menu', true);
+      }
     });
     tabHit.on('pointerover', () => this.menuToggleLabel.setColor('#ffe0a0'));
     tabHit.on('pointerout', () => this.menuToggleLabel.setColor('#c9a84c'));

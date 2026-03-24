@@ -437,6 +437,12 @@ export class TitleScene extends Phaser.Scene {
       guestText.setColor(TextColors.light);
     });
     guestBg.on('pointerdown', () => {
+      // Guest sessions always start fresh — clear any leftover save data
+      // so the menu shows "Begin Investigation" instead of "Continue"
+      const save = SaveSystem.getInstance();
+      if (save.hasAnySave()) {
+        save.deleteSave();
+      }
       form.destroy();
       this.authFormDestroy = null;
       container.destroy();

@@ -68,6 +68,10 @@ const SFX_MANIFEST: Record<string, string> = {
 const audioCache = new Map<string, HTMLAudioElement>();
 let preloaded = false;
 
+// Managed phone ringing state
+let phoneRingTimer: ReturnType<typeof setInterval> | null = null;
+let phoneRingSound: HTMLAudioElement | null = null;
+
 /** Preload all SFX files. Call once during boot. */
 export function preloadSFX(): Promise<void> {
   if (preloaded) return Promise.resolve();
@@ -92,6 +96,9 @@ export function preloadSFX(): Promise<void> {
   });
 }
 
+// Track active audio clones so we can stop them all on scene transitions
+const activeClones: Set<HTMLAudioElement> = new Set();
+
 /** Play a sound by its manifest key. Volume-aware, non-blocking. */
 function playSFX(key: string, volume = 0.5): void {
   if (masterVolume <= 0) return;
@@ -105,9 +112,30 @@ function playSFX(key: string, volume = 0.5): void {
   // Clone the audio element so overlapping plays don't cut each other off
   const sound = cached.cloneNode(true) as HTMLAudioElement;
   sound.volume = Math.min(1, volume * masterVolume);
+  activeClones.add(sound);
+  sound.addEventListener('ended', () => activeClones.delete(sound), { once: true });
   sound.play().catch(() => {
-    // Browser may block autoplay before user gesture — silently ignore
+    activeClones.delete(sound);
   });
+}
+
+/** Stop all currently playing SFX clones — call on scene transitions. */
+function stopAllSFX(): void {
+  for (const sound of activeClones) {
+    sound.pause();
+    sound.currentTime = 0;
+  }
+  activeClones.clear();
+  // Also stop managed phone ringing
+  if (phoneRingTimer) {
+    clearInterval(phoneRingTimer);
+    phoneRingTimer = null;
+  }
+  if (phoneRingSound) {
+    phoneRingSound.pause();
+    phoneRingSound.currentTime = 0;
+    phoneRingSound = null;
+  }
 }
 
 export const UISounds = {
@@ -199,8 +227,43 @@ export const UISounds = {
   /** Ghostly whisper texture */
   ghostWhisper(): void { playSFX('ghostWhisper', 0.4); },
 
-  /** Old rotary phone ring */
+  /** Old rotary phone ring — single shot */
   phoneRing(): void { playSFX('phoneRing', 0.6); },
+
+  /** Start ambient phone ringing — plays 2 rings then pauses, repeating.
+   *  Call phoneRingStop() to cancel. */
+  phoneRingStart(): void {
+    // Already ringing
+    if (phoneRingTimer) return;
+
+    const ring = () => {
+      if (masterVolume <= 0) return;
+      const path = SFX_MANIFEST['phoneRing'];
+      if (!path) return;
+      const cached = audioCache.get(path);
+      if (!cached) return;
+      phoneRingSound = cached.cloneNode(true) as HTMLAudioElement;
+      phoneRingSound.volume = Math.min(1, 0.35 * masterVolume);
+      phoneRingSound.play().catch(() => {});
+    };
+
+    // Ring once now, then repeat every 4 seconds (short ring + silence gap)
+    ring();
+    phoneRingTimer = setInterval(ring, 4000);
+  },
+
+  /** Stop ambient phone ringing. */
+  phoneRingStop(): void {
+    if (phoneRingTimer) {
+      clearInterval(phoneRingTimer);
+      phoneRingTimer = null;
+    }
+    if (phoneRingSound) {
+      phoneRingSound.pause();
+      phoneRingSound.currentTime = 0;
+      phoneRingSound = null;
+    }
+  },
 
   /** Door creak — old wooden door */
   doorCreak(): void { playSFX('doorCreak', 0.5); },
@@ -275,4 +338,7 @@ export const UISounds = {
 
   /** Poison bubble — sinister liquid gurgle */
   poisonBubble(): void { playSFX('poisonBubble', 0.4); },
+
+  /** Stop ALL playing SFX — call during scene transitions to prevent audio bleed. */
+  stopAll(): void { stopAllSFX(); },
 };
