@@ -18,7 +18,7 @@ let particlesEnabled = localStorage.getItem('nd_particles') !== 'off';
 let musicVolume = parseFloat(localStorage.getItem('nd_music_volume') ?? '0.5');
 
 /** Selected music track ID for lobby background music. */
-let musicTrack = localStorage.getItem('nd_music_track') ?? 'midnight_theatre';
+let musicTrack = localStorage.getItem('nd_music_track') ?? 'lobby_elegant';
 
 function getCtx(): AudioContext | null {
   if (!audioCtx) {
