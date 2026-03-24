@@ -233,74 +233,88 @@ export class UIScene extends Phaser.Scene {
   private borderChapterText!: Phaser.GameObjects.Text;
   private borderQuestHintText!: Phaser.GameObjects.Text;
 
-  private createFloatingHUD(canvasW: number, fTop: number, toolbarTop: number): void {
-    const HUD_W = 310;
-    const HUD_PAD = 18;
-    const HUD_MARGIN = 16;
-    const hudX = canvasW - HUD_W - HUD_MARGIN;
-    const hudY = fTop + HUD_MARGIN;
-    const hudCx = HUD_W / 2; // center X within container
+  private hudExpanded = true;
+  private hudExpandedH = 0;
+  private hudCollapsedH = 0;
+  private hudBgGfx!: Phaser.GameObjects.Graphics;
+  private hudBodyContainer!: Phaser.GameObjects.Container;
+
+  private createFloatingHUD(canvasW: number, fTop: number, _toolbarTop: number): void {
+    const HUD_W = 280;
+    const HUD_PAD = 16;
+    // Anchored flush to the frame edge — no floating margin
+    const hudX = canvasW - HUD_W - 6; // 6 = FRAME_LEFT border width
+    const hudY = fTop;
+    const hudCx = HUD_W / 2;
 
     this.hudContainer = this.add.container(hudX, hudY).setDepth(Depths.tooltip);
+    this.hudBgGfx = this.add.graphics();
 
-    // ── Semi-transparent background with art deco border ──
-    const bgGfx = this.add.graphics();
-    // We'll calculate total height after laying out, so draw bg last
+    // ── Collapsed header row: Room name + chevron toggle ──
     let y = HUD_PAD;
 
-    // ── Chapter indicator ──
     this.borderChapterText = this.add.text(hudCx, y, '', {
-      fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue,
-      letterSpacing: 5, align: 'center',
+      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue,
+      letterSpacing: 4, align: 'center',
     }).setOrigin(0.5, 0);
-    y += 22;
+    y += 16;
 
-    // ── Room name ──
-    this.borderRoomNameText = this.add.text(hudCx, y, '', {
-      fontFamily: FONT, fontSize: '26px', color: '#c9a84c',
-      fontStyle: 'bold', align: 'center', letterSpacing: 3,
-      wordWrap: { width: HUD_W - HUD_PAD * 2 },
+    this.borderRoomNameText = this.add.text(hudCx - 14, y, '', {
+      fontFamily: FONT, fontSize: '22px', color: '#c9a84c',
+      fontStyle: 'bold', align: 'center', letterSpacing: 2,
+      wordWrap: { width: HUD_W - HUD_PAD * 2 - 40 },
     }).setOrigin(0.5, 0);
-    y += 42;
 
-    // ── Thin gold divider ──
+    // Toggle chevron (▼ expanded, ▶ collapsed)
+    const chevron = this.add.text(HUD_W - HUD_PAD - 8, y + 4, '\u25BC', {
+      fontFamily: FONT, fontSize: '16px', color: '#8a8a9a',
+    }).setOrigin(0.5, 0);
+    chevron.setInteractive({ cursor: POINTER_CURSOR });
+    y += 34;
+
+    this.hudCollapsedH = y + HUD_PAD / 2;
+
+    // ── Expandable body (everything below the header) ──
+    this.hudBodyContainer = this.add.container(0, 0);
+
+    // Thin gold divider
     const divGfx = this.add.graphics();
-    divGfx.lineStyle(1, DecoColors.gold, 0.3);
-    divGfx.lineBetween(HUD_PAD + 10, y, HUD_W - HUD_PAD - 10, y);
-    this.hudContainer.add(divGfx);
-    y += 14;
+    divGfx.lineStyle(1, DecoColors.gold, 0.25);
+    divGfx.lineBetween(HUD_PAD + 8, y, HUD_W - HUD_PAD - 8, y);
+    this.hudBodyContainer.add(divGfx);
+    y += 12;
 
-    // ── Stats row: Items | Clues ──
-    const statsLeftX = HUD_PAD + 20;
+    // Stats row: Items | Clues
+    const statsLeftX = HUD_PAD + 16;
     const statsMidX = HUD_W / 2;
 
     const itemsLabel = this.add.text(statsLeftX, y, 'ITEMS', {
-      fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue, letterSpacing: 2,
+      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue, letterSpacing: 2,
     }).setOrigin(0, 0);
-    const cluesLabel = this.add.text(statsMidX + 10, y, 'CLUES', {
-      fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue, letterSpacing: 2,
+    const cluesLabel = this.add.text(statsMidX + 8, y, 'CLUES', {
+      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue, letterSpacing: 2,
     }).setOrigin(0, 0);
-    y += 18;
+    y += 16;
 
     this.borderItemCountText = this.add.text(statsLeftX, y, '', {
-      fontFamily: FONT, fontSize: '28px', color: '#c9a84c', fontStyle: 'bold',
+      fontFamily: FONT, fontSize: '24px', color: '#c9a84c', fontStyle: 'bold',
     }).setOrigin(0, 0);
-    this.borderClueCountText = this.add.text(statsMidX + 10, y, '', {
-      fontFamily: FONT, fontSize: '28px', color: '#8a9aaa', fontStyle: 'bold',
+    this.borderClueCountText = this.add.text(statsMidX + 8, y, '', {
+      fontFamily: FONT, fontSize: '24px', color: '#8a9aaa', fontStyle: 'bold',
     }).setOrigin(0, 0);
-    y += 36;
+    y += 32;
 
-    // ── Progress bar ──
-    const barW = HUD_W - HUD_PAD * 2 - 20;
-    const barH = 10;
-    const barX = HUD_PAD + 10;
+    // Progress bar
+    const barW = HUD_W - HUD_PAD * 2 - 16;
+    const barH = 8;
+    const barX = HUD_PAD + 8;
 
     const barBgGfx = this.add.graphics();
     barBgGfx.fillStyle(0x1a1a2e, 0.8);
-    barBgGfx.fillRoundedRect(barX, y, barW, barH, 5);
+    barBgGfx.fillRoundedRect(barX, y, barW, barH, 4);
     barBgGfx.lineStyle(1, DecoColors.gold, 0.25);
-    barBgGfx.strokeRoundedRect(barX, y, barW, barH, 5);
-    this.hudContainer.add(barBgGfx);
+    barBgGfx.strokeRoundedRect(barX, y, barW, barH, 4);
+    this.hudBodyContainer.add(barBgGfx);
 
     this.borderProgressBar = this.add.graphics();
     this.borderProgressBar.setData('barX', barX);
@@ -308,63 +322,61 @@ export class UIScene extends Phaser.Scene {
     this.borderProgressBar.setData('barW', barW);
     this.borderProgressBar.setData('barH', barH);
 
-    this.borderProgressPct = this.add.text(HUD_W - HUD_PAD - 10, y + barH / 2, '', {
-      fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim, fontStyle: 'bold',
+    this.borderProgressPct = this.add.text(HUD_W - HUD_PAD - 8, y + barH / 2, '', {
+      fontFamily: FONT, fontSize: '13px', color: TextColors.goldDim, fontStyle: 'bold',
     }).setOrigin(1, 0.5);
-    y += barH + 14;
+    y += barH + 12;
 
-    // ── Thin gold divider ──
+    // Divider
     const div2Gfx = this.add.graphics();
-    div2Gfx.lineStyle(1, DecoColors.gold, 0.3);
-    div2Gfx.lineBetween(HUD_PAD + 10, y, HUD_W - HUD_PAD - 10, y);
-    this.hudContainer.add(div2Gfx);
-    y += 14;
+    div2Gfx.lineStyle(1, DecoColors.gold, 0.25);
+    div2Gfx.lineBetween(HUD_PAD + 8, y, HUD_W - HUD_PAD - 8, y);
+    this.hudBodyContainer.add(div2Gfx);
+    y += 12;
 
-    // ── OBJECTIVE ──
-    const objLabel = this.add.text(hudCx, y, '\u2756  OBJECTIVE  \u2756', {
-      fontFamily: FONT, fontSize: '15px', color: '#c9a84c',
-      letterSpacing: 3, align: 'center',
+    // Objective
+    const objLabel = this.add.text(hudCx, y, '\u2756 OBJECTIVE \u2756', {
+      fontFamily: FONT, fontSize: '13px', color: '#c9a84c',
+      letterSpacing: 2, align: 'center',
     }).setOrigin(0.5, 0);
-    y += 24;
+    y += 20;
 
     this.borderQuestHintText = this.add.text(hudCx, y, '', {
-      fontFamily: FONT, fontSize: '18px', color: '#f0e0b8',
+      fontFamily: FONT, fontSize: '15px', color: '#f0e0b8',
       fontStyle: 'italic', align: 'center',
-      wordWrap: { width: HUD_W - HUD_PAD * 2 },
-      lineSpacing: 4,
+      wordWrap: { width: HUD_W - HUD_PAD * 2 - 4 },
+      lineSpacing: 3,
     }).setOrigin(0.5, 0);
-    y += 70;
+    y += 56;
 
-    // ── Thin gold divider ──
+    // Divider
     const div3Gfx = this.add.graphics();
     div3Gfx.lineStyle(1, DecoColors.gold, 0.2);
-    div3Gfx.lineBetween(HUD_PAD + 20, y, HUD_W - HUD_PAD - 20, y);
-    this.hudContainer.add(div3Gfx);
-    y += 16;
+    div3Gfx.lineBetween(HUD_PAD + 16, y, HUD_W - HUD_PAD - 16, y);
+    this.hudBodyContainer.add(div3Gfx);
+    y += 12;
 
-    // ── Room stats row ──
-    this.borderRoomClueCountText = this.add.text(hudCx - 40, y, '', {
-      fontFamily: FONT, fontSize: '13px', color: '#7a8a9a',
+    // Room stats row
+    this.borderRoomClueCountText = this.add.text(hudCx - 36, y, '', {
+      fontFamily: FONT, fontSize: '12px', color: '#7a8a9a',
     }).setOrigin(0.5, 0);
-    const placesLabel = this.add.text(hudCx - 40, y + 16, 'PLACES', {
-      fontFamily: FONT, fontSize: '10px', color: TextColors.mutedBlue, letterSpacing: 2,
+    const placesLabel = this.add.text(hudCx - 36, y + 14, 'PLACES', {
+      fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue, letterSpacing: 2,
     }).setOrigin(0.5, 0);
 
-    this.borderTotalItemCountText = this.add.text(hudCx + 40, y, '', {
-      fontFamily: FONT, fontSize: '13px', color: '#7a8a9a',
+    this.borderTotalItemCountText = this.add.text(hudCx + 36, y, '', {
+      fontFamily: FONT, fontSize: '12px', color: '#7a8a9a',
     }).setOrigin(0.5, 0);
-    const totalLabel = this.add.text(hudCx + 40, y + 16, 'TOTAL', {
-      fontFamily: FONT, fontSize: '10px', color: TextColors.mutedBlue, letterSpacing: 2,
+    const totalLabel = this.add.text(hudCx + 36, y + 14, 'TOTAL', {
+      fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue, letterSpacing: 2,
     }).setOrigin(0.5, 0);
-    y += 34;
+    y += 30;
 
-    // ── Audio + Settings controls (stacked vertically) ──
-    y += 6;
+    // Audio + Settings
     const musicSys = MusicSystem.getInstance();
 
-    // Audio toggle (speaker icon) — large
-    const audioBtn = this.add.text(hudCx - 30, y, '\u{1F50A}', {
-      fontSize: '48px',
+    const audioBtn = this.add.text(hudCx - 24, y, '\u{1F50A}', {
+      fontSize: '36px',
     }).setOrigin(0.5, 0);
     audioBtn.setInteractive({ cursor: POINTER_CURSOR });
 
@@ -391,39 +403,24 @@ export class UIScene extends Phaser.Scene {
       updateAudioIcon();
     });
 
-    // Settings gear — large, next to speaker
-    const gearBtn = this.add.text(hudCx + 30, y, '\u2699', {
-      fontSize: '52px', color: '#8a8a9a',
+    const gearBtn = this.add.text(hudCx + 24, y, '\u2699', {
+      fontSize: '40px', color: '#8a8a9a',
     }).setOrigin(0.5, 0);
     gearBtn.setInteractive({
       cursor: POINTER_CURSOR,
-      hitArea: new Phaser.Geom.Rectangle(-16, -8, 72, 72),
+      hitArea: new Phaser.Geom.Rectangle(-18, -8, 60, 60),
       hitAreaCallback: Phaser.Geom.Rectangle.Contains,
     });
     gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));
     gearBtn.on('pointerout', () => gearBtn.setColor('#8a8a9a'));
     gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
 
-    y += 58;
+    y += 46;
 
-    // ── Draw the background panel ──
-    const totalH = y + HUD_PAD / 2;
-    bgGfx.fillStyle(0x0a0a18, 0.82);
-    bgGfx.fillRoundedRect(0, 0, HUD_W, totalH, 8);
-    bgGfx.lineStyle(1.5, DecoColors.gold, 0.4);
-    bgGfx.strokeRoundedRect(0, 0, HUD_W, totalH, 8);
+    this.hudExpandedH = y + HUD_PAD / 2;
 
-    // Corner ornaments on the HUD
-    drawCornerOrnament(bgGfx, 5, 5, 12, 'tl', DecoColors.gold, 0.3);
-    drawCornerOrnament(bgGfx, HUD_W - 5, 5, 12, 'tr', DecoColors.gold, 0.3);
-    drawCornerOrnament(bgGfx, 5, totalH - 5, 12, 'bl', DecoColors.gold, 0.3);
-    drawCornerOrnament(bgGfx, HUD_W - 5, totalH - 5, 12, 'br', DecoColors.gold, 0.3);
-
-    // Add all elements to the container (bgGfx first so it's behind everything)
-    this.hudContainer.add(bgGfx);
-    this.hudContainer.sendToBack(bgGfx);
-    this.hudContainer.add([
-      this.borderChapterText, this.borderRoomNameText,
+    // Add body elements to body container
+    this.hudBodyContainer.add([
       itemsLabel, cluesLabel,
       this.borderItemCountText, this.borderClueCountText,
       this.borderProgressBar, this.borderProgressPct,
@@ -433,7 +430,54 @@ export class UIScene extends Phaser.Scene {
       audioBtn, gearBtn,
     ]);
 
+    // Draw initial background
+    this.drawHUDBg(HUD_W, this.hudExpandedH);
+
+    // Add everything to HUD container
+    this.hudContainer.add(this.hudBgGfx);
+    this.hudContainer.sendToBack(this.hudBgGfx);
+    this.hudContainer.add([
+      this.borderChapterText, this.borderRoomNameText, chevron,
+      this.hudBodyContainer,
+    ]);
+
+    // Toggle expand/collapse
+    chevron.on('pointerover', () => chevron.setColor(TextColors.gold));
+    chevron.on('pointerout', () => chevron.setColor('#8a8a9a'));
+    chevron.on('pointerdown', () => {
+      UISounds.click();
+      this.hudExpanded = !this.hudExpanded;
+      chevron.setText(this.hudExpanded ? '\u25BC' : '\u25B6');
+      this.hudBodyContainer.setVisible(this.hudExpanded);
+      this.drawHUDBg(HUD_W, this.hudExpanded ? this.hudExpandedH : this.hudCollapsedH);
+    });
+
+    // Also make the header row clickable to toggle
+    const headerHit = this.add.rectangle(HUD_W / 2, (HUD_PAD + 34) / 2, HUD_W, HUD_PAD + 34, 0x000000, 0);
+    headerHit.setInteractive({ cursor: POINTER_CURSOR });
+    headerHit.on('pointerdown', () => {
+      UISounds.click();
+      this.hudExpanded = !this.hudExpanded;
+      chevron.setText(this.hudExpanded ? '\u25BC' : '\u25B6');
+      this.hudBodyContainer.setVisible(this.hudExpanded);
+      this.drawHUDBg(HUD_W, this.hudExpanded ? this.hudExpandedH : this.hudCollapsedH);
+    });
+    this.hudContainer.add(headerHit);
+    this.hudContainer.sendToBack(headerHit);
+
     this.updateRightPanelStats();
+  }
+
+  private drawHUDBg(w: number, h: number): void {
+    this.hudBgGfx.clear();
+    this.hudBgGfx.fillStyle(0x0a0a18, 0.78);
+    this.hudBgGfx.fillRoundedRect(0, 0, w, h, 6);
+    this.hudBgGfx.lineStyle(1.5, DecoColors.gold, 0.35);
+    this.hudBgGfx.strokeRoundedRect(0, 0, w, h, 6);
+    drawCornerOrnament(this.hudBgGfx, 4, 4, 10, 'tl', DecoColors.gold, 0.25);
+    drawCornerOrnament(this.hudBgGfx, w - 4, 4, 10, 'tr', DecoColors.gold, 0.25);
+    drawCornerOrnament(this.hudBgGfx, 4, h - 4, 10, 'bl', DecoColors.gold, 0.25);
+    drawCornerOrnament(this.hudBgGfx, w - 4, h - 4, 10, 'br', DecoColors.gold, 0.25);
   }
 
   /** Check whether a hotspot's hideWhen condition is met (should be hidden). */
@@ -1387,10 +1431,10 @@ export class UIScene extends Phaser.Scene {
 
     // ── Sound Volume ──
     this.settingsContent.add(this.add.text(cx, y, 'SOUND VOLUME', {
-      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontFamily: FONT, fontSize: '22px', color: '#5a4a3a',
       fontStyle: 'bold', letterSpacing: 4,
     }).setOrigin(0.5, 0));
-    y += 40;
+    y += 44;
 
     const sliderW = Math.min(usableW - 60, 400);
     const sliderX = cx - sliderW / 2;
@@ -1415,7 +1459,7 @@ export class UIScene extends Phaser.Scene {
 
     // Volume percentage label
     const volLabel = this.add.text(cx, y + 28, `${Math.round(currentVol * 100)}%`, {
-      fontFamily: FONT, fontSize: '22px', color: TAB_GOLD_STR, fontStyle: 'bold',
+      fontFamily: FONT, fontSize: '24px', color: TAB_GOLD_STR, fontStyle: 'bold',
     }).setOrigin(0.5, 0);
     this.settingsContent.add(volLabel);
 
@@ -1455,10 +1499,10 @@ export class UIScene extends Phaser.Scene {
 
     // ── Music Volume ──
     this.settingsContent.add(this.add.text(cx, y, 'MUSIC VOLUME', {
-      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontFamily: FONT, fontSize: '22px', color: '#5a4a3a',
       fontStyle: 'bold', letterSpacing: 4,
     }).setOrigin(0.5, 0));
-    y += 40;
+    y += 44;
 
     const mSliderW = sliderW;
     const mSliderX = cx - mSliderW / 2;
@@ -1479,7 +1523,7 @@ export class UIScene extends Phaser.Scene {
     this.settingsContent.add(mThumb);
 
     const mVolLabel = this.add.text(cx, y + 28, `${Math.round(currentMusicVol * 100)}%`, {
-      fontFamily: FONT, fontSize: '22px', color: TAB_GOLD_STR, fontStyle: 'bold',
+      fontFamily: FONT, fontSize: '24px', color: TAB_GOLD_STR, fontStyle: 'bold',
     }).setOrigin(0.5, 0);
     this.settingsContent.add(mVolLabel);
 
@@ -1510,74 +1554,96 @@ export class UIScene extends Phaser.Scene {
 
     y += 80;
 
-    // ── Music Track Selector ──
+    // ── Music Track Selector (compact carousel) ──
     this.settingsContent.add(this.add.text(cx, y, 'MUSIC TRACK', {
-      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontFamily: FONT, fontSize: '22px', color: '#5a4a3a',
       fontStyle: 'bold', letterSpacing: 4,
     }).setOrigin(0.5, 0));
-    y += 10;
+    y += 40;
 
-    this.settingsContent.add(this.add.text(cx, y + 22, 'Preview and select background music', {
-      fontFamily: FONT, fontSize: '13px', color: '#7a6a5a', fontStyle: 'italic',
-    }).setOrigin(0.5, 0));
-    y += 50;
+    // Build track list: "Room Default" first, then all tracks
+    const allChoices: Array<{ id: string; name: string; description: string }> = [
+      { id: '__room_default__', name: 'Room Default', description: 'Each room plays its own track' },
+      ...MUSIC_TRACKS,
+    ];
+    const isOverride = UISounds.getMusicOverride();
+    const currentTrackId = isOverride ? UISounds.getMusicTrack() : '__room_default__';
+    let currentIdx = allChoices.findIndex(c => c.id === currentTrackId);
+    if (currentIdx < 0) currentIdx = 0;
 
-    const currentTrackId = UISounds.getMusicTrack();
-    const trackBtnW = Math.min(usableW - 20, 420);
-    const trackBtnH = 46;
-    const trackGap = 8;
+    const carouselW = Math.min(usableW - 40, 420);
+    const arrowSize = 40;
+    const nameW = carouselW - arrowSize * 2 - 20;
 
-    for (const track of MUSIC_TRACKS) {
-      const isActive = track.id === currentTrackId;
-      const tbg = this.add.rectangle(cx, y + trackBtnH / 2, trackBtnW, trackBtnH,
-        isActive ? TAB_GOLD : 0x3a2a1a, isActive ? 0.6 : 0.15);
-      tbg.setStrokeStyle(1.5, TAB_GOLD, isActive ? 0.8 : 0.2);
-      tbg.setInteractive({ cursor: POINTER_CURSOR });
-      this.settingsContent.add(tbg);
+    // Left arrow
+    const leftArrow = this.add.text(cx - carouselW / 2 + arrowSize / 2, y + 18, '\u25C0', {
+      fontFamily: FONT, fontSize: '32px', color: TAB_GOLD_STR,
+    }).setOrigin(0.5);
+    leftArrow.setInteractive({ cursor: POINTER_CURSOR });
+    this.settingsContent.add(leftArrow);
 
-      // Track name
-      const tName = this.add.text(cx - trackBtnW / 2 + 20, y + trackBtnH / 2, track.name, {
-        fontFamily: FONT, fontSize: '16px',
-        color: isActive ? '#2a1a0a' : TAB_GOLD_STR,
-        fontStyle: isActive ? 'bold' : 'normal',
-      }).setOrigin(0, 0.5);
-      this.settingsContent.add(tName);
+    // Right arrow
+    const rightArrow = this.add.text(cx + carouselW / 2 - arrowSize / 2, y + 18, '\u25B6', {
+      fontFamily: FONT, fontSize: '32px', color: TAB_GOLD_STR,
+    }).setOrigin(0.5);
+    rightArrow.setInteractive({ cursor: POINTER_CURSOR });
+    this.settingsContent.add(rightArrow);
 
-      // Track description
-      const tDesc = this.add.text(cx + trackBtnW / 2 - 20, y + trackBtnH / 2, track.description, {
-        fontFamily: FONT, fontSize: '12px',
-        color: isActive ? '#4a3a2a' : '#7a6a5a',
-        fontStyle: 'italic',
-      }).setOrigin(1, 0.5);
-      this.settingsContent.add(tDesc);
+    // Track name (centered between arrows)
+    const trackNameText = this.add.text(cx, y + 10, allChoices[currentIdx].name, {
+      fontFamily: FONT, fontSize: '22px', color: TAB_GOLD_STR,
+      fontStyle: 'bold', align: 'center',
+      wordWrap: { width: nameW },
+    }).setOrigin(0.5, 0);
+    this.settingsContent.add(trackNameText);
 
-      // Playing indicator
-      if (isActive) {
-        const indicator = this.add.text(cx - trackBtnW / 2 + 8, y + trackBtnH / 2, '\u266A', {
-          fontFamily: FONT, fontSize: '18px', color: '#2a1a0a',
-        }).setOrigin(0.5);
-        this.settingsContent.add(indicator);
-        tName.setX(cx - trackBtnW / 2 + 28);
+    // Track description (below name)
+    const trackDescText = this.add.text(cx, y + 38, allChoices[currentIdx].description, {
+      fontFamily: FONT, fontSize: '15px', color: '#7a6a5a',
+      fontStyle: 'italic', align: 'center',
+      wordWrap: { width: nameW },
+    }).setOrigin(0.5, 0);
+    this.settingsContent.add(trackDescText);
+
+    // Playing indicator
+    const playingNote = this.add.text(cx, y + 62, '\u266A  Now Playing', {
+      fontFamily: FONT, fontSize: '13px', color: '#6a8a5a',
+      fontStyle: 'italic',
+    }).setOrigin(0.5, 0);
+    playingNote.setVisible(currentIdx > 0); // visible when a specific track is selected
+    this.settingsContent.add(playingNote);
+
+    const selectTrack = (idx: number) => {
+      const choice = allChoices[idx];
+      trackNameText.setText(choice.name);
+      trackDescText.setText(choice.description);
+
+      if (choice.id === '__room_default__') {
+        UISounds.setMusicOverride(false);
+        playingNote.setVisible(false);
+      } else {
+        UISounds.setMusicTrack(choice.id);
+        UISounds.setMusicOverride(true);
+        MusicSystem.getInstance().play(choice.id);
+        playingNote.setVisible(true);
       }
+      UISounds.click();
+    };
 
-      tbg.on('pointerdown', () => {
-        UISounds.setMusicTrack(track.id);
-        UISounds.click();
-        const music = MusicSystem.getInstance();
-        music.play(track.id);
-        this.refreshSettingsContent();
-      });
-      tbg.on('pointerover', () => {
-        if (track.id !== UISounds.getMusicTrack()) tbg.setFillStyle(0x3a2a1a, 0.3);
-      });
-      tbg.on('pointerout', () => {
-        if (track.id !== UISounds.getMusicTrack()) tbg.setFillStyle(0x3a2a1a, 0.15);
-      });
+    leftArrow.on('pointerdown', () => {
+      currentIdx = (currentIdx - 1 + allChoices.length) % allChoices.length;
+      selectTrack(currentIdx);
+    });
+    rightArrow.on('pointerdown', () => {
+      currentIdx = (currentIdx + 1) % allChoices.length;
+      selectTrack(currentIdx);
+    });
+    leftArrow.on('pointerover', () => leftArrow.setColor('#e0d0a0'));
+    leftArrow.on('pointerout', () => leftArrow.setColor(TAB_GOLD_STR));
+    rightArrow.on('pointerover', () => rightArrow.setColor('#e0d0a0'));
+    rightArrow.on('pointerout', () => rightArrow.setColor(TAB_GOLD_STR));
 
-      y += trackBtnH + trackGap;
-    }
-
-    y += 20;
+    y += 90;
 
     // ── Divider ──
     const divGfxMusic = this.add.graphics();
@@ -1588,10 +1654,10 @@ export class UIScene extends Phaser.Scene {
 
     // ── Text Speed ──
     this.settingsContent.add(this.add.text(cx, y, 'TEXT SPEED', {
-      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontFamily: FONT, fontSize: '22px', color: '#5a4a3a',
       fontStyle: 'bold', letterSpacing: 4,
     }).setOrigin(0.5, 0));
-    y += 40;
+    y += 44;
 
     const speedPresets: Array<{ label: string; value: 'slow' | 'normal' | 'fast' | 'instant' }> = [
       { label: 'Slow', value: 'slow' },
@@ -1599,8 +1665,8 @@ export class UIScene extends Phaser.Scene {
       { label: 'Fast', value: 'fast' },
       { label: 'Instant', value: 'instant' },
     ];
-    const btnW = 100;
-    const btnH = 38;
+    const btnW = 110;
+    const btnH = 42;
     const btnGap = 12;
     const totalBtnsW = speedPresets.length * btnW + (speedPresets.length - 1) * btnGap;
     let bx = cx - totalBtnsW / 2 + btnW / 2;
@@ -1615,7 +1681,7 @@ export class UIScene extends Phaser.Scene {
       this.settingsContent.add(bg);
 
       const txt = this.add.text(bx, y + btnH / 2, preset.label, {
-        fontFamily: FONT, fontSize: '16px',
+        fontFamily: FONT, fontSize: '18px',
         color: isActive ? '#2a1a0a' : TAB_GOLD_STR,
         fontStyle: isActive ? 'bold' : 'normal',
       }).setOrigin(0.5);
@@ -1642,10 +1708,10 @@ export class UIScene extends Phaser.Scene {
 
     // ── Toggles Row: Particles & Fullscreen ──
     this.settingsContent.add(this.add.text(cx, y, 'DISPLAY', {
-      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontFamily: FONT, fontSize: '22px', color: '#5a4a3a',
       fontStyle: 'bold', letterSpacing: 4,
     }).setOrigin(0.5, 0));
-    y += 40;
+    y += 44;
 
     const toggles: Array<{ label: string; active: boolean; onToggle: () => void }> = [
       {
@@ -1670,8 +1736,8 @@ export class UIScene extends Phaser.Scene {
       },
     ];
 
-    const toggleW = 160;
-    const toggleH = 38;
+    const toggleW = 170;
+    const toggleH = 42;
     const toggleGap = 24;
     const totalTogglesW = toggles.length * toggleW + (toggles.length - 1) * toggleGap;
     let tx = cx - totalTogglesW / 2 + toggleW / 2;
@@ -1686,7 +1752,7 @@ export class UIScene extends Phaser.Scene {
 
       const stateLabel = isOn ? 'ON' : 'OFF';
       const ttxt = this.add.text(tx, y + toggleH / 2, `${toggle.label}: ${stateLabel}`, {
-        fontFamily: FONT, fontSize: '15px',
+        fontFamily: FONT, fontSize: '18px',
         color: isOn ? '#2a1a0a' : TAB_GOLD_STR,
         fontStyle: isOn ? 'bold' : 'normal',
       }).setOrigin(0.5);
@@ -1709,10 +1775,10 @@ export class UIScene extends Phaser.Scene {
 
     // ── Clear Save Data ──
     this.settingsContent.add(this.add.text(cx, y, 'SAVE DATA', {
-      fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+      fontFamily: FONT, fontSize: '22px', color: '#5a4a3a',
       fontStyle: 'bold', letterSpacing: 4,
     }).setOrigin(0.5, 0));
-    y += 40;
+    y += 44;
 
     const clearBtnW = 220;
     const clearBtnH = 48;
@@ -1766,7 +1832,7 @@ export class UIScene extends Phaser.Scene {
     const auth = AuthManager.getInstance();
     if (auth.isAvailable()) {
       this.settingsContent.add(this.add.text(cx, y, 'ACCOUNT', {
-        fontFamily: FONT, fontSize: '18px', color: '#5a4a3a',
+        fontFamily: FONT, fontSize: '22px', color: '#5a4a3a',
         fontStyle: 'bold', letterSpacing: 4,
       }).setOrigin(0.5, 0));
       y += 35;

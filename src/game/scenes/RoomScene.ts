@@ -226,21 +226,30 @@ export class RoomScene extends Phaser.Scene {
     ambientAudio.setScene(this);
     ambientAudio.enterRoom(this.currentRoom.id);
 
-    // Play background music in every room — track changes by room for atmosphere
-    const ROOM_MUSIC: Record<string, string> = {
-      lobby: 'signs_to_nowhere',           // noir jazz — welcoming but mysterious
-      auditorium: 'lobby_elegant',          // warm elegant strings
-      backstage: 'mystery_unsolved',        // investigation energy
-      dressing_room: 'comfortable_mystery', // contemplative vintage piano
-      projection_booth: 'ghost_story',      // haunting atmosphere
-      managers_office: 'crypto',            // moody building tension
-      catwalk: 'darkest_child',             // dark and unsettling
-      basement: 'dreamy_flashback',         // emotional revelation
-    };
+    // Play background music — each room has a default track, but if the player
+    // manually chose a track from settings, respect that override.
     const music = MusicSystem.getInstance();
-    const targetTrack = ROOM_MUSIC[this.currentRoom.id] || 'signs_to_nowhere';
-    if (!music.isPlaying() || music.getCurrentTrack()?.id !== targetTrack) {
-      music.play(targetTrack);
+    if (UISounds.getMusicOverride()) {
+      // Player chose a specific track — play it if not already playing
+      if (!music.isPlaying()) {
+        music.play(UISounds.getMusicTrack());
+      }
+    } else {
+      // Use room-specific default track
+      const ROOM_MUSIC: Record<string, string> = {
+        lobby: 'signs_to_nowhere',           // noir jazz — welcoming but mysterious
+        auditorium: 'lobby_elegant',          // warm elegant strings
+        backstage: 'mystery_unsolved',        // investigation energy
+        dressing_room: 'comfortable_mystery', // contemplative vintage piano
+        projection_booth: 'ghost_story',      // haunting atmosphere
+        managers_office: 'crypto',            // moody building tension
+        catwalk: 'darkest_child',             // dark and unsettling
+        basement: 'dreamy_flashback',         // emotional revelation
+      };
+      const targetTrack = ROOM_MUSIC[this.currentRoom.id] || 'signs_to_nowhere';
+      if (!music.isPlaying() || music.getCurrentTrack()?.id !== targetTrack) {
+        music.play(targetTrack);
+      }
     }
 
     // Hotspot editor toggle (Shift+Q)

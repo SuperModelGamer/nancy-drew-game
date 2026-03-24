@@ -43,63 +43,57 @@ interface ProceduralLayer {
   duration?: number;
 }
 
-// Room ambient SFX — kept subtle so they don't compete with the music.
-// Primary audio files play at low volume as texture; procedural layers add
-// occasional environmental detail (creaks, drips) rather than constant drones.
+// Room ambient SFX — very subtle texture underneath the real music tracks.
+// Primary loops play at whisper-level volume; procedural layers add occasional
+// environmental detail (creaks, drips) rather than constant drones.
+// No continuous drones — the music system handles atmosphere now.
 const ROOM_AUDIO: Record<string, RoomAudioConfig> = {
   lobby: {
     primary: 'amb_abandoned_building',
-    primaryVol: 0.12,
+    primaryVol: 0.04,
     procedural: [],
   },
   auditorium: {
-    primary: 'amb_ambient_horror',
-    primaryVol: 0.1,
+    primaryVol: 0,
     procedural: [
-      { type: 'creak', freq: 300, volume: 0.015, wave: 'sawtooth', freqEnd: 150, interval: 12000, duration: 0.4 },
+      { type: 'creak', freq: 300, volume: 0.008, wave: 'sawtooth', freqEnd: 150, interval: 18000, duration: 0.3 },
     ],
   },
   backstage: {
     primary: 'amb_abandoned_building2',
-    primaryVol: 0.1,
+    primaryVol: 0.03,
     secondary: 'amb_wood_creak',
-    secondaryVol: 0.08,
+    secondaryVol: 0.03,
     procedural: [],
   },
   dressing_room: {
-    primary: 'amb_horror_ambient',
-    primaryVol: 0.08,
+    primaryVol: 0,
     procedural: [],
   },
   projection_booth: {
     primary: 'amb_electrical_hum',
-    primaryVol: 0.1,
-    procedural: [
-      { type: 'hum', freq: 60, volume: 0.015, wave: 'sawtooth', duration: 8 },
-    ],
+    primaryVol: 0.04,
+    procedural: [],
   },
   catwalk: {
     primary: 'amb_metal_ambience',
-    primaryVol: 0.1,
+    primaryVol: 0.04,
     procedural: [
-      { type: 'wind', freq: 200, volume: 0.015, wave: 'sine', freqEnd: 80, duration: 4 },
-      { type: 'creak', freq: 500, volume: 0.01, wave: 'sawtooth', freqEnd: 200, interval: 10000, duration: 0.6 },
+      { type: 'creak', freq: 500, volume: 0.006, wave: 'sawtooth', freqEnd: 200, interval: 15000, duration: 0.4 },
     ],
   },
   basement: {
-    primary: 'amb_creepy_ambient',
-    primaryVol: 0.12,
-    secondary: 'amb_water_drip',
-    secondaryVol: 0.08,
+    primary: 'amb_water_drip',
+    primaryVol: 0.05,
     procedural: [
-      { type: 'drip', freq: 3000, volume: 0.01, wave: 'sine', freqEnd: 800, interval: 6000, duration: 0.08 },
+      { type: 'drip', freq: 3000, volume: 0.006, wave: 'sine', freqEnd: 800, interval: 8000, duration: 0.08 },
     ],
   },
   managers_office: {
     primary: 'amb_abandoned_building',
-    primaryVol: 0.08,
+    primaryVol: 0.03,
     secondary: 'amb_clock_tick',
-    secondaryVol: 0.12,
+    secondaryVol: 0.06,
     procedural: [],
   },
 };
