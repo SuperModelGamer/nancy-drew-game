@@ -283,21 +283,26 @@ export class UIScene extends Phaser.Scene {
     const canvasH = this.cameras.main.height;
     const TAB_H = 36;
 
+    // Kill any in-progress tweens to prevent conflicts
+    this.tweens.killTweensOf(this.toolbarContainer);
+    this.tweens.killTweensOf(this.toolbarToggleTab);
+
     if (this.toolbarExpanded) {
+      // Slide toolbar up from below the screen
       this.toolbarContainer.setVisible(true);
-      this.toolbarContainer.setY(canvasH);
+      this.toolbarContainer.setY(canvasH + TOOLBAR_H + TAB_H);
       this.tweens.add({
         targets: this.toolbarContainer,
         y: canvasH,
-        duration: 200,
-        ease: 'Power2',
+        duration: 250,
+        ease: 'Back.easeOut',
       });
       // Move toggle tab up above toolbar
       this.tweens.add({
         targets: this.toolbarToggleTab,
         y: canvasH - TOOLBAR_H - TAB_H / 2,
-        duration: 200,
-        ease: 'Power2',
+        duration: 250,
+        ease: 'Back.easeOut',
       });
     } else {
       // Close any open panels
@@ -340,80 +345,79 @@ export class UIScene extends Phaser.Scene {
   private hudBodyContainer!: Phaser.GameObjects.Container;
 
   private createFloatingHUD(canvasW: number, fTop: number, _toolbarTop: number): void {
-    const HUD_W = 280;
-    const HUD_PAD = 16;
-    // Anchored flush to the frame edge — no floating margin
-    const hudX = canvasW - HUD_W - 6; // 6 = FRAME_LEFT border width
-    const hudY = fTop;
+    const HUD_W = 420;
+    const HUD_PAD = 28;
+    const hudX = canvasW - HUD_W - 10;
+    const hudY = fTop + 6;
     const hudCx = HUD_W / 2;
 
     this.hudContainer = this.add.container(hudX, hudY).setDepth(Depths.tooltip);
     this.hudBgGfx = this.add.graphics();
 
-    // ── Collapsed header row: Room name + chevron toggle ──
+    // ── Collapsed header row: Chapter + Room name + chevron toggle ──
     let y = HUD_PAD;
 
     this.borderChapterText = this.add.text(hudCx, y, '', {
-      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue,
-      letterSpacing: 4, align: 'center',
+      fontFamily: FONT, fontSize: '16px', color: TextColors.mutedBlue,
+      letterSpacing: 5, align: 'center',
     }).setOrigin(0.5, 0);
-    y += 16;
+    y += 28;
 
-    this.borderRoomNameText = this.add.text(hudCx - 14, y, '', {
-      fontFamily: FONT, fontSize: '22px', color: '#c9a84c',
-      fontStyle: 'bold', align: 'center', letterSpacing: 2,
-      wordWrap: { width: HUD_W - HUD_PAD * 2 - 40 },
+    this.borderRoomNameText = this.add.text(hudCx, y, '', {
+      fontFamily: FONT, fontSize: '32px', color: '#c9a84c',
+      fontStyle: 'bold', align: 'center', letterSpacing: 3,
+      wordWrap: { width: HUD_W - HUD_PAD * 2 - 60 },
     }).setOrigin(0.5, 0);
 
     // Toggle chevron (▼ expanded, ▶ collapsed)
-    const chevron = this.add.text(HUD_W - HUD_PAD - 8, y + 4, '\u25BC', {
-      fontFamily: FONT, fontSize: '16px', color: '#8a8a9a',
+    const chevron = this.add.text(HUD_W - HUD_PAD, y + 6, '\u25BC', {
+      fontFamily: FONT, fontSize: '22px', color: '#8a8a9a',
     }).setOrigin(0.5, 0);
     chevron.setInteractive({ cursor: POINTER_CURSOR });
-    y += 34;
+    y += 48;
 
     this.hudCollapsedH = y + HUD_PAD / 2;
 
     // ── Expandable body (everything below the header) ──
     this.hudBodyContainer = this.add.container(0, 0);
 
-    // Thin gold divider
+    // Gold divider
     const divGfx = this.add.graphics();
-    divGfx.lineStyle(1, DecoColors.gold, 0.25);
-    divGfx.lineBetween(HUD_PAD + 8, y, HUD_W - HUD_PAD - 8, y);
+    divGfx.lineStyle(1.5, DecoColors.gold, 0.3);
+    divGfx.lineBetween(HUD_PAD, y, HUD_W - HUD_PAD, y);
     this.hudBodyContainer.add(divGfx);
-    y += 12;
+    y += 20;
 
-    // Stats row: Items | Clues
-    const statsLeftX = HUD_PAD + 16;
-    const statsMidX = HUD_W / 2;
+    // Stats row: Items | Clues — two columns
+    const colLeftX = HUD_PAD + 28;
+    const colRightX = HUD_W / 2 + 24;
 
-    const itemsLabel = this.add.text(statsLeftX, y, 'ITEMS', {
-      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue, letterSpacing: 2,
+    const itemsLabel = this.add.text(colLeftX, y, 'ITEMS', {
+      fontFamily: FONT, fontSize: '16px', color: TextColors.mutedBlue, letterSpacing: 4,
     }).setOrigin(0, 0);
-    const cluesLabel = this.add.text(statsMidX + 8, y, 'CLUES', {
-      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue, letterSpacing: 2,
+    const cluesLabel = this.add.text(colRightX, y, 'CLUES', {
+      fontFamily: FONT, fontSize: '16px', color: TextColors.mutedBlue, letterSpacing: 4,
     }).setOrigin(0, 0);
-    y += 16;
+    y += 26;
 
-    this.borderItemCountText = this.add.text(statsLeftX, y, '', {
-      fontFamily: FONT, fontSize: '24px', color: '#c9a84c', fontStyle: 'bold',
+    this.borderItemCountText = this.add.text(colLeftX, y, '', {
+      fontFamily: FONT, fontSize: '36px', color: '#c9a84c', fontStyle: 'bold',
     }).setOrigin(0, 0);
-    this.borderClueCountText = this.add.text(statsMidX + 8, y, '', {
-      fontFamily: FONT, fontSize: '24px', color: '#8a9aaa', fontStyle: 'bold',
+    this.borderClueCountText = this.add.text(colRightX, y, '', {
+      fontFamily: FONT, fontSize: '36px', color: '#8a9aaa', fontStyle: 'bold',
     }).setOrigin(0, 0);
-    y += 32;
+    y += 48;
 
     // Progress bar
-    const barW = HUD_W - HUD_PAD * 2 - 16;
-    const barH = 8;
-    const barX = HUD_PAD + 8;
+    const barW = HUD_W - HUD_PAD * 2 - 12;
+    const barH = 14;
+    const barX = HUD_PAD + 6;
 
     const barBgGfx = this.add.graphics();
     barBgGfx.fillStyle(0x1a1a2e, 0.8);
-    barBgGfx.fillRoundedRect(barX, y, barW, barH, 4);
+    barBgGfx.fillRoundedRect(barX, y, barW, barH, 7);
     barBgGfx.lineStyle(1, DecoColors.gold, 0.25);
-    barBgGfx.strokeRoundedRect(barX, y, barW, barH, 4);
+    barBgGfx.strokeRoundedRect(barX, y, barW, barH, 7);
     this.hudBodyContainer.add(barBgGfx);
 
     this.borderProgressBar = this.add.graphics();
@@ -422,61 +426,65 @@ export class UIScene extends Phaser.Scene {
     this.borderProgressBar.setData('barW', barW);
     this.borderProgressBar.setData('barH', barH);
 
-    this.borderProgressPct = this.add.text(HUD_W - HUD_PAD - 8, y + barH / 2, '', {
-      fontFamily: FONT, fontSize: '13px', color: TextColors.goldDim, fontStyle: 'bold',
-    }).setOrigin(1, 0.5);
-    y += barH + 12;
+    this.borderProgressPct = this.add.text(HUD_W - HUD_PAD - 6, y + barH + 8, '', {
+      fontFamily: FONT, fontSize: '17px', color: TextColors.goldDim, fontStyle: 'bold',
+    }).setOrigin(1, 0);
+    y += barH + 32;
 
     // Divider
     const div2Gfx = this.add.graphics();
-    div2Gfx.lineStyle(1, DecoColors.gold, 0.25);
-    div2Gfx.lineBetween(HUD_PAD + 8, y, HUD_W - HUD_PAD - 8, y);
+    div2Gfx.lineStyle(1.5, DecoColors.gold, 0.3);
+    div2Gfx.lineBetween(HUD_PAD, y, HUD_W - HUD_PAD, y);
     this.hudBodyContainer.add(div2Gfx);
-    y += 12;
+    y += 22;
 
     // Objective
     const objLabel = this.add.text(hudCx, y, '\u2756 OBJECTIVE \u2756', {
-      fontFamily: FONT, fontSize: '13px', color: '#c9a84c',
-      letterSpacing: 2, align: 'center',
+      fontFamily: FONT, fontSize: '18px', color: '#c9a84c',
+      letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0);
-    y += 20;
+    y += 32;
 
     this.borderQuestHintText = this.add.text(hudCx, y, '', {
-      fontFamily: FONT, fontSize: '15px', color: '#f0e0b8',
+      fontFamily: FONT, fontSize: '20px', color: '#f0e0b8',
       fontStyle: 'italic', align: 'center',
-      wordWrap: { width: HUD_W - HUD_PAD * 2 - 4 },
-      lineSpacing: 3,
+      wordWrap: { width: HUD_W - HUD_PAD * 2 - 8 },
+      lineSpacing: 6,
     }).setOrigin(0.5, 0);
-    y += 56;
+    // Reserve space for ~3 lines of hint text (20px * 3 + lineSpacing)
+    y += 90;
 
     // Divider
     const div3Gfx = this.add.graphics();
     div3Gfx.lineStyle(1, DecoColors.gold, 0.2);
     div3Gfx.lineBetween(HUD_PAD + 16, y, HUD_W - HUD_PAD - 16, y);
     this.hudBodyContainer.add(div3Gfx);
-    y += 12;
+    y += 20;
 
-    // Room stats row
-    this.borderRoomClueCountText = this.add.text(hudCx - 36, y, '', {
-      fontFamily: FONT, fontSize: '12px', color: '#7a8a9a',
+    // Room stats row — wide spacing
+    const statLeftX = hudCx - 70;
+    const statRightX = hudCx + 70;
+
+    this.borderRoomClueCountText = this.add.text(statLeftX, y, '', {
+      fontFamily: FONT, fontSize: '22px', color: '#7a8a9a', fontStyle: 'bold',
     }).setOrigin(0.5, 0);
-    const placesLabel = this.add.text(hudCx - 36, y + 14, 'PLACES', {
-      fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue, letterSpacing: 2,
+    const placesLabel = this.add.text(statLeftX, y + 28, 'ROOM', {
+      fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue, letterSpacing: 3,
     }).setOrigin(0.5, 0);
 
-    this.borderTotalItemCountText = this.add.text(hudCx + 36, y, '', {
-      fontFamily: FONT, fontSize: '12px', color: '#7a8a9a',
+    this.borderTotalItemCountText = this.add.text(statRightX, y, '', {
+      fontFamily: FONT, fontSize: '22px', color: '#7a8a9a', fontStyle: 'bold',
     }).setOrigin(0.5, 0);
-    const totalLabel = this.add.text(hudCx + 36, y + 14, 'TOTAL', {
-      fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue, letterSpacing: 2,
+    const totalLabel = this.add.text(statRightX, y + 28, 'TOTAL', {
+      fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue, letterSpacing: 3,
     }).setOrigin(0.5, 0);
-    y += 30;
+    y += 56;
 
-    // Audio + Settings
+    // Audio + Settings — generous spacing
     const musicSys = MusicSystem.getInstance();
 
-    const audioBtn = this.add.text(hudCx - 24, y, '\u{1F50A}', {
-      fontSize: '36px',
+    const audioBtn = this.add.text(hudCx - 48, y, '\u{1F50A}', {
+      fontSize: '46px',
     }).setOrigin(0.5, 0);
     audioBtn.setInteractive({ cursor: POINTER_CURSOR });
 
@@ -503,19 +511,19 @@ export class UIScene extends Phaser.Scene {
       updateAudioIcon();
     });
 
-    const gearBtn = this.add.text(hudCx + 24, y, '\u2699', {
-      fontSize: '40px', color: '#8a8a9a',
+    const gearBtn = this.add.text(hudCx + 48, y - 2, '\u2699', {
+      fontSize: '56px', color: '#8a8a9a',
     }).setOrigin(0.5, 0);
     gearBtn.setInteractive({
       cursor: POINTER_CURSOR,
-      hitArea: new Phaser.Geom.Rectangle(-18, -8, 60, 60),
+      hitArea: new Phaser.Geom.Rectangle(-28, -8, 80, 80),
       hitAreaCallback: Phaser.Geom.Rectangle.Contains,
     });
     gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));
     gearBtn.on('pointerout', () => gearBtn.setColor('#8a8a9a'));
     gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
 
-    y += 46;
+    y += 62;
 
     this.hudExpandedH = y + HUD_PAD / 2;
 
@@ -553,7 +561,8 @@ export class UIScene extends Phaser.Scene {
     });
 
     // Also make the header row clickable to toggle
-    const headerHit = this.add.rectangle(HUD_W / 2, (HUD_PAD + 34) / 2, HUD_W, HUD_PAD + 34, 0x000000, 0);
+    const headerHitH = 70;
+    const headerHit = this.add.rectangle(HUD_W / 2, headerHitH / 2, HUD_W, headerHitH, 0x000000, 0);
     headerHit.setInteractive({ cursor: POINTER_CURSOR });
     headerHit.on('pointerdown', () => {
       UISounds.click();
