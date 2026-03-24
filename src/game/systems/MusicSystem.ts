@@ -1,21 +1,26 @@
 /**
  * MusicSystem — Background music player using real audio tracks.
  *
- * Uses royalty-free music files (Mixkit License) loaded as HTML5 Audio.
+ * Uses royalty-free music files loaded as HTML5 Audio.
  * Each track is a professionally produced piece mapped to a game mood.
  * Supports crossfading between tracks, volume control, and looping.
  *
- * Track sources (all Mixkit Stock Music Free License):
- *  - lobby_elegant: "Wedding 01" by Francisco Alvear
- *  - elegant_classical: "Cristales" by Eugenio Mininni
- *  - exploration_dreamy: "Forest Mist Whispers" by Alejandro Magaña
- *  - investigation_suspense: "Echoes" by Andrew Ev
- *  - noir_tension: "Fallen (Asper)" by Eugenio Mininni
- *  - eerie_ghost: "Spirit in the Woods" by Alejandro Magaña
- *  - calm_thinking: "Opalescent" by Eugenio Mininni
- *  - discovery_emotional: "Charlotte" by Eugenio Mininni
- *  - valley_sunset: "Valley Sunset" by Alejandro Magaña
- *  - gentle_piano: "Zanarkand Forest" by Alejandro Magaña
+ * Track sources & licenses:
+ *  CC BY 4.0 (Shane Ivers - silvermansound.com):
+ *    - signs_to_nowhere: Noir jazz — bass, vibraphone, muted trumpet, drums
+ *    - speakeasy: Uptempo 1920s jazz combo
+ *    - mystery_unsolved: Piano, strings, theremin — investigation energy
+ *
+ *  CC BY 3.0 (Kevin MacLeod - incompetech.com):
+ *    - ghost_story: Classic haunting atmosphere
+ *    - comfortable_mystery: Vintage electric piano, surreal arpeggios
+ *    - darkest_child: Dark, unsettling tension
+ *    - dreamy_flashback: Soft emotional revelation
+ *    - crypto: Moody, building tension
+ *
+ *  Mixkit Stock Music Free License:
+ *    - lobby_elegant: "Wedding 01" by Francisco Alvear
+ *    - gentle_piano: "Zanarkand Forest" by Alejandro Magaña
  */
 
 import { UISounds } from '../utils/sounds';
@@ -32,62 +37,62 @@ export interface MusicTrackDef {
 
 export const MUSIC_TRACKS: MusicTrackDef[] = [
   {
-    id: 'lobby_elegant',
+    id: 'signs_to_nowhere',
     name: 'Grand Lobby',
-    description: 'Warm and elegant — perfect for the theater lobby',
+    description: 'Noir jazz — bass, vibraphone, muted trumpet',
+    file: '/music/signs_to_nowhere.mp3',
+  },
+  {
+    id: 'speakeasy',
+    name: 'The Speakeasy',
+    description: 'Uptempo 1920s jazz combo',
+    file: '/music/speakeasy.mp3',
+  },
+  {
+    id: 'lobby_elegant',
+    name: 'Chandelier Dreams',
+    description: 'Warm, elegant strings and piano',
     file: '/music/lobby_elegant.mp3',
   },
   {
-    id: 'elegant_classical',
-    name: 'Chandelier Dreams',
-    description: 'Classical elegance with sweeping strings',
-    file: '/music/elegant_classical.mp3',
-  },
-  {
-    id: 'exploration_dreamy',
-    name: 'Whispered Clues',
-    description: 'Dreamy and curious — for exploring new rooms',
-    file: '/music/exploration_dreamy.mp3',
-  },
-  {
-    id: 'investigation_suspense',
+    id: 'mystery_unsolved',
     name: 'The Investigation',
-    description: 'Atmospheric tension — gathering evidence',
-    file: '/music/investigation_suspense.mp3',
+    description: 'Piano, strings, and theremin — detective energy',
+    file: '/music/mystery_unsolved.mp3',
   },
   {
-    id: 'noir_tension',
+    id: 'crypto',
     name: 'Velvet Curtain',
-    description: 'Dark noir atmosphere — something is not right',
-    file: '/music/noir_tension.mp3',
+    description: 'Moody, building tension',
+    file: '/music/crypto.mp3',
   },
   {
-    id: 'eerie_ghost',
+    id: 'ghost_story',
     name: 'The Empty Stage',
-    description: 'Mysterious and eerie — ghostly encounters',
-    file: '/music/eerie_ghost.mp3',
+    description: 'Classic haunting atmosphere',
+    file: '/music/ghost_story.mp3',
   },
   {
-    id: 'calm_thinking',
+    id: 'darkest_child',
+    name: 'Gaslight',
+    description: 'Dark, unsettling — something lurks below',
+    file: '/music/darkest_child.mp3',
+  },
+  {
+    id: 'comfortable_mystery',
     name: 'The Study',
-    description: 'Contemplative ambient — solving puzzles',
-    file: '/music/calm_thinking.mp3',
+    description: 'Vintage electric piano — surreal and contemplative',
+    file: '/music/comfortable_mystery.mp3',
   },
   {
-    id: 'discovery_emotional',
+    id: 'dreamy_flashback',
     name: 'Crimson Veil',
-    description: 'Emotional and moving — uncovering the truth',
-    file: '/music/discovery_emotional.mp3',
-  },
-  {
-    id: 'valley_sunset',
-    name: 'Midnight Theatre',
-    description: 'Mysterious warmth — the theater at night',
-    file: '/music/valley_sunset.mp3',
+    description: 'Soft, emotional — uncovering the truth',
+    file: '/music/dreamy_flashback.mp3',
   },
   {
     id: 'gentle_piano',
-    name: 'Gaslight',
+    name: 'Midnight Theatre',
     description: 'Gentle piano — quiet reflection',
     file: '/music/gentle_piano.mp3',
   },

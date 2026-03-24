@@ -228,17 +228,17 @@ export class RoomScene extends Phaser.Scene {
 
     // Play background music in every room — track changes by room for atmosphere
     const ROOM_MUSIC: Record<string, string> = {
-      lobby: 'lobby_elegant',
-      auditorium: 'elegant_classical',
-      backstage: 'exploration_dreamy',
-      dressing_room: 'gentle_piano',
-      projection_booth: 'eerie_ghost',
-      managers_office: 'noir_tension',
-      catwalk: 'investigation_suspense',
-      basement: 'discovery_emotional',
+      lobby: 'signs_to_nowhere',           // noir jazz — welcoming but mysterious
+      auditorium: 'lobby_elegant',          // warm elegant strings
+      backstage: 'mystery_unsolved',        // investigation energy
+      dressing_room: 'comfortable_mystery', // contemplative vintage piano
+      projection_booth: 'ghost_story',      // haunting atmosphere
+      managers_office: 'crypto',            // moody building tension
+      catwalk: 'darkest_child',             // dark and unsettling
+      basement: 'dreamy_flashback',         // emotional revelation
     };
     const music = MusicSystem.getInstance();
-    const targetTrack = ROOM_MUSIC[this.currentRoom.id] || 'valley_sunset';
+    const targetTrack = ROOM_MUSIC[this.currentRoom.id] || 'signs_to_nowhere';
     if (!music.isPlaying() || music.getCurrentTrack()?.id !== targetTrack) {
       music.play(targetTrack);
     }
