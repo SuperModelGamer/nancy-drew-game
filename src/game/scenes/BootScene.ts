@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Colors, TextColors, FONT } from '../utils/constants';
 import { generateItemIcons } from '../utils/item-icons';
 import { getAmbientAudioManifest } from '../systems/AmbientAudioSystem';
+import { preloadSFX } from '../utils/sounds';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -275,6 +276,8 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     // Generate procedural item icons as textures
     generateItemIcons(this);
+    // Preload real SFX audio files (non-blocking — game starts immediately)
+    preloadSFX();
     this.scene.start('TitleScene');
   }
 }
