@@ -257,162 +257,159 @@ export class UIScene extends Phaser.Scene {
   ): void {
     const panelH = toolbarTop - fTop;
     const contentX = rpCx;
-    const pad = 18;
+    const pad = 14;
     const decoGfx = this.add.graphics().setDepth(Depths.tooltip);
 
     // ── Subtle sunburst behind center of panel ──
-    drawSunburst(decoGfx, rpCx, fTop + panelH * 0.35, 110, 16, DecoColors.gold, 0.04);
+    drawSunburst(decoGfx, rpCx, fTop + panelH * 0.28, 110, 16, DecoColors.gold, 0.04);
 
     // ── Top corner ornaments ──
     drawCornerOrnament(decoGfx, rpX + 6, fTop + 6, 16, 'tl', DecoColors.gold, 0.2);
     drawCornerOrnament(decoGfx, rpX + rpW - 6, fTop + 6, 16, 'tr', DecoColors.gold, 0.2);
 
     // ─── Layout: vertically center content within panel ───
-    // Total content height estimate for balanced spacing
-    const totalContentH = 740; // approximate height of all elements + quest hint
+    const totalContentH = 820;
     let y = fTop + Math.max(pad, (panelH - totalContentH) / 2);
 
     // ── Chapter indicator ──
     this.borderChapterText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '10px', color: TextColors.mutedBlue,
+      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue,
       letterSpacing: 4, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 22;
+    y += 24;
 
     // ── Room name ──
     this.borderRoomNameText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '17px', color: '#c9a84c',
+      fontFamily: FONT, fontSize: '18px', color: '#c9a84c',
       fontStyle: 'bold', align: 'center', letterSpacing: 2,
       wordWrap: { width: rpW - pad * 2 },
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 48;
+    y += 44;
 
     // ── Art deco divider ──
     drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2, DecoColors.gold, 0.3);
-    y += 28;
+    y += 24;
 
-    // ── ITEMS (per-room) ──
+    // ── ITEMS IN ROOM ──
     this.add.text(contentX, y, 'ITEMS IN ROOM', {
-      fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue,
-      letterSpacing: 4, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 22;
-
-    this.borderItemCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '30px', color: '#c9a84c',
-      fontStyle: 'bold', align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 50;
-
-    // ── Places to check in this room (gold) ──
-    this.add.text(contentX, y, 'PLACES TO CHECK', {
-      fontFamily: FONT, fontSize: '10px', color: '#c9a84c',
+      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue,
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 22;
+    y += 20;
 
-    this.borderRoomClueCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '26px', color: '#c9a84c',
+    this.borderItemCountText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '28px', color: '#c9a84c',
       fontStyle: 'bold', align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 46;
+    y += 42;
+
+    // ── PLACES TO CHECK ──
+    this.add.text(contentX, y, 'PLACES TO CHECK', {
+      fontFamily: FONT, fontSize: '11px', color: '#c9a84c',
+      letterSpacing: 2, align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 20;
+
+    this.borderRoomClueCountText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '24px', color: '#c9a84c',
+      fontStyle: 'bold', align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 38;
 
     // ── Thin gold line ──
     decoGfx.lineStyle(1, DecoColors.gold, 0.15);
-    decoGfx.lineBetween(rpX + pad + 16, y, rpX + rpW - pad - 16, y);
-    y += 22;
+    decoGfx.lineBetween(rpX + pad + 10, y, rpX + rpW - pad - 10, y);
+    y += 18;
 
-    // ── Items total (white) ──
+    // ── ITEMS TOTAL ──
     this.add.text(contentX, y, 'ITEMS TOTAL', {
-      fontFamily: FONT, fontSize: '10px', color: '#ffffff',
+      fontFamily: FONT, fontSize: '11px', color: '#ffffff',
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 22;
+    y += 20;
 
     this.borderTotalItemCountText = this.add.text(contentX, y, '', {
       fontFamily: FONT, fontSize: '22px', color: '#ffffff',
       align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 42;
+    y += 36;
 
     // ── Thin gold line ──
     decoGfx.lineStyle(1, DecoColors.gold, 0.15);
-    decoGfx.lineBetween(rpX + pad + 16, y, rpX + rpW - pad - 16, y);
-    y += 22;
+    decoGfx.lineBetween(rpX + pad + 10, y, rpX + rpW - pad - 10, y);
+    y += 18;
 
-    // ── CLUES (global) ──
+    // ── CLUES TOTAL ──
     this.add.text(contentX, y, 'CLUES TOTAL', {
-      fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue,
-      letterSpacing: 4, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 24;
-
-    this.borderClueCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '26px', color: '#7a8a9a',
-      align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 46;
-
-    // ── Progress bar ──
-    this.add.text(contentX, y, 'PROGRESS', {
-      fontFamily: FONT, fontSize: '9px', color: TextColors.mutedBlue,
+      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue,
       letterSpacing: 3, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 20;
 
-    const barW = rpW - pad * 2 - 20;
-    const barH = 6;
-    const barX = rpX + pad + 10;
-    // Bar background
-    decoGfx.fillStyle(0x1a1a2e, 0.8);
-    decoGfx.fillRoundedRect(barX, y, barW, barH, 3);
-    decoGfx.lineStyle(1, DecoColors.gold, 0.2);
-    decoGfx.strokeRoundedRect(barX, y, barW, barH, 3);
+    this.borderClueCountText = this.add.text(contentX, y, '', {
+      fontFamily: FONT, fontSize: '24px', color: '#8a9aaa',
+      align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 38;
 
-    // Progress fill (drawn separately so we can update it)
+    // ── PROGRESS ──
+    this.add.text(contentX, y, 'PROGRESS', {
+      fontFamily: FONT, fontSize: '10px', color: TextColors.mutedBlue,
+      letterSpacing: 3, align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 20;
+
+    const barW = rpW - pad * 2 - 10;
+    const barH = 8;
+    const barX = rpX + pad + 5;
+    decoGfx.fillStyle(0x1a1a2e, 0.8);
+    decoGfx.fillRoundedRect(barX, y, barW, barH, 4);
+    decoGfx.lineStyle(1, DecoColors.gold, 0.25);
+    decoGfx.strokeRoundedRect(barX, y, barW, barH, 4);
+
     this.borderProgressBar = this.add.graphics().setDepth(Depths.tooltip);
     this.borderProgressBar.setData('barX', barX);
     this.borderProgressBar.setData('barY', y);
     this.borderProgressBar.setData('barW', barW);
     this.borderProgressBar.setData('barH', barH);
 
-    y += barH + 8;
+    y += barH + 6;
     this.borderProgressPct = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '10px', color: TextColors.goldDim,
+      fontFamily: FONT, fontSize: '11px', color: TextColors.goldDim,
       align: 'center',
+    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    y += 22;
+
+    // ── Art deco divider before objective ──
+    drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2, DecoColors.gold, 0.3);
+    y += 22;
+
+    // ── OBJECTIVE ──
+    this.add.text(contentX, y, '\u2756  OBJECTIVE  \u2756', {
+      fontFamily: FONT, fontSize: '11px', color: '#c9a84c',
+      letterSpacing: 2, align: 'center',
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     y += 24;
 
-    // ── Art deco divider before quest hint ──
-    drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2, DecoColors.gold, 0.25);
-    y += 20;
-
-    // ── Quest Hint / Objective ──
-    this.add.text(contentX, y, 'OBJECTIVE', {
-      fontFamily: FONT, fontSize: '10px', color: TextColors.mutedBlue,
-      letterSpacing: 3, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 20;
-
     this.borderQuestHintText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '16px', color: '#e8d8b0',
+      fontFamily: FONT, fontSize: '15px', color: '#eed9a0',
       fontStyle: 'italic', align: 'center',
-      wordWrap: { width: rpW - pad * 2 },
+      wordWrap: { width: rpW - pad * 2 + 4 },
       lineSpacing: 5,
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 100; // reserve space for hint text
+    y += 100;
 
     // ── Art deco divider before controls ──
     drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2 - 10, DecoColors.gold, 0.2);
-    y += 22;
+    y += 24;
 
-    // ── Audio toggle + Settings gear (side by side) ──
+    // ── Audio toggle + Settings gear ──
     const controlsY = y;
     const musicSys = MusicSystem.getInstance();
 
-    // Audio toggle (chime icon)
-    const audioBtn = this.add.text(contentX - 32, controlsY, '\u{1F514}', {
-      fontSize: '32px', color: TextColors.mutedBlue,
+    // Audio toggle (bell icon)
+    const audioBtn = this.add.text(contentX - 34, controlsY, '\u{1F514}', {
+      fontSize: '36px', color: TextColors.mutedBlue,
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
     audioBtn.setInteractive({ cursor: POINTER_CURSOR });
 
@@ -429,11 +426,9 @@ export class UIScene extends Phaser.Scene {
       UISounds.click();
       const currentVol = UISounds.getMusicVolume();
       if (currentVol > 0) {
-        // Mute — store previous volume and set to 0
         audioBtn.setData('prevVol', currentVol);
         UISounds.setMusicVolume(0);
       } else {
-        // Unmute — restore previous volume
         const prev = (audioBtn.getData('prevVol') as number) || 0.5;
         UISounds.setMusicVolume(prev);
       }
@@ -442,10 +437,10 @@ export class UIScene extends Phaser.Scene {
     });
 
     // Settings gear
-    const gearBtn = this.add.text(contentX + 32, controlsY, '⚙', {
-      fontSize: '36px', color: TextColors.mutedBlue,
+    const gearBtn = this.add.text(contentX + 34, controlsY, '\u2699', {
+      fontSize: '40px', color: TextColors.mutedBlue,
     }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    gearBtn.setInteractive({ cursor: POINTER_CURSOR, hitArea: new Phaser.Geom.Rectangle(-8, -8, 64, 64), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
+    gearBtn.setInteractive({ cursor: POINTER_CURSOR, hitArea: new Phaser.Geom.Rectangle(-12, -8, 64, 64), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
     gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));
     gearBtn.on('pointerout', () => gearBtn.setColor(TextColors.mutedBlue));
     gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
