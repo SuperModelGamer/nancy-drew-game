@@ -4,7 +4,7 @@ import { SaveSystem } from '../systems/SaveSystem';
 import { DialogueSystem } from '../systems/DialogueSystem';
 import roomsData from '../data/rooms.json';
 import itemsData from '../data/items.json';
-import { Colors, TextColors, FONT, Depths, computeViewfinderLayout } from '../utils/constants';
+import { Colors, TextColors, FONT, Depths, computeViewfinderLayout, BOTTOM_BAR_H } from '../utils/constants';
 import { POINTER_CURSOR } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
@@ -15,7 +15,6 @@ import { createAuthFormElements, submitAuthForm } from '../ui/AuthFormOverlay';
 
 // Height of the bottom toolbar strip (buttons + chapter label)
 const TOOLBAR_H = 112;
-const BOTTOM_MARGIN = 12; // negative space below toolbar to prevent misclicks
 const BTN_W = 260;
 const BTN_H = 66;
 const BTN_FONT = '24px';
@@ -89,8 +88,9 @@ export class UIScene extends Phaser.Scene {
 
   // ── Bottom panel state ──
   private toolbarExpanded = false;
-  private toolbarContainer!: Phaser.GameObjects.Container;
-  private toolbarToggleTab!: Phaser.GameObjects.Container;
+  private toolbarContainer!: Phaser.GameObjects.Container;  // expandable info section
+  private bottomBarContainer!: Phaser.GameObjects.Container; // always-visible button bar
+  private menuToggleLabel!: Phaser.GameObjects.Text;
 
   constructor() {
     super({ key: 'UIScene' });
@@ -106,15 +106,16 @@ export class UIScene extends Phaser.Scene {
 
     const frameBg = this.add.graphics();
 
-    // Solid opaque fill for border strips (minimal — just thin edges, no permanent toolbar)
+    // Solid opaque fill for border strips
     frameBg.fillStyle(DecoColors.navy, 1);
     frameBg.fillRect(0, 0, width, fTop);                                // top (thin)
     frameBg.fillRect(0, fTop, fLeft, height - fTop);                    // left (thin)
     frameBg.fillRect(width - fLeft, fTop, fLeft, height - fTop);        // right (thin)
+    // bottom strip is drawn by the always-visible bottom bar
 
-    // Outer gold frame rectangle
+    // Outer gold frame rectangle (full canvas)
     frameBg.lineStyle(2, DecoColors.gold, 0.5);
-    frameBg.strokeRect(1, 1, width - 2, height - BOTTOM_MARGIN - 1);
+    frameBg.strokeRect(1, 1, width - 2, height - 2);
 
     // Inner frame line (game viewport boundary)
     frameBg.lineStyle(1.5, DecoColors.gold, 0.4);
@@ -123,8 +124,8 @@ export class UIScene extends Phaser.Scene {
     // Four outer corner ornaments
     drawCornerOrnament(frameBg, 4, 4, 18, 'tl', DecoColors.gold, 0.4);
     drawCornerOrnament(frameBg, width - 4, 4, 18, 'tr', DecoColors.gold, 0.4);
-    drawCornerOrnament(frameBg, 4, height - BOTTOM_MARGIN - 4, 18, 'bl', DecoColors.gold, 0.4);
-    drawCornerOrnament(frameBg, width - 4, height - BOTTOM_MARGIN - 4, 18, 'br', DecoColors.gold, 0.4);
+    drawCornerOrnament(frameBg, 4, height - 4, 18, 'bl', DecoColors.gold, 0.4);
+    drawCornerOrnament(frameBg, width - 4, height - 4, 18, 'br', DecoColors.gold, 0.4);
 
     frameBg.setDepth(Depths.tooltip - 1);
 
@@ -176,58 +177,161 @@ export class UIScene extends Phaser.Scene {
   private panelH = 0; // total height of the slide-up panel
 
   private createBottomPanel(canvasW: number, canvasH: number, vf: ReturnType<typeof computeViewfinderLayout>): void {
-    const TAB_H = 40;
     const PAD = 28;
+    const barTop = canvasH - BOTTOM_BAR_H; // y where the permanent bar starts
 
     // ════════════════════════════════════════════════════════════════════════
-    // Toggle tab (always visible at bottom center)
+    // Always-visible bottom bar (action buttons + audio/settings + menu toggle)
     // ════════════════════════════════════════════════════════════════════════
-    this.toolbarToggleTab = this.add.container(canvasW / 2, canvasH - TAB_H / 2);
-    this.toolbarToggleTab.setDepth(Depths.tooltip + 1);
+    this.bottomBarContainer = this.add.container(0, barTop);
+    this.bottomBarContainer.setDepth(Depths.tooltip + 1);
 
-    const tabW = 220;
-    const tabGfx = this.add.graphics();
-    tabGfx.fillStyle(DecoColors.navy, 0.94);
-    tabGfx.fillRoundedRect(-tabW / 2, -TAB_H / 2, tabW, TAB_H, { tl: 12, tr: 12, bl: 0, br: 0 });
-    tabGfx.lineStyle(1.5, DecoColors.gold, 0.5);
-    tabGfx.strokeRoundedRect(-tabW / 2, -TAB_H / 2, tabW, TAB_H, { tl: 12, tr: 12, bl: 0, br: 0 });
-    this.toolbarToggleTab.add(tabGfx);
+    // Bar background
+    const barBgGfx = this.add.graphics();
+    barBgGfx.fillStyle(DecoColors.navy, 0.96);
+    barBgGfx.fillRect(0, 0, canvasW, BOTTOM_BAR_H);
+    barBgGfx.lineStyle(1.5, DecoColors.gold, 0.4);
+    barBgGfx.lineBetween(0, 0, canvasW, 0); // gold top border
+    drawCornerOrnament(barBgGfx, 8, 8, 12, 'tl', DecoColors.gold, 0.3);
+    drawCornerOrnament(barBgGfx, canvasW - 8, 8, 12, 'tr', DecoColors.gold, 0.3);
+    this.bottomBarContainer.add(barBgGfx);
 
-    const tabLabel = this.add.text(0, -2, '\u25B2 MENU', {
-      fontFamily: FONT, fontSize: '16px', color: '#c9a84c',
+    // Menu toggle label at top center of bar
+    this.menuToggleLabel = this.add.text(canvasW / 2, 14, '\u25B2 MENU', {
+      fontFamily: FONT, fontSize: '14px', color: '#c9a84c',
       fontStyle: 'bold', letterSpacing: 4,
     }).setOrigin(0.5);
-    this.toolbarToggleTab.add(tabLabel);
+    this.bottomBarContainer.add(this.menuToggleLabel);
 
-    const tabHit = this.add.rectangle(0, 0, tabW, TAB_H, 0x000000, 0);
+    const tabHitW = 220;
+    const tabHit = this.add.rectangle(canvasW / 2, 14, tabHitW, 24, 0x000000, 0);
     tabHit.setInteractive({ cursor: POINTER_CURSOR });
     tabHit.on('pointerdown', () => {
       UISounds.click();
       this.toggleToolbar();
-      tabLabel.setText(this.toolbarExpanded ? '\u25BC MENU' : '\u25B2 MENU');
+      this.menuToggleLabel.setText(this.toolbarExpanded ? '\u25BC MENU' : '\u25B2 MENU');
     });
-    tabHit.on('pointerover', () => tabLabel.setColor('#ffe0a0'));
-    tabHit.on('pointerout', () => tabLabel.setColor('#c9a84c'));
-    this.toolbarToggleTab.add(tabHit);
+    tabHit.on('pointerover', () => this.menuToggleLabel.setColor('#ffe0a0'));
+    tabHit.on('pointerout', () => this.menuToggleLabel.setColor('#c9a84c'));
+    this.bottomBarContainer.add(tabHit);
+
+    // ── Action buttons + audio/settings ──
+    // Buttons are centered vertically in the space below the toggle label
+    const btnAreaTop = 28;
+    const btnCenterY = btnAreaTop + (BOTTOM_BAR_H - btnAreaTop - 8) / 2; // centered with bottom padding
+    const btnSpacing = Math.min(vf.renderedW / 7, 260);
+    const btnCenterX = canvasW / 2;
+
+    // Audio toggle (left of buttons)
+    const musicSys = MusicSystem.getInstance();
+    const audioBtn = this.add.text(btnCenterX - btnSpacing * 2.3, btnCenterY, '\u{1F50A}', {
+      fontSize: '44px',
+    }).setOrigin(0.5, 0.5);
+    audioBtn.setInteractive({ cursor: POINTER_CURSOR });
+
+    const updateAudioIcon = () => {
+      const muted = UISounds.getMusicVolume() <= 0;
+      audioBtn.setText(muted ? '\u{1F507}' : '\u{1F50A}');
+      audioBtn.setColor(muted ? '#4a4a5a' : '#8a8a9a');
+    };
+    updateAudioIcon();
+
+    audioBtn.on('pointerover', () => audioBtn.setColor(TextColors.gold));
+    audioBtn.on('pointerout', () => updateAudioIcon());
+    audioBtn.on('pointerdown', () => {
+      UISounds.click();
+      const currentVol = UISounds.getMusicVolume();
+      if (currentVol > 0) {
+        audioBtn.setData('prevVol', currentVol);
+        UISounds.setMusicVolume(0);
+      } else {
+        const prev = (audioBtn.getData('prevVol') as number) || 0.5;
+        UISounds.setMusicVolume(prev);
+      }
+      musicSys.updateVolume();
+      updateAudioIcon();
+    });
+    this.bottomBarContainer.add(audioBtn);
+
+    // 4 action buttons (centered)
+    const buttons = [
+      { label: 'EVIDENCE', color: DecoColors.gold, x: btnCenterX - btnSpacing * 1.5, action: () => this.toggleEvidence() },
+      { label: 'SUSPECTS', color: 0xb4a0d4, x: btnCenterX - btnSpacing * 0.5, action: () => {
+        const speaker = DialogueSystem.getInstance().getLastSpeaker();
+        const speakerToSuspect: Record<string, string> = {
+          'Vivian': 'vivian', 'Edwin': 'edwin', 'Stella': 'stella',
+          'Ashworth': 'ashworth', 'Diego': 'diego',
+        };
+        this.registry.set('currentDialogueSuspect', speakerToSuspect[speaker] || null);
+        this.scene.launch('SuspectScene');
+      }},
+      { label: 'MAP', color: Colors.mapBlue, x: btnCenterX + btnSpacing * 0.5, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
+      { label: 'JOURNAL', color: DecoColors.gold, x: btnCenterX + btnSpacing * 1.5, action: () => this.toggleJournal() },
+    ];
+
+    buttons.forEach(btn => {
+      const btnContainer = this.add.container(btn.x, btnCenterY);
+
+      const btnGfx = this.add.graphics();
+      drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
+        fillColor: DecoColors.navy, fillAlpha: 0.6,
+        strokeColor: btn.color, strokeAlpha: 0.4, chevronDepth: BTN_CHEVRON,
+      });
+      btnContainer.add(btnGfx);
+
+      const hitArea = this.add.rectangle(0, 0, BTN_W, BTN_H, 0x000000, 0);
+      hitArea.setInteractive({ cursor: POINTER_CURSOR });
+      hitArea.on('pointerover', () => {
+        btnGfx.clear();
+        drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
+          fillColor: DecoColors.navyLight, fillAlpha: 0.8,
+          strokeColor: btn.color, strokeAlpha: 0.8, chevronDepth: BTN_CHEVRON,
+        });
+      });
+      hitArea.on('pointerout', () => {
+        btnGfx.clear();
+        drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
+          fillColor: DecoColors.navy, fillAlpha: 0.6,
+          strokeColor: btn.color, strokeAlpha: 0.4, chevronDepth: BTN_CHEVRON,
+        });
+      });
+      hitArea.on('pointerdown', () => {
+        UISounds.click();
+        btn.action();
+      });
+      btnContainer.add(hitArea);
+
+      const colorHex = `#${btn.color.toString(16).padStart(6, '0')}`;
+      const text = this.add.text(0, 0, btn.label, {
+        fontFamily: FONT, fontSize: BTN_FONT, color: colorHex,
+        fontStyle: 'bold', letterSpacing: 4,
+      }).setOrigin(0.5);
+      btnContainer.add(text);
+
+      this.bottomBarContainer.add(btnContainer);
+    });
+
+    // Settings gear (right of buttons)
+    const gearBtn = this.add.text(btnCenterX + btnSpacing * 2.3, btnCenterY - 2, '\u2699', {
+      fontSize: '54px', color: '#8a8a9a',
+    }).setOrigin(0.5, 0.5);
+    gearBtn.setInteractive({
+      cursor: POINTER_CURSOR,
+      hitArea: new Phaser.Geom.Rectangle(-28, -28, 80, 80),
+      hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+    });
+    gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));
+    gearBtn.on('pointerout', () => gearBtn.setColor('#8a8a9a'));
+    gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
+    this.bottomBarContainer.add(gearBtn);
 
     // ════════════════════════════════════════════════════════════════════════
-    // Panel content — build from top to bottom using a y cursor,
-    // then we know the total height and position it anchored at bottom.
-    // Layout (3 rows):
-    //   Row 1: Chapter / Room name / Stats / Progress / Objective
-    //   Row 2: Divider
-    //   Row 3: Action buttons + audio/settings
+    // Expandable info panel (slides up from above the bottom bar)
+    // Contains: Chapter / Room / Objective / Stats / Progress
     // ════════════════════════════════════════════════════════════════════════
-
-    // We'll create everything in a container at (0,0) first, then position.
     this.toolbarContainer = this.add.container(0, 0);
     this.toolbarContainer.setDepth(Depths.tooltip);
     this.toolbarContainer.setVisible(false);
-
-    // ── Row 1: Info section — laid out horizontally in zones ──
-    // Left zone: chapter + room name
-    // Center zone: objective
-    // Right zone: stats + progress
 
     const infoY = PAD;
     const leftZoneX = PAD + 20;
@@ -304,12 +408,12 @@ export class UIScene extends Phaser.Scene {
     const barX = statsX - barW;
     const barY = infoY + 86;
 
-    const barBgGfx = this.add.graphics();
-    barBgGfx.fillStyle(0x1a1a2e, 0.8);
-    barBgGfx.fillRoundedRect(barX, barY, barW, barH, 6);
-    barBgGfx.lineStyle(1, DecoColors.gold, 0.25);
-    barBgGfx.strokeRoundedRect(barX, barY, barW, barH, 6);
-    this.toolbarContainer.add(barBgGfx);
+    const progressBgGfx = this.add.graphics();
+    progressBgGfx.fillStyle(0x1a1a2e, 0.8);
+    progressBgGfx.fillRoundedRect(barX, barY, barW, barH, 6);
+    progressBgGfx.lineStyle(1, DecoColors.gold, 0.25);
+    progressBgGfx.strokeRoundedRect(barX, barY, barW, barH, 6);
+    this.toolbarContainer.add(progressBgGfx);
 
     this.borderProgressBar = this.add.graphics();
     this.borderProgressBar.setData('barX', barX);
@@ -323,137 +427,21 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(1, 0);
     this.toolbarContainer.add(this.borderProgressPct);
 
-    // ── Divider between info and buttons ──
-    const dividerY = infoY + 116;
-    const divGfx = this.add.graphics();
-    divGfx.lineStyle(1.5, DecoColors.gold, 0.3);
-    divGfx.lineBetween(PAD + 40, dividerY, canvasW - PAD - 40, dividerY);
-    this.toolbarContainer.add(divGfx);
+    // ── Calculate info panel height and add background ──
+    this.panelH = infoY + 120 + PAD; // info section + bottom padding
 
-    // ── Row 2: Action buttons + audio/settings ──
-    const btnRowY = dividerY + 18;
-    const btnSpacing = Math.min(vf.renderedW / 7, 260);
-    const btnCenterX = canvasW / 2;
+    const infoBgGfx = this.add.graphics();
+    infoBgGfx.fillStyle(DecoColors.navy, 0.96);
+    infoBgGfx.fillRect(0, 0, canvasW, this.panelH);
+    infoBgGfx.lineStyle(1.5, DecoColors.gold, 0.4);
+    infoBgGfx.lineBetween(0, 0, canvasW, 0); // gold top border
+    drawCornerOrnament(infoBgGfx, 8, 8, 12, 'tl', DecoColors.gold, 0.3);
+    drawCornerOrnament(infoBgGfx, canvasW - 8, 8, 12, 'tr', DecoColors.gold, 0.3);
+    this.toolbarContainer.add(infoBgGfx);
+    this.toolbarContainer.sendToBack(infoBgGfx);
 
-    // Audio toggle (left of buttons)
-    const musicSys = MusicSystem.getInstance();
-    const audioBtn = this.add.text(btnCenterX - btnSpacing * 2.3, btnRowY + BTN_H / 2, '\u{1F50A}', {
-      fontSize: '44px',
-    }).setOrigin(0.5, 0.5);
-    audioBtn.setInteractive({ cursor: POINTER_CURSOR });
-
-    const updateAudioIcon = () => {
-      const muted = UISounds.getMusicVolume() <= 0;
-      audioBtn.setText(muted ? '\u{1F507}' : '\u{1F50A}');
-      audioBtn.setColor(muted ? '#4a4a5a' : '#8a8a9a');
-    };
-    updateAudioIcon();
-
-    audioBtn.on('pointerover', () => audioBtn.setColor(TextColors.gold));
-    audioBtn.on('pointerout', () => updateAudioIcon());
-    audioBtn.on('pointerdown', () => {
-      UISounds.click();
-      const currentVol = UISounds.getMusicVolume();
-      if (currentVol > 0) {
-        audioBtn.setData('prevVol', currentVol);
-        UISounds.setMusicVolume(0);
-      } else {
-        const prev = (audioBtn.getData('prevVol') as number) || 0.5;
-        UISounds.setMusicVolume(prev);
-      }
-      musicSys.updateVolume();
-      updateAudioIcon();
-    });
-    this.toolbarContainer.add(audioBtn);
-
-    // 4 action buttons (centered)
-    const buttons = [
-      { label: 'EVIDENCE', color: DecoColors.gold, x: btnCenterX - btnSpacing * 1.5, action: () => this.toggleEvidence() },
-      { label: 'SUSPECTS', color: 0xb4a0d4, x: btnCenterX - btnSpacing * 0.5, action: () => {
-        const speaker = DialogueSystem.getInstance().getLastSpeaker();
-        const speakerToSuspect: Record<string, string> = {
-          'Vivian': 'vivian', 'Edwin': 'edwin', 'Stella': 'stella',
-          'Ashworth': 'ashworth', 'Diego': 'diego',
-        };
-        this.registry.set('currentDialogueSuspect', speakerToSuspect[speaker] || null);
-        this.scene.launch('SuspectScene');
-      }},
-      { label: 'MAP', color: Colors.mapBlue, x: btnCenterX + btnSpacing * 0.5, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
-      { label: 'JOURNAL', color: DecoColors.gold, x: btnCenterX + btnSpacing * 1.5, action: () => this.toggleJournal() },
-    ];
-
-    buttons.forEach(btn => {
-      const btnContainer = this.add.container(btn.x, btnRowY + BTN_H / 2);
-
-      const btnGfx = this.add.graphics();
-      drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
-        fillColor: DecoColors.navy, fillAlpha: 0.6,
-        strokeColor: btn.color, strokeAlpha: 0.4, chevronDepth: BTN_CHEVRON,
-      });
-      btnContainer.add(btnGfx);
-
-      const hitArea = this.add.rectangle(0, 0, BTN_W, BTN_H, 0x000000, 0);
-      hitArea.setInteractive({ cursor: POINTER_CURSOR });
-      hitArea.on('pointerover', () => {
-        btnGfx.clear();
-        drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
-          fillColor: DecoColors.navyLight, fillAlpha: 0.8,
-          strokeColor: btn.color, strokeAlpha: 0.8, chevronDepth: BTN_CHEVRON,
-        });
-      });
-      hitArea.on('pointerout', () => {
-        btnGfx.clear();
-        drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
-          fillColor: DecoColors.navy, fillAlpha: 0.6,
-          strokeColor: btn.color, strokeAlpha: 0.4, chevronDepth: BTN_CHEVRON,
-        });
-      });
-      hitArea.on('pointerdown', () => {
-        UISounds.click();
-        btn.action();
-      });
-      btnContainer.add(hitArea);
-
-      const colorHex = `#${btn.color.toString(16).padStart(6, '0')}`;
-      const text = this.add.text(0, 0, btn.label, {
-        fontFamily: FONT, fontSize: BTN_FONT, color: colorHex,
-        fontStyle: 'bold', letterSpacing: 4,
-      }).setOrigin(0.5);
-      btnContainer.add(text);
-
-      this.toolbarContainer.add(btnContainer);
-    });
-
-    // Settings gear (right of buttons)
-    const gearBtn = this.add.text(btnCenterX + btnSpacing * 2.3, btnRowY + BTN_H / 2 - 2, '\u2699', {
-      fontSize: '54px', color: '#8a8a9a',
-    }).setOrigin(0.5, 0.5);
-    gearBtn.setInteractive({
-      cursor: POINTER_CURSOR,
-      hitArea: new Phaser.Geom.Rectangle(-28, -28, 80, 80),
-      hitAreaCallback: Phaser.Geom.Rectangle.Contains,
-    });
-    gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));
-    gearBtn.on('pointerout', () => gearBtn.setColor('#8a8a9a'));
-    gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
-    this.toolbarContainer.add(gearBtn);
-
-    // ── Calculate total panel height and add background ──
-    this.panelH = btnRowY + BTN_H + PAD;
-
-    const bgGfx = this.add.graphics();
-    bgGfx.fillStyle(DecoColors.navy, 0.96);
-    bgGfx.fillRect(0, 0, canvasW, this.panelH);
-    bgGfx.lineStyle(1.5, DecoColors.gold, 0.4);
-    bgGfx.lineBetween(0, 0, canvasW, 0);
-    // Corner ornaments
-    drawCornerOrnament(bgGfx, 8, 8, 12, 'tl', DecoColors.gold, 0.3);
-    drawCornerOrnament(bgGfx, canvasW - 8, 8, 12, 'tr', DecoColors.gold, 0.3);
-    this.toolbarContainer.add(bgGfx);
-    this.toolbarContainer.sendToBack(bgGfx);
-
-    // Position panel off-screen at bottom
-    this.toolbarContainer.setY(canvasH + this.panelH);
+    // Position info panel off-screen (hidden behind bottom bar)
+    this.toolbarContainer.setY(barTop);
 
     this.updateRightPanelStats();
   }
@@ -461,23 +449,16 @@ export class UIScene extends Phaser.Scene {
   private toggleToolbar(): void {
     this.toolbarExpanded = !this.toolbarExpanded;
     const canvasH = this.cameras.main.height;
-    const TAB_H = 40;
+    const barTop = canvasH - BOTTOM_BAR_H;
 
     this.tweens.killTweensOf(this.toolbarContainer);
-    this.tweens.killTweensOf(this.toolbarToggleTab);
 
     if (this.toolbarExpanded) {
       this.toolbarContainer.setVisible(true);
-      this.toolbarContainer.setY(canvasH + this.panelH);
+      this.toolbarContainer.setY(barTop);
       this.tweens.add({
         targets: this.toolbarContainer,
-        y: canvasH - this.panelH,
-        duration: 300,
-        ease: 'Back.easeOut',
-      });
-      this.tweens.add({
-        targets: this.toolbarToggleTab,
-        y: canvasH - this.panelH - TAB_H / 2,
+        y: barTop - this.panelH,
         duration: 300,
         ease: 'Back.easeOut',
       });
@@ -486,16 +467,10 @@ export class UIScene extends Phaser.Scene {
       if (this.journalOpen) this.closeJournal();
       this.tweens.add({
         targets: this.toolbarContainer,
-        y: canvasH + this.panelH,
+        y: barTop,
         duration: 250,
         ease: 'Power2',
         onComplete: () => { if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false); },
-      });
-      this.tweens.add({
-        targets: this.toolbarToggleTab,
-        y: canvasH - TAB_H / 2,
-        duration: 250,
-        ease: 'Power2',
       });
     }
   }
