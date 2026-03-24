@@ -1,57 +1,19 @@
 import Phaser from 'phaser';
-import { FONT } from '../utils/constants';
 
 /**
  * IntroScene — plays the ElevenLabs intro cinematic as a native HTML <video>
  * element overlaid on the Phaser canvas. This bypasses Phaser's broken video
- * system entirely for reliable 1920×1080 playback.
- *
- * Features:
- *  - Timed subtitles synced to narration
- *  - Cinematic letterbox bars for film feel
- *  - Smooth fade-to-black transition
+ * system entirely for reliable fullscreen playback.
  *
  * After the video ends (or is skipped), transitions to RoomScene + UIScene.
  */
 
-interface SubtitleCue {
-  /** Time in seconds when this subtitle appears */
-  time: number;
-  /** Subtitle text */
-  text: string;
-  /** Duration in seconds (auto-calculated from next cue if omitted) */
-  duration?: number;
-}
-
-// ── Subtitle track for the intro cinematic narration ──────────────────────────
-// Timings are approximate — adjust after watching the final video.
-const INTRO_SUBTITLES: SubtitleCue[] = [
-  { time: 0.0,  text: 'The Monarch sits condemned.' },
-  { time: 4.0,  text: 'Three days from demolition.' },
-  { time: 7.0,  text: 'A developer named Roland Ashworth plans to tear it down for condominiums.' },
-  { time: 12.0, text: 'Nancy, someone has been poisoned. The police won\'t listen.' },
-  { time: 17.0, text: 'The wrecking crew comes in three days.' },
-  { time: 20.0, text: 'And something is haunting this theatre.' },
-  { time: 23.0, text: 'Please, there is only one I trust.' },
-  { time: 29.0, text: 'Someone is copying a murder that was never solved.' },
-  { time: 33.0, text: 'A copycat poison.' },
-  { time: 35.0, text: 'A condemned building.' },
-  { time: 37.0, text: 'A ghost that shouldn\'t exist.' },
-  { time: 40.0, text: 'She pushed through the heavy doors of the Monarch Theatre.' },
-  { time: 44.0, text: 'The dark, dusty stairs wind from the side entrance to the Grand Lobby.' },
-  { time: 49.0, text: 'Vivian is waiting.' },
-  { time: 51.0, text: '' },
-];
-
 const GOLD = 'rgba(201, 168, 76,';
-const LETTERBOX_HEIGHT = '7%';
 
 export class IntroScene extends Phaser.Scene {
   private videoEl: HTMLVideoElement | null = null;
   private skipBtn: HTMLButtonElement | null = null;
   private container: HTMLDivElement | null = null;
-  private subtitleEl: HTMLDivElement | null = null;
-  private subtitleTimers: number[] = [];
   private ended = false;
 
   constructor() {
@@ -73,7 +35,7 @@ export class IntroScene extends Phaser.Scene {
       return;
     }
 
-    // Create a container div that matches the canvas position exactly
+    // Create a container div that covers the full canvas area
     this.container = document.createElement('div');
     this.container.style.cssText = `
       position: absolute;
@@ -81,86 +43,43 @@ export class IntroScene extends Phaser.Scene {
       left: 0;
       width: 100%;
       height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       background: #000;
       z-index: 10;
+      overflow: hidden;
     `;
     parent.style.position = 'relative';
     parent.appendChild(this.container);
 
-    // Create native HTML video element
+    // Create native HTML video element — fills entire screen
     this.videoEl = document.createElement('video');
     this.videoEl.src = 'assets/cinematics/ElevenLabs_Nancy_Drew_Intro_1.mp4';
     this.videoEl.playsInline = true;
     this.videoEl.preload = 'auto';
     this.videoEl.style.cssText = `
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
       object-fit: cover;
-      background: #000;
     `;
 
     this.container.appendChild(this.videoEl);
-
-    // ── Cinematic letterbox bars ──
-    const makeBar = (position: 'top' | 'bottom') => {
-      const bar = document.createElement('div');
-      bar.style.cssText = `
-        position: absolute;
-        ${position}: 0;
-        left: 0;
-        width: 100%;
-        height: ${LETTERBOX_HEIGHT};
-        background: #000;
-        z-index: 11;
-        pointer-events: none;
-      `;
-      return bar;
-    };
-    this.container.appendChild(makeBar('top'));
-    this.container.appendChild(makeBar('bottom'));
-
-    // ── Subtitle overlay ──
-    this.subtitleEl = document.createElement('div');
-    this.subtitleEl.style.cssText = `
-      position: absolute;
-      bottom: 12%;
-      left: 50%;
-      transform: translateX(-50%);
-      max-width: 80%;
-      text-align: center;
-      font-family: ${FONT};
-      font-size: clamp(16px, 2.2vw, 28px);
-      color: #fff;
-      text-shadow: 0 0 12px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.8);
-      background: rgba(0, 0, 0, 0.45);
-      padding: 8px 24px;
-      border-radius: 4px;
-      letter-spacing: 0.5px;
-      line-height: 1.5;
-      z-index: 12;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-    `;
-    this.container.appendChild(this.subtitleEl);
-
-    // Schedule subtitle cues
-    this.scheduleSubtitles();
 
     // Skip button (HTML so it sits above the video)
     this.skipBtn = document.createElement('button');
     this.skipBtn.textContent = 'SKIP \u25B8';
     this.skipBtn.style.cssText = `
       position: absolute;
-      top: calc(${LETTERBOX_HEIGHT} + 12px);
+      top: 20px;
       right: 24px;
       background: none;
       border: 1px solid ${GOLD} 0.4);
       color: ${GOLD} 0.7);
-      font-family: ${FONT};
+      font-family: 'Crimson Text', 'Georgia', serif;
       font-size: 18px;
       letter-spacing: 2px;
       padding: 6px 16px;
@@ -208,34 +127,6 @@ export class IntroScene extends Phaser.Scene {
     this.videoEl.addEventListener('ended', () => this.endVideo());
   }
 
-  private scheduleSubtitles(): void {
-    for (let i = 0; i < INTRO_SUBTITLES.length; i++) {
-      const cue = INTRO_SUBTITLES[i];
-      const next = INTRO_SUBTITLES[i + 1];
-      const duration = cue.duration ?? (next ? next.time - cue.time - 0.4 : 4);
-
-      const showTimer = window.setTimeout(() => {
-        if (!this.subtitleEl) return;
-        if (cue.text === '') {
-          // Empty text = hide subtitles
-          this.subtitleEl.style.opacity = '0';
-        } else {
-          this.subtitleEl.textContent = cue.text;
-          this.subtitleEl.style.opacity = '1';
-        }
-      }, cue.time * 1000);
-      this.subtitleTimers.push(showTimer);
-
-      // Auto-hide before next cue (unless empty cue)
-      if (cue.text !== '' && duration > 0) {
-        const hideTimer = window.setTimeout(() => {
-          if (this.subtitleEl) this.subtitleEl.style.opacity = '0';
-        }, (cue.time + duration) * 1000);
-        this.subtitleTimers.push(hideTimer);
-      }
-    }
-  }
-
   private endVideo(): void {
     if (this.ended) return;
     this.ended = true;
@@ -256,10 +147,6 @@ export class IntroScene extends Phaser.Scene {
   }
 
   private cleanup(): void {
-    // Clear subtitle timers
-    for (const t of this.subtitleTimers) window.clearTimeout(t);
-    this.subtitleTimers = [];
-
     if (this.videoEl) {
       this.videoEl.pause();
       this.videoEl.removeAttribute('src');
@@ -271,7 +158,6 @@ export class IntroScene extends Phaser.Scene {
       this.container = null;
     }
     this.skipBtn = null;
-    this.subtitleEl = null;
   }
 
   private startGame(): void {

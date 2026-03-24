@@ -643,7 +643,6 @@
           "height": 156,
           "label": "Margaux's Vanity",
           "type": "inspect",
-          "clueImage": "clue_dr_vanity",
           "description": "Margaux's vanity. Her name is still painted on the mirror in faded gold letters. The lightbulbs around the frame are mostly dead, but two still glow, warm and amber. There are dried roses, an empty perfume bottle, and a hairbrush with dark strands still caught in the bristles. Almost a hundred years, and her hair is still here. It feels wrong to touch anything. But I have to."
         },
         {
@@ -654,9 +653,9 @@
           "height": 366,
           "label": "Vanity Mirror",
           "type": "locked",
+          "description": "I hold the magnifying glass up to the mirror and tilt it in the light. There — barely visible — letters traced in wax on the glass surface. My hands are shaking a little. Margaux wrote this. Nearly a hundred years ago, she sat right where I'm standing and wrote: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.' She knew. She knew who was killing her, and nobody listened.",
           "requiredItem": "magnifying_glass",
-          "puzzleId": "mirror_puzzle",
-          "description": "I hold the magnifying glass up to the mirror and tilt it in the light. There — barely visible — letters traced in wax on the glass surface. My hands are shaking a little. Margaux wrote this. Nearly a hundred years ago, she sat right where I'm standing and wrote: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.' She knew. She knew who was killing her, and nobody listened."
+          "puzzleId": "mirror_puzzle"
         },
         {
           "id": "dr_diary",
@@ -666,10 +665,10 @@
           "height": 154,
           "label": "Vanity Drawer",
           "type": "pickup",
+          "description": "Inside the drawer: a leather-bound diary with M.F. embossed in gold on the cover.",
           "itemId": "margaux_diary",
           "onceOnly": true,
-          "showWhen": "learned_1928_murder",
-          "description": "Inside the drawer: a leather-bound diary with M.F. embossed in gold on the cover."
+          "showWhen": "learned_1928_murder"
         },
         {
           "id": "dr_perfume_bottles",
@@ -749,8 +748,8 @@
           "height": 111,
           "label": "Locked Trunk",
           "type": "locked",
-          "puzzleId": "trunk_puzzle",
-          "description": "An antique trunk with a combination lock. Three dials, each numbered 0–9. The trunk is engraved with Margaux's initials: M.F."
+          "description": "An antique trunk with a combination lock. Three dials, each numbered 0–9. The trunk is engraved with Margaux's initials: M.F.",
+          "puzzleId": "trunk_puzzle"
         },
         {
           "id": "dr_alchemy_book",
@@ -786,8 +785,8 @@
         },
         {
           "id": "dr_vivian_archive",
-          "x": 162,
-          "y": 290,
+          "x": 1084,
+          "y": 845,
           "width": 160,
           "height": 120,
           "label": "Vivian's Archive Box",

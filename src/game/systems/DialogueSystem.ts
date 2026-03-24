@@ -698,7 +698,7 @@ export class DialogueSystem {
     const totalH = displayChoices.length * (CHOICE_H + 15) - 15;
     const startY = height * 0.5 - totalH / 2;
 
-    // Header text — must be in the container so it's cleaned up on next render
+    // Header text
     const headerY = startY - 70;
     const header = this.scene.add.text(width / 2, headerY, 'What would you like to say?', {
       fontFamily: FONT,
@@ -708,18 +708,10 @@ export class DialogueSystem {
     }).setOrigin(0.5);
     this.container.add(header);
 
-    // Format flag/item names into readable evidence hints
-    const formatName = (id: string): string => {
-      return id.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    };
-
     displayChoices.forEach((choice, i) => {
-      const gatedByFlag = isGatedByFlag(choice);
-      const gatedByItem = isGatedByItem(choice);
-      const locked = gatedByFlag || gatedByItem;
       const y = startY + i * (CHOICE_H + 15) + CHOICE_H / 2;
 
-      // Choice button
+      // Choice button — all displayed choices are fully available
       let btn: Phaser.GameObjects.Rectangle | Phaser.GameObjects.Image;
 
       if (this.scene!.textures.exists('dlg_choice_btn')) {
@@ -727,23 +719,13 @@ export class DialogueSystem {
         (btn as Phaser.GameObjects.Image).setDisplaySize(choiceW, CHOICE_H);
       } else {
         btn = this.scene!.add.rectangle(width / 2, y, choiceW, CHOICE_H, 0x0e0c14, 0.92);
-        (btn as Phaser.GameObjects.Rectangle).setStrokeStyle(
-          1.5, !locked ? Colors.gold : 0x444444, !locked ? 0.5 : 0.3
-        );
+        (btn as Phaser.GameObjects.Rectangle).setStrokeStyle(1.5, Colors.gold, 0.5);
       }
 
-      // Locked choices: show what evidence is needed, not the spoiler dialogue text
-      let displayText: string;
-      if (gatedByFlag) {
-        displayText = `Requires: ${formatName(choice.requiredFlag!)}`;
-      } else if (gatedByItem) {
-        displayText = `Requires evidence: ${formatName(choice.requiredItem!)}`;
-      } else {
-        displayText = choice.text;
-      }
+      const displayText = choice.text;
 
-      // Locked text uses a visible but muted color (not near-invisible)
-      const textColor = locked ? '#8a7a5a' : TextColors.gold;
+      // Bright, clearly readable text for all available choices
+      const textColor = '#e8d5a3';
 
       // Text positioned inside the gold borders of choice-btn.png
       // The crown ornament at top takes ~20%, so offset text slightly below center
@@ -757,16 +739,7 @@ export class DialogueSystem {
         align: 'center',
       }).setOrigin(0.5);
 
-      // Add lock icon for locked choices
-      if (locked) {
-        const lockIcon = this.scene!.add.text(
-          width / 2 - textInnerW / 2 - 15, y + textOffsetY, '🔒',
-          { fontSize: '20px' }
-        ).setOrigin(0.5);
-        this.container!.add(lockIcon);
-      }
-
-      if (!locked) {
+      {
         btn.setInteractive({ cursor: POINTER_CURSOR });
 
         // Store the base scales set by setDisplaySize so hover tweens are relative
@@ -825,7 +798,7 @@ export class DialogueSystem {
           } else {
             btn.clearTint();
           }
-          text.setColor(textColor);
+          text.setColor('#e8d5a3');
         });
 
         // Press: push animation then select
@@ -852,13 +825,12 @@ export class DialogueSystem {
 
       this.container!.add([btn, text]);
 
-      // Staggered entrance animation (locked choices are dimmed)
-      const targetAlpha = locked ? 0.5 : 1;
+      // Staggered entrance animation — all choices fully visible
       btn.setAlpha(0);
       text.setAlpha(0);
       this.scene!.tweens.add({
         targets: btn,
-        alpha: targetAlpha,
+        alpha: 1,
         y: { from: y + 22, to: y },
         duration: 300,
         delay: i * 80,
@@ -866,7 +838,7 @@ export class DialogueSystem {
       });
       this.scene!.tweens.add({
         targets: text,
-        alpha: targetAlpha,
+        alpha: 1,
         y: { from: y + 22, to: y },
         duration: 300,
         delay: i * 80,
