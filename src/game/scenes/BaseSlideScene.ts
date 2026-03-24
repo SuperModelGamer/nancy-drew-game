@@ -168,6 +168,9 @@ export abstract class BaseSlideScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Ensure all managed sounds are stopped if the scene is shut down externally
+    this.events.once('shutdown', () => this.stopAllSounds());
+
     const { width, height } = this.cameras.main;
     const timing = this.getTimingConfig();
 

@@ -88,6 +88,9 @@ export class RoomScene extends Phaser.Scene {
     if (!data.skipCinematic) {
       const cinematic = getCinematicForRoom(roomId);
       if (cinematic) {
+        // Stop all audio before handing off to the cinematic scene
+        UISounds.stopAll();
+        MusicSystem.getInstance().stop();
         // Flag prevents create() from running room setup on a missing currentRoom
         this.redirectingToCinematic = true;
         this.scene.start('CinematicScene', {
@@ -1160,6 +1163,8 @@ export class RoomScene extends Phaser.Scene {
   }
 
   private navigateToRoom(roomId: string): void {
+    // Stop all SFX so they don't bleed into the next room
+    UISounds.stopAll();
     UISounds.doorTransition();
     SaveSystem.getInstance().setCurrentRoom(roomId);
     SaveSystem.getInstance().save();
