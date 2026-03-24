@@ -91,8 +91,7 @@ export class UIScene extends Phaser.Scene {
   private toolbarContainer!: Phaser.GameObjects.Container;  // expandable info section
   private bottomBarContainer!: Phaser.GameObjects.Container; // always-visible button bar
   private menuToggleLabel!: Phaser.GameObjects.Text;
-  private bottomBarHidden = false;
-  private autoHideTimer: Phaser.Time.TimerEvent | null = null;
+  private autoCollapseTimer: Phaser.Time.TimerEvent | null = null;
   private volumeSliderContainer: Phaser.GameObjects.Container | null = null;
   private volumeSliderFill: Phaser.GameObjects.Graphics | null = null;
   private updateAudioIcon: (() => void) | null = null;
@@ -167,22 +166,6 @@ export class UIScene extends Phaser.Scene {
       SaveSystem.getInstance().offChange(onSaveChange);
     });
 
-    // Auto-hide bottom bar after 5s of inactivity — show on mouse near bottom
-    this.resetAutoHideTimer();
-    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      const canvasH = this.cameras.main.height;
-      // If mouse is in the bottom 120px zone, reset the timer (show bar)
-      if (pointer.y > canvasH - 120) {
-        this.resetAutoHideTimer();
-      }
-    });
-    // Any click on the bottom bar area resets the timer
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      const canvasH = this.cameras.main.height;
-      if (pointer.y > canvasH - BOTTOM_BAR_H - 40) {
-        this.resetAutoHideTimer();
-      }
-    });
   }
 
   // ─── Combined bottom panel (HUD stats + action buttons) ─────────────────
@@ -617,9 +600,16 @@ export class UIScene extends Phaser.Scene {
         targets: this.toolbarContainer,
         y: barTop - this.panelH,
         duration: 300,
-        ease: 'Cubic.easeOut',  // smooth slide up without overshoot
+        ease: 'Cubic.easeOut',
       });
+      // Start auto-collapse timer (collapses after 5s of no interaction)
+      this.resetAutoCollapseTimer();
     } else {
+      // Cancel any pending auto-collapse
+      if (this.autoCollapseTimer) {
+        this.autoCollapseTimer.remove(false);
+        this.autoCollapseTimer = null;
+      }
       if (this.evidenceOpen) this.closeEvidence();
       if (this.journalOpen) this.closeJournal();
       this.tweens.add({
@@ -632,49 +622,29 @@ export class UIScene extends Phaser.Scene {
     }
   }
 
-  /** Reset auto-hide timer — call whenever the user interacts with the toolbar area. */
-  private resetAutoHideTimer(): void {
-    if (this.autoHideTimer) {
-      this.autoHideTimer.remove(false);
-      this.autoHideTimer = null;
+  /** Reset auto-collapse timer — call whenever the user interacts with the expanded panel. */
+  private resetAutoCollapseTimer(): void {
+    if (this.autoCollapseTimer) {
+      this.autoCollapseTimer.remove(false);
+      this.autoCollapseTimer = null;
     }
-    // Show the bar if it was hidden
-    if (this.bottomBarHidden) {
-      this.showBottomBar();
-    }
-    // Start a new 5-second timer
-    this.autoHideTimer = this.time.delayedCall(5000, () => {
-      // Only auto-hide if toolbar is collapsed and no panels are open
-      if (!this.toolbarExpanded && !this.evidenceOpen && !this.journalOpen && !this.settingsOpen) {
-        this.hideBottomBar();
+    if (!this.toolbarExpanded) return;
+    // Start a new 5-second timer to collapse the expanded info panel
+    this.autoCollapseTimer = this.time.delayedCall(5000, () => {
+      if (this.toolbarExpanded && !this.evidenceOpen && !this.journalOpen && !this.settingsOpen) {
+        this.toolbarExpanded = false;
+        this.menuToggleLabel.setText('\u25B2 MENU');
+        const canvasH = this.cameras.main.height;
+        const barTop = canvasH - BOTTOM_BAR_H;
+        this.tweens.killTweensOf(this.toolbarContainer);
+        this.tweens.add({
+          targets: this.toolbarContainer,
+          y: barTop,
+          duration: 250,
+          ease: 'Power2',
+          onComplete: () => { if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false); },
+        });
       }
-    });
-  }
-
-  private hideBottomBar(): void {
-    if (this.bottomBarHidden) return;
-    this.bottomBarHidden = true;
-    const canvasH = this.cameras.main.height;
-    this.tweens.killTweensOf(this.bottomBarContainer);
-    this.tweens.add({
-      targets: this.bottomBarContainer,
-      y: canvasH,          // slide completely off-screen
-      duration: 400,
-      ease: 'Power2',
-    });
-  }
-
-  private showBottomBar(): void {
-    if (!this.bottomBarHidden) return;
-    this.bottomBarHidden = false;
-    const canvasH = this.cameras.main.height;
-    const barTop = canvasH - BOTTOM_BAR_H;
-    this.tweens.killTweensOf(this.bottomBarContainer);
-    this.tweens.add({
-      targets: this.bottomBarContainer,
-      y: barTop,
-      duration: 300,
-      ease: 'Cubic.easeOut',
     });
   }
 
@@ -881,20 +851,20 @@ export class UIScene extends Phaser.Scene {
     if (this.evidenceOpen) {
       this.closeEvidence();
     } else {
-      // Close journal if open
       if (this.journalOpen) this.closeJournal();
       this.openEvidence();
     }
+    this.resetAutoCollapseTimer();
   }
 
   private toggleJournal(): void {
     if (this.journalOpen) {
       this.closeJournal();
     } else {
-      // Close evidence if open
       if (this.evidenceOpen) this.closeEvidence();
       this.openJournal();
     }
+    this.resetAutoCollapseTimer();
   }
 
   private openEvidence(): void {

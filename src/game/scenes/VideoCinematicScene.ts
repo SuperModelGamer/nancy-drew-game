@@ -18,6 +18,7 @@ import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
 import { MusicSystem } from '../systems/MusicSystem';
 import { AmbientAudioSystem } from '../systems/AmbientAudioSystem';
+import { UISounds } from '../utils/sounds';
 
 const GOLD = 'rgba(201, 168, 76,';
 
@@ -56,9 +57,10 @@ export class VideoCinematicScene extends Phaser.Scene {
       this.scene.setActive(false, 'UIScene');
     }
 
-    // Stop background music and ambient audio — video has its own audio track
+    // Stop ALL other audio — video has its own audio track
     MusicSystem.getInstance().stop();
     AmbientAudioSystem.getInstance().stopAll();
+    UISounds.stopAll();
 
     // Black background behind everything
     const { width, height } = this.cameras.main;
@@ -219,10 +221,13 @@ export class VideoCinematicScene extends Phaser.Scene {
     this.container.appendChild(leftCurtain);
     this.container.appendChild(rightCurtain);
 
-    // Trigger the slide-in animation
+    // Trigger the slide-in animation (double-rAF ensures browser paints the
+    // initial off-screen position before the transition fires)
     requestAnimationFrame(() => {
-      leftCurtain.style.transform = 'translateX(0)';
-      rightCurtain.style.transform = 'translateX(0)';
+      requestAnimationFrame(() => {
+        leftCurtain.style.transform = 'translateX(0)';
+        rightCurtain.style.transform = 'translateX(0)';
+      });
     });
 
     // After curtains close, clean up and transition
