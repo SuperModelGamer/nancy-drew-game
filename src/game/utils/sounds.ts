@@ -20,6 +20,9 @@ let musicVolume = parseFloat(localStorage.getItem('nd_music_volume') ?? '0.5');
 /** Selected music track ID for lobby background music. */
 let musicTrack = localStorage.getItem('nd_music_track') ?? 'signs_to_nowhere';
 
+/** Whether the player has manually overridden the room-default music track. */
+let musicOverride = localStorage.getItem('nd_music_override') === 'true';
+
 function getCtx(): AudioContext | null {
   if (!audioCtx) {
     try {
@@ -155,6 +158,13 @@ export const UISounds = {
   setMusicTrack(id: string): void {
     musicTrack = id;
     localStorage.setItem('nd_music_track', id);
+  },
+
+  /** Whether player has manually overridden room-default music. */
+  getMusicOverride(): boolean { return musicOverride; },
+  setMusicOverride(on: boolean): void {
+    musicOverride = on;
+    localStorage.setItem('nd_music_override', on ? 'true' : 'false');
   },
 
   // Soft click for button presses and hotspot interaction

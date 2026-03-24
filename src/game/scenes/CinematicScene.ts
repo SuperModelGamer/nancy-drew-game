@@ -17,6 +17,8 @@
 
 import { SaveSystem } from '../systems/SaveSystem';
 import { UISounds } from '../utils/sounds';
+import { MusicSystem } from '../systems/MusicSystem';
+import { AmbientAudioSystem } from '../systems/AmbientAudioSystem';
 import { BaseSlideScene, Slide } from './BaseSlideScene';
 
 // ─── Cinematic event definitions ─────────────────────────────────────────────
@@ -748,6 +750,9 @@ export class CinematicScene extends BaseSlideScene {
       this.scene.setActive(false, 'UIScene');
       this.scene.sendToBack('UIScene');
     }
+    // Stop background music and ambient audio so they don't overlap cinematic audio
+    MusicSystem.getInstance().stop();
+    AmbientAudioSystem.getInstance().stopAll();
     super.create();
   }
 

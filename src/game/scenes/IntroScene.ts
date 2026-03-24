@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { MusicSystem } from '../systems/MusicSystem';
+import { AmbientAudioSystem } from '../systems/AmbientAudioSystem';
 
 /**
  * IntroScene — plays the ElevenLabs intro cinematic as a native HTML <video>
@@ -22,6 +24,10 @@ export class IntroScene extends Phaser.Scene {
 
   create(): void {
     this.ended = false;
+
+    // Stop any existing music/ambient audio before playing intro video
+    MusicSystem.getInstance().stop();
+    AmbientAudioSystem.getInstance().stopAll();
 
     // Black background behind everything
     const { width, height } = this.cameras.main;
@@ -136,14 +142,53 @@ export class IntroScene extends Phaser.Scene {
       return;
     }
 
-    // Fade out
-    this.container.style.transition = 'opacity 0.8s ease';
-    this.container.style.opacity = '0';
+    // Red curtain close effect — two crimson panels slide in from left and right
+    const curtainStyle = `
+      position: absolute;
+      top: 0;
+      width: 52%;
+      height: 100%;
+      background: linear-gradient(90deg, #2a0505 0%, #4a0a0a 40%, #5a1010 60%, #4a0a0a 100%);
+      z-index: 14;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    `;
 
+    const leftCurtain = document.createElement('div');
+    leftCurtain.style.cssText = curtainStyle + 'left: 0; transform: translateX(-100%);';
+
+    const rightCurtain = document.createElement('div');
+    rightCurtain.style.cssText = curtainStyle + 'right: 0; transform: translateX(100%);';
+
+    // Gold fringe line on inner edge of each curtain
+    const fringeStyle = `
+      position: absolute;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(180deg, rgba(201,168,76,0.6) 0%, rgba(201,168,76,0.3) 50%, rgba(201,168,76,0.6) 100%);
+    `;
+    const fringeL = document.createElement('div');
+    fringeL.style.cssText = fringeStyle + 'right: 0;';
+    leftCurtain.appendChild(fringeL);
+
+    const fringeR = document.createElement('div');
+    fringeR.style.cssText = fringeStyle + 'left: 0;';
+    rightCurtain.appendChild(fringeR);
+
+    this.container.appendChild(leftCurtain);
+    this.container.appendChild(rightCurtain);
+
+    // Trigger the slide-in animation
+    requestAnimationFrame(() => {
+      leftCurtain.style.transform = 'translateX(0)';
+      rightCurtain.style.transform = 'translateX(0)';
+    });
+
+    // After curtains close, clean up and start game (RoomScene will do the curtain open)
     setTimeout(() => {
       this.cleanup();
       this.startGame();
-    }, 800);
+    }, 900);
   }
 
   private cleanup(): void {

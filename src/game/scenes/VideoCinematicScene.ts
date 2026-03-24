@@ -19,6 +19,8 @@
 
 import Phaser from 'phaser';
 import { SaveSystem } from '../systems/SaveSystem';
+import { MusicSystem } from '../systems/MusicSystem';
+import { AmbientAudioSystem } from '../systems/AmbientAudioSystem';
 import { UISounds } from '../utils/sounds';
 import { FONT } from '../utils/constants';
 
@@ -72,6 +74,9 @@ export class VideoCinematicScene extends Phaser.Scene {
       this.scene.setVisible(false, 'UIScene');
       this.scene.setActive(false, 'UIScene');
     }
+    // Stop background music and ambient audio so they don't overlap video audio
+    MusicSystem.getInstance().stop();
+    AmbientAudioSystem.getInstance().stopAll();
 
     // Black background
     this.add.rectangle(width / 2, height / 2, width, height, 0x000000).setDepth(0);
