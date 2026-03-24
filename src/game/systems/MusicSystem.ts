@@ -1,16 +1,20 @@
 /**
- * MusicSystem — procedural ambient music generator using Web Audio API.
+ * MusicSystem v2 — Procedural ambient music with chord progressions,
+ * arpeggiated patterns, and delay effects for a 1920s theater mystery.
  *
- * Generates atmospheric ambient music on the fly — no audio files needed.
- * Each "track" is a unique combination of oscillators, filters, and modulation
- * that creates a distinct mood. Music is infinite and non-repetitive (no loop seams).
+ * Each track features:
+ *  - Chord progressions that cycle with smooth frequency glide (pad layer)
+ *  - Piano-like arpeggiated patterns following the current chord
+ *  - Sub-bass following the chord root
+ *  - Delay effect for spatial depth and reverb
+ *  - Vibrato and filter modulation for organic movement
  *
- * Tracks are themed for a 1920s theater mystery:
- *  - Midnight Theatre: Deep pads with organ-like overtones
- *  - Velvet Curtain: Warm, mysterious shimmer
- *  - Gaslight: Haunting, sparse with bell-like tones
- *  - The Empty Stage: Eerie minimal drone with distant echoes
- *  - Chandelier Dreams: Elegant ambient with crystal tones
+ * Tracks:
+ *  - Chandelier Dreams: Elegant jazz arpeggios (lobby)
+ *  - Midnight Theatre: Dark minor progressions (auditorium)
+ *  - Velvet Curtain: Suspenseful noir (backstage/office)
+ *  - Gaslight: Haunting sparse tones (dressing room/basement)
+ *  - The Empty Stage: Melancholic and spacious (projection booth/catwalk)
  */
 
 import { UISounds } from '../utils/sounds';
@@ -21,144 +25,216 @@ export interface MusicTrackDef {
   id: string;
   name: string;
   description: string;
-  /** Base frequencies for the pad layers */
-  padFreqs: number[];
-  /** Oscillator types for each pad */
-  padWaves: OscillatorType[];
-  /** Pad volumes (0–1) */
-  padVols: number[];
-  /** LFO speed (Hz) for pad volume modulation */
-  lfoSpeed: number;
-  /** LFO depth (0–1) — how much volume wobbles */
-  lfoDepth: number;
-  /** Whether to add shimmer (high harmonics) */
-  shimmer: boolean;
-  /** Shimmer base frequency */
-  shimmerFreq?: number;
-  /** Whether to add bell/chime tones */
-  bells: boolean;
-  /** Bell interval range [min, max] in ms */
-  bellInterval?: [number, number];
-  /** Bell frequencies (pentatonic-ish) */
-  bellFreqs?: number[];
-  /** Filter cutoff for warmth (Hz) — lower = darker */
+  /** Chord progression — each chord is 4 frequencies (pad voicing) */
+  chords: number[][];
+  /** Seconds per chord before advancing */
+  chordDuration: number;
+  /** Milliseconds between arpeggio notes */
+  arpInterval: number;
+  /** Oscillator wave for pad voices */
+  padWave: OscillatorType;
+  /** Volume per pad voice (0–1) */
+  padVolume: number;
+  /** Volume for arpeggio notes (0–1) */
+  arpVolume: number;
+  /** Volume for bass layer (0–1) */
+  bassVolume: number;
+  /** Low-pass filter cutoff (Hz) */
   filterCutoff: number;
-  /** Sub-bass drone frequency (0 = none) */
-  subBass: number;
-  /** Detune range for organic feel (cents) */
-  detuneRange: number;
+  /** Delay effect time (seconds) */
+  delayTime: number;
+  /** Delay feedback (0–1) */
+  delayFeedback: number;
+  /** Delay wet mix (0–1) */
+  delayMix: number;
+  /** Pad vibrato rate (Hz) */
+  vibratoRate: number;
+  /** Pad vibrato depth (cents) */
+  vibratoDepth: number;
 }
+
+// ── Frequency reference ─────────────────────────────────────────────────────
+// C3=130.8  D3=146.8  Eb3=155.6  E3=164.8  F3=174.6  F#3=185.0  G3=196.0
+// Ab3=207.7  A3=220.0  Bb3=233.1  B3=247.0
+// C4=261.6  C#4=277.2  D4=293.7  Eb4=311.1  E4=329.6  F4=349.2  F#4=370.0
+// G4=392.0  Ab4=415.3  A4=440.0  Bb4=466.2  B4=493.9
+// C5=523.3  D5=587.3  E5=659.3  F5=698.5  G5=784.0  A5=880.0  B5=987.8
 
 export const MUSIC_TRACKS: MusicTrackDef[] = [
   {
+    id: 'chandelier_dreams',
+    name: 'Chandelier Dreams',
+    description: 'Elegant jazz with crystal arpeggios',
+    chords: [
+      [261.6, 329.6, 392.0, 493.9],  // Cmaj7
+      [220.0, 261.6, 329.6, 392.0],  // Am7
+      [293.7, 349.2, 440.0, 523.3],  // Dm7
+      [196.0, 247.0, 293.7, 349.2],  // G7
+      [174.6, 220.0, 261.6, 329.6],  // Fmaj7
+      [220.0, 261.6, 329.6, 392.0],  // Am7
+      [293.7, 349.2, 440.0, 523.3],  // Dm7
+      [196.0, 247.0, 293.7, 349.2],  // G7
+    ],
+    chordDuration: 8,
+    arpInterval: 380,
+    padWave: 'triangle',
+    padVolume: 0.06,
+    arpVolume: 0.055,
+    bassVolume: 0.045,
+    filterCutoff: 2200,
+    delayTime: 0.33,
+    delayFeedback: 0.25,
+    delayMix: 0.18,
+    vibratoRate: 4.5,
+    vibratoDepth: 4,
+  },
+  {
     id: 'midnight_theatre',
     name: 'Midnight Theatre',
-    description: 'Deep, dark pads with organ-like overtones',
-    padFreqs: [55, 82.5, 110, 165],        // A1, E2, A2, E3
-    padWaves: ['sine', 'sine', 'triangle', 'sine'],
-    padVols: [0.12, 0.08, 0.06, 0.03],
-    lfoSpeed: 0.08,
-    lfoDepth: 0.3,
-    shimmer: false,
-    bells: true,
-    bellInterval: [8000, 16000],
-    bellFreqs: [440, 523, 659, 784, 880],   // A4, C5, E5, G5, A5
-    filterCutoff: 800,
-    subBass: 36.7,                           // D1
-    detuneRange: 8,
+    description: 'Dark minor progressions with deep pads',
+    chords: [
+      [220.0, 261.6, 329.6, 392.0],  // Am7
+      [293.7, 349.2, 440.0, 523.3],  // Dm7
+      [164.8, 207.7, 247.0, 293.7],  // E7
+      [220.0, 261.6, 329.6, 392.0],  // Am7
+      [174.6, 220.0, 261.6, 329.6],  // Fmaj7
+      [293.7, 349.2, 440.0, 523.3],  // Dm7
+      [247.0, 293.7, 349.2, 415.3],  // Bdim7
+      [164.8, 207.7, 247.0, 293.7],  // E7
+    ],
+    chordDuration: 10,
+    arpInterval: 500,
+    padWave: 'sine',
+    padVolume: 0.07,
+    arpVolume: 0.04,
+    bassVolume: 0.05,
+    filterCutoff: 1200,
+    delayTime: 0.45,
+    delayFeedback: 0.30,
+    delayMix: 0.25,
+    vibratoRate: 3.5,
+    vibratoDepth: 5,
   },
   {
     id: 'velvet_curtain',
     name: 'Velvet Curtain',
-    description: 'Warm, mysterious with subtle shimmer',
-    padFreqs: [65.4, 98, 130.8, 196],       // C2, G2, C3, G3
-    padWaves: ['sine', 'triangle', 'sine', 'sine'],
-    padVols: [0.10, 0.07, 0.05, 0.04],
-    lfoSpeed: 0.06,
-    lfoDepth: 0.25,
-    shimmer: true,
-    shimmerFreq: 1047,                       // C6
-    bells: true,
-    bellInterval: [6000, 12000],
-    bellFreqs: [523, 587, 698, 784, 1047],   // C5, D5, F5, G5, C6
-    filterCutoff: 1200,
-    subBass: 32.7,                           // C1
-    detuneRange: 6,
+    description: 'Suspenseful noir with building tension',
+    chords: [
+      [146.8, 174.6, 220.0, 261.6],  // Dm7
+      [196.0, 233.1, 293.7, 349.2],  // Gm7
+      [220.0, 277.2, 329.6, 392.0],  // A7
+      [146.8, 174.6, 220.0, 261.6],  // Dm7
+      [233.1, 293.7, 349.2, 440.0],  // Bbmaj7
+      [196.0, 233.1, 293.7, 349.2],  // Gm7
+      [220.0, 277.2, 329.6, 392.0],  // A7
+      [146.8, 174.6, 220.0, 261.6],  // Dm7
+    ],
+    chordDuration: 9,
+    arpInterval: 350,
+    padWave: 'triangle',
+    padVolume: 0.06,
+    arpVolume: 0.05,
+    bassVolume: 0.04,
+    filterCutoff: 1600,
+    delayTime: 0.28,
+    delayFeedback: 0.20,
+    delayMix: 0.15,
+    vibratoRate: 4.0,
+    vibratoDepth: 4,
   },
   {
     id: 'gaslight',
     name: 'Gaslight',
-    description: 'Haunting and sparse with bell-like tones',
-    padFreqs: [73.4, 110, 146.8],           // D2, A2, D3
-    padWaves: ['sine', 'sine', 'triangle'],
-    padVols: [0.09, 0.06, 0.04],
-    lfoSpeed: 0.04,
-    lfoDepth: 0.4,
-    shimmer: false,
-    bells: true,
-    bellInterval: [4000, 9000],
-    bellFreqs: [587, 698, 880, 1047, 1175],  // D5, F5, A5, C6, D6
-    filterCutoff: 900,
-    subBass: 0,
-    detuneRange: 12,
+    description: 'Haunting and sparse with ghostly tones',
+    chords: [
+      [164.8, 196.0, 247.0, 293.7],  // Em7
+      [220.0, 261.6, 329.6, 392.0],  // Am7
+      [247.0, 311.1, 370.0, 440.0],  // B7
+      [164.8, 196.0, 247.0, 293.7],  // Em7
+      [261.6, 329.6, 392.0, 493.9],  // Cmaj7
+      [220.0, 261.6, 329.6, 392.0],  // Am7
+      [247.0, 311.1, 370.0, 440.0],  // B7
+      [164.8, 196.0, 247.0, 293.7],  // Em7
+    ],
+    chordDuration: 12,
+    arpInterval: 600,
+    padWave: 'sine',
+    padVolume: 0.055,
+    arpVolume: 0.045,
+    bassVolume: 0.04,
+    filterCutoff: 1000,
+    delayTime: 0.50,
+    delayFeedback: 0.35,
+    delayMix: 0.30,
+    vibratoRate: 3.0,
+    vibratoDepth: 6,
   },
   {
     id: 'empty_stage',
     name: 'The Empty Stage',
-    description: 'Eerie, minimal drone with distant echoes',
-    padFreqs: [49, 73.4, 98],               // G1, D2, G2
-    padWaves: ['sine', 'sine', 'sine'],
-    padVols: [0.11, 0.07, 0.04],
-    lfoSpeed: 0.03,
-    lfoDepth: 0.5,
-    shimmer: true,
-    shimmerFreq: 784,                        // G5
-    bells: true,
-    bellInterval: [10000, 20000],
-    bellFreqs: [392, 494, 587, 784],         // G4, B4, D5, G5
-    filterCutoff: 600,
-    subBass: 24.5,                           // B0
-    detuneRange: 15,
-  },
-  {
-    id: 'chandelier_dreams',
-    name: 'Chandelier Dreams',
-    description: 'Elegant ambient with crystal-like tones',
-    padFreqs: [82.4, 123.5, 164.8, 247],    // E2, B2, E3, B3
-    padWaves: ['sine', 'triangle', 'sine', 'sine'],
-    padVols: [0.08, 0.06, 0.05, 0.03],
-    lfoSpeed: 0.07,
-    lfoDepth: 0.2,
-    shimmer: true,
-    shimmerFreq: 1319,                       // E6
-    bells: true,
-    bellInterval: [3000, 7000],
-    bellFreqs: [659, 784, 988, 1319, 1568],  // E5, G5, B5, E6, G6
-    filterCutoff: 2000,
-    subBass: 41.2,                           // E1
-    detuneRange: 5,
+    description: 'Melancholic and spacious with slow echoes',
+    chords: [
+      [196.0, 233.1, 293.7, 349.2],  // Gm7
+      [261.6, 311.1, 392.0, 466.2],  // Cm7
+      [146.8, 185.0, 220.0, 261.6],  // D7
+      [196.0, 233.1, 293.7, 349.2],  // Gm7
+      [311.1, 392.0, 466.2, 587.3],  // Ebmaj7
+      [261.6, 311.1, 392.0, 466.2],  // Cm7
+      [146.8, 185.0, 220.0, 261.6],  // D7
+      [196.0, 233.1, 293.7, 349.2],  // Gm7
+    ],
+    chordDuration: 11,
+    arpInterval: 520,
+    padWave: 'sine',
+    padVolume: 0.06,
+    arpVolume: 0.04,
+    bassVolume: 0.045,
+    filterCutoff: 900,
+    delayTime: 0.55,
+    delayFeedback: 0.35,
+    delayMix: 0.30,
+    vibratoRate: 2.8,
+    vibratoDepth: 6,
   },
 ];
 
-// ─── Music System Singleton ─────────────────────────────────────────────────
+// ─── Internal Types ─────────────────────────────────────────────────────────
+
+interface PadVoice {
+  osc1: OscillatorNode;
+  osc2: OscillatorNode;
+  gain: GainNode;
+}
+
+// ─── Music System ───────────────────────────────────────────────────────────
 
 export class MusicSystem {
   private static instance: MusicSystem;
+
   private audioCtx: AudioContext | null = null;
+
+  // Audio graph nodes
   private masterGain: GainNode | null = null;
-  private padOscs: OscillatorNode[] = [];
-  private padGains: GainNode[] = [];
-  private lfoOsc: OscillatorNode | null = null;
-  private lfoGain: GainNode | null = null;
-  private shimmerOsc: OscillatorNode | null = null;
-  private shimmerGain: GainNode | null = null;
-  private subOsc: OscillatorNode | null = null;
-  private subGain: GainNode | null = null;
   private filterNode: BiquadFilterNode | null = null;
-  private bellTimerId: number = 0;
+  private dryGain: GainNode | null = null;
+  private delayNode: DelayNode | null = null;
+  private feedbackGain: GainNode | null = null;
+  private wetGain: GainNode | null = null;
+  private padVoices: PadVoice[] = [];
+  private bassOsc: OscillatorNode | null = null;
+  private bassGain: GainNode | null = null;
+  private vibratoLFO: OscillatorNode | null = null;
+  private vibratoGain: GainNode | null = null;
+  private filterLFO: OscillatorNode | null = null;
+  private filterLFOGain: GainNode | null = null;
+
+  // State
   private currentTrack: MusicTrackDef | null = null;
   private playing = false;
-  private fadeInterval: number = 0;
+  private chordIndex = 0;
+  private arpIndex = 0;
+  private chordTimerId = 0;
+  private arpTimerId = 0;
 
   static getInstance(): MusicSystem {
     if (!MusicSystem.instance) {
@@ -177,14 +253,13 @@ export class MusicSystem {
     return this.audioCtx;
   }
 
-  /** Start playing a track by ID. Crossfades if already playing. */
+  /** Start playing a track by ID. Crossfades if already playing a different track. */
   play(trackId?: string): void {
     const id = trackId ?? UISounds.getMusicTrack();
     const track = MUSIC_TRACKS.find(t => t.id === id) ?? MUSIC_TRACKS[0];
 
     if (this.playing && this.currentTrack?.id === track.id) return;
 
-    // Stop current track with fade
     if (this.playing) {
       this.stop(true).then(() => this.startTrack(track));
     } else {
@@ -200,7 +275,6 @@ export class MusicSystem {
     }
 
     if (fade) {
-      // Fade out over 1.5s
       const now = this.audioCtx.currentTime;
       this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
       this.masterGain.gain.linearRampToValueAtTime(0, now + 1.5);
@@ -230,182 +304,225 @@ export class MusicSystem {
 
     this.currentTrack = track;
     this.playing = true;
+    this.chordIndex = 0;
+    this.arpIndex = 0;
 
     const musicVol = UISounds.getMusicVolume() * UISounds.getVolume();
-
-    // Master gain → destination
-    this.masterGain = ctx.createGain();
-    this.masterGain.gain.setValueAtTime(0.001, ctx.currentTime);
-    this.masterGain.connect(ctx.destination);
-
-    // Low-pass filter for warmth
-    this.filterNode = ctx.createBiquadFilter();
-    this.filterNode.type = 'lowpass';
-    this.filterNode.frequency.setValueAtTime(track.filterCutoff, ctx.currentTime);
-    this.filterNode.Q.setValueAtTime(0.7, ctx.currentTime);
-    this.filterNode.connect(this.masterGain);
-
-    // LFO for organic volume modulation
-    this.lfoOsc = ctx.createOscillator();
-    this.lfoOsc.type = 'sine';
-    this.lfoOsc.frequency.setValueAtTime(track.lfoSpeed, ctx.currentTime);
-    this.lfoGain = ctx.createGain();
-    this.lfoGain.gain.setValueAtTime(track.lfoDepth, ctx.currentTime);
-    this.lfoOsc.connect(this.lfoGain);
-    this.lfoOsc.start(ctx.currentTime);
-
-    // Create pad oscillators
-    for (let i = 0; i < track.padFreqs.length; i++) {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = track.padWaves[i] ?? 'sine';
-      osc.frequency.setValueAtTime(track.padFreqs[i], ctx.currentTime);
-      // Slight detune for organic feel
-      osc.detune.setValueAtTime((Math.random() - 0.5) * track.detuneRange * 2, ctx.currentTime);
-
-      gain.gain.setValueAtTime(track.padVols[i] ?? 0.05, ctx.currentTime);
-      // Connect LFO to modulate pad gain
-      this.lfoGain.connect(gain.gain);
-
-      osc.connect(gain);
-      gain.connect(this.filterNode);
-      osc.start(ctx.currentTime);
-
-      this.padOscs.push(osc);
-      this.padGains.push(gain);
-    }
-
-    // Sub-bass drone
-    if (track.subBass > 0) {
-      this.subOsc = ctx.createOscillator();
-      this.subGain = ctx.createGain();
-      this.subOsc.type = 'sine';
-      this.subOsc.frequency.setValueAtTime(track.subBass, ctx.currentTime);
-      this.subGain.gain.setValueAtTime(0.06, ctx.currentTime);
-      this.subOsc.connect(this.subGain);
-      this.subGain.connect(this.masterGain); // bypass filter for clean sub
-      this.subOsc.start(ctx.currentTime);
-    }
-
-    // Shimmer layer (high harmonics with slow sweep)
-    if (track.shimmer && track.shimmerFreq) {
-      this.shimmerOsc = ctx.createOscillator();
-      this.shimmerGain = ctx.createGain();
-      this.shimmerOsc.type = 'sine';
-      this.shimmerOsc.frequency.setValueAtTime(track.shimmerFreq, ctx.currentTime);
-      this.shimmerGain.gain.setValueAtTime(0.008, ctx.currentTime);
-      this.shimmerOsc.connect(this.shimmerGain);
-      this.shimmerGain.connect(this.masterGain);
-      this.shimmerOsc.start(ctx.currentTime);
-
-      // Slow frequency sweep for movement
-      this.shimmerOsc.frequency.linearRampToValueAtTime(
-        track.shimmerFreq * 1.02, ctx.currentTime + 20
-      );
-    }
-
-    // Fade in over 3 seconds
-    this.masterGain.gain.linearRampToValueAtTime(musicVol, ctx.currentTime + 3);
-
-    // Start bell/chime events
-    if (track.bells && track.bellFreqs && track.bellInterval) {
-      this.scheduleBell(track);
-    }
-
-    // Start slow organic drift — periodically retune pads slightly
-    this.startDrift(track);
-  }
-
-  private scheduleBell(track: MusicTrackDef): void {
-    if (!this.playing || !track.bellInterval || !track.bellFreqs) return;
-    const [minMs, maxMs] = track.bellInterval;
-    const delay = minMs + Math.random() * (maxMs - minMs);
-
-    this.bellTimerId = window.setTimeout(() => {
-      if (!this.playing) return;
-      this.playBell(track);
-      this.scheduleBell(track);
-    }, delay);
-  }
-
-  private playBell(track: MusicTrackDef): void {
-    const ctx = this.getCtx();
-    if (!ctx || !this.masterGain || !track.bellFreqs) return;
-
-    const musicVol = UISounds.getMusicVolume() * UISounds.getVolume();
-    if (musicVol <= 0) return;
-
-    const freq = track.bellFreqs[Math.floor(Math.random() * track.bellFreqs.length)];
     const now = ctx.currentTime;
 
-    // Main bell tone
+    // ── Master output ──
+    this.masterGain = ctx.createGain();
+    this.masterGain.gain.setValueAtTime(0.001, now);
+    this.masterGain.connect(ctx.destination);
+
+    // ── Delay effect (feedback delay for reverb/space) ──
+    this.delayNode = ctx.createDelay(2.0);
+    this.delayNode.delayTime.setValueAtTime(track.delayTime, now);
+    this.feedbackGain = ctx.createGain();
+    this.feedbackGain.gain.setValueAtTime(track.delayFeedback, now);
+    this.wetGain = ctx.createGain();
+    this.wetGain.gain.setValueAtTime(track.delayMix, now);
+
+    this.delayNode.connect(this.feedbackGain);
+    this.feedbackGain.connect(this.delayNode); // feedback loop
+    this.delayNode.connect(this.wetGain);
+    this.wetGain.connect(this.masterGain);
+
+    // ── Dry path ──
+    this.dryGain = ctx.createGain();
+    this.dryGain.gain.setValueAtTime(1.0, now);
+    this.dryGain.connect(this.masterGain);
+
+    // ── Low-pass filter for warmth ──
+    this.filterNode = ctx.createBiquadFilter();
+    this.filterNode.type = 'lowpass';
+    this.filterNode.frequency.setValueAtTime(track.filterCutoff, now);
+    this.filterNode.Q.setValueAtTime(0.7, now);
+    this.filterNode.connect(this.dryGain);
+    this.filterNode.connect(this.delayNode); // send to delay too
+
+    // ── Slow filter sweep LFO for organic movement ──
+    this.filterLFO = ctx.createOscillator();
+    this.filterLFO.type = 'sine';
+    this.filterLFO.frequency.setValueAtTime(0.04, now);
+    this.filterLFOGain = ctx.createGain();
+    this.filterLFOGain.gain.setValueAtTime(track.filterCutoff * 0.25, now);
+    this.filterLFO.connect(this.filterLFOGain);
+    this.filterLFOGain.connect(this.filterNode.frequency);
+    this.filterLFO.start(now);
+
+    // ── Pad voices (4 voices × 2 detuned oscillators for chorus) ──
+    const chord = track.chords[0];
+    for (let i = 0; i < 4; i++) {
+      const freq = chord[i] ?? chord[0];
+
+      const osc1 = ctx.createOscillator();
+      osc1.type = track.padWave;
+      osc1.frequency.setValueAtTime(freq, now);
+      osc1.detune.setValueAtTime(-7, now);
+
+      const osc2 = ctx.createOscillator();
+      osc2.type = track.padWave;
+      osc2.frequency.setValueAtTime(freq, now);
+      osc2.detune.setValueAtTime(7, now);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(track.padVolume, now);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(this.filterNode);
+
+      osc1.start(now);
+      osc2.start(now);
+
+      this.padVoices.push({ osc1, osc2, gain });
+    }
+
+    // ── Vibrato LFO for pads ──
+    this.vibratoLFO = ctx.createOscillator();
+    this.vibratoLFO.type = 'sine';
+    this.vibratoLFO.frequency.setValueAtTime(track.vibratoRate, now);
+    this.vibratoGain = ctx.createGain();
+    this.vibratoGain.gain.setValueAtTime(track.vibratoDepth, now);
+    this.vibratoLFO.connect(this.vibratoGain);
+    for (const voice of this.padVoices) {
+      this.vibratoGain.connect(voice.osc1.detune);
+      this.vibratoGain.connect(voice.osc2.detune);
+    }
+    this.vibratoLFO.start(now);
+
+    // ── Bass (root note one octave below chord, bypasses filter for clarity) ──
+    this.bassOsc = ctx.createOscillator();
+    this.bassOsc.type = 'sine';
+    this.bassOsc.frequency.setValueAtTime(chord[0] / 2, now);
+    this.bassGain = ctx.createGain();
+    this.bassGain.gain.setValueAtTime(track.bassVolume, now);
+    this.bassOsc.connect(this.bassGain);
+    this.bassGain.connect(this.masterGain);
+    this.bassOsc.start(now);
+
+    // ── Fade in over 3 seconds ──
+    this.masterGain.gain.linearRampToValueAtTime(musicVol, now + 3);
+
+    // ── Start chord progression and arpeggiator ──
+    this.scheduleChordChange(track);
+    this.scheduleArpNote(track);
+  }
+
+  // ── Chord progression ─────────────────────────────────────────────────
+
+  private scheduleChordChange(track: MusicTrackDef): void {
+    this.chordTimerId = window.setTimeout(() => {
+      if (!this.playing) return;
+      this.advanceChord(track);
+      this.scheduleChordChange(track);
+    }, track.chordDuration * 1000);
+  }
+
+  private advanceChord(track: MusicTrackDef): void {
+    if (!this.playing || !this.audioCtx) return;
+
+    this.chordIndex = (this.chordIndex + 1) % track.chords.length;
+    const chord = track.chords[this.chordIndex];
+    const now = this.audioCtx.currentTime;
+    const glide = 3; // seconds — smooth portamento between chords
+
+    // Glide pad voices to new chord tones
+    for (let i = 0; i < this.padVoices.length; i++) {
+      const freq = chord[i] ?? chord[0];
+      try {
+        this.padVoices[i].osc1.frequency.linearRampToValueAtTime(freq, now + glide);
+        this.padVoices[i].osc2.frequency.linearRampToValueAtTime(freq, now + glide);
+      } catch { /* oscillator may have stopped */ }
+    }
+
+    // Glide bass to new root (one octave below chord root)
+    if (this.bassOsc) {
+      try {
+        this.bassOsc.frequency.linearRampToValueAtTime(chord[0] / 2, now + glide);
+      } catch { /* ok */ }
+    }
+
+    // Reset arp index so it starts fresh on new chord
+    this.arpIndex = 0;
+  }
+
+  // ── Arpeggiator ───────────────────────────────────────────────────────
+
+  private scheduleArpNote(track: MusicTrackDef): void {
+    // Slight timing jitter (±10%) for human feel
+    const jitter = track.arpInterval * (0.9 + Math.random() * 0.2);
+    this.arpTimerId = window.setTimeout(() => {
+      if (!this.playing) return;
+      this.playArpNote(track);
+      this.scheduleArpNote(track);
+    }, jitter);
+  }
+
+  private playArpNote(track: MusicTrackDef): void {
+    const ctx = this.getCtx();
+    if (!ctx || !this.filterNode) return;
+
+    // Derive arp notes from current chord (one octave up, pendulum pattern)
+    const chord = track.chords[this.chordIndex];
+    const arpUp = chord.map(f => f * 2);
+    const len = arpUp.length;
+    const period = len * 2 - 2; // pendulum: 0,1,2,3,2,1 → period=6
+    const pos = this.arpIndex % Math.max(period, 1);
+    const noteIdx = pos < len ? pos : period - pos;
+    const freq = arpUp[noteIdx] ?? arpUp[0];
+    this.arpIndex++;
+
+    // 18% chance to rest — creates breathing room
+    if (Math.random() < 0.18) return;
+
+    const now = ctx.currentTime;
+    // Velocity variation (±30%) for dynamics
+    const velocity = track.arpVolume * (0.7 + Math.random() * 0.6);
+
+    // Piano-like tone: fundamental + 2nd harmonic (octave)
     const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
     osc.type = 'sine';
     osc.frequency.setValueAtTime(freq, now);
 
-    // Bell-like envelope: quick attack, long exponential decay
-    const vol = 0.03 + Math.random() * 0.02;
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(vol, now + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 4);
+    const harm = ctx.createOscillator();
+    harm.type = 'sine';
+    harm.frequency.setValueAtTime(freq * 2, now);
 
-    osc.connect(gain);
-    gain.connect(this.masterGain);
+    // Piano envelope: fast attack, moderate decay, gentle release
+    const noteGain = ctx.createGain();
+    noteGain.gain.setValueAtTime(0.001, now);
+    noteGain.gain.linearRampToValueAtTime(velocity, now + 0.008);          // attack
+    noteGain.gain.exponentialRampToValueAtTime(velocity * 0.35, now + 0.12); // initial decay
+    noteGain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);          // release
+
+    // 2nd harmonic at 15% (adds brightness without harshness)
+    const harmGain = ctx.createGain();
+    harmGain.gain.setValueAtTime(0.15, now);
+
+    osc.connect(noteGain);
+    harm.connect(harmGain);
+    harmGain.connect(noteGain);
+    noteGain.connect(this.filterNode);
+
     osc.start(now);
-    osc.stop(now + 4.1);
-    osc.onended = () => { osc.disconnect(); gain.disconnect(); };
+    harm.start(now);
+    osc.stop(now + 3);
+    harm.stop(now + 3);
 
-    // Optional second harmonic (softer, octave up) for richness
-    if (Math.random() > 0.5) {
-      const osc2 = ctx.createOscillator();
-      const gain2 = ctx.createGain();
-      osc2.type = 'sine';
-      osc2.frequency.setValueAtTime(freq * 2, now);
-      gain2.gain.setValueAtTime(0.001, now);
-      gain2.gain.linearRampToValueAtTime(vol * 0.3, now + 0.02);
-      gain2.gain.exponentialRampToValueAtTime(0.001, now + 3);
-      osc2.connect(gain2);
-      gain2.connect(this.masterGain);
-      osc2.start(now);
-      osc2.stop(now + 3.1);
-      osc2.onended = () => { osc2.disconnect(); gain2.disconnect(); };
-    }
-  }
-
-  private startDrift(track: MusicTrackDef): void {
-    // Every 15-25 seconds, slightly retune pads for organic movement
-    const drift = () => {
-      if (!this.playing || !this.audioCtx) return;
-      const now = this.audioCtx.currentTime;
-
-      for (let i = 0; i < this.padOscs.length; i++) {
-        const baseFreq = track.padFreqs[i];
-        const newDetune = (Math.random() - 0.5) * track.detuneRange * 2;
-        try {
-          this.padOscs[i].detune.linearRampToValueAtTime(newDetune, now + 8);
-        } catch { /* oscillator may have been stopped */ }
-      }
-
-      // Also gently sweep the filter cutoff
-      if (this.filterNode) {
-        const cutoffDrift = track.filterCutoff * (0.85 + Math.random() * 0.3);
-        this.filterNode.frequency.linearRampToValueAtTime(cutoffDrift, now + 10);
-      }
-
-      // Schedule next drift
-      const nextDrift = 15000 + Math.random() * 10000;
-      this.fadeInterval = window.setTimeout(drift, nextDrift);
+    osc.onended = () => {
+      try { osc.disconnect(); harm.disconnect(); noteGain.disconnect(); harmGain.disconnect(); }
+      catch { /* already cleaned up */ }
     };
-
-    this.fadeInterval = window.setTimeout(drift, 10000 + Math.random() * 5000);
   }
+
+  // ── Cleanup ───────────────────────────────────────────────────────────
 
   private cleanup(): void {
     this.playing = false;
-    window.clearTimeout(this.bellTimerId);
-    window.clearTimeout(this.fadeInterval);
+    window.clearTimeout(this.chordTimerId);
+    window.clearTimeout(this.arpTimerId);
 
     const stopOsc = (osc: OscillatorNode | null) => {
       if (!osc) return;
@@ -413,30 +530,29 @@ export class MusicSystem {
       try { osc.disconnect(); } catch { /* ok */ }
     };
 
-    for (const osc of this.padOscs) stopOsc(osc);
-    for (const gain of this.padGains) { try { gain.disconnect(); } catch { /* ok */ } }
-    this.padOscs = [];
-    this.padGains = [];
+    const disc = (node: AudioNode | null) => {
+      if (!node) return;
+      try { node.disconnect(); } catch { /* ok */ }
+    };
 
-    stopOsc(this.lfoOsc);
-    this.lfoOsc = null;
-    if (this.lfoGain) { try { this.lfoGain.disconnect(); } catch { /* ok */ } }
-    this.lfoGain = null;
+    for (const v of this.padVoices) {
+      stopOsc(v.osc1);
+      stopOsc(v.osc2);
+      disc(v.gain);
+    }
+    this.padVoices = [];
 
-    stopOsc(this.shimmerOsc);
-    this.shimmerOsc = null;
-    if (this.shimmerGain) { try { this.shimmerGain.disconnect(); } catch { /* ok */ } }
-    this.shimmerGain = null;
-
-    stopOsc(this.subOsc);
-    this.subOsc = null;
-    if (this.subGain) { try { this.subGain.disconnect(); } catch { /* ok */ } }
-    this.subGain = null;
-
-    if (this.filterNode) { try { this.filterNode.disconnect(); } catch { /* ok */ } }
-    this.filterNode = null;
-
-    if (this.masterGain) { try { this.masterGain.disconnect(); } catch { /* ok */ } }
-    this.masterGain = null;
+    stopOsc(this.bassOsc);       this.bassOsc = null;
+    disc(this.bassGain);         this.bassGain = null;
+    stopOsc(this.vibratoLFO);    this.vibratoLFO = null;
+    disc(this.vibratoGain);      this.vibratoGain = null;
+    stopOsc(this.filterLFO);     this.filterLFO = null;
+    disc(this.filterLFOGain);    this.filterLFOGain = null;
+    disc(this.filterNode);       this.filterNode = null;
+    disc(this.delayNode);        this.delayNode = null;
+    disc(this.feedbackGain);     this.feedbackGain = null;
+    disc(this.wetGain);          this.wetGain = null;
+    disc(this.dryGain);          this.dryGain = null;
+    disc(this.masterGain);       this.masterGain = null;
   }
 }
