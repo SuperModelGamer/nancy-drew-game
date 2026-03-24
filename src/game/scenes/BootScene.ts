@@ -248,6 +248,8 @@ export class BootScene extends Phaser.Scene {
 
     // Load video cinematics (optional — game degrades to slide-based cinematics)
     const videoCinematics = [
+      'cinematic_murder_1928', 'cinematic_copycat', 'cinematic_ghost_rumors',
+      'cinematic_ghost_sighting',
       'cinematic_ghost_reveal', 'cinematic_confession', 'cinematic_ending_justice',
       'cinematic_ending_exposure', 'cinematic_ending_mercy',
     ];
