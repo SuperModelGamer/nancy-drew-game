@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { Colors, TextColors, FONT } from '../utils/constants';
 import { generateItemIcons } from '../utils/item-icons';
-import { getAmbientAudioManifest } from '../systems/AmbientAudioSystem';
+// Ambient audio loading disabled
 import { preloadSFX } from '../utils/sounds';
 
 export class BootScene extends Phaser.Scene {
@@ -197,10 +197,7 @@ export class BootScene extends Phaser.Scene {
       this.load.audio(key, [`assets/vo/intro/${key}.mp3`, `assets/vo/intro/${key}.ogg`]);
     }
 
-    // Load ambient audio for room soundscapes (optional — procedural fallback exists)
-    for (const { key, path } of getAmbientAudioManifest()) {
-      this.load.audio(key, [path]);
-    }
+    // Ambient audio disabled — music handles atmosphere, SFX on clicks/triggers only
 
     // Load dialogue UI assets (optional — procedural fallbacks exist)
     const dlgAssets: Record<string, string> = {

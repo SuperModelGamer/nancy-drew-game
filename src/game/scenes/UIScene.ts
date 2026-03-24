@@ -87,6 +87,12 @@ export class UIScene extends Phaser.Scene {
   private settingsOpen = false;
   private settingsContainer!: Phaser.GameObjects.Container;
 
+  // ── Bottom toolbar state ──
+  private toolbarExpanded = false;
+  private toolbarContainer!: Phaser.GameObjects.Container;
+  private toolbarToggleTab!: Phaser.GameObjects.Container;
+  private toolbarBgGfx!: Phaser.GameObjects.Graphics;
+
   constructor() {
     super({ key: 'UIScene' });
   }
@@ -102,14 +108,11 @@ export class UIScene extends Phaser.Scene {
 
     const frameBg = this.add.graphics();
 
-    // Solid opaque fill for border strips (minimal — just thin edges + toolbar)
+    // Solid opaque fill for border strips (minimal — just thin edges, no permanent toolbar)
     frameBg.fillStyle(DecoColors.navy, 1);
     frameBg.fillRect(0, 0, width, fTop);                                // top (thin)
-    frameBg.fillRect(0, fTop, fLeft, toolbarTop - fTop);                // left (thin)
-    frameBg.fillRect(width - fLeft, fTop, fLeft, toolbarTop - fTop);    // right (thin)
-    frameBg.fillRect(0, toolbarTop, width, TOOLBAR_H);                  // toolbar
-    frameBg.fillStyle(0x060810, 1);
-    frameBg.fillRect(0, height - BOTTOM_MARGIN, width, BOTTOM_MARGIN);
+    frameBg.fillRect(0, fTop, fLeft, height - fTop);                    // left (thin)
+    frameBg.fillRect(width - fLeft, fTop, fLeft, height - fTop);        // right (thin)
 
     // Outer gold frame rectangle
     frameBg.lineStyle(2, DecoColors.gold, 0.5);
@@ -130,64 +133,8 @@ export class UIScene extends Phaser.Scene {
     // ─── Floating HUD overlay (top-right corner) ───
     this.createFloatingHUD(width, fTop, toolbarTop);
 
-    // ─── Toolbar buttons (centered across full game width) ───
-    const toolbarCenterX = width / 2;
-    const buttonY = toolbarTop + TOOLBAR_H / 2;
-    const btnSpacing = vf.renderedW / 5; // spread across full game width
-
-    const buttons = [
-      { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: toolbarCenterX - btnSpacing * 1.5, action: () => this.toggleEvidence() },
-      { label: 'SUSPECTS', icon: '◉', color: 0xb4a0d4, x: toolbarCenterX - btnSpacing * 0.5, action: () => {
-        // Pass current dialogue speaker so Suspects defaults to their page
-        const speaker = DialogueSystem.getInstance().getLastSpeaker();
-        const speakerToSuspect: Record<string, string> = {
-          'Vivian': 'vivian', 'Edwin': 'edwin', 'Stella': 'stella',
-          'Ashworth': 'ashworth', 'Diego': 'diego',
-        };
-        this.registry.set('currentDialogueSuspect', speakerToSuspect[speaker] || null);
-        this.scene.launch('SuspectScene');
-      }},
-      { label: 'MAP', icon: '◇', color: Colors.mapBlue, x: toolbarCenterX + btnSpacing * 0.5, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
-      { label: 'JOURNAL', icon: '◆', color: DecoColors.gold, x: toolbarCenterX + btnSpacing * 1.5, action: () => this.toggleJournal() },
-    ];
-
-    buttons.forEach(btn => {
-      const container = this.add.container(btn.x, buttonY);
-      container.setDepth(Depths.tooltip);
-
-      const btnGfx = this.add.graphics();
-      drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
-        fillColor: DecoColors.navy, fillAlpha: 0.6,
-        strokeColor: btn.color, strokeAlpha: 0.4, chevronDepth: BTN_CHEVRON,
-      });
-      container.add(btnGfx);
-
-      const hitArea = this.add.rectangle(0, 0, BTN_W, BTN_H, 0x000000, 0);
-      hitArea.setInteractive({ cursor: POINTER_CURSOR });
-      hitArea.on('pointerover', () => {
-        btnGfx.clear();
-        drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
-          fillColor: DecoColors.navyLight, fillAlpha: 0.8,
-          strokeColor: btn.color, strokeAlpha: 0.8, chevronDepth: BTN_CHEVRON,
-        });
-      });
-      hitArea.on('pointerout', () => {
-        btnGfx.clear();
-        drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
-          fillColor: DecoColors.navy, fillAlpha: 0.6,
-          strokeColor: btn.color, strokeAlpha: 0.4, chevronDepth: BTN_CHEVRON,
-        });
-      });
-      hitArea.on('pointerdown', btn.action);
-      container.add(hitArea);
-
-      const colorHex = `#${btn.color.toString(16).padStart(6, '0')}`;
-      const text = this.add.text(0, 0, btn.label, {
-        fontFamily: FONT, fontSize: BTN_FONT, color: colorHex,
-        fontStyle: 'bold', letterSpacing: 4,
-      }).setOrigin(0.5);
-      container.add(text);
-    });
+    // ─── Collapsible bottom toolbar ───
+    this.createCollapsibleToolbar(width, height, vf);
 
     // ─── Evidence panel (hidden by default) ───
     this.evidenceContainer = this.createEvidencePanel();
@@ -218,6 +165,159 @@ export class UIScene extends Phaser.Scene {
       InventorySystem.getInstance().offChange(onInventoryChange);
       SaveSystem.getInstance().offChange(onSaveChange);
     });
+  }
+
+  // ─── Collapsible bottom toolbar ───────────────────────────────────────────
+
+  private createCollapsibleToolbar(canvasW: number, canvasH: number, vf: ReturnType<typeof computeViewfinderLayout>): void {
+    const TAB_H = 36;       // height of the small toggle tab
+    const TOOLBAR_PAD = 16;
+
+    // ── Toggle tab (always visible at bottom center) ──
+    this.toolbarToggleTab = this.add.container(canvasW / 2, canvasH - TAB_H / 2);
+    this.toolbarToggleTab.setDepth(Depths.tooltip + 1);
+
+    const tabW = 180;
+    const tabGfx = this.add.graphics();
+    tabGfx.fillStyle(DecoColors.navy, 0.92);
+    tabGfx.fillRoundedRect(-tabW / 2, -TAB_H / 2, tabW, TAB_H, { tl: 10, tr: 10, bl: 0, br: 0 });
+    tabGfx.lineStyle(1.5, DecoColors.gold, 0.5);
+    tabGfx.strokeRoundedRect(-tabW / 2, -TAB_H / 2, tabW, TAB_H, { tl: 10, tr: 10, bl: 0, br: 0 });
+    this.toolbarToggleTab.add(tabGfx);
+
+    const tabLabel = this.add.text(0, -2, '\u25B2 MENU', {
+      fontFamily: FONT, fontSize: '14px', color: '#c9a84c',
+      fontStyle: 'bold', letterSpacing: 3,
+    }).setOrigin(0.5);
+    this.toolbarToggleTab.add(tabLabel);
+
+    const tabHit = this.add.rectangle(0, 0, tabW, TAB_H, 0x000000, 0);
+    tabHit.setInteractive({ cursor: POINTER_CURSOR });
+    tabHit.on('pointerdown', () => {
+      UISounds.click();
+      this.toggleToolbar();
+      tabLabel.setText(this.toolbarExpanded ? '\u25BC MENU' : '\u25B2 MENU');
+    });
+    tabHit.on('pointerover', () => tabLabel.setColor('#ffe0a0'));
+    tabHit.on('pointerout', () => tabLabel.setColor('#c9a84c'));
+    this.toolbarToggleTab.add(tabHit);
+
+    // ── Toolbar panel (hidden by default, slides up from bottom) ──
+    this.toolbarContainer = this.add.container(0, canvasH);
+    this.toolbarContainer.setDepth(Depths.tooltip);
+    this.toolbarContainer.setVisible(false);
+
+    // Background
+    this.toolbarBgGfx = this.add.graphics();
+    this.toolbarBgGfx.fillStyle(DecoColors.navy, 0.95);
+    this.toolbarBgGfx.fillRect(0, -TOOLBAR_H - TAB_H, canvasW, TOOLBAR_H + TAB_H);
+    this.toolbarBgGfx.lineStyle(1.5, DecoColors.gold, 0.4);
+    this.toolbarBgGfx.lineBetween(0, -TOOLBAR_H - TAB_H, canvasW, -TOOLBAR_H - TAB_H);
+    this.toolbarContainer.add(this.toolbarBgGfx);
+
+    // Buttons
+    const toolbarCenterX = canvasW / 2;
+    const buttonY = -TOOLBAR_H / 2 - TAB_H / 2;
+    const btnSpacing = Math.min(vf.renderedW / 5, 300);
+
+    const buttons = [
+      { label: 'EVIDENCE', icon: '\u25C8', color: DecoColors.gold, x: toolbarCenterX - btnSpacing * 1.5, action: () => this.toggleEvidence() },
+      { label: 'SUSPECTS', icon: '\u25C9', color: 0xb4a0d4, x: toolbarCenterX - btnSpacing * 0.5, action: () => {
+        const speaker = DialogueSystem.getInstance().getLastSpeaker();
+        const speakerToSuspect: Record<string, string> = {
+          'Vivian': 'vivian', 'Edwin': 'edwin', 'Stella': 'stella',
+          'Ashworth': 'ashworth', 'Diego': 'diego',
+        };
+        this.registry.set('currentDialogueSuspect', speakerToSuspect[speaker] || null);
+        this.scene.launch('SuspectScene');
+      }},
+      { label: 'MAP', icon: '\u25C7', color: Colors.mapBlue, x: toolbarCenterX + btnSpacing * 0.5, action: () => this.scene.launch('MapScene', { currentRoom: SaveSystem.getInstance().getCurrentRoom() }) },
+      { label: 'JOURNAL', icon: '\u25C6', color: DecoColors.gold, x: toolbarCenterX + btnSpacing * 1.5, action: () => this.toggleJournal() },
+    ];
+
+    buttons.forEach(btn => {
+      const btnContainer = this.add.container(btn.x, buttonY);
+
+      const btnGfx = this.add.graphics();
+      drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
+        fillColor: DecoColors.navy, fillAlpha: 0.6,
+        strokeColor: btn.color, strokeAlpha: 0.4, chevronDepth: BTN_CHEVRON,
+      });
+      btnContainer.add(btnGfx);
+
+      const hitArea = this.add.rectangle(0, 0, BTN_W, BTN_H, 0x000000, 0);
+      hitArea.setInteractive({ cursor: POINTER_CURSOR });
+      hitArea.on('pointerover', () => {
+        btnGfx.clear();
+        drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
+          fillColor: DecoColors.navyLight, fillAlpha: 0.8,
+          strokeColor: btn.color, strokeAlpha: 0.8, chevronDepth: BTN_CHEVRON,
+        });
+      });
+      hitArea.on('pointerout', () => {
+        btnGfx.clear();
+        drawChevronTab(btnGfx, 0, 0, BTN_W, BTN_H, {
+          fillColor: DecoColors.navy, fillAlpha: 0.6,
+          strokeColor: btn.color, strokeAlpha: 0.4, chevronDepth: BTN_CHEVRON,
+        });
+      });
+      hitArea.on('pointerdown', () => {
+        UISounds.click();
+        btn.action();
+      });
+      btnContainer.add(hitArea);
+
+      const colorHex = `#${btn.color.toString(16).padStart(6, '0')}`;
+      const text = this.add.text(0, 0, btn.label, {
+        fontFamily: FONT, fontSize: BTN_FONT, color: colorHex,
+        fontStyle: 'bold', letterSpacing: 4,
+      }).setOrigin(0.5);
+      btnContainer.add(text);
+
+      this.toolbarContainer.add(btnContainer);
+    });
+  }
+
+  private toggleToolbar(): void {
+    this.toolbarExpanded = !this.toolbarExpanded;
+    const canvasH = this.cameras.main.height;
+    const TAB_H = 36;
+
+    if (this.toolbarExpanded) {
+      this.toolbarContainer.setVisible(true);
+      this.toolbarContainer.setY(canvasH);
+      this.tweens.add({
+        targets: this.toolbarContainer,
+        y: canvasH,
+        duration: 200,
+        ease: 'Power2',
+      });
+      // Move toggle tab up above toolbar
+      this.tweens.add({
+        targets: this.toolbarToggleTab,
+        y: canvasH - TOOLBAR_H - TAB_H / 2,
+        duration: 200,
+        ease: 'Power2',
+      });
+    } else {
+      // Close any open panels
+      if (this.evidenceOpen) this.closeEvidence();
+      if (this.journalOpen) this.closeJournal();
+      this.tweens.add({
+        targets: this.toolbarContainer,
+        y: canvasH + TOOLBAR_H + TAB_H,
+        duration: 200,
+        ease: 'Power2',
+        onComplete: () => { if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false); },
+      });
+      // Move toggle tab back to bottom
+      this.tweens.add({
+        targets: this.toolbarToggleTab,
+        y: canvasH - TAB_H / 2,
+        duration: 200,
+        ease: 'Power2',
+      });
+    }
   }
 
   // ─── Floating HUD overlay ──────────────────────────────────────────────────
@@ -738,7 +838,7 @@ export class UIScene extends Phaser.Scene {
 
     // Panel dimensions
     const panelW = Math.min(width - 60, 1650);
-    const panelH = height - TOOLBAR_H - BOTTOM_MARGIN - 45;
+    const panelH = height - 60; // full height minus padding
     const panelX = width / 2;
     const panelY = panelH / 2 + 15;
 

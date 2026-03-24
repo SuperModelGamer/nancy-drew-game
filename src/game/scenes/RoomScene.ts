@@ -14,7 +14,7 @@ import { Cursors, createGlowSpyglass, createItemCursor } from '../utils/cursors'
 import { addAmbientParticles } from '../utils/ambient-particles';
 import { drawDecoDivider, DecoColors, DecoTextColors } from '../utils/art-deco';
 import { UISounds } from '../utils/sounds';
-import { AmbientAudioSystem } from '../systems/AmbientAudioSystem';
+// AmbientAudioSystem disabled — SFX on clicks/triggers only, music handles atmosphere
 import { MusicSystem } from '../systems/MusicSystem';
 import { playCurtainClose } from '../utils/transitions';
 import { getCinematicForRoom } from './CinematicScene';
@@ -221,10 +221,7 @@ export class RoomScene extends Phaser.Scene {
       });
     }
 
-    // Start room-specific ambient audio
-    const ambientAudio = AmbientAudioSystem.getInstance();
-    ambientAudio.setScene(this);
-    ambientAudio.enterRoom(this.currentRoom.id);
+    // Ambient audio disabled — music system handles atmosphere
 
     // Play background music — each room has a default track, but if the player
     // manually chose a track from settings, respect that override.
@@ -466,7 +463,6 @@ export class RoomScene extends Phaser.Scene {
 
       // Click/tap handler with sparkle feedback and sound
       bg.on('pointerdown', () => {
-        UISounds.click();
         this.playClickSparkle(hx, hy, Colors.gold);
         this.handleHotspot(hotspot);
       });
@@ -548,6 +544,9 @@ export class RoomScene extends Phaser.Scene {
       SaveSystem.getInstance().setFlag(hotspot.setsFlag, true);
     }
 
+    // Play contextual SFX based on hotspot label/type
+    this.playHotspotSFX(hotspot);
+
     switch (hotspot.type) {
       case 'inspect':
         this.showDescription(hotspot.description || 'Nothing noteworthy.', undefined, hotspot.clueImage);
@@ -618,6 +617,34 @@ export class RoomScene extends Phaser.Scene {
         }
         break;
     }
+  }
+
+  /** Play a contextual sound effect based on the hotspot label and type. */
+  private playHotspotSFX(hotspot: Hotspot): void {
+    // Navigate hotspots use door sound (played in navigateToRoom), skip here
+    if (hotspot.type === 'navigate') return;
+    // Pickup has its own sound in the handler
+    if (hotspot.type === 'pickup') return;
+
+    const label = (hotspot.label || '').toLowerCase();
+
+    // Match label keywords to appropriate SFX
+    if (/drawer/i.test(label)) { UISounds.drawerOpen(); return; }
+    if (/door|trapdoor/i.test(label)) { UISounds.doorCreak(); return; }
+    if (/curtain/i.test(label)) { UISounds.curtainPull(); return; }
+    if (/cabinet|filing/i.test(label)) { UISounds.drawerOpen(); return; }
+    if (/desk|table/i.test(label)) { UISounds.drawerOpen(); return; }
+    if (/book|journal|diary|script|letter|note|ledger|pamphlet|playbill|poem/i.test(label)) { UISounds.pageTurn(); return; }
+    if (/safe|lock|padlock/i.test(label)) { UISounds.safeDial(); return; }
+    if (/key/i.test(label)) { UISounds.keyJingle(); return; }
+    if (/lamp|light|spotlight|switch/i.test(label)) { UISounds.spotlightClick(); return; }
+    if (/phone/i.test(label)) { UISounds.phoneRing(); return; }
+    if (/photo|portrait|picture|painting/i.test(label)) { UISounds.photoSnap(); return; }
+    if (/fog|machine|pipe/i.test(label)) { UISounds.fogMachineHiss(); return; }
+    if (/map/i.test(label)) { UISounds.mapOpen(); return; }
+    if (/goblet|glass|cup|bottle|vial|poison/i.test(label)) { UISounds.gobletClink(); return; }
+
+    // Default: no sound for unmatched inspect hotspots (no more click-on-everything)
   }
 
   private handleLockedHotspot(hotspot: Hotspot, selectedItem: string | null): void {
