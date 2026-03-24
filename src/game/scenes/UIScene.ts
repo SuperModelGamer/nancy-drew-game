@@ -8,7 +8,7 @@ import { Colors, TextColors, FONT, Depths, computeViewfinderLayout } from '../ut
 import { POINTER_CURSOR } from '../utils/cursors';
 import { createCloseButton, createOverlay } from '../utils/ui-helpers';
 import { UISounds } from '../utils/sounds';
-import { drawChevronTab, drawCornerOrnament, drawDecoDivider, drawSunburst, drawGeoBorder, DecoColors } from '../utils/art-deco';
+import { drawChevronTab, drawCornerOrnament, DecoColors } from '../utils/art-deco';
 import { AuthManager } from '../systems/AuthManager';
 import { MusicSystem, MUSIC_TRACKS } from '../systems/MusicSystem';
 import { createAuthFormElements, submitAuthForm } from '../ui/AuthFormOverlay';
@@ -94,66 +94,46 @@ export class UIScene extends Phaser.Scene {
   create(): void {
     const { width, height } = this.cameras.main;
 
-    // ─── Viewfinder frame — thin left border, thick right info panel ───
+    // ─── Full-screen game viewport with minimal frame ───
     const vf = computeViewfinderLayout(width, height);
     const fLeft = vf.leftMargin;
     const fTop = vf.topMargin;
     const toolbarTop = vf.viewportY + vf.viewportH;
-    const rpX = vf.rightPanelX; // right panel left edge
-    const rpW = vf.rightPanelW; // right panel width
-    const rpCx = rpX + rpW / 2; // right panel center X
 
     const frameBg = this.add.graphics();
 
-    // Solid opaque fill for border strips
+    // Solid opaque fill for border strips (minimal — just thin edges + toolbar)
     frameBg.fillStyle(DecoColors.navy, 1);
-    frameBg.fillRect(0, 0, width, fTop);                                // top
+    frameBg.fillRect(0, 0, width, fTop);                                // top (thin)
     frameBg.fillRect(0, fTop, fLeft, toolbarTop - fTop);                // left (thin)
-    frameBg.fillRect(rpX, fTop, rpW, toolbarTop - fTop);                // right panel
+    frameBg.fillRect(width - fLeft, fTop, fLeft, toolbarTop - fTop);    // right (thin)
     frameBg.fillRect(0, toolbarTop, width, TOOLBAR_H);                  // toolbar
     frameBg.fillStyle(0x060810, 1);
     frameBg.fillRect(0, height - BOTTOM_MARGIN, width, BOTTOM_MARGIN);
 
     // Outer gold frame rectangle
-    frameBg.lineStyle(3, DecoColors.gold, 0.7);
-    frameBg.strokeRect(1, 1, width - 2, height - BOTTOM_MARGIN - 1);
-    frameBg.lineStyle(1, DecoColors.gold, 0.3);
-    frameBg.strokeRect(5, 5, width - 10, height - BOTTOM_MARGIN - 9);
-
-    // Inner frame line (game viewport boundary — uses renderedW, not full viewport)
     frameBg.lineStyle(2, DecoColors.gold, 0.5);
+    frameBg.strokeRect(1, 1, width - 2, height - BOTTOM_MARGIN - 1);
+
+    // Inner frame line (game viewport boundary)
+    frameBg.lineStyle(1.5, DecoColors.gold, 0.4);
     frameBg.strokeRect(fLeft, fTop, vf.renderedW, vf.viewportH);
 
-    // Vertical separator between viewport and right panel
-    frameBg.lineStyle(1.5, DecoColors.gold, 0.35);
-    frameBg.lineBetween(rpX, fTop + 6, rpX, toolbarTop - 6);
-
     // Four outer corner ornaments
-    drawCornerOrnament(frameBg, 6, 6, 24, 'tl', DecoColors.gold, 0.45);
-    drawCornerOrnament(frameBg, width - 6, 6, 24, 'tr', DecoColors.gold, 0.45);
-    drawCornerOrnament(frameBg, 6, height - BOTTOM_MARGIN - 6, 24, 'bl', DecoColors.gold, 0.45);
-    drawCornerOrnament(frameBg, width - 6, height - BOTTOM_MARGIN - 6, 24, 'br', DecoColors.gold, 0.45);
-
-    // Top border ornament centered over rendered game area
-    const vpCenterX = fLeft + vf.renderedW / 2;
-    const topDiamond = 6;
-    frameBg.fillStyle(DecoColors.gold, 0.5);
-    frameBg.fillPoints([
-      new Phaser.Geom.Point(vpCenterX, 1),
-      new Phaser.Geom.Point(vpCenterX + topDiamond, fTop / 2),
-      new Phaser.Geom.Point(vpCenterX, fTop - 1),
-      new Phaser.Geom.Point(vpCenterX - topDiamond, fTop / 2),
-    ], true);
+    drawCornerOrnament(frameBg, 4, 4, 18, 'tl', DecoColors.gold, 0.4);
+    drawCornerOrnament(frameBg, width - 4, 4, 18, 'tr', DecoColors.gold, 0.4);
+    drawCornerOrnament(frameBg, 4, height - BOTTOM_MARGIN - 4, 18, 'bl', DecoColors.gold, 0.4);
+    drawCornerOrnament(frameBg, width - 4, height - BOTTOM_MARGIN - 4, 18, 'br', DecoColors.gold, 0.4);
 
     frameBg.setDepth(Depths.tooltip - 1);
 
-    // ─── Right info panel content ───
-    this.createRightInfoPanel(rpX, rpW, rpCx, fTop, toolbarTop);
+    // ─── Floating HUD overlay (top-right corner) ───
+    this.createFloatingHUD(width, fTop, toolbarTop);
 
-    // ─── Toolbar buttons (centered under the rendered game image) ───
-    const toolbarCenterX = fLeft + vf.renderedW / 2;
+    // ─── Toolbar buttons (centered across full game width) ───
+    const toolbarCenterX = width / 2;
     const buttonY = toolbarTop + TOOLBAR_H / 2;
-    const btnSpacing = vf.renderedW / 5; // spread across rendered game width
+    const btnSpacing = vf.renderedW / 5; // spread across full game width
 
     const buttons = [
       { label: 'EVIDENCE', icon: '◈', color: DecoColors.gold, x: toolbarCenterX - btnSpacing * 1.5, action: () => this.toggleEvidence() },
@@ -240,8 +220,9 @@ export class UIScene extends Phaser.Scene {
     });
   }
 
-  // ─── Right info panel ───────────────────────────────────────────────────────
+  // ─── Floating HUD overlay ──────────────────────────────────────────────────
 
+  private hudContainer!: Phaser.GameObjects.Container;
   private borderItemCountText!: Phaser.GameObjects.Text;
   private borderClueCountText!: Phaser.GameObjects.Text;
   private borderRoomNameText!: Phaser.GameObjects.Text;
@@ -252,171 +233,145 @@ export class UIScene extends Phaser.Scene {
   private borderChapterText!: Phaser.GameObjects.Text;
   private borderQuestHintText!: Phaser.GameObjects.Text;
 
-  private createRightInfoPanel(
-    rpX: number, rpW: number, rpCx: number, fTop: number, toolbarTop: number,
-  ): void {
-    const panelH = toolbarTop - fTop;
-    const contentX = rpCx;
-    const pad = 14;
-    const decoGfx = this.add.graphics().setDepth(Depths.tooltip);
+  private createFloatingHUD(canvasW: number, fTop: number, toolbarTop: number): void {
+    const HUD_W = 310;
+    const HUD_PAD = 18;
+    const HUD_MARGIN = 16;
+    const hudX = canvasW - HUD_W - HUD_MARGIN;
+    const hudY = fTop + HUD_MARGIN;
+    const hudCx = HUD_W / 2; // center X within container
 
-    // ── Subtle sunburst behind center of panel ──
-    drawSunburst(decoGfx, rpCx, fTop + panelH * 0.28, 110, 16, DecoColors.gold, 0.04);
+    this.hudContainer = this.add.container(hudX, hudY).setDepth(Depths.tooltip);
 
-    // ── Top corner ornaments ──
-    drawCornerOrnament(decoGfx, rpX + 6, fTop + 6, 16, 'tl', DecoColors.gold, 0.2);
-    drawCornerOrnament(decoGfx, rpX + rpW - 6, fTop + 6, 16, 'tr', DecoColors.gold, 0.2);
-
-    // ─── Layout: vertically center content within panel ───
-    const totalContentH = 820;
-    let y = fTop + Math.max(pad, (panelH - totalContentH) / 2);
+    // ── Semi-transparent background with art deco border ──
+    const bgGfx = this.add.graphics();
+    // We'll calculate total height after laying out, so draw bg last
+    let y = HUD_PAD;
 
     // ── Chapter indicator ──
-    this.borderChapterText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '13px', color: TextColors.mutedBlue,
-      letterSpacing: 4, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 24;
+    this.borderChapterText = this.add.text(hudCx, y, '', {
+      fontFamily: FONT, fontSize: '14px', color: TextColors.mutedBlue,
+      letterSpacing: 5, align: 'center',
+    }).setOrigin(0.5, 0);
+    y += 22;
 
     // ── Room name ──
-    this.borderRoomNameText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '22px', color: '#c9a84c',
-      fontStyle: 'bold', align: 'center', letterSpacing: 2,
-      wordWrap: { width: rpW - pad * 2 },
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 50;
-
-    // ── Art deco divider ──
-    drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2, DecoColors.gold, 0.3);
-    y += 24;
-
-    // ── ITEMS IN ROOM ──
-    this.add.text(contentX, y, 'ITEMS IN ROOM', {
-      fontFamily: FONT, fontSize: '13px', color: TextColors.mutedBlue,
-      letterSpacing: 3, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 20;
-
-    this.borderItemCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '32px', color: '#c9a84c',
-      fontStyle: 'bold', align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    this.borderRoomNameText = this.add.text(hudCx, y, '', {
+      fontFamily: FONT, fontSize: '26px', color: '#c9a84c',
+      fontStyle: 'bold', align: 'center', letterSpacing: 3,
+      wordWrap: { width: HUD_W - HUD_PAD * 2 },
+    }).setOrigin(0.5, 0);
     y += 42;
 
-    // ── PLACES TO CHECK ──
-    this.add.text(contentX, y, 'PLACES TO CHECK', {
-      fontFamily: FONT, fontSize: '13px', color: '#c9a84c',
-      letterSpacing: 2, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 20;
+    // ── Thin gold divider ──
+    const divGfx = this.add.graphics();
+    divGfx.lineStyle(1, DecoColors.gold, 0.3);
+    divGfx.lineBetween(HUD_PAD + 10, y, HUD_W - HUD_PAD - 10, y);
+    this.hudContainer.add(divGfx);
+    y += 14;
 
-    this.borderRoomClueCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '28px', color: '#c9a84c',
-      fontStyle: 'bold', align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 38;
+    // ── Stats row: Items | Clues ──
+    const statsLeftX = HUD_PAD + 20;
+    const statsMidX = HUD_W / 2;
 
-    // ── Thin gold line ──
-    decoGfx.lineStyle(1, DecoColors.gold, 0.15);
-    decoGfx.lineBetween(rpX + pad + 10, y, rpX + rpW - pad - 10, y);
+    const itemsLabel = this.add.text(statsLeftX, y, 'ITEMS', {
+      fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue, letterSpacing: 2,
+    }).setOrigin(0, 0);
+    const cluesLabel = this.add.text(statsMidX + 10, y, 'CLUES', {
+      fontFamily: FONT, fontSize: '12px', color: TextColors.mutedBlue, letterSpacing: 2,
+    }).setOrigin(0, 0);
     y += 18;
 
-    // ── ITEMS TOTAL ──
-    this.add.text(contentX, y, 'ITEMS TOTAL', {
-      fontFamily: FONT, fontSize: '13px', color: '#ffffff',
-      letterSpacing: 3, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 20;
-
-    this.borderTotalItemCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '26px', color: '#ffffff',
-      align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    this.borderItemCountText = this.add.text(statsLeftX, y, '', {
+      fontFamily: FONT, fontSize: '28px', color: '#c9a84c', fontStyle: 'bold',
+    }).setOrigin(0, 0);
+    this.borderClueCountText = this.add.text(statsMidX + 10, y, '', {
+      fontFamily: FONT, fontSize: '28px', color: '#8a9aaa', fontStyle: 'bold',
+    }).setOrigin(0, 0);
     y += 36;
 
-    // ── Thin gold line ──
-    decoGfx.lineStyle(1, DecoColors.gold, 0.15);
-    decoGfx.lineBetween(rpX + pad + 10, y, rpX + rpW - pad - 10, y);
-    y += 18;
+    // ── Progress bar ──
+    const barW = HUD_W - HUD_PAD * 2 - 20;
+    const barH = 10;
+    const barX = HUD_PAD + 10;
 
-    // ── CLUES TOTAL ──
-    this.add.text(contentX, y, 'CLUES TOTAL', {
-      fontFamily: FONT, fontSize: '13px', color: TextColors.mutedBlue,
-      letterSpacing: 3, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 20;
+    const barBgGfx = this.add.graphics();
+    barBgGfx.fillStyle(0x1a1a2e, 0.8);
+    barBgGfx.fillRoundedRect(barX, y, barW, barH, 5);
+    barBgGfx.lineStyle(1, DecoColors.gold, 0.25);
+    barBgGfx.strokeRoundedRect(barX, y, barW, barH, 5);
+    this.hudContainer.add(barBgGfx);
 
-    this.borderClueCountText = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '28px', color: '#8a9aaa',
-      align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 38;
-
-    // ── PROGRESS ──
-    this.add.text(contentX, y, 'PROGRESS', {
-      fontFamily: FONT, fontSize: '13px', color: TextColors.mutedBlue,
-      letterSpacing: 3, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 20;
-
-    const barW = rpW - pad * 2 - 10;
-    const barH = 8;
-    const barX = rpX + pad + 5;
-    decoGfx.fillStyle(0x1a1a2e, 0.8);
-    decoGfx.fillRoundedRect(barX, y, barW, barH, 4);
-    decoGfx.lineStyle(1, DecoColors.gold, 0.25);
-    decoGfx.strokeRoundedRect(barX, y, barW, barH, 4);
-
-    this.borderProgressBar = this.add.graphics().setDepth(Depths.tooltip);
+    this.borderProgressBar = this.add.graphics();
     this.borderProgressBar.setData('barX', barX);
     this.borderProgressBar.setData('barY', y);
     this.borderProgressBar.setData('barW', barW);
     this.borderProgressBar.setData('barH', barH);
 
-    y += barH + 6;
-    this.borderProgressPct = this.add.text(contentX, y, '', {
-      fontFamily: FONT, fontSize: '13px', color: TextColors.goldDim,
-      align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 22;
+    this.borderProgressPct = this.add.text(HUD_W - HUD_PAD - 10, y + barH / 2, '', {
+      fontFamily: FONT, fontSize: '14px', color: TextColors.goldDim, fontStyle: 'bold',
+    }).setOrigin(1, 0.5);
+    y += barH + 14;
 
-    // ── Art deco divider before objective ──
-    drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2, DecoColors.gold, 0.3);
-    y += 22;
+    // ── Thin gold divider ──
+    const div2Gfx = this.add.graphics();
+    div2Gfx.lineStyle(1, DecoColors.gold, 0.3);
+    div2Gfx.lineBetween(HUD_PAD + 10, y, HUD_W - HUD_PAD - 10, y);
+    this.hudContainer.add(div2Gfx);
+    y += 14;
 
     // ── OBJECTIVE ──
-    this.add.text(contentX, y, '\u2756  OBJECTIVE  \u2756', {
-      fontFamily: FONT, fontSize: '14px', color: '#c9a84c',
-      letterSpacing: 2, align: 'center',
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    const objLabel = this.add.text(hudCx, y, '\u2756  OBJECTIVE  \u2756', {
+      fontFamily: FONT, fontSize: '15px', color: '#c9a84c',
+      letterSpacing: 3, align: 'center',
+    }).setOrigin(0.5, 0);
     y += 24;
 
-    this.borderQuestHintText = this.add.text(contentX, y, '', {
+    this.borderQuestHintText = this.add.text(hudCx, y, '', {
       fontFamily: FONT, fontSize: '18px', color: '#f0e0b8',
       fontStyle: 'italic', align: 'center',
-      wordWrap: { width: rpW - pad * 2 + 4 },
-      lineSpacing: 5,
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    y += 100;
+      wordWrap: { width: HUD_W - HUD_PAD * 2 },
+      lineSpacing: 4,
+    }).setOrigin(0.5, 0);
+    y += 70;
 
-    // ── Art deco divider before controls ──
-    drawDecoDivider(decoGfx, contentX, y, rpW - pad * 2 - 10, DecoColors.gold, 0.2);
-    y += 24;
+    // ── Thin gold divider ──
+    const div3Gfx = this.add.graphics();
+    div3Gfx.lineStyle(1, DecoColors.gold, 0.2);
+    div3Gfx.lineBetween(HUD_PAD + 20, y, HUD_W - HUD_PAD - 20, y);
+    this.hudContainer.add(div3Gfx);
+    y += 16;
 
-    // ── Audio toggle + Settings gear ──
-    const controlsY = y;
+    // ── Room stats row ──
+    this.borderRoomClueCountText = this.add.text(hudCx - 40, y, '', {
+      fontFamily: FONT, fontSize: '13px', color: '#7a8a9a',
+    }).setOrigin(0.5, 0);
+    const placesLabel = this.add.text(hudCx - 40, y + 16, 'PLACES', {
+      fontFamily: FONT, fontSize: '10px', color: TextColors.mutedBlue, letterSpacing: 2,
+    }).setOrigin(0.5, 0);
+
+    this.borderTotalItemCountText = this.add.text(hudCx + 40, y, '', {
+      fontFamily: FONT, fontSize: '13px', color: '#7a8a9a',
+    }).setOrigin(0.5, 0);
+    const totalLabel = this.add.text(hudCx + 40, y + 16, 'TOTAL', {
+      fontFamily: FONT, fontSize: '10px', color: TextColors.mutedBlue, letterSpacing: 2,
+    }).setOrigin(0.5, 0);
+    y += 34;
+
+    // ── Audio + Settings controls (stacked vertically) ──
+    y += 6;
     const musicSys = MusicSystem.getInstance();
 
-    // Audio toggle (bell icon)
-    const audioBtn = this.add.text(contentX - 42, controlsY, '\u{1F50A}', {
-      fontSize: '42px', color: TextColors.mutedBlue,
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
+    // Audio toggle (speaker icon) — large
+    const audioBtn = this.add.text(hudCx - 30, y, '\u{1F50A}', {
+      fontSize: '48px',
+    }).setOrigin(0.5, 0);
     audioBtn.setInteractive({ cursor: POINTER_CURSOR });
 
     const updateAudioIcon = () => {
       const muted = UISounds.getMusicVolume() <= 0;
       audioBtn.setText(muted ? '\u{1F507}' : '\u{1F50A}');
-      audioBtn.setColor(muted ? '#4a4a5a' : TextColors.mutedBlue);
+      audioBtn.setColor(muted ? '#4a4a5a' : '#8a8a9a');
     };
     updateAudioIcon();
 
@@ -436,21 +391,47 @@ export class UIScene extends Phaser.Scene {
       updateAudioIcon();
     });
 
-    // Settings gear
-    const gearBtn = this.add.text(contentX + 42, controlsY, '\u2699', {
-      fontSize: '46px', color: TextColors.mutedBlue,
-    }).setOrigin(0.5, 0).setDepth(Depths.tooltip);
-    gearBtn.setInteractive({ cursor: POINTER_CURSOR, hitArea: new Phaser.Geom.Rectangle(-12, -8, 64, 64), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
+    // Settings gear — large, next to speaker
+    const gearBtn = this.add.text(hudCx + 30, y, '\u2699', {
+      fontSize: '52px', color: '#8a8a9a',
+    }).setOrigin(0.5, 0);
+    gearBtn.setInteractive({
+      cursor: POINTER_CURSOR,
+      hitArea: new Phaser.Geom.Rectangle(-16, -8, 72, 72),
+      hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+    });
     gearBtn.on('pointerover', () => gearBtn.setColor(TextColors.gold));
-    gearBtn.on('pointerout', () => gearBtn.setColor(TextColors.mutedBlue));
+    gearBtn.on('pointerout', () => gearBtn.setColor('#8a8a9a'));
     gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
 
-    // ── Bottom corner ornaments ──
-    drawCornerOrnament(decoGfx, rpX + 6, toolbarTop - 6, 16, 'bl', DecoColors.gold, 0.2);
-    drawCornerOrnament(decoGfx, rpX + rpW - 6, toolbarTop - 6, 16, 'br', DecoColors.gold, 0.2);
+    y += 58;
 
-    // ── Zigzag geo border at very bottom ──
-    drawGeoBorder(decoGfx, rpX + pad, toolbarTop - 24, rpW - pad * 2, DecoColors.gold, 0.12, 10, 3);
+    // ── Draw the background panel ──
+    const totalH = y + HUD_PAD / 2;
+    bgGfx.fillStyle(0x0a0a18, 0.82);
+    bgGfx.fillRoundedRect(0, 0, HUD_W, totalH, 8);
+    bgGfx.lineStyle(1.5, DecoColors.gold, 0.4);
+    bgGfx.strokeRoundedRect(0, 0, HUD_W, totalH, 8);
+
+    // Corner ornaments on the HUD
+    drawCornerOrnament(bgGfx, 5, 5, 12, 'tl', DecoColors.gold, 0.3);
+    drawCornerOrnament(bgGfx, HUD_W - 5, 5, 12, 'tr', DecoColors.gold, 0.3);
+    drawCornerOrnament(bgGfx, 5, totalH - 5, 12, 'bl', DecoColors.gold, 0.3);
+    drawCornerOrnament(bgGfx, HUD_W - 5, totalH - 5, 12, 'br', DecoColors.gold, 0.3);
+
+    // Add all elements to the container (bgGfx first so it's behind everything)
+    this.hudContainer.add(bgGfx);
+    this.hudContainer.sendToBack(bgGfx);
+    this.hudContainer.add([
+      this.borderChapterText, this.borderRoomNameText,
+      itemsLabel, cluesLabel,
+      this.borderItemCountText, this.borderClueCountText,
+      this.borderProgressBar, this.borderProgressPct,
+      objLabel, this.borderQuestHintText,
+      this.borderRoomClueCountText, placesLabel,
+      this.borderTotalItemCountText, totalLabel,
+      audioBtn, gearBtn,
+    ]);
 
     this.updateRightPanelStats();
   }
@@ -1351,6 +1332,8 @@ export class UIScene extends Phaser.Scene {
 
   private settingsContent!: Phaser.GameObjects.Container;
   private settingsBookLayout = { panelW: 0, panelX: 0, contentTop: 0, contentBottom: 0, paperLeft: 0, paperW: 0 };
+  private settingsScrollY = 0;
+  private settingsMaxScroll = 0;
 
   private createSettingsPanel(): Phaser.GameObjects.Container {
     const container = this.add.container(0, 0);
@@ -1368,6 +1351,26 @@ export class UIScene extends Phaser.Scene {
 
     this.settingsContent = this.add.container(0, 0);
     container.add(this.settingsContent);
+
+    // Mask to clip content within the book panel content area
+    const maskShape = this.add.graphics();
+    maskShape.setVisible(false);
+    maskShape.fillStyle(0xffffff);
+    maskShape.fillRect(layout.paperLeft, layout.contentTop, layout.paperW, layout.contentBottom - layout.contentTop);
+    const mask = maskShape.createGeometryMask();
+    container.add(maskShape);
+    this.settingsContent.setMask(mask);
+
+    // Scroll with mouse wheel
+    this.input.on('wheel', (_pointer: Phaser.Input.Pointer, _gameObjects: Phaser.GameObjects.GameObject[], _deltaX: number, deltaY: number) => {
+      if (!this.settingsOpen) return;
+      this.settingsScrollY = Phaser.Math.Clamp(
+        this.settingsScrollY - deltaY * 0.8,
+        -this.settingsMaxScroll,
+        0,
+      );
+      this.settingsContent.setY(this.settingsScrollY);
+    });
 
     return container;
   }
@@ -1829,6 +1832,14 @@ export class UIScene extends Phaser.Scene {
         fontFamily: FONT, fontSize: '17px', color: '#6a5a4a',
         fontStyle: 'italic', align: 'center', lineSpacing: 6,
       }).setOrigin(0.5, 0));
+    y += 60;
+
+    // ── Calculate scroll bounds ──
+    const visibleH = contentBottom - contentTop;
+    const totalContentH = y - contentTop;
+    this.settingsMaxScroll = Math.max(0, totalContentH - visibleH);
+    this.settingsScrollY = 0;
+    this.settingsContent.setY(0);
   }
 
   // ── In-game auth dialog for guest users ──
