@@ -353,20 +353,22 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 
 ### Screen Layout (during gameplay)
 
+Full-screen game viewport with thin gold art-deco frame (6px borders). A floating semi-transparent HUD overlay in the top-right corner shows room name, stats, objective, and audio/settings controls. All overlay panels (evidence, journal, map, suspects, settings) render as full-screen book-style modals on top of the game view.
+
 ```
-┌──────────────────────────────────────┐
-│  Room Name                           │
-│                                      │
-│                                      │
-│         [Room Background]            │
-│      [Hotspot] [Hotspot] [NPC]       │
-│                                      │
-│                                      │
-│                                      │
-│                                      │
-├──────────────────────────────────────┤
-│ [Items]  [Suspects] [Map]  [Journal]│
-└──────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│                                  ┌─────────┐ │
+│                                  │ CH. 1   │ │
+│                                  │ LOBBY   │ │
+│        [Full-Screen Room]        │ Items   │ │
+│     [Hotspot] [Hotspot] [NPC]    │ Clues   │ │
+│                                  │ Obj...  │ │
+│                                  │ 🔊 ⚙   │ │
+│                                  └─────────┘ │
+│                                              │
+├──────────────────────────────────────────────┤
+│  [Evidence]  [Suspects]  [Map]  [Journal]    │
+└──────────────────────────────────────────────┘
 ```
 
 ### Mobile Considerations
@@ -423,13 +425,32 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 | Catwalk | Metal ambience | — | Wind + metal creak |
 | Basement | Creepy ambient | Water drip | Low drone (50Hz) + drip |
 
+### Background Music System (Built)
+
+Real MP3 music tracks from royalty-free sources, played via HTML5 Audio with crossfading, looping, and volume control. Each room maps to a specific track. Players can switch tracks from the settings panel (scrollable track selector).
+
+| Track ID | In-Game Name | Description | Source | License |
+|----------|-------------|-------------|--------|---------|
+| signs_to_nowhere | Grand Lobby | Noir jazz — bass, vibraphone, muted trumpet | Shane Ivers | CC BY 4.0 |
+| speakeasy | The Speakeasy | Uptempo 1920s jazz combo | Shane Ivers | CC BY 4.0 |
+| mystery_unsolved | The Investigation | Piano, strings, theremin — detective energy | Shane Ivers | CC BY 4.0 |
+| lobby_elegant | Chandelier Dreams | Warm, elegant strings and piano | Francisco Alvear (Mixkit) | Mixkit Free |
+| gentle_piano | Midnight Theatre | Gentle piano — quiet reflection | Alejandro Magaña (Mixkit) | Mixkit Free |
+| crypto | Velvet Curtain | Moody, building tension | Kevin MacLeod | CC BY 3.0 |
+| ghost_story | The Empty Stage | Classic haunting atmosphere | Kevin MacLeod | CC BY 3.0 |
+| darkest_child | Gaslight | Dark, unsettling — something lurks below | Kevin MacLeod | CC BY 3.0 |
+| comfortable_mystery | The Study | Vintage electric piano — surreal, contemplative | Kevin MacLeod | CC BY 3.0 |
+| dreamy_flashback | Crimson Veil | Soft, emotional — uncovering the truth | Kevin MacLeod | CC BY 3.0 |
+
+Room-to-track mapping: lobby → signs_to_nowhere, auditorium → lobby_elegant, backstage → mystery_unsolved, dressing_room → comfortable_mystery, projection_booth → ghost_story, managers_office → crypto, catwalk → darkest_child, basement → dreamy_flashback.
+
 ### Audio File Needs
 
 | Type | Examples | Format | Directory |
 |------|----------|--------|-----------|
 | Ambience | Room-specific atmospheric loops | Looping MP3/OGG | `assets/audio/` |
 | UI sounds | Real-world versions of procedural SFX (optional upgrade) | Short MP3 | `assets/audio/sfx/` |
-| Music | Title theme, investigation theme, ghost theme, resolution theme | Looping MP3 | `assets/audio/music/` |
+| Music | 10 tracks installed, may want more upbeat/lighthearted options | Looping MP3 | `public/music/` |
 | Dialogue VO | Per-line voice acting for all 10 dialogue trees | MP3/OGG | `assets/vo/dialogue/` |
 | Cinematic VO | Narrator voice for intro/cinematics (18 slides done) | MP3 | `assets/vo/intro/` |
 
@@ -605,7 +626,7 @@ If fail states are ever added (e.g., getting caught by Edwin, time-sensitive eve
 | BootScene (loading) | Done | Asset preloading with graceful fallback for missing files |
 | TitleScene | Done | Title, subtitle, start button, fade |
 | RoomScene | Done | Hotspot rendering, all 5 types, room transitions, multi-alt backgrounds |
-| UIScene | Done | Inventory panel, journal button (placeholder) |
+| UIScene | Done | Full-screen viewport, floating HUD overlay, evidence/journal/settings panels |
 | InventorySystem | Done | Add, remove, select, serialize |
 | DialogueSystem | Done | Lines, branching choices, conditions, events, per-line VO playback |
 | PuzzleSystem | Done | Answer checking, clue retrieval, serialize |
@@ -670,6 +691,12 @@ If fail states are ever added (e.g., getting caught by Edwin, time-sensitive eve
 | 47 | Dialogue voiceover infrastructure (per-line VO playback with graceful fallback) | Done |
 | 48 | VideoCinematicScene (full-screen video cutscenes with subtitles, skip, fallback) | Done |
 | 49 | Asset pipeline: BootScene loads alt backgrounds, puzzle images, clue images, dialogue VO, video cinematics | Done |
+| 50 | Background music system — 10 real MP3 tracks with HTML5 Audio, crossfading, room mapping, volume control | Done |
+| 51 | Music track selector in Settings panel with scrollable list and live preview | Done |
+| 52 | Full-screen game viewport with floating HUD overlay (replaced sidebar panel) | Done |
+| 53 | Settings panel: volume sliders, music volume, track selector, text speed, particles, fullscreen, save management | Done |
+| 54 | Audio toggle (speaker icon) and settings gear in HUD overlay | Done |
+| 55 | Quest hint system — chapter-aware dynamic objective hints in HUD | Done |
 
 ### What Needs Building (in priority order)
 
@@ -678,7 +705,7 @@ If fail states are ever added (e.g., getting caught by Edwin, time-sensitive eve
 | 1 | **Art asset creation** | Alt background images, puzzle illustrations, clue close-ups | Image generation |
 | 2 | **Dialogue VO recording** | Voice acting for 10 dialogue trees (~200 lines) | Audio recording |
 | 3 | **Video cinematics** | 5 video cutscenes (ghost reveal, confession, 3 endings) | Video production |
-| 4 | **Music tracks** | Title theme, investigation theme, ghost theme, resolution | Audio composition |
+| 4 | **Additional upbeat music** | More lighthearted/fun tracks to balance dark moody ones | Audio sourcing |
 | 5 | **Hotspot placement tuning** | Lobby hotspots need repositioning for viewfinder viewport | Art assets |
 | 6 | **Mobile touch testing** | Tap target tuning, responsive layout QA | Everything |
 | 7 | **Difficulty mode toggle** | Junior/Senior Detective switch in settings | UI work |
@@ -975,15 +1002,20 @@ Legend: ✅ = exists | ❌ = needs creation | 🔧 = procedural fallback exists 
 | sfx_phone_ring | File-based | ❌ 🔧 |
 | sfx_heartbeat | File-based | ❌ 🔧 |
 
-### 16l. Audio — Music
+### 16l. Audio — Music (10 tracks, 66MB total in `public/music/`)
 
-| File | Key | Usage | Status |
-|------|-----|-------|--------|
-| `audio/music_intro.mp3` | music_intro | Intro cinematic | ❌ |
-| Title theme | — | Title screen | ❌ |
-| Investigation theme | — | Gameplay exploration | ❌ |
-| Ghost/tension theme | — | Ghost encounters | ❌ |
-| Resolution theme | — | Ending cinematics | ❌ |
+| File | Track Name | Room | License | Status |
+|------|-----------|------|---------|--------|
+| `public/music/signs_to_nowhere.mp3` | Grand Lobby | Lobby | CC BY 4.0 (Shane Ivers) | ✅ |
+| `public/music/speakeasy.mp3` | The Speakeasy | — (selectable) | CC BY 4.0 (Shane Ivers) | ✅ |
+| `public/music/mystery_unsolved.mp3` | The Investigation | Backstage | CC BY 4.0 (Shane Ivers) | ✅ |
+| `public/music/lobby_elegant.mp3` | Chandelier Dreams | Auditorium | Mixkit Free (Francisco Alvear) | ✅ |
+| `public/music/gentle_piano.mp3` | Midnight Theatre | — (selectable) | Mixkit Free (Alejandro Magaña) | ✅ |
+| `public/music/crypto.mp3` | Velvet Curtain | Manager's Office | CC BY 3.0 (Kevin MacLeod) | ✅ |
+| `public/music/ghost_story.mp3` | The Empty Stage | Projection Booth | CC BY 3.0 (Kevin MacLeod) | ✅ |
+| `public/music/darkest_child.mp3` | Gaslight | Catwalk | CC BY 3.0 (Kevin MacLeod) | ✅ |
+| `public/music/comfortable_mystery.mp3` | The Study | Dressing Room | CC BY 3.0 (Kevin MacLeod) | ✅ |
+| `public/music/dreamy_flashback.mp3` | Crimson Veil | Basement | CC BY 3.0 (Kevin MacLeod) | ✅ |
 
 ### 16m. Audio — Voice Over
 
@@ -1017,19 +1049,19 @@ Legend: ✅ = exists | ❌ = needs creation | 🔧 = procedural fallback exists 
 | Ambient audio | 12 | 12 | 0 | — |
 | SFX (procedural) | 25+ | 25+ | 0 | — |
 | SFX (file-based) | 4 | 0 | 4 | Yes (procedural) |
-| Music tracks | 5 | 0 | 5 | No |
+| Music tracks | 10 | 10 | 0 | — |
 | Intro VO | 18 | 18 | 0 | — |
 | Dialogue VO | ~200 lines | 0 | ~200 | Yes (text only) |
-| **TOTALS** | **~395** | **~130** | **~265** | — |
+| **TOTALS** | **~395** | **~140** | **~255** | — |
 
 ### Priority Creation Order
 
 1. **Alt backgrounds (14)** — Biggest visual impact for story progression feel
 2. **Clue close-ups (8 priority + 19 others)** — Enhances detective investigation moments
 3. **Puzzle illustrations (10)** — Improves puzzle atmosphere
-4. **Music tracks (5)** — Essential for mood and polish
-5. **Video cinematics (5)** — Premium polish for key story moments
-6. **Dialogue VO (~200 lines)** — Full voice acting pass
+4. **Video cinematics (5)** — Premium polish for key story moments
+5. **Dialogue VO (~200 lines)** — Full voice acting pass
+6. **Additional upbeat music tracks** — Balance the moody tracks with fun/lighthearted options
 7. **File-based SFX (4)** — Minor, procedural fallbacks work well
 
 ---
