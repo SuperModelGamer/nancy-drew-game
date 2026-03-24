@@ -488,12 +488,14 @@ export class CinematicScene extends BaseSlideScene {
   private cinematicData!: CinematicEvent;
   private targetRoom = 'lobby';
   private eventCompleted = false;
+  private redirectedToVideo = false;
 
   constructor() {
     super({ key: 'CinematicScene' });
   }
 
   init(data: { cinematicId: string; targetRoom: string }): void {
+    this.redirectedToVideo = false;
     const event = CINEMATIC_EVENTS.find(e => e.id === data.cinematicId);
     if (!event) {
       this.scene.start('RoomScene', { roomId: data.targetRoom });
@@ -505,6 +507,7 @@ export class CinematicScene extends BaseSlideScene {
 
     // If a video version exists, redirect to VideoCinematicScene (native HTML video)
     if (event.videoKey) {
+      this.redirectedToVideo = true;
       this.scene.start('VideoCinematicScene', {
         videoKey: event.videoKey,
         targetScene: 'RoomScene',
@@ -518,7 +521,7 @@ export class CinematicScene extends BaseSlideScene {
   }
 
   create(): void {
-    if (!this.cinematicData) return;
+    if (!this.cinematicData || this.redirectedToVideo) return;
     // Hide the UI frame so the cinematic fills the full screen
     if (this.scene.isActive('UIScene')) {
       this.scene.setVisible(false, 'UIScene');
