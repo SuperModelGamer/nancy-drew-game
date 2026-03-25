@@ -7,53 +7,58 @@
           "id": "start",
           "triggerEvent": "vivian_intro",
           "lines": [
-            { "speaker": "Vivian", "text": "Nancy Drew? Oh, mon Dieu, thank heavens. I wasn't sure anyone would come." },
-            { "speaker": "Nancy", "text": "Ms. Delacroix? You called about a poisoning — and a ghost?" },
-            { "speaker": "Vivian", "text": "Both, ma chère. Roland Ashworth — the man demolishing my theater — collapsed last night. Doctors say he was poisoned. And before that... she appeared again." },
-            { "speaker": "Nancy", "text": "She?" },
-            { "speaker": "Vivian", "text": "Margaux Fontaine. The greatest actress who ever graced that stage. She died here in 1928 — on stage, during her final performance. And now her ghost walks the Monarch." }
+            { "speaker": "Vivian", "text": "Nancy Drew? Oh, mon Dieu, thank heavens. I wasn't sure anyone would come.", "vo": "vo_vivian_start_01" },
+            { "speaker": "Nancy", "text": "Ms. Delacroix? You called about a poisoning — and a ghost?", "vo": "vo_nancy_start_01" },
+            { "speaker": "Vivian", "text": "Both, ma chère. Roland Ashworth — the man demolishing my theater — collapsed last night. Doctors say he was poisoned. And before that... she appeared again.", "vo": "vo_vivian_start_02" },
+            { "speaker": "Nancy", "text": "She?", "vo": "vo_nancy_start_02" },
+            { "speaker": "Vivian", "text": "Margaux Fontaine. The greatest actress who ever graced that stage. She died here in 1928 — on stage, during her final performance. And now her ghost walks the Monarch.", "vo": "vo_vivian_start_03" }
           ],
           "choices": [
             {
               "text": "Tell me about Margaux Fontaine.",
-              "nextNode": "about_margaux"
+              "nextNode": "about_margaux",
+              "vo": "vo_nancy_choice_margaux"
             },
             {
               "text": "What happened to Ashworth?",
-              "nextNode": "about_ashworth"
+              "nextNode": "about_ashworth",
+              "vo": "vo_nancy_choice_ashworth"
             },
             {
               "text": "Who else is in the theater right now?",
-              "nextNode": "about_others"
+              "nextNode": "about_others",
+              "vo": "vo_nancy_choice_others"
             }
           ]
         },
         {
           "id": "about_margaux",
           "lines": [
-            { "speaker": "Vivian", "text": "Margaux Fontaine was... how do I say this... she was luminous. She was performing 'The Crimson Veil' — her signature role — when she collapsed during the final act. Poison in the prop goblet, they said. Un accident terrible. But I never believed that. She was my godmother, Nancy. She held me as a baby. I still remember her perfume — jasmine and something warm. And I've spent my whole life in this theater, waiting for the truth." },
-            { "speaker": "Nancy", "text": "You think she was murdered?" },
-            { "speaker": "Vivian", "text": "I know she was, ma chère. In my bones, I know. And I think her ghost knows it too." }
+            { "speaker": "Vivian", "text": "Margaux Fontaine was... how do I say this... she was luminous. She was performing 'The Crimson Veil' — her signature role — when she collapsed during the final act. Poison in the prop goblet, they said. Un accident terrible. But I never believed that. She was my godmother, Nancy. She held me as a baby. I still remember her perfume — jasmine and something warm. And I've spent my whole life in this theater, waiting for the truth.", "vo": "vo_vivian_margaux_01" },
+            { "speaker": "Nancy", "text": "You think she was murdered?", "vo": "vo_nancy_margaux_01" },
+            { "speaker": "Vivian", "text": "I know she was, ma chère. In my bones, I know. And I think her ghost knows it too.", "vo": "vo_vivian_margaux_02" }
           ],
           "choices": [
             {
               "text": "What happened to Ashworth?",
               "nextNode": "about_ashworth",
-              "triggerEvent": "learned_about_margaux"
+              "triggerEvent": "learned_about_margaux",
+              "vo": "vo_nancy_choice_ashworth2"
             },
             {
               "text": "I'll start investigating.",
               "nextNode": "end",
-              "triggerEvent": "learned_about_margaux"
+              "triggerEvent": "learned_about_margaux",
+              "vo": "vo_nancy_choice_investigate"
             }
           ]
         },
         {
           "id": "about_ashworth",
           "lines": [
-            { "speaker": "Vivian", "text": "Roland Ashworth bought the Monarch six months ago. Plans to demolish it — mon beau théâtre — in three days. Luxury condominiums, he says. As if the world needs more of those. Last night, he was found unconscious in his office. Some kind of toxin — non-lethal, but très deliberate. He's recovering upstairs, furious and suspicious of everyone." },
-            { "speaker": "Nancy", "text": "Does he have enemies here?" },
-            { "speaker": "Vivian", "text": "Everyone in this theater has a reason to want the demolition stopped. Myself included. I won't insult your intelligence by pretending otherwise." }
+            { "speaker": "Vivian", "text": "Roland Ashworth bought the Monarch six months ago. Plans to demolish it — mon beau théâtre — in three days. Luxury condominiums, he says. As if the world needs more of those. Last night, he was found unconscious in his office. Some kind of toxin — non-lethal, but très deliberate. He's recovering upstairs, furious and suspicious of everyone.", "vo": "vo_vivian_ashworth_01" },
+            { "speaker": "Nancy", "text": "Does he have enemies here?", "vo": "vo_nancy_ashworth_01" },
+            { "speaker": "Vivian", "text": "Everyone in this theater has a reason to want the demolition stopped. Myself included. I won't insult your intelligence by pretending otherwise.", "vo": "vo_vivian_ashworth_02" }
           ],
           "nextNode": "end",
           "triggerEvent": "learned_about_ashworth"
@@ -61,15 +66,15 @@
         {
           "id": "about_others",
           "lines": [
-            { "speaker": "Vivian", "text": "There's Edwin Hale — un historien, a theater historian. He's been documenting the Monarch for... oh, it must be fifteen years now. You'll find him in the auditorium. He practically lives in those seats. Stella Morrow is our stage manager. Practical woman — no nonsense, that one. Knows every inch of this building. She's backstage, as always." },
-            { "speaker": "Vivian", "text": "And young Diego Reyes — a playwright renting the projection booth. Un garçon charmant, but he's heard things at night he can't explain. It's rattled him, poor dear. Then there's Ashworth himself, recovering in the manager's office. He won't be happy to see a detective. He isn't happy about anything, vraiment." }
+            { "speaker": "Vivian", "text": "There's Edwin Hale — un historien, a theater historian. He's been documenting the Monarch for... oh, it must be fifteen years now. You'll find him in the auditorium. He practically lives in those seats. Stella Morrow is our stage manager. Practical woman — no nonsense, that one. Knows every inch of this building. She's backstage, as always.", "vo": "vo_vivian_others_01" },
+            { "speaker": "Vivian", "text": "And young Diego Reyes — a playwright renting the projection booth. Un garçon charmant, but he's heard things at night he can't explain. It's rattled him, poor dear. Then there's Ashworth himself, recovering in the manager's office. He won't be happy to see a detective. He isn't happy about anything, vraiment.", "vo": "vo_vivian_others_02" }
           ],
           "nextNode": "start"
         },
         {
           "id": "end",
           "lines": [
-            { "speaker": "Vivian", "text": "I left a master key at the concierge desk — it opens most doors in the theater. There's also a magnifying glass. It belonged to my late husband. He was... he had sharp eyes. You'll need them. And Nancy — sois prudente. Be careful. The Monarch has kept its secrets for almost a century. It won't give them up easily." }
+            { "speaker": "Vivian", "text": "I left a master key at the concierge desk — it opens most doors in the theater. There's also a magnifying glass. It belonged to my late husband. He was... he had sharp eyes. You'll need them. And Nancy — sois prudente. Be careful. The Monarch has kept its secrets for almost a century. It won't give them up easily.", "vo": "vo_vivian_end_01" }
           ]
         }
       ]
