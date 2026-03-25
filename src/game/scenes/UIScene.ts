@@ -1187,19 +1187,15 @@ export class UIScene extends Phaser.Scene {
       }
 
       cardBg.on('pointerdown', () => {
-        if (this.selectedItemId === itemId) {
-          // Toggle: clicking the already-inspected item selects/deselects it for use
-          if (selectedItem === itemId) {
-            inventory.selectItem(null);
-          } else {
-            inventory.selectItem(itemId);
-          }
-          this.refreshInventoryGrid();
+        if (this.selectedItemId === itemId && selectedItem === itemId) {
+          // Already inspected and equipped — unequip
+          inventory.selectItem(null);
         } else {
-          // First click: inspect the item
+          // Inspect and equip in one click
           this.showItemDetail(itemId);
-          this.refreshInventoryGrid();
+          inventory.selectItem(itemId);
         }
+        this.refreshInventoryGrid();
       });
 
       cardBg.on('pointerover', () => {

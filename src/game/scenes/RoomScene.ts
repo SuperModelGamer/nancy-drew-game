@@ -650,6 +650,7 @@ export class RoomScene extends Phaser.Scene {
             this.showDescription('You already have this.');
           } else {
             inventory.addItem(hotspot.itemId);
+            inventory.selectItem(hotspot.itemId);
             UISounds.itemPickup();
             this.showPickupToast(hotspot.label);
             this.usedHotspots.add(hotspot.id);
