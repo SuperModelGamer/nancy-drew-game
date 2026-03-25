@@ -226,6 +226,26 @@ export class BootScene extends Phaser.Scene {
       'vo_nancy_choice_margaux', 'vo_nancy_choice_ashworth',
       'vo_nancy_choice_others', 'vo_nancy_choice_ashworth2',
       'vo_nancy_choice_investigate',
+      // Phone call — Carson Drew (Dad)
+      'vo_carson_phone_01', 'vo_carson_phone_02',
+      'vo_carson_phone_03', 'vo_carson_phone_04',
+      // Phone call — Nancy
+      'vo_nancy_phone_01', 'vo_nancy_phone_02', 'vo_nancy_phone_03',
+      // Vivian intro revisit — dialogue lines
+      'vo_vivian_revisit_01', 'vo_vivian_revisit_02', 'vo_vivian_revisit_03',
+      'vo_vivian_holding_01', 'vo_vivian_holding_02', 'vo_vivian_holding_04',
+      'vo_vivian_history_01', 'vo_vivian_history_02', 'vo_vivian_history_03', 'vo_vivian_history_04',
+      'vo_vivian_strange_01', 'vo_vivian_strange_02', 'vo_vivian_strange_03', 'vo_vivian_strange_04',
+      'vo_vivian_farewell_01',
+      // Nancy revisit — dialogue lines
+      'vo_nancy_revisit_01',
+      'vo_nancy_holding_01', 'vo_nancy_holding_02',
+      'vo_nancy_history_01',
+      'vo_nancy_strange_01', 'vo_nancy_strange_02',
+      // Nancy revisit — choice lines
+      'vo_nancy_choice_diary', 'vo_nancy_choice_locket', 'vo_nancy_choice_mirror',
+      'vo_nancy_choice_holding_up', 'vo_nancy_choice_history',
+      'vo_nancy_choice_strange', 'vo_nancy_choice_keep_investigating',
     ];
     for (const key of voFiles) {
       this.load.audio(key, [`audio/vo/${key}.mp3`]);
