@@ -117,8 +117,18 @@
           "label": "Vivian Delacroix",
           "type": "talk",
           "dialogueId": "vivian_intro",
-          "altDialogueId": "vivian_intro_revisit",
-          "altDialogueWhen": "left_lobby_after_intro"
+          "hideWhen": "vivian_intro"
+        },
+        {
+          "id": "lobby_vivian_revisit",
+          "x": 734,
+          "y": 664,
+          "width": 109,
+          "height": 418,
+          "label": "Vivian Delacroix",
+          "type": "talk",
+          "dialogueId": "vivian_intro_revisit",
+          "showWhen": "left_lobby_after_intro"
         },
         {
           "id": "lobby_marble_floor",
