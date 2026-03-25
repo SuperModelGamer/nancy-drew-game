@@ -1186,84 +1186,91 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Vivian", "text": "Ah, Nancy. Back again. You have that look — the one my late husband used to get when he was reading the last chapter of a mystery novel. That impatient furrow between the eyebrows." },
-            { "speaker": "Nancy", "text": "I just have a few more questions, Vivian." },
-            { "speaker": "Vivian", "text": "Of course you do. Sit, sit. I was just making tea — oh, don't give me that look, it's chamomile, perfectly safe. I made it myself. Although I suppose that's exactly what a poisoner would say, non?" },
-            { "speaker": "Vivian", "text": "I'm joking, ma chère. Mostly." }
+            { "speaker": "Vivian", "text": "Ah, Nancy. Back again. You have that look — the one my late husband used to get when he was reading the last chapter of a mystery novel. That impatient furrow between the eyebrows.", "vo": "vo_vivian_revisit_01" },
+            { "speaker": "Nancy", "text": "I just have a few more questions, Vivian.", "vo": "vo_nancy_revisit_01" },
+            { "speaker": "Vivian", "text": "Of course you do. Sit, sit. I was just making tea — oh, don't give me that look, it's chamomile, perfectly safe. I made it myself. Although I suppose that's exactly what a poisoner would say, non?", "vo": "vo_vivian_revisit_02" },
+            { "speaker": "Vivian", "text": "I'm joking, ma chère. Mostly.", "vo": "vo_vivian_revisit_03" }
           ],
           "choices": [
             {
               "text": "Vivian, I found Margaux's diary in the dressing room.",
               "nextNode": "diary_reveal",
-              "requiredItem": "margaux_diary"
+              "requiredItem": "margaux_diary",
+              "vo": "vo_nancy_choice_diary"
             },
             {
               "text": "I found something in Margaux's trunk. I think it's yours.",
               "nextNode": "locket_reveal",
-              "requiredItem": "margaux_locket"
+              "requiredItem": "margaux_locket",
+              "vo": "vo_nancy_choice_locket"
             },
             {
               "text": "The mirror in Margaux's dressing room — she wrote 'C.D.' on it. Does that mean anything to you?",
               "nextNode": "mirror_accusation",
-              "requiredFlag": "margaux_accusation"
+              "requiredFlag": "margaux_accusation",
+              "vo": "vo_nancy_choice_mirror"
             },
             {
               "text": "How are you holding up?",
-              "nextNode": "holding_up"
+              "nextNode": "holding_up",
+              "vo": "vo_nancy_choice_holding_up"
             },
             {
               "text": "Tell me more about the theater's history.",
-              "nextNode": "theater_history"
+              "nextNode": "theater_history",
+              "vo": "vo_nancy_choice_history"
             },
             {
               "text": "Have you noticed anything strange lately?",
-              "nextNode": "strange_things"
+              "nextNode": "strange_things",
+              "vo": "vo_nancy_choice_strange"
             },
             {
               "text": "I should keep investigating.",
-              "nextNode": "farewell"
+              "nextNode": "farewell",
+              "vo": "vo_nancy_choice_keep_investigating"
             }
           ]
         },
         {
           "id": "holding_up",
           "lines": [
-            { "speaker": "Vivian", "text": "How am I holding up? Oh, you know. The building I've lived in for seventy-three years is being demolished. There's a ghost that may or may not be my godmother. A man was poisoned upstairs. And a teenager is my best hope." },
-            { "speaker": "Nancy", "text": "I'm not a teenager anymore, Vivian." },
-            { "speaker": "Vivian", "text": "Everyone under fifty is a teenager to me, darling. It's one of the few privileges of old age — along with saying exactly what you think and pretending you can't hear things you don't want to." },
+            { "speaker": "Vivian", "text": "How am I holding up? Oh, you know. The building I've lived in for seventy-three years is being demolished. There's a ghost that may or may not be my godmother. A man was poisoned upstairs. And a teenager is my best hope.", "vo": "vo_vivian_holding_01" },
+            { "speaker": "Nancy", "text": "I'm not a teenager anymore, Vivian.", "vo": "vo_nancy_holding_01" },
+            { "speaker": "Vivian", "text": "Everyone under fifty is a teenager to me, darling. It's one of the few privileges of old age — along with saying exactly what you think and pretending you can't hear things you don't want to.", "vo": "vo_vivian_holding_02" },
             { "speaker": "Vivian", "text": "But truly? I'm frightened. Not of the ghost — I've lived with Margaux's memory my whole life. I'm frightened of what happens when the wrecking ball comes. Where does an old actress go when her stage is gone?" },
-            { "speaker": "Nancy", "text": "We'll figure this out, Vivian. I promise." },
-            { "speaker": "Vivian", "text": "You remind me of her, you know. Margaux. She had that same stubborn certainty. It's either your greatest strength or a terrible liability. I could never decide which it was with her." }
+            { "speaker": "Nancy", "text": "We'll figure this out, Vivian. I promise.", "vo": "vo_nancy_holding_02" },
+            { "speaker": "Vivian", "text": "You remind me of her, you know. Margaux. She had that same stubborn certainty. It's either your greatest strength or a terrible liability. I could never decide which it was with her.", "vo": "vo_vivian_holding_04" }
           ],
           "nextNode": "start"
         },
         {
           "id": "theater_history",
           "lines": [
-            { "speaker": "Vivian", "text": "The Monarch opened in 1924 — did you know it was almost called 'The Imperial'? But the original owner, Theodore Whitfield, thought that sounded too pretentious. Can you imagine? A man who built a theater with gold leaf ceilings and marble pillars worrying about pretension." },
-            { "speaker": "Vivian", "text": "Opening night was Hamlet. Terrible production, by all accounts. The lead actor forgot the 'To be or not to be' soliloquy and improvised something about the weather. Theodore fired him during intermission." },
-            { "speaker": "Nancy", "text": "That's... quite a debut." },
-            { "speaker": "Vivian", "text": "The theater has always attracted drama, ma chère. Both kinds. You're standing in a building where Sarah Bernhardt once dropped her glass eye into the orchestra pit and made a stagehand fish it out during the second act." },
-            { "speaker": "Vivian", "text": "I miss those days. The theater was alive then. People came here to feel something. Now they stare at their telephones and call it entertainment. Bah." }
+            { "speaker": "Vivian", "text": "The Monarch opened in 1924 — did you know it was almost called 'The Imperial'? But the original owner, Theodore Whitfield, thought that sounded too pretentious. Can you imagine? A man who built a theater with gold leaf ceilings and marble pillars worrying about pretension.", "vo": "vo_vivian_history_01" },
+            { "speaker": "Vivian", "text": "Opening night was Hamlet. Terrible production, by all accounts. The lead actor forgot the 'To be or not to be' soliloquy and improvised something about the weather. Theodore fired him during intermission.", "vo": "vo_vivian_history_02" },
+            { "speaker": "Nancy", "text": "That's... quite a debut.", "vo": "vo_nancy_history_01" },
+            { "speaker": "Vivian", "text": "The theater has always attracted drama, ma chère. Both kinds. You're standing in a building where Sarah Bernhardt once dropped her glass eye into the orchestra pit and made a stagehand fish it out during the second act.", "vo": "vo_vivian_history_03" },
+            { "speaker": "Vivian", "text": "I miss those days. The theater was alive then. People came here to feel something. Now they stare at their telephones and call it entertainment. Bah.", "vo": "vo_vivian_history_04" }
           ],
           "nextNode": "start"
         },
         {
           "id": "strange_things",
           "lines": [
-            { "speaker": "Vivian", "text": "Strange? Ma chère, I live in a haunted theater where a man was poisoned and a detective is interrogating everyone. You'll have to be more specific about 'strange.'" },
-            { "speaker": "Nancy", "text": "Fair point. Anything out of the ordinary — for you?" },
-            { "speaker": "Vivian", "text": "Hmm. The lights in the auditorium flicker sometimes. Always three times, then they stop. Edwin says it's the wiring. I say wiring doesn't have a sense of rhythm." },
-            { "speaker": "Vivian", "text": "And I keep finding fresh flowers on the stage. White gardenias — Margaux's favorite. Someone is leaving them. Not me. I'm too old to climb those stairs for a bouquet." },
-            { "speaker": "Nancy", "text": "White gardenias. Interesting." },
-            { "speaker": "Vivian", "text": "You detectives and your 'interesting.' My husband used to say that too. Right before he solved something clever. Go on — I can see you thinking." }
+            { "speaker": "Vivian", "text": "Strange? Ma chère, I live in a haunted theater where a man was poisoned and a detective is interrogating everyone. You'll have to be more specific about 'strange.'", "vo": "vo_vivian_strange_01" },
+            { "speaker": "Nancy", "text": "Fair point. Anything out of the ordinary — for you?", "vo": "vo_nancy_strange_01" },
+            { "speaker": "Vivian", "text": "Hmm. The lights in the auditorium flicker sometimes. Always three times, then they stop. Edwin says it's the wiring. I say wiring doesn't have a sense of rhythm.", "vo": "vo_vivian_strange_02" },
+            { "speaker": "Vivian", "text": "And I keep finding fresh flowers on the stage. White gardenias — Margaux's favorite. Someone is leaving them. Not me. I'm too old to climb those stairs for a bouquet.", "vo": "vo_vivian_strange_03" },
+            { "speaker": "Nancy", "text": "White gardenias. Interesting.", "vo": "vo_nancy_strange_02" },
+            { "speaker": "Vivian", "text": "You detectives and your 'interesting.' My husband used to say that too. Right before he solved something clever. Go on — I can see you thinking.", "vo": "vo_vivian_strange_04" }
           ],
           "nextNode": "start"
         },
         {
           "id": "farewell",
           "lines": [
-            { "speaker": "Vivian", "text": "Go, go. Solve the mystery. Save my theater. And Nancy — don't skip meals. You detectives always forget to eat. There are crackers in the concession stand. They're only slightly stale." }
+            { "speaker": "Vivian", "text": "Go, go. Solve the mystery. Save my theater. And Nancy — don't skip meals. You detectives always forget to eat. There are crackers in the concession stand. They're only slightly stale.", "vo": "vo_vivian_farewell_01" }
           ]
         },
         {
