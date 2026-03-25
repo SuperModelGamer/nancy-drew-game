@@ -5,6 +5,7 @@ import { SaveSystem } from './SaveSystem';
 import { Colors, TextColors, FONT, Depths } from '../utils/constants';
 import { HAND_CURSOR, POINTER_CURSOR } from '../utils/cursors';
 import { UISounds } from '../utils/sounds';
+import { MusicSystem } from './MusicSystem';
 
 interface DialogueLine {
   speaker: string;
@@ -18,6 +19,8 @@ interface DialogueChoice {
   nextNode: string;
   requiredItem?: string;
   requiredFlag?: string;
+  /** Hide this choice once this flag is set. */
+  hideWhenFlag?: string;
   triggerEvent?: string;
   vo?: string;
 }
@@ -399,6 +402,8 @@ export class DialogueSystem {
         try {
           this.currentVO = this.scene.sound.add(line.vo, { volume: UISounds.getVolume() * 0.9 });
           this.currentVO.play();
+          MusicSystem.getInstance().duck();
+          this.currentVO.once('complete', () => MusicSystem.getInstance().unduck());
         } catch { /* VO optional — silently skip */ }
       }
     }
@@ -629,6 +634,7 @@ export class DialogueSystem {
     if (this.currentVO) {
       try { this.currentVO.destroy(); } catch { /* ok */ }
       this.currentVO = null;
+      MusicSystem.getInstance().unduck();
     }
   }
 
@@ -658,6 +664,8 @@ export class DialogueSystem {
     const isConsumed = (choice: DialogueChoice): boolean => {
       // Exit choices are never consumed
       if (isExitChoice(choice)) return false;
+      // Explicitly hidden by flag
+      if (choice.hideWhenFlag && (save.getFlag(choice.hideWhenFlag) || this.triggeredEvents.has(choice.hideWhenFlag))) return true;
       // Already visited this session
       if (choice.nextNode && this.visitedNodes.has(choice.nextNode)) return true;
       // Persisted from previous sessions
@@ -939,7 +947,11 @@ export class DialogueSystem {
       try {
         this.currentVO = this.scene.sound.add(choice.vo, { volume: UISounds.getVolume() * 0.9 });
         this.currentVO.play();
-        this.currentVO.once('complete', advance);
+        MusicSystem.getInstance().duck();
+        this.currentVO.once('complete', () => {
+          MusicSystem.getInstance().unduck();
+          advance();
+        });
       } catch {
         advance();
       }

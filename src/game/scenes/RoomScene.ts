@@ -31,6 +31,10 @@ interface Hotspot {
   itemId?: string;
   requiredItem?: string;
   dialogueId?: string;
+  /** Alternate dialogue ID used when altDialogueWhen flag is set. */
+  altDialogueId?: string;
+  /** Flag that switches this hotspot to altDialogueId. */
+  altDialogueWhen?: string;
   targetRoom?: string;
   puzzleId?: string;
   onceOnly?: boolean;
@@ -688,7 +692,9 @@ export class RoomScene extends Phaser.Scene {
           // Hide all hotspot labels so they don't show through the dialogue overlay
           this.hideAllHotspotLabels();
           const dialogue = DialogueSystem.getInstance();
-          dialogue.startDialogue(hotspot.dialogueId, this);
+          const useAlt = hotspot.altDialogueId && hotspot.altDialogueWhen &&
+            SaveSystem.getInstance().getFlag(hotspot.altDialogueWhen);
+          dialogue.startDialogue(useAlt ? hotspot.altDialogueId! : hotspot.dialogueId, this);
           // Refresh hotspots after dialogue ends (events may unlock new hotspots)
           const checkDialogueEnd = this.time.addEvent({
             delay: 250,
@@ -1217,6 +1223,10 @@ export class RoomScene extends Phaser.Scene {
     // Stop all SFX so they don't bleed into the next room
     UISounds.stopAll();
     UISounds.doorTransition();
+    // Track leaving the lobby after intro for revisit dialogue gating
+    if (this.currentRoom?.id === 'lobby' && SaveSystem.getInstance().getFlag('vivian_intro')) {
+      SaveSystem.getInstance().setFlag('left_lobby_after_intro', true);
+    }
     SaveSystem.getInstance().setCurrentRoom(roomId);
     SaveSystem.getInstance().save();
     playCurtainClose(this, () => {

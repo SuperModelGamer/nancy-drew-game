@@ -13,7 +13,7 @@ let textSpeedPreset: TextSpeedPreset = (localStorage.getItem('nd_text_speed') as
 let particlesEnabled = localStorage.getItem('nd_particles') !== 'off';
 
 /** Music volume (independent of master SFX volume). 0 = muted, 1 = full. */
-let musicVolume = parseFloat(localStorage.getItem('nd_music_volume') ?? '0.5');
+let musicVolume = parseFloat(localStorage.getItem('nd_music_volume') ?? '0.35');
 
 /** Selected music track ID for lobby background music. */
 let musicTrack = localStorage.getItem('nd_music_track') ?? 'signs_to_nowhere';
