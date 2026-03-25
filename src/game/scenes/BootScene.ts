@@ -211,24 +211,24 @@ export class BootScene extends Phaser.Scene {
     }
 
     // Load dialogue voiceover audio files (optional — dialogue works without VO)
-    // Format: vo_{dialogueId}_{lineIndex} → assets/vo/dialogue/{dialogueId}_{lineIndex}.mp3
-    // VO files are loaded on-demand per dialogue, but we pre-load key conversations
-    const voDialogues = [
-      'vivian_intro', 'vivian_diary', 'vivian_locket',
-      'edwin_auditorium', 'edwin_confronted',
-      'ashworth_office', 'stella_backstage', 'stella_passages',
-      'diego_booth', 'phone_calls',
+    // Named VO files in public/audio/vo/
+    const voFiles = [
+      // Vivian intro — dialogue lines
+      'vo_vivian_start_01', 'vo_vivian_start_02', 'vo_vivian_start_03',
+      'vo_vivian_margaux_01', 'vo_vivian_margaux_02',
+      'vo_vivian_ashworth_01', 'vo_vivian_ashworth_02',
+      'vo_vivian_others_01', 'vo_vivian_others_02',
+      'vo_vivian_end_01',
+      // Nancy intro — dialogue lines
+      'vo_nancy_start_01', 'vo_nancy_start_02',
+      'vo_nancy_margaux_01', 'vo_nancy_ashworth_01',
+      // Nancy intro — choice lines
+      'vo_nancy_choice_margaux', 'vo_nancy_choice_ashworth',
+      'vo_nancy_choice_others', 'vo_nancy_choice_ashworth2',
+      'vo_nancy_choice_investigate',
     ];
-    for (const dlgId of voDialogues) {
-      // Load up to 20 lines per dialogue (unused ones silently fail)
-      for (let i = 1; i <= 20; i++) {
-        const padded = String(i).padStart(2, '0');
-        const key = `vo_${dlgId}_${padded}`;
-        this.load.audio(key, [
-          `assets/vo/dialogue/${dlgId}_${padded}.mp3`,
-          `assets/vo/dialogue/${dlgId}_${padded}.ogg`,
-        ]);
-      }
+    for (const key of voFiles) {
+      this.load.audio(key, [`audio/vo/${key}.mp3`]);
     }
 
     // Video cinematics are played via native HTML <video> (see VideoCinematicScene),

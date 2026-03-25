@@ -19,6 +19,7 @@ interface DialogueChoice {
   requiredItem?: string;
   requiredFlag?: string;
   triggerEvent?: string;
+  vo?: string;
 }
 
 interface DialogueNode {
@@ -915,6 +916,17 @@ export class DialogueSystem {
 
   private selectChoice(choice: DialogueChoice): void {
     if (!this.currentDialogue) return;
+
+    // Play choice VO if available
+    if (choice.vo && this.scene) {
+      this.stopVO();
+      if (this.scene.cache.audio.exists(choice.vo)) {
+        try {
+          this.currentVO = this.scene.sound.add(choice.vo, { volume: UISounds.getVolume() * 0.9 });
+          this.currentVO.play();
+        } catch { /* VO optional */ }
+      }
+    }
 
     if (choice.triggerEvent) {
       this.triggerEvent(choice.triggerEvent);
