@@ -100,22 +100,10 @@ const ROOM_AUDIO: Record<string, RoomAudioConfig> = {
 
 // ─── Audio asset manifest (loaded by BootScene) ─────────────────────────────
 
-/** Returns the audio keys and file paths to load. */
+/** Returns the audio keys and file paths to load.
+ *  Currently empty — ambient SFX files removed; user will supply replacements. */
 export function getAmbientAudioManifest(): Array<{ key: string; path: string }> {
-  return [
-    { key: 'amb_abandoned_building', path: 'assets/audio/abandoned_building.mp3' },
-    { key: 'amb_abandoned_building2', path: 'assets/audio/abandoned_building2.mp3' },
-    { key: 'amb_ambient_horror', path: 'assets/audio/ambient_horror.ogg' },
-    { key: 'amb_clock_tick', path: 'assets/audio/clock_tick.ogg' },
-    { key: 'amb_creepy_ambient', path: 'assets/audio/creepy_ambient.mp3' },
-    { key: 'amb_electrical_hum', path: 'assets/audio/electrical_hum.wav' },
-    { key: 'amb_ghost_whisper', path: 'assets/audio/ghost_whisper.wav' },
-    { key: 'amb_horror_ambient', path: 'assets/audio/horror_ambient.mp3' },
-    { key: 'amb_machinery_hum', path: 'assets/audio/machinery_hum.ogg' },
-    { key: 'amb_metal_ambience', path: 'assets/audio/metal_ambience.wav' },
-    { key: 'amb_water_drip', path: 'assets/audio/water_drip.wav' },
-    { key: 'amb_wood_creak', path: 'assets/audio/wood_creak.ogg' },
-  ];
+  return [];
 }
 
 // ─── System singleton ────────────────────────────────────────────────────────

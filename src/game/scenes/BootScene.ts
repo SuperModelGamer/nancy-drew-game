@@ -167,24 +167,9 @@ export class BootScene extends Phaser.Scene {
       this.load.image(key, `assets/intro/${key}.png`);
     }
 
-    // Load intro/cinematic audio — remap existing ambient files to SFX keys where possible
-    // Files that don't exist are silently suppressed by the loaderror handler below
-    const introAudio: Record<string, string[]> = {
-      ambient_theater: ['assets/audio/ambient_horror.ogg'],
-      sfx_ghost_whisper: ['assets/audio/ghost_whisper.wav'],
-      sfx_door_creak: ['assets/audio/wood_creak.ogg'],
-      // These use procedural fallbacks from UISounds but attempt file load too
-      sfx_goblet: ['audio/sfx_goblet.mp3', 'audio/sfx_goblet.ogg'],
-      sfx_thud: ['audio/sfx_thud.mp3', 'audio/sfx_thud.ogg'],
-      sfx_phone_ring: ['audio/sfx_phone_ring.mp3', 'audio/sfx_phone_ring.ogg'],
-      sfx_heartbeat: ['audio/sfx_heartbeat.mp3', 'audio/sfx_heartbeat.ogg'],
-      music_intro: ['audio/music_intro.mp3', 'audio/music_intro.ogg'],
-      // Cinematic-specific audio
-      cine_ambient_ghost: ['assets/audio/creepy_ambient.mp3'],
-    };
-    for (const [key, paths] of Object.entries(introAudio)) {
-      this.load.audio(key, paths);
-    }
+    // Intro/cinematic audio — SFX files removed; will be re-added when user supplies replacements
+    // Only attempt music_intro which may exist independently
+    this.load.audio('music_intro', ['audio/music_intro.mp3', 'audio/music_intro.ogg']);
 
     // Load intro voiceover narration (gracefully skipped if files don't exist)
     const voSlides = [
