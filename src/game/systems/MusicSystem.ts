@@ -109,6 +109,10 @@ export class MusicSystem {
   private playing = false;
   private fadeTimer: number = 0;
   private targetVolume = 1;
+  private ducked = false;
+  private duckTimer: number = 0;
+  /** Multiplier applied when VO is playing to keep music from competing. */
+  private static readonly DUCK_LEVEL = 0.3;
 
   static getInstance(): MusicSystem {
     if (!MusicSystem.instance) {
@@ -158,6 +162,49 @@ export class MusicSystem {
 
   isPlaying(): boolean { return this.playing; }
   getCurrentTrack(): MusicTrackDef | null { return this.currentTrack; }
+
+  /** Duck music volume while VO is playing. Call from DialogueSystem. */
+  duck(): void {
+    if (this.ducked || !this.currentAudio) return;
+    this.ducked = true;
+    window.clearInterval(this.duckTimer);
+    const target = this.targetVolume * MusicSystem.DUCK_LEVEL;
+    const steps = 15;
+    const interval = 300 / steps;
+    let step = 0;
+    const startVol = this.currentAudio.volume;
+    const decrement = (startVol - target) / steps;
+    this.duckTimer = window.setInterval(() => {
+      step++;
+      if (step >= steps || !this.currentAudio) {
+        if (this.currentAudio) this.currentAudio.volume = Math.max(0, target);
+        window.clearInterval(this.duckTimer);
+        return;
+      }
+      this.currentAudio.volume = Math.max(0, startVol - decrement * step);
+    }, interval);
+  }
+
+  /** Restore music volume after VO finishes. */
+  unduck(): void {
+    if (!this.ducked || !this.currentAudio) return;
+    this.ducked = false;
+    window.clearInterval(this.duckTimer);
+    const steps = 20;
+    const interval = 600 / steps;
+    let step = 0;
+    const startVol = this.currentAudio.volume;
+    const increment = (this.targetVolume - startVol) / steps;
+    this.duckTimer = window.setInterval(() => {
+      step++;
+      if (step >= steps || !this.currentAudio) {
+        if (this.currentAudio) this.currentAudio.volume = Math.max(0, Math.min(1, this.targetVolume));
+        window.clearInterval(this.duckTimer);
+        return;
+      }
+      this.currentAudio.volume = Math.max(0, Math.min(1, startVol + increment * step));
+    }, interval);
+  }
 
   // ── Private ─────────────────────────────────────────────────────────────
 

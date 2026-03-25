@@ -116,7 +116,9 @@
           "height": 418,
           "label": "Vivian Delacroix",
           "type": "talk",
-          "dialogueId": "vivian_intro"
+          "dialogueId": "vivian_intro",
+          "altDialogueId": "vivian_intro_revisit",
+          "altDialogueWhen": "left_lobby_after_intro"
         },
         {
           "id": "lobby_marble_floor",

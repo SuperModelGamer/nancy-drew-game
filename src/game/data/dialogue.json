@@ -1050,9 +1050,15 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Nancy", "text": "I pick up the heavy receiver and the ringing stops. An old rotary phone on the lobby wall — the theater's landline hasn't been disconnected yet. I can hear a dial tone." }
+            { "speaker": "Nancy", "text": "I pick up the heavy receiver and the ringing stops. An old rotary phone on the lobby wall — the theater's landline hasn't been disconnected yet." }
           ],
           "choices": [
+            {
+              "text": "Answer the incoming call.",
+              "nextNode": "incoming_parents",
+              "requiredFlag": "vivian_intro",
+              "hideWhenFlag": "answered_parents_call"
+            },
             {
               "text": "Call Bess and George.",
               "nextNode": "bess_george",
@@ -1083,6 +1089,21 @@
               "nextNode": "hangup"
             }
           ]
+        },
+        {
+          "id": "incoming_parents",
+          "lines": [
+            { "speaker": "Nancy", "text": "Someone's already on the line — the phone was ringing when I picked it up." },
+            { "speaker": "Carson Drew", "text": "Nancy? Oh good, you made it. Hannah said you left in a hurry this morning — something about a theater and a ghost?" },
+            { "speaker": "Nancy", "text": "Hi Dad. Yes, I'm at the Monarch Theatre. Vivian Delacroix called me — she thinks the ghost of an actress from 1928 is haunting the place. And someone was poisoned here last night." },
+            { "speaker": "Carson Drew", "text": "Poisoned? Nancy, that changes things. Be very careful. If someone in that building is willing to use poison, they're dangerous." },
+            { "speaker": "Nancy", "text": "I know, Dad. I'll be careful." },
+            { "speaker": "Carson Drew", "text": "I mean it. Check in with me when you can. And Nancy — Vivian Delacroix's family has a complicated history with that theater. Her godmother was the actress who died on stage. There's more going on there than meets the eye." },
+            { "speaker": "Nancy", "text": "That's what I'm counting on. I'll call you when I know more." },
+            { "speaker": "Carson Drew", "text": "You'd better. And eat something — I know how you get when you're on a case." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "answered_parents_call"
         },
         {
           "id": "bess_george",
