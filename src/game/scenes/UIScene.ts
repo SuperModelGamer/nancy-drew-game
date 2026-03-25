@@ -356,9 +356,10 @@ export class UIScene extends Phaser.Scene {
     });
     this.bottomBarContainer.add(audioBtn);
 
-    // Volume slider (horizontal bar right of speaker icon)
+    // Volume slider (horizontal bar right of speaker icon, capped before EVIDENCE btn)
     const sliderX = audioBtnX + 32;
-    const sliderW = 80;
+    const evidenceLeftEdge = btnCenterX - btnSpacing * 1.5 - BTN_W / 2;
+    const sliderW = Math.min(80, evidenceLeftEdge - sliderX - 16); // 16px gap before button
     const sliderH = 8;
     this.volumeSliderContainer = this.add.container(0, btnCenterY);
 
@@ -373,6 +374,7 @@ export class UIScene extends Phaser.Scene {
     // Slider fill
     this.volumeSliderFill = this.add.graphics();
     this.volumeSliderFill.setData('sliderX', sliderX);
+    this.volumeSliderFill.setData('sliderW', sliderW);
     this.volumeSliderContainer.add(this.volumeSliderFill);
     this.updateVolumeSlider();
 
@@ -652,7 +654,7 @@ export class UIScene extends Phaser.Scene {
   private updateVolumeSlider(): void {
     if (!this.volumeSliderFill) return;
     const vol = UISounds.getVolume();
-    const sliderW = 80;
+    const sliderW = (this.volumeSliderFill.getData('sliderW') as number) || 80;
     const sliderH = 8;
     const sliderX = (this.volumeSliderFill.getData('sliderX') as number) || 0;
 
