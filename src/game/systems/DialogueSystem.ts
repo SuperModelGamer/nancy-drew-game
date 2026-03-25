@@ -655,15 +655,9 @@ export class DialogueSystem {
     overlay.setInteractive();
     this.container.add(overlay);
 
-    // Categorize choices: consumed (hide), gated (show locked), available (show normally)
-    // Exit choices (farewell nodes) are never consumed — always available as escape
-    const isExitChoice = (choice: DialogueChoice): boolean => {
-      return choice.nextNode === 'farewell';
-    };
-
+    // Categorize choices: consumed (hide) or gated (hide until unlocked)
+    // Rule: if not available or already completed, don't show it at all.
     const isConsumed = (choice: DialogueChoice): boolean => {
-      // Exit choices are never consumed
-      if (isExitChoice(choice)) return false;
       // Explicitly hidden by flag
       if (choice.hideWhenFlag && (save.getFlag(choice.hideWhenFlag) || this.triggeredEvents.has(choice.hideWhenFlag))) return true;
       // Already visited this session
@@ -838,26 +832,6 @@ export class DialogueSystem {
       }
 
       this.container!.add([btn, text]);
-
-      // Staggered entrance animation — all choices fully visible
-      btn.setAlpha(0);
-      text.setAlpha(0);
-      this.scene!.tweens.add({
-        targets: btn,
-        alpha: 1,
-        y: { from: y + 22, to: y },
-        duration: 300,
-        delay: i * 80,
-        ease: 'Power2',
-      });
-      this.scene!.tweens.add({
-        targets: text,
-        alpha: 1,
-        y: { from: y + 22, to: y },
-        duration: 300,
-        delay: i * 80,
-        ease: 'Power2',
-      });
     });
   }
 
