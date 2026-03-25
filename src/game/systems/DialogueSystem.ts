@@ -917,28 +917,34 @@ export class DialogueSystem {
   private selectChoice(choice: DialogueChoice): void {
     if (!this.currentDialogue) return;
 
-    // Play choice VO if available
-    if (choice.vo && this.scene) {
-      this.stopVO();
-      if (this.scene.cache.audio.exists(choice.vo)) {
-        try {
-          this.currentVO = this.scene.sound.add(choice.vo, { volume: UISounds.getVolume() * 0.9 });
-          this.currentVO.play();
-        } catch { /* VO optional */ }
-      }
-    }
-
     if (choice.triggerEvent) {
       this.triggerEvent(choice.triggerEvent);
     }
 
-    const nextIndex = this.currentDialogue.nodes.findIndex(n => n.id === choice.nextNode);
-    if (nextIndex >= 0) {
-      this.currentNodeIndex = nextIndex;
-      this.currentLineIndex = 0;
-      this.showCurrentLine();
+    const advance = () => {
+      if (!this.currentDialogue) return;
+      const nextIndex = this.currentDialogue.nodes.findIndex(n => n.id === choice.nextNode);
+      if (nextIndex >= 0) {
+        this.currentNodeIndex = nextIndex;
+        this.currentLineIndex = 0;
+        this.showCurrentLine();
+      } else {
+        this.endDialogue();
+      }
+    };
+
+    // Play choice VO if available, then advance after it finishes
+    if (choice.vo && this.scene && this.scene.cache.audio.exists(choice.vo)) {
+      this.stopVO();
+      try {
+        this.currentVO = this.scene.sound.add(choice.vo, { volume: UISounds.getVolume() * 0.9 });
+        this.currentVO.play();
+        this.currentVO.once('complete', advance);
+      } catch {
+        advance();
+      }
     } else {
-      this.endDialogue();
+      advance();
     }
   }
 
