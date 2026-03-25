@@ -226,6 +226,11 @@ export class BootScene extends Phaser.Scene {
       'vo_nancy_choice_margaux', 'vo_nancy_choice_ashworth',
       'vo_nancy_choice_others', 'vo_nancy_choice_ashworth2',
       'vo_nancy_choice_investigate',
+      // Phone call — Carson Drew (Dad)
+      'vo_carson_phone_01', 'vo_carson_phone_02',
+      'vo_carson_phone_03', 'vo_carson_phone_04',
+      // Phone call — Nancy
+      'vo_nancy_phone_01', 'vo_nancy_phone_02', 'vo_nancy_phone_03',
     ];
     for (const key of voFiles) {
       this.load.audio(key, [`audio/vo/${key}.mp3`]);

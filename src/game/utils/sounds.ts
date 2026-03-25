@@ -27,6 +27,7 @@ const SFX_MANIFEST: Record<string, string> = {
   click: 'audio/sfx_click.mp3',
   hover: 'audio/sfx_click.mp3',
   spotlightClick: 'audio/sfx_spotlight_click.mp3',
+  phoneRing: 'audio/vo/sfx_phone_ring.mp3',
 };
 
 // ─── Audio cache & playback ──────────────────────────────────────────────────
@@ -195,9 +196,26 @@ export const UISounds = {
   gobletClink(): void {},
   bodyThud(): void {},
   ghostWhisper(): void {},
-  phoneRing(): void {},
-  phoneRingStart(): void {},
-  phoneRingStop(): void {},
+  phoneRing(): void { playSFX('phoneRing', 0.6); },
+  phoneRingStart(): void {
+    if (phoneRingTimer) return;
+    const ring = () => {
+      if (masterVolume <= 0) return;
+      const path = SFX_MANIFEST['phoneRing'];
+      if (!path) return;
+      const cached = audioCache.get(path);
+      if (!cached) return;
+      phoneRingSound = cached.cloneNode(true) as HTMLAudioElement;
+      phoneRingSound.volume = Math.min(1, 0.35 * masterVolume);
+      phoneRingSound.play().catch(() => {});
+    };
+    ring();
+    phoneRingTimer = setInterval(ring, 4000);
+  },
+  phoneRingStop(): void {
+    if (phoneRingTimer) { clearInterval(phoneRingTimer); phoneRingTimer = null; }
+    if (phoneRingSound) { fadeOutAudio(phoneRingSound, 300); phoneRingSound = null; }
+  },
   doorCreak(): void {},
   heartbeat(): void {},
   lightSurge(): void {},
