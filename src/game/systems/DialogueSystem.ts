@@ -389,12 +389,17 @@ export class DialogueSystem {
     this.startTypewriter();
 
     // ── 4b. Voiceover playback ──
-    this.stopVO();
-    if (line.vo && this.scene.cache.audio.exists(line.vo)) {
-      try {
-        this.currentVO = this.scene.sound.add(line.vo, { volume: UISounds.getVolume() * 0.9 });
-        this.currentVO.play();
-      } catch { /* VO optional — silently skip */ }
+    // If this line has a vo key, stop any current VO and start the new one.
+    // If no vo key, let the previous VO keep playing (supports one audio file
+    // spanning multiple displayed text lines).
+    if (line.vo) {
+      this.stopVO();
+      if (this.scene.cache.audio.exists(line.vo)) {
+        try {
+          this.currentVO = this.scene.sound.add(line.vo, { volume: UISounds.getVolume() * 0.9 });
+          this.currentVO.play();
+        } catch { /* VO optional — silently skip */ }
+      }
     }
 
     // ── 5. Continue arrow (inside bottom border area) ──
