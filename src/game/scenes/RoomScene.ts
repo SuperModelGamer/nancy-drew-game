@@ -288,6 +288,17 @@ export class RoomScene extends Phaser.Scene {
       this.events.once('shutdown', () => save.offChange(checkPhoneAfterIntro));
     }
 
+    // Play dial tone SFX when Nancy hangs up the phone
+    const saveInst = SaveSystem.getInstance();
+    const checkPhoneHangup = () => {
+      if (saveInst.getFlag('phone_hangup')) {
+        UISounds.phoneDialTone();
+        saveInst.offChange(checkPhoneHangup);
+      }
+    };
+    saveInst.onChange(checkPhoneHangup);
+    this.events.once('shutdown', () => saveInst.offChange(checkPhoneHangup));
+
     // Stop phone ringing on scene shutdown (room transition)
     this.events.once('shutdown', () => {
       if (this.phoneRinging) {
