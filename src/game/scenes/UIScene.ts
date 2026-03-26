@@ -475,23 +475,20 @@ export class UIScene extends Phaser.Scene {
     gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
     this.bottomBarContainer.add(gearBtn);
 
-    // ── Always-visible room clue counter (left side, vertically aligned with buttons) ──
-    // Positioned between audio controls and EVIDENCE button
-    const clueBarX = audioBtnX + 60; // right of speaker icon + volume slider
+    // ── Always-visible room clue counter (far left, outside speaker icon) ──
+    const clueBarX = audioBtnX - 50; // left of speaker icon
     this.barRoomClueText = this.add.text(clueBarX, btnCenterY, '', {
       fontFamily: FONT, fontSize: '18px', color: '#8a9aaa',
       fontStyle: 'bold', letterSpacing: 1,
-    }).setOrigin(0, 0.5);
+    }).setOrigin(1, 0.5); // right-aligned so it grows leftward
     this.bottomBarContainer.add(this.barRoomClueText);
 
-    // ── Always-visible progress bar (right side, vertically aligned with buttons) ──
-    // Positioned between JOURNAL button and settings gear
-    const gearX = btnCenterX + btnSpacing * 2.3;
-    const journalRight = btnCenterX + btnSpacing * 1.5 + BTN_W / 2;
+    // ── Always-visible progress bar (far right, outside settings gear) ──
+    const gearRightEdge = btnCenterX + btnSpacing * 2.3 + 36;
     const pBarW = 120;
     const pBarH = 10;
-    const pBarX = journalRight + 16; // 16px gap after JOURNAL button
-    const pBarY = btnCenterY + 6; // slightly below center for bar under label
+    const pBarX = gearRightEdge + 12;
+    const pBarY = btnCenterY + 6;
 
     // Progress label
     const pLabel = this.add.text(pBarX, btnCenterY - 12, 'PROGRESS', {
