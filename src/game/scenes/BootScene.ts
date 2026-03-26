@@ -269,6 +269,7 @@ export class BootScene extends Phaser.Scene {
       'vo_nancy_choice_crimson', 'vo_nancy_choice_ghost', 'vo_nancy_choice_lastnight',
       'vo_nancy_choice_grandfather', 'vo_nancy_choice_props',
       'vo_nancy_choice_cecilia', 'vo_nancy_choice_diary_edwin', 'vo_nancy_choice_effects',
+      'vo_nancy_choice_investigate_edwin',
     ];
     for (const key of voFiles) {
       this.load.audio(key, [`audio/vo/${key}.mp3`]);

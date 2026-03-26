@@ -286,7 +286,7 @@
               "text": "Thank you, Edwin. I'll keep investigating.",
               "nextNode": "end",
               "triggerEvent": "learned_about_crimson_veil",
-              "vo": "vo_nancy_choice_investigate"
+              "vo": "vo_nancy_choice_investigate_edwin"
             }
           ]
         },
@@ -324,7 +324,7 @@
             {
               "text": "Interesting. I'll keep investigating.",
               "nextNode": "end",
-              "vo": "vo_nancy_choice_investigate"
+              "vo": "vo_nancy_choice_investigate_edwin"
             }
           ]
         },
