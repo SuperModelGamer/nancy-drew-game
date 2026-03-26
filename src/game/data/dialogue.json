@@ -1238,7 +1238,7 @@
             { "speaker": "Vivian", "text": "How am I holding up? Oh, you know. The building I've lived in for seventy-three years is being demolished. There's a ghost that may or may not be my godmother. A man was poisoned upstairs. And a teenager is my best hope.", "vo": "vo_vivian_holding_01" },
             { "speaker": "Nancy", "text": "I'm not a teenager anymore, Vivian.", "vo": "vo_nancy_holding_01" },
             { "speaker": "Vivian", "text": "Everyone under fifty is a teenager to me, darling. It's one of the few privileges of old age — along with saying exactly what you think and pretending you can't hear things you don't want to.", "vo": "vo_vivian_holding_02" },
-            { "speaker": "Vivian", "text": "But truly? I'm frightened. Not of the ghost — I've lived with Margaux's memory my whole life. I'm frightened of what happens when the wrecking ball comes. Where does an old actress go when her stage is gone?" },
+            { "speaker": "Vivian", "text": "But truly? I'm frightened. Not of the ghost — I've lived with Margaux's memory my whole life. I'm frightened of what happens when the wrecking ball comes. Where does an old actress go when her stage is gone?", "vo": "vo_vivian_holding_03" },
             { "speaker": "Nancy", "text": "We'll figure this out, Vivian. I promise.", "vo": "vo_nancy_holding_02" },
             { "speaker": "Vivian", "text": "You remind me of her, you know. Margaux. She had that same stubborn certainty. It's either your greatest strength or a terrible liability. I could never decide which it was with her.", "vo": "vo_vivian_holding_04" }
           ],
