@@ -190,7 +190,7 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
     overlayText: [
       { text: 'NIGHT 1 — 11:30 PM', delay: 500, duration: 3500, style: 'time', y: 16 },
       { text: 'Behind the Curtain', delay: 1200, duration: 3500, style: 'title', y: 30 },
-      { text: 'It\'s quieter back here. But not silent.\nSomething in this building is still awake.', delay: 4500, style: 'body', y: 80 },
+      { text: 'Past the velvet and the gilt,\nthe Monarch shows its bones.\nRope. Iron. Shadow.', delay: 4500, style: 'body', y: 80 },
     ],
     slides: [
       {
