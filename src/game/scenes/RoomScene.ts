@@ -244,11 +244,11 @@ export class RoomScene extends Phaser.Scene {
       const ROOM_MUSIC: Record<string, string> = {
         lobby: 'signs_to_nowhere',           // noir jazz — welcoming but mysterious
         auditorium: 'lobby_elegant',          // warm elegant strings
-        backstage: 'mystery_unsolved',        // investigation energy
+        backstage: 'darkest_child',             // dark, unsettling — gaslight
         dressing_room: 'comfortable_mystery', // contemplative vintage piano
         projection_booth: 'ghost_story',      // haunting atmosphere
         managers_office: 'crypto',            // moody building tension
-        catwalk: 'darkest_child',             // dark and unsettling
+        catwalk: 'mystery_unsolved',            // investigation energy
         basement: 'dreamy_flashback',         // emotional revelation
       };
       const targetTrack = ROOM_MUSIC[this.currentRoom.id] || 'signs_to_nowhere';
@@ -650,6 +650,7 @@ export class RoomScene extends Phaser.Scene {
             this.showDescription('You already have this.');
           } else {
             inventory.addItem(hotspot.itemId);
+            inventory.selectItem(hotspot.itemId);
             UISounds.itemPickup();
             this.showPickupToast(hotspot.label);
             this.usedHotspots.add(hotspot.id);
