@@ -18,8 +18,8 @@ let musicVolume = parseFloat(localStorage.getItem('nd_music_volume') ?? '0.35');
 /** Selected music track ID for lobby background music. */
 let musicTrack = localStorage.getItem('nd_music_track') ?? 'signs_to_nowhere';
 
-/** Whether the player has manually overridden the room-default music track. */
-let musicOverride = localStorage.getItem('nd_music_override') === 'true';
+/** Whether the player has manually overridden the room-default music track (session only). */
+let musicOverride = false;
 
 // ─── Audio file manifest ─────────────────────────────────────────────────────
 // Maps sound keys to file paths relative to public/
@@ -167,7 +167,6 @@ export const UISounds = {
   getMusicOverride(): boolean { return musicOverride; },
   setMusicOverride(on: boolean): void {
     musicOverride = on;
-    localStorage.setItem('nd_music_override', on ? 'true' : 'false');
   },
 
   // ─── UI Interaction SFX ──────────────────────────────────────────────────
