@@ -29,9 +29,6 @@ interface NancyThought {
   requiresFlag?: string; // only show after a certain event/flag
 }
 
-export type { SuspectProfile, SuspectFact, NancyThought };
-export { SUSPECTS };
-
 const SUSPECTS: SuspectProfile[] = [
   {
     id: 'vivian',

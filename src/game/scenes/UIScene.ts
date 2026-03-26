@@ -12,7 +12,6 @@ import { drawChevronTab, drawCornerOrnament, DecoColors } from '../utils/art-dec
 import { AuthManager } from '../systems/AuthManager';
 import { MusicSystem, MUSIC_TRACKS } from '../systems/MusicSystem';
 import { createAuthFormElements, submitAuthForm } from '../ui/AuthFormOverlay';
-import { SUSPECTS } from './SuspectScene';
 
 // Height of the bottom toolbar strip (buttons + chapter label)
 const TOOLBAR_H = 112;
@@ -1517,53 +1516,89 @@ export class UIScene extends Phaser.Scene {
     spineGfx.fillRect(spineX - 12, layout.contentTop - 4, 24, layout.contentBottom - layout.contentTop + 8);
     container.add(spineGfx);
 
-    // Page labels
-    const labelY = layout.contentTop + 6;
-    const leftPageCenter = layout.paperLeft + (layout.paperW / 2 - 14) / 2;
-    const rightPageCenter = layout.panelX + (layout.paperW / 2 - 14) / 2 + 14;
-
-    const leftLabel = this.add.text(leftPageCenter, labelY, 'CASE NOTES', {
-      fontFamily: JOURNAL_TITLE, fontSize: '18px', color: '#7a6a5a',
-      letterSpacing: 6,
-    }).setOrigin(0.5, 0);
-    container.add(leftLabel);
-
-    const rightLabel = this.add.text(rightPageCenter, labelY, 'SUSPECT BOARD', {
-      fontFamily: JOURNAL_TITLE, fontSize: '18px', color: '#7a6a5a',
-      letterSpacing: 6,
-    }).setOrigin(0.5, 0);
-    container.add(rightLabel);
-
     this.journalContent = this.add.container(0, 0);
     container.add(this.journalContent);
 
     return container;
   }
 
-  /** Compute how many journal entries fit on one left page. */
-  private computeJournalPageCapacity(entries: string[], startIdx: number, maxY: number, textW: number): number {
-    // Estimate how many entries fit by simulating layout heights
-    let y = 0;
-    const lineH = 30; // approximate line height for wrapped text at 26-28px font
-    const entryGap = 12;
+  /** Render one page of journal entries. Returns the number of entries actually rendered. */
+  private renderJournalPage(
+    entries: string[],
+    startGlobalIdx: number,
+    pageLeft: number,
+    pageW: number,
+    pageTop: number,
+    pageBottom: number,
+  ): number {
+    const lineSpacing = 30;
+    const marginX = pageLeft + 40;
+    const entryLeft = marginX + 12;
+    const entryTextW = pageW - 68;
+    const entryGap = 10;
+    const ruledStart = pageTop + 4;
+
+    // Ruled lines
+    const ruledGfx = this.add.graphics();
+    ruledGfx.lineStyle(1, BOOK_STAIN, 0.12);
+    for (let ly = ruledStart; ly < pageBottom - 30; ly += lineSpacing) {
+      ruledGfx.lineBetween(pageLeft + 4, ly, pageLeft + pageW - 4, ly);
+    }
+    // Red margin line
+    ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.18);
+    ruledGfx.lineBetween(marginX, pageTop, marginX, pageBottom - 30);
+    this.journalContent.add(ruledGfx);
+
+    let y = ruledStart + 2;
     let count = 0;
 
-    for (let i = startIdx; i < entries.length; i++) {
+    for (let i = 0; i < entries.length; i++) {
       const entry = entries[i];
-      const text = entry.startsWith('Thinking:') ? entry.replace(/^Thinking:\s*/, '') : entry;
-      const prefix = entry.startsWith('Thinking:') ? '— ' : entry.startsWith('Found ') ? '• ' : '';
-      const fullText = prefix + text;
-      // Rough estimate: characters per line based on font size and width
-      const charsPerLine = Math.floor(textW / 14); // ~14px per char at 26-28px Caveat
-      const numLines = Math.max(1, Math.ceil(fullText.length / charsPerLine));
-      const entryH = numLines * lineH + entryGap;
+      const globalIdx = startGlobalIdx + i;
+      const isThinking = entry.startsWith('Thinking:');
+      const isEvidence = entry.startsWith('Found ');
 
-      if (y + entryH > maxY) break;
-      y += entryH;
+      let displayText = entry;
+      if (isThinking) displayText = entry.replace(/^Thinking:\s*/, '');
+
+      const xJitter = ((globalIdx * 7) % 5) - 2;
+
+      let fontSize: number;
+      let color: string;
+      let prefix: string;
+
+      if (isThinking) {
+        fontSize = 26; color = '#5a4a3a'; prefix = '— ';
+      } else if (isEvidence) {
+        fontSize = 26; color = '#3a2a1a'; prefix = '• ';
+      } else {
+        fontSize = 28; color = '#2a1a0a'; prefix = '';
+      }
+
+      const text = this.add.text(entryLeft + xJitter, y, prefix + displayText, {
+        fontFamily: JOURNAL_HAND,
+        fontSize: `${fontSize}px`,
+        color,
+        fontStyle: isThinking ? 'normal' : 'bold',
+        wordWrap: { width: isThinking ? entryTextW - 12 : entryTextW },
+        lineSpacing: lineSpacing - fontSize + 2,
+      });
+
+      // Check if this entry would overflow the page
+      if (y + text.height > pageBottom - 30 && count > 0) {
+        text.destroy();
+        break;
+      }
+
+      const angle = ((globalIdx * 13 + 5) % 7 - 3) * 0.08;
+      text.setRotation(angle * Math.PI / 180);
+
+      this.journalContent.add(text);
+      y += text.height + entryGap;
       count++;
     }
 
-    return Math.max(1, count); // always show at least 1
+    return count;
   }
 
   private refreshJournalContent(): void {
@@ -1573,8 +1608,8 @@ export class UIScene extends Phaser.Scene {
     const save = SaveSystem.getInstance();
     const journal = save.getJournal();
 
-    // ─── Page geometry ───
-    const pageGutter = 22; // padding from spine & edges
+    // ─── Two-page geometry ───
+    const pageGutter = 22;
     const leftPageLeft = paperLeft + 20;
     const leftPageRight = panelX - pageGutter;
     const rightPageLeft = panelX + pageGutter;
@@ -1582,114 +1617,75 @@ export class UIScene extends Phaser.Scene {
     const leftPageW = leftPageRight - leftPageLeft;
     const rightPageW = rightPageRight - rightPageLeft;
 
-    const pageTop = contentTop + 30; // below page labels
+    const pageTop = contentTop + 8;
     const pageBottom = contentBottom - 10;
-    const usableH = pageBottom - pageTop;
-
-    // ══════════════════════════════════════════════════════════════════════════════
-    // LEFT PAGE — CASE NOTES (handwritten journal entries)
-    // ══════════════════════════════════════════════════════════════════════════════
-
-    // Ruled lines on left page
-    const ruledGfx = this.add.graphics();
-    const lineSpacing = 30;
-    const ruledStart = pageTop + 4;
-    ruledGfx.lineStyle(1, BOOK_STAIN, 0.12);
-    for (let ly = ruledStart; ly < pageBottom - 30; ly += lineSpacing) {
-      ruledGfx.lineBetween(leftPageLeft + 4, ly, leftPageRight - 4, ly);
-    }
-    // Red margin line
-    const marginX = leftPageLeft + 40;
-    ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.18);
-    ruledGfx.lineBetween(marginX, pageTop, marginX, pageBottom - 30);
-    this.journalContent.add(ruledGfx);
 
     if (journal.length === 0) {
       const empty = this.add.text(
-        (leftPageLeft + leftPageRight) / 2,
-        pageTop + usableH / 2,
-        "Nothing yet...\n\nExplore the theater and\ntalk to people to fill\nthis journal.", {
+        panelX, (pageTop + pageBottom) / 2,
+        "Nothing yet...\n\nExplore the theater and talk to people\nto fill this journal.", {
           fontFamily: JOURNAL_HAND, fontSize: '30px', color: '#8a7a6a',
           align: 'center', lineSpacing: 8,
         }).setOrigin(0.5);
       this.journalContent.add(empty);
+      return;
+    }
+
+    // ── Pre-compute spread capacities to figure out pagination ──
+    // Each "spread" = left page + right page. We need to know how many entries
+    // fit per spread so we can paginate correctly.
+    // Strategy: walk through entries, simulating layout to count per-spread capacity.
+    const spreads: { start: number; leftCount: number; rightCount: number }[] = [];
+    let idx = 0;
+    while (idx < journal.length) {
+      // Estimate left page capacity
+      const leftCount = this.estimatePageCapacity(journal, idx, leftPageW, pageBottom - pageTop - 40);
+      const rightCount = this.estimatePageCapacity(journal, idx + leftCount, rightPageW, pageBottom - pageTop - 40);
+      spreads.push({ start: idx, leftCount, rightCount });
+      idx += leftCount + rightCount;
+    }
+
+    const totalSpreads = spreads.length;
+    if (this.journalPage >= totalSpreads) this.journalPage = totalSpreads - 1;
+    if (this.journalPage < 0) this.journalPage = 0;
+
+    const spread = spreads[this.journalPage];
+
+    // ── Render left page ──
+    const leftEntries = journal.slice(spread.start, spread.start + spread.leftCount);
+    this.renderJournalPage(leftEntries, spread.start, leftPageLeft, leftPageW, pageTop, pageBottom);
+
+    // ── Render right page ──
+    const rightStart = spread.start + spread.leftCount;
+    const rightEntries = journal.slice(rightStart, rightStart + spread.rightCount);
+    if (rightEntries.length > 0) {
+      this.renderJournalPage(rightEntries, rightStart, rightPageLeft, rightPageW, pageTop, pageBottom);
     } else {
-      // Dynamic pagination — fit as many entries as the page height allows
-      const entryLeft = marginX + 12;
-      const entryTextW = leftPageW - 68;
-      const entryGap = 10;
+      // Right page is empty — draw ruled lines anyway for visual consistency
+      const ruledGfx = this.add.graphics();
+      const rMarginX = rightPageLeft + 40;
+      ruledGfx.lineStyle(1, BOOK_STAIN, 0.12);
+      for (let ly = pageTop + 4; ly < pageBottom - 30; ly += 30) {
+        ruledGfx.lineBetween(rightPageLeft + 4, ly, rightPageRight - 4, ly);
+      }
+      ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.18);
+      ruledGfx.lineBetween(rMarginX, pageTop, rMarginX, pageBottom - 30);
+      this.journalContent.add(ruledGfx);
+    }
 
-      // Calculate page capacity dynamically
-      const entriesPerPage = this.computeJournalPageCapacity(journal, 0, usableH - 50, entryTextW);
-      const totalPages = Math.ceil(journal.length / entriesPerPage);
-      if (this.journalPage >= totalPages) this.journalPage = totalPages - 1;
-      if (this.journalPage < 0) this.journalPage = 0;
+    // ── Page navigation — centered at bottom across both pages ──
+    if (totalSpreads > 1) {
+      const navY = pageBottom + 2;
 
-      const startIdx = this.journalPage * entriesPerPage;
-      const endIdx = Math.min(startIdx + entriesPerPage, journal.length);
-      const pageEntries = journal.slice(startIdx, endIdx);
-
-      let y = ruledStart + 2;
-
-      pageEntries.forEach((entry, i) => {
-        const globalIdx = startIdx + i;
-        const isThinking = entry.startsWith('Thinking:');
-        const isEvidence = entry.startsWith('Found ');
-
-        let displayText = entry;
-        if (isThinking) displayText = entry.replace(/^Thinking:\s*/, '');
-
-        // Slight x jitter for handwritten feel
-        const xJitter = ((globalIdx * 7) % 5) - 2;
-
-        let fontSize: number;
-        let color: string;
-        let prefix: string;
-
-        if (isThinking) {
-          fontSize = 26;
-          color = '#5a4a3a';
-          prefix = '— ';
-        } else if (isEvidence) {
-          fontSize = 26;
-          color = '#3a2a1a';
-          prefix = '• ';
-        } else {
-          fontSize = 28;
-          color = '#2a1a0a';
-          prefix = '';
-        }
-
-        const text = this.add.text(entryLeft + xJitter, y, prefix + displayText, {
-          fontFamily: JOURNAL_HAND,
-          fontSize: `${fontSize}px`,
-          color,
-          fontStyle: isThinking ? 'normal' : 'bold',
-          wordWrap: { width: isThinking ? entryTextW - 12 : entryTextW },
-          lineSpacing: lineSpacing - fontSize + 2,
-        });
-
-        // Slight rotation for handwritten feel
-        const angle = ((globalIdx * 13 + 5) % 7 - 3) * 0.08;
-        text.setRotation(angle * Math.PI / 180);
-
-        this.journalContent.add(text);
-        y += text.height + entryGap;
-      });
-
-      // Page navigation at bottom of left page
-      const navY = pageBottom - 8;
-      const leftCenter = (leftPageLeft + leftPageRight) / 2;
-
-      const pageText = this.add.text(leftCenter, navY, `— ${this.journalPage + 1} / ${totalPages} —`, {
+      const pageText = this.add.text(panelX, navY, `— ${this.journalPage + 1} / ${totalSpreads} —`, {
         fontFamily: JOURNAL_HAND, fontSize: '22px', color: '#8a7a6a',
       }).setOrigin(0.5);
       this.journalContent.add(pageText);
 
       if (this.journalPage > 0) {
-        const prevBtn = this.add.text(leftPageLeft + 16, navY, '< prev', {
+        const prevBtn = this.add.text(panelX - 120, navY, '< prev', {
           fontFamily: JOURNAL_HAND, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
-        }).setOrigin(0, 0.5);
+        }).setOrigin(1, 0.5);
         prevBtn.setInteractive({ cursor: POINTER_CURSOR });
         prevBtn.on('pointerover', () => prevBtn.setColor(TAB_GOLD_STR));
         prevBtn.on('pointerout', () => prevBtn.setColor('#5a3a2a'));
@@ -1697,10 +1693,10 @@ export class UIScene extends Phaser.Scene {
         this.journalContent.add(prevBtn);
       }
 
-      if (this.journalPage < totalPages - 1) {
-        const nextBtn = this.add.text(leftPageRight - 16, navY, 'next >', {
+      if (this.journalPage < totalSpreads - 1) {
+        const nextBtn = this.add.text(panelX + 120, navY, 'next >', {
           fontFamily: JOURNAL_HAND, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
-        }).setOrigin(1, 0.5);
+        }).setOrigin(0, 0.5);
         nextBtn.setInteractive({ cursor: POINTER_CURSOR });
         nextBtn.on('pointerover', () => nextBtn.setColor(TAB_GOLD_STR));
         nextBtn.on('pointerout', () => nextBtn.setColor('#5a3a2a'));
@@ -1708,154 +1704,31 @@ export class UIScene extends Phaser.Scene {
         this.journalContent.add(nextBtn);
       }
     }
+  }
 
-    // ══════════════════════════════════════════════════════════════════════════════
-    // RIGHT PAGE — SUSPECT BOARD
-    // ══════════════════════════════════════════════════════════════════════════════
+  /** Estimate how many entries fit on a single page given available width and height. */
+  private estimatePageCapacity(entries: string[], startIdx: number, pageW: number, maxH: number): number {
+    let y = 0;
+    const lineH = 30;
+    const entryGap = 10;
+    const textW = pageW - 68;
+    let count = 0;
 
-    // Light pin-board texture on right page
-    const boardGfx = this.add.graphics();
-    boardGfx.fillStyle(0xD4C4A8, 0.15);
-    boardGfx.fillRect(rightPageLeft, pageTop, rightPageW, usableH);
-    this.journalContent.add(boardGfx);
+    for (let i = startIdx; i < entries.length; i++) {
+      const entry = entries[i];
+      const text = entry.startsWith('Thinking:') ? entry.replace(/^Thinking:\s*/, '') : entry;
+      const prefix = entry.startsWith('Thinking:') ? '— ' : entry.startsWith('Found ') ? '• ' : '';
+      const fullText = prefix + text;
+      const charsPerLine = Math.floor(textW / 14);
+      const numLines = Math.max(1, Math.ceil(fullText.length / charsPerLine));
+      const entryH = numLines * lineH + entryGap;
 
-    let rY = pageTop + 4;
-    const metSuspects = SUSPECTS.filter(s => save.getFlag(s.metFlag));
-
-    if (metSuspects.length === 0) {
-      const noSuspects = this.add.text(
-        (rightPageLeft + rightPageRight) / 2,
-        pageTop + 60,
-        'No suspects yet.\n\nMeet people in the theater\nto build your suspect board.', {
-          fontFamily: JOURNAL_HAND, fontSize: '28px', color: '#8a7a6a',
-          align: 'center', lineSpacing: 8,
-        }).setOrigin(0.5, 0);
-      this.journalContent.add(noSuspects);
-    } else {
-      const suspectGap = 8;
-      const factIndent = 20;
-      const maxFactsPerSuspect = 3; // show at most 3 unlocked facts per suspect to save space
-
-      for (const suspect of metSuspects) {
-        if (rY > pageBottom - 40) break; // stop if we'd overflow
-
-        // Suspect name + role header
-        const colorStr = '#' + suspect.color.toString(16).padStart(6, '0');
-        const nameText = this.add.text(rightPageLeft + 8, rY, suspect.name, {
-          fontFamily: JOURNAL_FONT, fontSize: '22px', color: colorStr,
-          fontStyle: 'bold',
-        });
-        this.journalContent.add(nameText);
-
-        const roleText = this.add.text(rightPageLeft + 8 + nameText.width + 10, rY + 2, `— ${suspect.role}`, {
-          fontFamily: JOURNAL_FONT, fontSize: '18px', color: '#6a5a4a',
-          fontStyle: 'italic',
-        });
-        this.journalContent.add(roleText);
-
-        rY += 28;
-
-        // Divider line under name
-        const divGfx = this.add.graphics();
-        divGfx.lineStyle(1, suspect.color, 0.3);
-        divGfx.lineBetween(rightPageLeft + 8, rY - 4, rightPageRight - 16, rY - 4);
-        this.journalContent.add(divGfx);
-
-        // Unlocked facts
-        const unlockedFacts = suspect.facts.filter(f =>
-          !f.requiresFlag || save.getFlag(f.requiresFlag)
-        );
-
-        const factsToShow = unlockedFacts.slice(0, maxFactsPerSuspect);
-        for (const fact of factsToShow) {
-          if (rY > pageBottom - 30) break;
-
-          const factText = this.add.text(rightPageLeft + factIndent, rY, `· ${fact.text}`, {
-            fontFamily: JOURNAL_HAND, fontSize: '22px', color: '#3a2a1a',
-            wordWrap: { width: rightPageW - factIndent - 20 },
-            lineSpacing: 2,
-          });
-          this.journalContent.add(factText);
-          rY += factText.height + 4;
-        }
-
-        if (unlockedFacts.length > maxFactsPerSuspect) {
-          const moreText = this.add.text(rightPageLeft + factIndent, rY, `  +${unlockedFacts.length - maxFactsPerSuspect} more...`, {
-            fontFamily: JOURNAL_HAND, fontSize: '20px', color: '#8a7a6a',
-            fontStyle: 'italic',
-          });
-          this.journalContent.add(moreText);
-          rY += 24;
-        }
-
-        // Latest Nancy thought about this suspect (if any unlocked)
-        const unlockedThoughts = suspect.thoughts.filter(t =>
-          !t.requiresFlag || save.getFlag(t.requiresFlag)
-        );
-        if (unlockedThoughts.length > 0) {
-          const latestThought = unlockedThoughts[unlockedThoughts.length - 1];
-          if (rY < pageBottom - 50) {
-            const thoughtText = this.add.text(rightPageLeft + factIndent + 4, rY + 2, latestThought.text, {
-              fontFamily: JOURNAL_HAND, fontSize: '20px', color: '#6a5a4a',
-              fontStyle: 'italic',
-              wordWrap: { width: rightPageW - factIndent - 30 },
-              lineSpacing: 2,
-            });
-            this.journalContent.add(thoughtText);
-            rY += thoughtText.height + 6;
-          }
-        }
-
-        rY += suspectGap;
-      }
+      if (y + entryH > maxH && count > 0) break;
+      y += entryH;
+      count++;
     }
 
-    // ─── Key Questions section at bottom of right page ───
-    const questionsY = Math.max(rY + 10, pageBottom - 120);
-    if (questionsY < pageBottom - 40) {
-      const qDivGfx = this.add.graphics();
-      qDivGfx.lineStyle(1, 0x8a7a6a, 0.3);
-      qDivGfx.lineBetween(rightPageLeft + 16, questionsY - 4, rightPageRight - 24, questionsY - 4);
-      this.journalContent.add(qDivGfx);
-
-      const qLabel = this.add.text(rightPageLeft + 16, questionsY, 'KEY QUESTIONS', {
-        fontFamily: JOURNAL_TITLE, fontSize: '16px', color: '#7a6a5a',
-        letterSpacing: 4,
-      });
-      this.journalContent.add(qLabel);
-
-      // Dynamic questions based on game progress
-      const questions: string[] = [];
-      if (save.getFlag('learned_about_ashworth')) {
-        questions.push('Who poisoned Ashworth — and why?');
-      }
-      if (save.getFlag('learned_about_crimson_veil')) {
-        questions.push('What happened during The Crimson Veil\'s final act?');
-      }
-      if (!save.getFlag('edwin_personal_revealed') && save.getFlag('learned_about_hale_family')) {
-        questions.push('What is Edwin\'s real connection to Margaux?');
-      }
-      if (save.getFlag('learned_about_missing_props') && !save.getFlag('stella_confession')) {
-        questions.push('Why are props disappearing from the theater?');
-      }
-      if (save.getFlag('learned_about_basement_intruder')) {
-        questions.push('Who has been living in the basement?');
-      }
-      if (questions.length === 0) {
-        questions.push('What secrets does the Monarch Theater hold?');
-      }
-
-      let qY = questionsY + 22;
-      for (const q of questions.slice(0, 4)) {
-        if (qY > pageBottom - 10) break;
-        const qText = this.add.text(rightPageLeft + 24, qY, `? ${q}`, {
-          fontFamily: JOURNAL_HAND, fontSize: '22px', color: '#5a3a2a',
-          wordWrap: { width: rightPageW - 50 },
-        });
-        this.journalContent.add(qText);
-        qY += qText.height + 6;
-      }
-    }
+    return Math.max(count, startIdx < entries.length ? 1 : 0);
   }
 
   // ─── Settings Panel ──────────────────────────────────────────────────────────
