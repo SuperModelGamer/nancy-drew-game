@@ -188,9 +188,9 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
     triggerFlag: '',
     videoKey: 'cinematic_backstage_entry',
     overlayText: [
-      { text: 'NIGHT 1 — 11:30 PM', delay: 500, duration: 3500, style: 'time', y: 18 },
-      { text: 'Behind the Curtain', delay: 1200, duration: 3500, style: 'title', y: 28 },
-      { text: 'Everyone has a role to play in this theater.\nI just haven\'t learned mine yet.', delay: 4500, style: 'body', y: 82 },
+      { text: 'NIGHT 1 — 11:30 PM', delay: 500, duration: 3500, style: 'time', y: 16 },
+      { text: 'Behind the Curtain', delay: 1200, duration: 3500, style: 'title', y: 30 },
+      { text: 'It\'s quieter back here. But not silent.\nSomething in this building is still awake.', delay: 4500, style: 'body', y: 80 },
     ],
     slides: [
       {

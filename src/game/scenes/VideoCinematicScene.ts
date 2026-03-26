@@ -124,10 +124,10 @@ export class VideoCinematicScene extends Phaser.Scene {
           const el = document.createElement('div');
           const yPos = line.y ?? 50;
           const styleMap: Record<string, string> = {
-            title: `font-size: 48px; font-weight: bold; letter-spacing: 6px; font-family: 'Playfair Display SC', 'Crimson Text', Georgia, serif; color: ${GOLD} 0.95); text-shadow: 0 2px 12px rgba(0,0,0,0.8);`,
-            subtitle: `font-size: 24px; font-style: italic; letter-spacing: 3px; font-family: 'Crimson Text', Georgia, serif; color: ${GOLD} 0.8); text-shadow: 0 1px 8px rgba(0,0,0,0.7);`,
-            time: `font-size: 18px; letter-spacing: 5px; font-family: 'Crimson Text', Georgia, serif; color: rgba(180,180,200,0.8); text-transform: uppercase; text-shadow: 0 1px 6px rgba(0,0,0,0.7);`,
-            body: `font-size: 20px; line-height: 1.6; font-family: 'Crimson Text', Georgia, serif; color: rgba(240,224,184,0.9); text-shadow: 0 1px 8px rgba(0,0,0,0.8); max-width: 600px;`,
+            title: `font-size: 64px; font-weight: bold; letter-spacing: 8px; font-family: 'Playfair Display SC', 'Crimson Text', Georgia, serif; color: ${GOLD} 0.95); text-shadow: 0 3px 16px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.5);`,
+            subtitle: `font-size: 32px; font-style: italic; letter-spacing: 4px; font-family: 'Crimson Text', Georgia, serif; color: ${GOLD} 0.8); text-shadow: 0 2px 10px rgba(0,0,0,0.8);`,
+            time: `font-size: 26px; letter-spacing: 8px; font-family: 'Crimson Text', Georgia, serif; color: rgba(180,180,200,0.85); text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.8);`,
+            body: `font-size: 28px; line-height: 1.6; font-family: 'Crimson Text', Georgia, serif; color: rgba(240,224,184,0.9); text-shadow: 0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.5); max-width: 700px;`,
           };
           el.innerHTML = line.text.replace(/\n/g, '<br>');
           el.style.cssText = `
