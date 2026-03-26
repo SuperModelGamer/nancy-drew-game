@@ -231,30 +231,21 @@ export class RoomScene extends Phaser.Scene {
 
     // Ambient audio disabled — music system handles atmosphere
 
-    // Play background music — each room has a default track, but if the player
-    // manually chose a track from settings, respect that override.
+    // Play background music — each room has its own track
     const music = MusicSystem.getInstance();
-    if (UISounds.getMusicOverride()) {
-      // Player chose a specific track — play it if not already playing
-      if (!music.isPlaying()) {
-        music.play(UISounds.getMusicTrack());
-      }
-    } else {
-      // Use room-specific default track
-      const ROOM_MUSIC: Record<string, string> = {
-        lobby: 'signs_to_nowhere',           // noir jazz — welcoming but mysterious
-        auditorium: 'lobby_elegant',          // warm elegant strings
-        backstage: 'darkest_child',             // dark, unsettling — gaslight
-        dressing_room: 'comfortable_mystery', // contemplative vintage piano
-        projection_booth: 'ghost_story',      // haunting atmosphere
-        managers_office: 'crypto',            // moody building tension
-        catwalk: 'mystery_unsolved',            // investigation energy
-        basement: 'dreamy_flashback',         // emotional revelation
-      };
-      const targetTrack = ROOM_MUSIC[this.currentRoom.id] || 'signs_to_nowhere';
-      if (!music.isPlaying() || music.getCurrentTrack()?.id !== targetTrack) {
-        music.play(targetTrack);
-      }
+    const ROOM_MUSIC: Record<string, string> = {
+      lobby: 'signs_to_nowhere',           // noir jazz — welcoming but mysterious
+      auditorium: 'lobby_elegant',          // warm elegant strings
+      backstage: 'darkest_child',             // dark, unsettling — gaslight
+      dressing_room: 'comfortable_mystery', // contemplative vintage piano
+      projection_booth: 'ghost_story',      // haunting atmosphere
+      managers_office: 'crypto',            // moody building tension
+      catwalk: 'mystery_unsolved',            // investigation energy
+      basement: 'dreamy_flashback',         // emotional revelation
+    };
+    const targetTrack = ROOM_MUSIC[this.currentRoom.id] || 'signs_to_nowhere';
+    if (!music.isPlaying() || music.getCurrentTrack()?.id !== targetTrack) {
+      music.play(targetTrack);
     }
 
     // Ambient phone ringing in lobby — starts after talking to Vivian, stops on pickup
@@ -673,7 +664,8 @@ export class RoomScene extends Phaser.Scene {
             // Add journal entry for key evidence pickups
             const item = itemsData.items.find(i => i.id === hotspot.itemId);
             if (item) {
-              SaveSystem.getInstance().addJournalEntry(`Found ${item.name} in the ${this.currentRoom.name}.`);
+              const roomName = this.currentRoom.name.replace(/^The\s+/, '');
+              SaveSystem.getInstance().addJournalEntry(`Found ${item.name} in the ${roomName}.`);
             }
             // Refresh hotspots so the picked-up item disappears immediately
             this.createHotspots();
