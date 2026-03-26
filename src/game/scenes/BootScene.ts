@@ -246,6 +246,29 @@ export class BootScene extends Phaser.Scene {
       'vo_nancy_choice_diary', 'vo_nancy_choice_locket', 'vo_nancy_choice_mirror',
       'vo_nancy_choice_holding_up', 'vo_nancy_choice_history',
       'vo_nancy_choice_strange', 'vo_nancy_choice_keep_investigating',
+      // Edwin auditorium — Edwin lines
+      'vo_edwin_start_01', 'vo_edwin_start_02', 'vo_edwin_start_03',
+      'vo_edwin_crimson_01', 'vo_edwin_crimson_02', 'vo_edwin_crimson_03',
+      'vo_edwin_diary_01', 'vo_edwin_diary_02', 'vo_edwin_diary_03', 'vo_edwin_diary_04',
+      'vo_edwin_ghost_01', 'vo_edwin_ghost_02', 'vo_edwin_ghost_03',
+      'vo_edwin_effects_01', 'vo_edwin_effects_02', 'vo_edwin_effects_03', 'vo_edwin_effects_04',
+      'vo_edwin_props_01', 'vo_edwin_props_02', 'vo_edwin_props_03', 'vo_edwin_props_04',
+      'vo_edwin_lastnight_01', 'vo_edwin_lastnight_02', 'vo_edwin_lastnight_03', 'vo_edwin_lastnight_04',
+      'vo_edwin_grandfather_01', 'vo_edwin_grandfather_02', 'vo_edwin_grandfather_03',
+      'vo_edwin_grandfather_04', 'vo_edwin_grandfather_05',
+      'vo_edwin_cecilia_01', 'vo_edwin_cecilia_02',
+      'vo_edwin_end_01', 'vo_edwin_end_02',
+      // Edwin auditorium — Nancy lines
+      'vo_nancy_edwin_01', 'vo_nancy_crimson_01',
+      'vo_nancy_diary_edwin_01', 'vo_nancy_effects_01',
+      'vo_nancy_props_01', 'vo_nancy_props_02', 'vo_nancy_props_03',
+      'vo_nancy_lastnight_01', 'vo_nancy_lastnight_02', 'vo_nancy_lastnight_03',
+      'vo_nancy_grandfather_01', 'vo_nancy_grandfather_02',
+      'vo_nancy_cecilia_01',
+      // Edwin auditorium — Nancy choice lines
+      'vo_nancy_choice_crimson', 'vo_nancy_choice_ghost', 'vo_nancy_choice_lastnight',
+      'vo_nancy_choice_grandfather', 'vo_nancy_choice_props',
+      'vo_nancy_choice_cecilia', 'vo_nancy_choice_diary_edwin', 'vo_nancy_choice_effects',
     ];
     for (const key of voFiles) {
       this.load.audio(key, [`audio/vo/${key}.mp3`]);
