@@ -628,9 +628,9 @@
           "y": 971,
           "width": 166,
           "height": 163,
-          "label": "Back to Auditorium",
+          "label": "To Projection Booth",
           "type": "navigate",
-          "targetRoom": "auditorium",
+          "targetRoom": "projection_booth",
           "showWhen": "stella_backstage"
         }
       ]

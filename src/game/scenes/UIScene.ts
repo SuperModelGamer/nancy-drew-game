@@ -765,7 +765,7 @@ export class UIScene extends Phaser.Scene {
     const save = SaveSystem.getInstance();
     const inventory = InventorySystem.getInstance();
     const currentRoomId = save.getCurrentRoom();
-    const rooms = roomsData.rooms as { id: string; name: string; hotspots: { id: string; type: string; itemId?: string; showWhen?: string; hideWhen?: string }[] }[];
+    const rooms = roomsData.rooms as { id: string; name: string; hotspots: { id: string; type: string; itemId?: string; showWhen?: string; hideWhen?: string; targetRoom?: string }[] }[];
     const currentRoom = rooms.find(r => r.id === currentRoomId);
 
     // Chapter
@@ -793,14 +793,15 @@ export class UIScene extends Phaser.Scene {
       this.borderItemCountText.setText(`${roomPickupFound} / ${roomPickupTotal}`);
     }
 
-    // Per-room clue counter (inspect + pickup + locked + talk hotspots)
-    // Includes talk hotspots so players know they still need to speak with NPCs
+    // Per-room clue counter (inspect + pickup + locked + talk hotspots, excluding doors)
+    // Excludes hotspots with targetRoom (those are doors/navigation, not clues)
     let roomClueTotal = 0;
     let roomClueFound = 0;
     if (currentRoom) {
       for (const hs of currentRoom.hotspots) {
         const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
         if (!isClueType) continue;
+        if (hs.targetRoom) continue;
         if (!this.isHotspotAvailable(hs.showWhen)) continue;
         if (this.isHotspotHidden(hs.hideWhen)) continue;
         roomClueTotal++;
@@ -843,13 +844,14 @@ export class UIScene extends Phaser.Scene {
       this.borderTotalItemCountText.setText(`Total items: ${foundItemsAll}/${totalItemsAll}`);
     }
 
-    // Global clue counter (only clues currently available to the player)
+    // Global clue counter (only clues currently available to the player, excluding doors)
     let totalClues = 0;
     let foundClues = 0;
     for (const room of rooms) {
       for (const hs of room.hotspots) {
         const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
         if (!isClueType) continue;
+        if (hs.targetRoom) continue;
         if (!this.isHotspotAvailable((hs as { showWhen?: string }).showWhen)) continue;
         if (this.isHotspotHidden(hs.hideWhen)) continue;
         totalClues++;
@@ -1344,16 +1346,17 @@ export class UIScene extends Phaser.Scene {
   private updateDiscoveryCounters(): void {
     const save = SaveSystem.getInstance();
     const currentRoomId = save.getCurrentRoom();
-    const rooms = roomsData.rooms as { id: string; hotspots: { id: string; type: string; itemId?: string; hideWhen?: string }[] }[];
+    const rooms = roomsData.rooms as { id: string; hotspots: { id: string; type: string; itemId?: string; hideWhen?: string; targetRoom?: string }[] }[];
     const currentRoom = rooms.find(r => r.id === currentRoomId);
 
-    // Hotspot discovery counter (across all rooms, only currently available clues)
+    // Hotspot discovery counter (across all rooms, only currently available clues, excluding doors)
     let totalHotspots = 0;
     let discoveredHotspots = 0;
     for (const room of rooms) {
       for (const hs of room.hotspots) {
         const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
         if (!isClueType) continue;
+        if (hs.targetRoom) continue;
         if (!this.isHotspotAvailable((hs as { showWhen?: string }).showWhen)) continue;
         if (this.isHotspotHidden(hs.hideWhen)) continue;
         totalHotspots++;
@@ -1366,12 +1369,12 @@ export class UIScene extends Phaser.Scene {
       this.hotspotCounterText.setText(`🔍 Clues Discovered: ${discoveredHotspots} / ${totalHotspots}`);
     }
 
-    // Per-room clue counter (all interactive hotspot types, consistent with total counter)
+    // Per-room clue counter (all interactive hotspot types, excluding doors)
     if (currentRoom && this.roomItemCounterText) {
       const roomHotspots = currentRoom.hotspots.filter(
-        (hs: { type: string; showWhen?: string; hideWhen?: string }) => {
+        (hs: { type: string; showWhen?: string; hideWhen?: string; targetRoom?: string }) => {
           const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
-          return isClueType && this.isHotspotAvailable(hs.showWhen) && !this.isHotspotHidden(hs.hideWhen);
+          return isClueType && !hs.targetRoom && this.isHotspotAvailable(hs.showWhen) && !this.isHotspotHidden(hs.hideWhen);
         }
       );
       const foundInRoom = roomHotspots.filter(
