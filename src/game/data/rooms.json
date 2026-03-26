@@ -299,6 +299,18 @@
           "type": "talk",
           "dialogueId": "edwin_auditorium",
           "showWhen": "vivian_intro",
+          "hideWhen": "edwin_auditorium"
+        },
+        {
+          "id": "aud_edwin_revisit",
+          "x": 615,
+          "y": 645,
+          "width": 236,
+          "height": 393,
+          "label": "Edwin Hale",
+          "type": "talk",
+          "dialogueId": "edwin_auditorium_revisit",
+          "showWhen": "stella_backstage",
           "hideWhen": "edwin_personal_revealed"
         },
         {
