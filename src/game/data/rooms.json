@@ -415,7 +415,7 @@
           "label": "Back to Lobby",
           "type": "navigate",
           "targetRoom": "lobby",
-          "showWhen": "edwin_auditorium"
+          "showWhen": "stella_backstage"
         },
         {
           "id": "aud_threatening_note",
