@@ -273,6 +273,20 @@ export class RoomScene extends Phaser.Scene {
           }
         });
       }
+
+      // Also listen for vivian_intro completing mid-scene (first playthrough)
+      const checkPhoneAfterIntro = () => {
+        if (save.getFlag('vivian_intro') && !save.getFlag('used_hotspot_lobby_phone') && !this.phoneRinging) {
+          this.time.delayedCall(2000, () => {
+            if (!this.phoneRinging && !save.getFlag('used_hotspot_lobby_phone')) {
+              this.phoneRinging = true;
+              UISounds.phoneRingStart();
+            }
+          });
+        }
+      };
+      save.onChange(checkPhoneAfterIntro);
+      this.events.once('shutdown', () => save.offChange(checkPhoneAfterIntro));
     }
 
     // Stop phone ringing on scene shutdown (room transition)
