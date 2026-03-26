@@ -393,6 +393,13 @@ export class DialogueSystem {
     this.fullLineText = line.text;
     this.startTypewriter();
 
+    // ── 4a½. Per-line trigger event ──
+    // Fire a flag as soon as this line starts displaying (before player clicks past it).
+    // Useful for triggering ambient effects (e.g. phone ring) while a line is on screen.
+    if (line.triggerEvent) {
+      this.triggerEvent(line.triggerEvent);
+    }
+
     // ── 4b. Voiceover playback ──
     // If this line has a vo key, stop any current VO and start the new one.
     // If no vo key, let the previous VO keep playing (supports one audio file
