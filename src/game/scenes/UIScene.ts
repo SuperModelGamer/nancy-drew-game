@@ -475,23 +475,26 @@ export class UIScene extends Phaser.Scene {
     gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
     this.bottomBarContainer.add(gearBtn);
 
-    // ── Always-visible room clue counter (left side, above button row) ──
-    const clueBarY = 12;
-    const clueBarX = audioBtnX - 10;
-    this.barRoomClueText = this.add.text(clueBarX, clueBarY, '', {
+    // ── Always-visible room clue counter (left side, vertically aligned with buttons) ──
+    // Positioned between audio controls and EVIDENCE button
+    const clueBarX = audioBtnX + 60; // right of speaker icon + volume slider
+    this.barRoomClueText = this.add.text(clueBarX, btnCenterY, '', {
       fontFamily: FONT, fontSize: '18px', color: '#8a9aaa',
       fontStyle: 'bold', letterSpacing: 1,
-    }).setOrigin(0, 0);
+    }).setOrigin(0, 0.5);
     this.bottomBarContainer.add(this.barRoomClueText);
 
-    // ── Always-visible progress bar (right side, above button row) ──
-    const pBarW = 140;
+    // ── Always-visible progress bar (right side, vertically aligned with buttons) ──
+    // Positioned between JOURNAL button and settings gear
+    const gearX = btnCenterX + btnSpacing * 2.3;
+    const journalRight = btnCenterX + btnSpacing * 1.5 + BTN_W / 2;
+    const pBarW = 120;
     const pBarH = 10;
-    const pBarX = btnCenterX + btnSpacing * 2.3 + 30 - pBarW; // right-aligned near gear
-    const pBarRightEdge = btnCenterX + btnSpacing * 2.3 + 30;
+    const pBarX = journalRight + 16; // 16px gap after JOURNAL button
+    const pBarY = btnCenterY + 6; // slightly below center for bar under label
 
     // Progress label
-    const pLabel = this.add.text(pBarX, clueBarY - 2, 'PROGRESS', {
+    const pLabel = this.add.text(pBarX, btnCenterY - 12, 'PROGRESS', {
       fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue,
       letterSpacing: 3,
     }).setOrigin(0, 0);
@@ -500,24 +503,24 @@ export class UIScene extends Phaser.Scene {
     // Track background
     this.barProgressTrack = this.add.graphics();
     this.barProgressTrack.fillStyle(0x1a1a2e, 0.8);
-    this.barProgressTrack.fillRoundedRect(pBarX, clueBarY + 14, pBarW, pBarH, 5);
+    this.barProgressTrack.fillRoundedRect(pBarX, pBarY, pBarW, pBarH, 5);
     this.barProgressTrack.lineStyle(1, DecoColors.gold, 0.25);
-    this.barProgressTrack.strokeRoundedRect(pBarX, clueBarY + 14, pBarW, pBarH, 5);
+    this.barProgressTrack.strokeRoundedRect(pBarX, pBarY, pBarW, pBarH, 5);
     this.bottomBarContainer.add(this.barProgressTrack);
 
     // Fill bar
     this.barProgressFill = this.add.graphics();
     this.barProgressFill.setData('barX', pBarX);
-    this.barProgressFill.setData('barY', clueBarY + 14);
+    this.barProgressFill.setData('barY', pBarY);
     this.barProgressFill.setData('barW', pBarW);
     this.barProgressFill.setData('barH', pBarH);
     this.bottomBarContainer.add(this.barProgressFill);
 
-    // Percentage text
-    this.barProgressPct = this.add.text(pBarRightEdge + 8, clueBarY + 8, '', {
+    // Percentage text (right of progress bar)
+    this.barProgressPct = this.add.text(pBarX + pBarW + 8, btnCenterY, '', {
       fontFamily: FONT, fontSize: '16px', color: TextColors.goldDim,
       fontStyle: 'bold',
-    }).setOrigin(0, 0);
+    }).setOrigin(0, 0.5);
     this.bottomBarContainer.add(this.barProgressPct);
 
     // ════════════════════════════════════════════════════════════════════════
