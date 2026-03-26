@@ -358,7 +358,7 @@
             { "speaker": "Edwin", "text": "I... yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux... they were..." },
             { "speaker": "Edwin", "text": "He never got over her death. Forty-three years, Nancy. He spent forty-three years insisting it wasn't an accident. Nobody believed him. He died in 1971 — March 14th — still fighting. Still writing letters to the police department." },
             { "speaker": "Edwin", "text": "I promised him I'd find the truth. I was twelve years old and I promised. That's why I'm here. That's why I've always been here." },
-            { "speaker": "Nancy", "text": "That's a heavy promise to carry for fifteen years." },
+            { "speaker": "Nancy", "text": "That's a heavy promise to carry for over fifty years." },
             { "speaker": "Edwin", "text": "Some promises are worth the weight." }
           ],
           "nextNode": "end",
@@ -1431,7 +1431,7 @@
             { "speaker": "Edwin", "text": "I... yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux... they were..." },
             { "speaker": "Edwin", "text": "He never got over her death. Forty-three years, Nancy. He spent forty-three years insisting it wasn't an accident. Nobody believed him. He died in 1971 — March 14th — still fighting. Still writing letters to the police department." },
             { "speaker": "Edwin", "text": "I promised him I'd find the truth. I was twelve years old and I promised. That's why I'm here. That's why I've always been here." },
-            { "speaker": "Nancy", "text": "That's a heavy promise to carry for fifteen years." },
+            { "speaker": "Nancy", "text": "That's a heavy promise to carry for over fifty years." },
             { "speaker": "Edwin", "text": "Some promises are worth the weight." }
           ],
           "nextNode": "farewell",
