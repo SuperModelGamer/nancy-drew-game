@@ -12,6 +12,8 @@ interface DialogueLine {
   text: string;
   /** Optional voiceover audio key (loaded in BootScene, e.g. "vo_vivian_intro_01") */
   vo?: string;
+  /** Optional flag to trigger when this line starts displaying */
+  triggerEvent?: string;
 }
 
 interface DialogueChoice {
@@ -392,6 +394,13 @@ export class DialogueSystem {
 
     this.fullLineText = line.text;
     this.startTypewriter();
+
+    // ── 4a½. Per-line trigger event ──
+    // Fire a flag as soon as this line starts displaying (before player clicks past it).
+    // Useful for triggering ambient effects (e.g. phone ring) while a line is on screen.
+    if (line.triggerEvent) {
+      this.triggerEvent(line.triggerEvent);
+    }
 
     // ── 4b. Voiceover playback ──
     // If this line has a vo key, stop any current VO and start the new one.

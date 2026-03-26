@@ -72,9 +72,8 @@
         },
         {
           "id": "end",
-          "triggerEvent": "vivian_intro",
           "lines": [
-            { "speaker": "Vivian", "text": "I left a master key at the concierge desk — it opens most doors in the theater. There's also a magnifying glass. It belonged to my late husband. He was... he had sharp eyes. You'll need them. And Nancy — sois prudente. Be careful. The Monarch has kept its secrets for almost a century. It won't give them up easily.", "vo": "vo_vivian_end_01" }
+            { "speaker": "Vivian", "text": "I left a master key at the concierge desk — it opens most doors in the theater. There's also a magnifying glass. It belonged to my late husband. He was... he had sharp eyes. You'll need them. And Nancy — sois prudente. Be careful. The Monarch has kept its secrets for almost a century. It won't give them up easily.", "vo": "vo_vivian_end_01", "triggerEvent": "vivian_intro" }
           ]
         }
       ]
@@ -212,84 +211,92 @@
           "id": "start",
           "triggerEvent": "edwin_auditorium",
           "lines": [
-            { "speaker": "Edwin", "text": "Ah — you must be the detective Vivian called. Edwin Hale. Theater historian, Emerson College adjunct, author of — well, three books on New England theater history, if we're keeping track. Please, sit anywhere. The whole auditorium's empty, as usual." },
-            { "speaker": "Nancy", "text": "Nancy Drew. How long have you been studying the Monarch?" },
-            { "speaker": "Edwin", "text": "Fifteen years. Well — fifteen years and four months, to be precise. I started in November of 2010. The Monarch is my life's work." },
-            { "speaker": "Edwin", "text": "This building isn't just bricks and velvet, Ms. Drew. It's a living archive. Every floorboard, every rivet, every scratch on these armrests has a story. And if Ashworth has his way, it'll all be rubble in exactly seventy-two hours." }
+            { "speaker": "Edwin", "text": "Ah — you must be the detective Vivian called. Edwin Hale. Theater historian, Emerson College adjunct, author of — well, three books on New England theater history, if we're keeping track. Please, sit anywhere. The whole auditorium's empty, as usual.", "vo": "vo_edwin_start_01" },
+            { "speaker": "Nancy", "text": "Nancy Drew. How long have you been studying the Monarch?", "vo": "vo_nancy_edwin_01" },
+            { "speaker": "Edwin", "text": "Fifteen years. Well — fifteen years and four months, to be precise. I started in November of 2010. The Monarch is my life's work.", "vo": "vo_edwin_start_02" },
+            { "speaker": "Edwin", "text": "This building isn't just bricks and velvet, Ms. Drew. It's a living archive. Every floorboard, every rivet, every scratch on these armrests has a story. And if Ashworth has his way, it'll all be rubble in exactly seventy-two hours.", "vo": "vo_edwin_start_03" }
           ],
           "choices": [
             {
               "text": "Tell me about The Crimson Veil.",
-              "nextNode": "crimson_veil"
+              "nextNode": "crimson_veil",
+              "vo": "vo_nancy_choice_crimson"
             },
             {
               "text": "What do you think about the ghost sightings?",
-              "nextNode": "ghost_opinion"
+              "nextNode": "ghost_opinion",
+              "vo": "vo_nancy_choice_ghost"
             },
             {
               "text": "Did you see anything suspicious last night?",
-              "nextNode": "last_night"
+              "nextNode": "last_night",
+              "vo": "vo_nancy_choice_lastnight"
             },
             {
               "text": "Your grandfather was James Hale — Margaux's lover.",
               "nextNode": "grandfather",
-              "requiredFlag": "saw_ghost"
+              "requiredFlag": "saw_ghost",
+              "vo": "vo_nancy_choice_grandfather"
             },
             {
               "text": "Stella says props have been going missing. Do you know anything about that?",
               "nextNode": "edwin_on_props",
-              "requiredFlag": "learned_about_missing_props"
+              "requiredFlag": "learned_about_missing_props",
+              "vo": "vo_nancy_choice_props"
             }
           ]
         },
         {
           "id": "edwin_on_props",
           "lines": [
-            { "speaker": "Edwin", "text": "Missing props? That's... concerning. Some of those pieces are historically significant — the Tiffany lamps alone date to 1923, and the candelabra is original to the opening gala." },
-            { "speaker": "Nancy", "text": "Stella seems worried about it." },
-            { "speaker": "Edwin", "text": "Stella has her — well, she has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are the real mystery. The props are a — a separate matter entirely. A distraction." },
-            { "speaker": "Nancy", "text": "You seem very sure they're separate. How would you know that unless you knew what was actually going on?" },
-            { "speaker": "Edwin", "text": "I — that's not what I — I'm a historian, Nancy. I know how to sort through noise to find the signal. That's literally my job. I'm not hiding anything, if that's what you're implying. I'm trying to help you prioritize." },
-            { "speaker": "Nancy", "text": "I didn't say you were hiding anything." },
-            { "speaker": "Edwin", "text": "No. No, you didn't. I just — forget I said that. The answer to this mystery is on the stage, not on a prop shelf. I'd stake my reputation on it. What's left of it." }
+            { "speaker": "Edwin", "text": "Missing props? That's... concerning. Some of those pieces are historically significant — the Tiffany lamps alone date to 1923, and the candelabra is original to the opening gala.", "vo": "vo_edwin_props_01" },
+            { "speaker": "Nancy", "text": "Stella seems worried about it.", "vo": "vo_nancy_props_01" },
+            { "speaker": "Edwin", "text": "Stella has her — well, she has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are the real mystery. The props are a — a separate matter entirely. A distraction.", "vo": "vo_edwin_props_02" },
+            { "speaker": "Nancy", "text": "You seem very sure they're separate. How would you know that unless you knew what was actually going on?", "vo": "vo_nancy_props_02" },
+            { "speaker": "Edwin", "text": "I — that's not what I — I'm a historian, Nancy. I know how to sort through noise to find the signal. That's literally my job. I'm not hiding anything, if that's what you're implying. I'm trying to help you prioritize.", "vo": "vo_edwin_props_03" },
+            { "speaker": "Nancy", "text": "I didn't say you were hiding anything.", "vo": "vo_nancy_props_03" },
+            { "speaker": "Edwin", "text": "No. No, you didn't. I just — forget I said that. The answer to this mystery is on the stage, not on a prop shelf. I'd stake my reputation on it. What's left of it.", "vo": "vo_edwin_props_04" }
           ],
           "nextNode": "end"
         },
         {
           "id": "crimson_veil",
           "lines": [
-            { "speaker": "Edwin", "text": "The Crimson Veil was the jewel of the 1928 season — premiered September 15th, ran for six weeks. A gothic melodrama about a countess who discovers her husband has been poisoning her. The irony is... well, you'll see." },
-            { "speaker": "Edwin", "text": "Margaux Fontaine was extraordinary in the role. Extraordinary. In the final act, her character drinks from a poisoned goblet. But on opening night — October 31st, 1928, a Thursday — the prop goblet contained real poison." },
-            { "speaker": "Nancy", "text": "And it was ruled an accident?" },
-            { "speaker": "Edwin", "text": "The official story — and I use that phrase with contempt — was that a stagehand made a terrible mistake. But the stagehand was never identified. Never named, never questioned. And Margaux's understudy, Cecilia Drake, took over the role the very next night and became a star. November 1st, 1928. I have the playbill." }
+            { "speaker": "Edwin", "text": "The Crimson Veil was the jewel of the 1928 season — premiered September 15th, ran for six weeks. A gothic melodrama about a countess who discovers her husband has been poisoning her. The irony is... well, you'll see.", "vo": "vo_edwin_crimson_01" },
+            { "speaker": "Edwin", "text": "Margaux Fontaine was extraordinary in the role. Extraordinary. In the final act, her character drinks from a poisoned goblet. But on opening night — October 31st, 1928, a Thursday — the prop goblet contained real poison.", "vo": "vo_edwin_crimson_02" },
+            { "speaker": "Nancy", "text": "And it was ruled an accident?", "vo": "vo_nancy_crimson_01" },
+            { "speaker": "Edwin", "text": "The official story — and I use that phrase with contempt — was that a stagehand made a terrible mistake. But the stagehand was never identified. Never named, never questioned. And Margaux's understudy, Cecilia Drake, took over the role the very next night and became a star. November 1st, 1928. I have the playbill.", "vo": "vo_edwin_crimson_03" }
           ],
           "choices": [
             {
               "text": "You think Cecilia Drake killed her?",
               "nextNode": "cecilia_theory",
-              "triggerEvent": "learned_about_crimson_veil"
+              "triggerEvent": "learned_about_crimson_veil",
+              "vo": "vo_nancy_choice_cecilia"
             },
             {
               "text": "I found Margaux's diary. She knew she was being poisoned.",
               "nextNode": "diary_reaction",
               "requiredItem": "margaux_diary",
-              "triggerEvent": "learned_about_crimson_veil"
+              "triggerEvent": "learned_about_crimson_veil",
+              "vo": "vo_nancy_choice_diary_edwin"
             },
             {
               "text": "Thank you, Edwin. I'll keep investigating.",
               "nextNode": "end",
-              "triggerEvent": "learned_about_crimson_veil"
+              "triggerEvent": "learned_about_crimson_veil",
+              "vo": "vo_nancy_choice_investigate_edwin"
             }
           ]
         },
         {
           "id": "diary_reaction",
           "lines": [
-            { "speaker": "Edwin", "text": "You found her — wait. You found her diary? Where? In the dressing room?" },
-            { "speaker": "Edwin", "text": "...May I see it? Please. I've been looking for primary sources — firsthand accounts — about Margaux for fifteen years. This is... this is unprecedented." },
-            { "speaker": "Nancy", "text": "She writes about feeling sick after tea, about a metallic taste. And she suspected someone specific." },
-            { "speaker": "Edwin", "text": "Then she knew. She knew, and nobody listened. The police, the theater owners — they all called it an accident because it was easier." },
-            { "speaker": "Edwin", "text": "That diary could be the evidence we need. Don't lose it, Nancy." }
+            { "speaker": "Edwin", "text": "You found her — wait. You found her diary? Where? In the dressing room?", "vo": "vo_edwin_diary_01" },
+            { "speaker": "Edwin", "text": "...May I see it? Please. I've been looking for primary sources — firsthand accounts — about Margaux for fifteen years. This is... this is unprecedented.", "vo": "vo_edwin_diary_02" },
+            { "speaker": "Nancy", "text": "She writes about feeling sick after tea, about a metallic taste. And she suspected someone specific.", "vo": "vo_nancy_diary_edwin_01" },
+            { "speaker": "Edwin", "text": "Then she knew. She knew, and nobody listened. The police, the theater owners — they all called it an accident because it was easier.", "vo": "vo_edwin_diary_03" },
+            { "speaker": "Edwin", "text": "That diary could be the evidence we need. Don't lose it, Nancy.", "vo": "vo_edwin_diary_04" }
           ],
           "nextNode": "end",
           "triggerEvent": "showed_edwin_diary"
@@ -297,69 +304,72 @@
         {
           "id": "ghost_opinion",
           "lines": [
-            { "speaker": "Edwin", "text": "I'm a historian, not a spiritualist. I deal in documents, not — not apparitions. But I've seen things here I can't explain. And I've tried, believe me." },
-            { "speaker": "Edwin", "text": "Fog that rolls across the stage when no machine is running. A figure in white that appears under the ghost light and vanishes. The sound of a woman's voice reciting lines from The Crimson Veil — Act Three, Scene Four, to be specific. Word perfect." },
-            { "speaker": "Edwin", "text": "Whether it's truly Margaux's spirit or something else entirely... this theater is not at peace. I can feel it. And I'm not a man who says things like that." }
+            { "speaker": "Edwin", "text": "I'm a historian, not a spiritualist. I deal in documents, not — not apparitions. But I've seen things here I can't explain. And I've tried, believe me.", "vo": "vo_edwin_ghost_01" },
+            { "speaker": "Edwin", "text": "Fog that rolls across the stage when no machine is running. A figure in white that appears under the ghost light and vanishes. The sound of a woman's voice reciting lines from The Crimson Veil — Act Three, Scene Four, to be specific. Word perfect.", "vo": "vo_edwin_ghost_02" },
+            { "speaker": "Edwin", "text": "Whether it's truly Margaux's spirit or something else entirely... this theater is not at peace. I can feel it. And I'm not a man who says things like that.", "vo": "vo_edwin_ghost_03" }
           ],
           "choices": [
             {
               "text": "The effects manual describes systems that could fake all of that.",
               "nextNode": "effects_challenge",
-              "requiredItem": "effects_manual"
+              "requiredItem": "effects_manual",
+              "vo": "vo_nancy_choice_effects"
             },
             {
               "text": "Tell me about The Crimson Veil.",
-              "nextNode": "crimson_veil"
+              "nextNode": "crimson_veil",
+              "vo": "vo_nancy_choice_crimson"
             },
             {
               "text": "Interesting. I'll keep investigating.",
-              "nextNode": "end"
+              "nextNode": "end",
+              "vo": "vo_nancy_choice_investigate_edwin"
             }
           ]
         },
         {
           "id": "effects_challenge",
           "lines": [
-            { "speaker": "Edwin", "text": "You've read the — you've actually read the effects manual? The whole thing? That's... thorough." },
-            { "speaker": "Edwin", "text": "Yes, theoretically, someone could use the old systems to stage a convincing ghost. Fog machines, the trapdoor — which is a Graves & Sons counterweight model, very reliable — proper lighting. It would be — it would be quite an undertaking." },
-            { "speaker": "Edwin", "text": "But they'd need extensive knowledge of the building. Months of preparation. They'd need to have — to have practiced. Extensively. Not that I've thought about it in detail. I'm just — speaking generally. As a historian." },
-            { "speaker": "Nancy", "text": "Like saving the theater from demolition?" },
-            { "speaker": "Edwin", "text": "...That would certainly be a reason. Hypothetically speaking. But you'd want to — I mean, a person would want to look at all the suspects before jumping to conclusions. That's just good detective work, isn't it?" }
+            { "speaker": "Edwin", "text": "You've read the — you've actually read the effects manual? The whole thing? That's... thorough.", "vo": "vo_edwin_effects_01" },
+            { "speaker": "Edwin", "text": "Yes, theoretically, someone could use the old systems to stage a convincing ghost. Fog machines, the trapdoor — which is a Graves & Sons counterweight model, very reliable — proper lighting. It would be — it would be quite an undertaking.", "vo": "vo_edwin_effects_02" },
+            { "speaker": "Edwin", "text": "But they'd need extensive knowledge of the building. Months of preparation. They'd need to have — to have practiced. Extensively. Not that I've thought about it in detail. I'm just — speaking generally. As a historian.", "vo": "vo_edwin_effects_03" },
+            { "speaker": "Nancy", "text": "Like saving the theater from demolition?", "vo": "vo_nancy_effects_01" },
+            { "speaker": "Edwin", "text": "...That would certainly be a reason. Hypothetically speaking. But you'd want to — I mean, a person would want to look at all the suspects before jumping to conclusions. That's just good detective work, isn't it?", "vo": "vo_edwin_effects_04" }
           ],
           "nextNode": "end"
         },
         {
           "id": "last_night",
           "lines": [
-            { "speaker": "Edwin", "text": "I was in my usual seat — row G, center — reviewing my notes. Chapter twelve revisions, if that matters. Around ten o'clock — well, closer to ten-fifteen, maybe ten-ten — I heard a crash from the manager's office." },
-            { "speaker": "Nancy", "text": "That's a fifteen-minute window you're not sure about." },
-            { "speaker": "Edwin", "text": "I — I wasn't watching the clock. I was working. By the time I got there, Ashworth was on the floor. Stella called the ambulance. The rest of us waited. It was... unsettling." },
-            { "speaker": "Nancy", "text": "Did you notice anything else? Anyone missing?" },
-            { "speaker": "Edwin", "text": "Everyone was — well, I can't say everyone was accounted for. It's a big building. Many hidden corners. Someone could have slipped away and come back without anyone noticing. Hypothetically." },
-            { "speaker": "Nancy", "text": "You said 'hypothetically.'" },
-            { "speaker": "Edwin", "text": "I said what I said. I'm trying to be helpful, Nancy. That's all." }
+            { "speaker": "Edwin", "text": "I was in my usual seat — row G, center — reviewing my notes. Chapter twelve revisions, if that matters. Around ten o'clock — well, closer to ten-fifteen, maybe ten-ten — I heard a crash from the manager's office.", "vo": "vo_edwin_lastnight_01" },
+            { "speaker": "Nancy", "text": "That's a fifteen-minute window you're not sure about.", "vo": "vo_nancy_lastnight_01" },
+            { "speaker": "Edwin", "text": "I — I wasn't watching the clock. I was working. By the time I got there, Ashworth was on the floor. Stella called the ambulance. The rest of us waited. It was... unsettling.", "vo": "vo_edwin_lastnight_02" },
+            { "speaker": "Nancy", "text": "Did you notice anything else? Anyone missing?", "vo": "vo_nancy_lastnight_02" },
+            { "speaker": "Edwin", "text": "Everyone was — well, I can't say everyone was accounted for. It's a big building. Many hidden corners. Someone could have slipped away and come back without anyone noticing. Hypothetically.", "vo": "vo_edwin_lastnight_03" },
+            { "speaker": "Nancy", "text": "You said 'hypothetically.'", "vo": "vo_nancy_lastnight_03" },
+            { "speaker": "Edwin", "text": "I said what I said. I'm trying to be helpful, Nancy. That's all.", "vo": "vo_edwin_lastnight_04" }
           ],
           "nextNode": "start"
         },
         {
           "id": "cecilia_theory",
           "lines": [
-            { "speaker": "Edwin", "text": "I have my suspicions. Cecilia Drake had means, motive, and opportunity. She knew the prop table. She had access backstage. And she had everything to gain." },
-            { "speaker": "Edwin", "text": "But proving it after nearly a century? That's the challenge. If there's evidence, it's buried somewhere in this theater." },
-            { "speaker": "Nancy", "text": "Then I'd better start digging." }
+            { "speaker": "Edwin", "text": "I have my suspicions. Cecilia Drake had means, motive, and opportunity. She knew the prop table. She had access backstage. And she had everything to gain.", "vo": "vo_edwin_cecilia_01" },
+            { "speaker": "Edwin", "text": "But proving it after nearly a century? That's the challenge. If there's evidence, it's buried somewhere in this theater.", "vo": "vo_edwin_cecilia_02" },
+            { "speaker": "Nancy", "text": "Then I'd better start digging.", "vo": "vo_nancy_cecilia_01" }
           ],
           "nextNode": "end"
         },
         {
           "id": "grandfather",
           "lines": [
-            { "speaker": "Edwin", "text": "...Who told you — how did you—" },
-            { "speaker": "Nancy", "text": "Vivian. She recognized the name." },
-            { "speaker": "Edwin", "text": "I... yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux... they were..." },
-            { "speaker": "Edwin", "text": "He never got over her death. Forty-three years, Nancy. He spent forty-three years insisting it wasn't an accident. Nobody believed him. He died in 1971 — March 14th — still fighting. Still writing letters to the police department." },
-            { "speaker": "Edwin", "text": "I promised him I'd find the truth. I was twelve years old and I promised. That's why I'm here. That's why I've always been here." },
-            { "speaker": "Nancy", "text": "That's a heavy promise to carry for fifteen years." },
-            { "speaker": "Edwin", "text": "Some promises are worth the weight." }
+            { "speaker": "Edwin", "text": "...Who told you — how did you—", "vo": "vo_edwin_grandfather_01" },
+            { "speaker": "Nancy", "text": "Vivian. She recognized the name.", "vo": "vo_nancy_grandfather_01" },
+            { "speaker": "Edwin", "text": "I... yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux... they were...", "vo": "vo_edwin_grandfather_02" },
+            { "speaker": "Edwin", "text": "He never got over her death. Forty-three years, Nancy. He spent forty-three years insisting it wasn't an accident. Nobody believed him. He died in 1971 — March 14th — still fighting. Still writing letters to the police department.", "vo": "vo_edwin_grandfather_03" },
+            { "speaker": "Edwin", "text": "I promised him I'd find the truth. I was twelve years old and I promised. That's why I'm here. That's why I've always been here.", "vo": "vo_edwin_grandfather_04" },
+            { "speaker": "Nancy", "text": "That's a heavy promise to carry for over fifty years.", "vo": "vo_nancy_grandfather_02" },
+            { "speaker": "Edwin", "text": "Some promises are worth the weight.", "vo": "vo_edwin_grandfather_05" }
           ],
           "nextNode": "end",
           "triggerEvent": "edwin_personal_revealed"
@@ -367,8 +377,8 @@
         {
           "id": "end",
           "lines": [
-            { "speaker": "Edwin", "text": "If you need anything — history, floor plans, old records, architectural details — I'm your man. I know this building better than anyone alive. Better than anyone who's ever lived, probably. Forgive the immodesty." },
-            { "speaker": "Edwin", "text": "Oh, and Nancy? If you see the ghost... try talking to her. You never know. Stranger things have happened. Well — actually, have they? I'd need to check my notes." }
+            { "speaker": "Edwin", "text": "If you need anything — history, floor plans, old records, architectural details — I'm your man. I know this building better than anyone alive. Better than anyone who's ever lived, probably. Forgive the immodesty.", "vo": "vo_edwin_end_01" },
+            { "speaker": "Edwin", "text": "Oh, and Nancy? If you see the ghost... try talking to her. You never know. Stranger things have happened. Well — actually, have they? I'd need to check my notes.", "vo": "vo_edwin_end_02" }
           ]
         }
       ]
@@ -1093,7 +1103,7 @@
         {
           "id": "incoming_parents",
           "lines": [
-            { "speaker": "Nancy", "text": "Someone's already on the line — the phone was ringing when I picked it up." },
+            { "speaker": "Nancy", "text": "Someone's already on the line — the phone was ringing when I picked it up.", "vo": "vo_nancy_phone_pickup" },
             { "speaker": "Carson Drew", "text": "Nancy? Oh good, you made it. Hannah said you left in a hurry this morning — something about a theater and a ghost?", "vo": "vo_carson_phone_01" },
             { "speaker": "Nancy", "text": "Hi Dad. Yes, I'm at the Monarch Theatre. Vivian Delacroix called me — she thinks the ghost of an actress from 1928 is haunting the place. And someone was poisoned here last night.", "vo": "vo_nancy_phone_01" },
             { "speaker": "Carson Drew", "text": "Poisoned? Nancy, that changes things. Be very careful. If someone in that building is willing to use poison, they're dangerous.", "vo": "vo_carson_phone_02" },
@@ -1431,7 +1441,7 @@
             { "speaker": "Edwin", "text": "I... yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux... they were..." },
             { "speaker": "Edwin", "text": "He never got over her death. Forty-three years, Nancy. He spent forty-three years insisting it wasn't an accident. Nobody believed him. He died in 1971 — March 14th — still fighting. Still writing letters to the police department." },
             { "speaker": "Edwin", "text": "I promised him I'd find the truth. I was twelve years old and I promised. That's why I'm here. That's why I've always been here." },
-            { "speaker": "Nancy", "text": "That's a heavy promise to carry for fifteen years." },
+            { "speaker": "Nancy", "text": "That's a heavy promise to carry for over fifty years." },
             { "speaker": "Edwin", "text": "Some promises are worth the weight." }
           ],
           "nextNode": "farewell",
