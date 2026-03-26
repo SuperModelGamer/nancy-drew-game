@@ -241,6 +241,7 @@ export class DialogueSystem {
       if (node.triggerEvent) {
         this.triggerEvent(node.triggerEvent);
       }
+      this.stopVO(); // Stop any lingering VO before showing choices
       this.renderChoices(node.choices);
     } else {
       if (node.triggerEvent) {
@@ -892,6 +893,7 @@ export class DialogueSystem {
     if (!node) return;
 
     this.stopTypewriter();
+    this.stopVO();
     this.currentLineIndex = node.lines.length;
     this.showCurrentLine();
   }

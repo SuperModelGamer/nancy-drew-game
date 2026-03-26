@@ -5,7 +5,6 @@
       "nodes": [
         {
           "id": "start",
-          "triggerEvent": "vivian_intro",
           "lines": [
             { "speaker": "Vivian", "text": "Nancy Drew? Oh, mon Dieu, thank heavens. I wasn't sure anyone would come.", "vo": "vo_vivian_start_01" },
             { "speaker": "Nancy", "text": "Ms. Delacroix? You called about a poisoning — and a ghost?", "vo": "vo_nancy_start_01" },
@@ -73,6 +72,7 @@
         },
         {
           "id": "end",
+          "triggerEvent": "vivian_intro",
           "lines": [
             { "speaker": "Vivian", "text": "I left a master key at the concierge desk — it opens most doors in the theater. There's also a magnifying glass. It belonged to my late husband. He was... he had sharp eyes. You'll need them. And Nancy — sois prudente. Be careful. The Monarch has kept its secrets for almost a century. It won't give them up easily.", "vo": "vo_vivian_end_01" }
           ]

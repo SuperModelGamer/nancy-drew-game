@@ -535,13 +535,10 @@ export class RoomScene extends Phaser.Scene {
         });
       }
 
-      // Get cursor for this hotspot type
-      const hoverCursor = this.getHotspotCursor(hotspot.type);
-
       // Hover: change cursor by type, show label, subtle gold edge shimmer
       bg.on('pointerover', () => {
         this.tweens.add({ targets: label, alpha: 1, duration: 180 });
-        this.input.setDefaultCursor(hoverCursor);
+        this.input.setDefaultCursor(this.getHotspotCursor(hotspot.type));
       });
 
       bg.on('pointerout', () => {
@@ -1029,13 +1026,14 @@ export class RoomScene extends Phaser.Scene {
 
   /** Return the appropriate cursor for a hotspot type — Nancy Drew style */
   private getHotspotCursor(type: string): string {
+    const hasGlass = InventorySystem.getInstance().hasItem('magnifying_glass');
     switch (type) {
-      case 'inspect': return this.glowCursor; // glowing spyglass
+      case 'inspect': return hasGlass ? this.glowCursor : Cursors.inspect;
       case 'pickup': return Cursors.pickup;    // grabbing hand
       case 'navigate': return Cursors.navigate; // door with arrow
       case 'talk': return Cursors.talk;         // speech bubble
       case 'locked': return Cursors.locked;     // padlock
-      default: return this.glowCursor;
+      default: return hasGlass ? this.glowCursor : Cursors.inspect;
     }
   }
 
