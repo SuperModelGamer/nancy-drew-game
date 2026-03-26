@@ -183,6 +183,12 @@ export class UIScene extends Phaser.Scene {
   private borderQuestHintText!: Phaser.GameObjects.Text;
   private panelH = 0; // total height of the slide-up panel
 
+  // Always-visible bottom bar stats
+  private barRoomClueText!: Phaser.GameObjects.Text;
+  private barProgressTrack!: Phaser.GameObjects.Graphics;
+  private barProgressFill!: Phaser.GameObjects.Graphics;
+  private barProgressPct!: Phaser.GameObjects.Text;
+
   private createBottomPanel(canvasW: number, canvasH: number, vf: ReturnType<typeof computeViewfinderLayout>): void {
     const PAD = 28;
     const barTop = canvasH - BOTTOM_BAR_H; // y where the permanent bar starts
@@ -469,6 +475,51 @@ export class UIScene extends Phaser.Scene {
     gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
     this.bottomBarContainer.add(gearBtn);
 
+    // ── Always-visible room clue counter (left side, above button row) ──
+    const clueBarY = 12;
+    const clueBarX = audioBtnX - 10;
+    this.barRoomClueText = this.add.text(clueBarX, clueBarY, '', {
+      fontFamily: FONT, fontSize: '18px', color: '#8a9aaa',
+      fontStyle: 'bold', letterSpacing: 1,
+    }).setOrigin(0, 0);
+    this.bottomBarContainer.add(this.barRoomClueText);
+
+    // ── Always-visible progress bar (right side, above button row) ──
+    const pBarW = 140;
+    const pBarH = 10;
+    const pBarX = btnCenterX + btnSpacing * 2.3 + 30 - pBarW; // right-aligned near gear
+    const pBarRightEdge = btnCenterX + btnSpacing * 2.3 + 30;
+
+    // Progress label
+    const pLabel = this.add.text(pBarX, clueBarY - 2, 'PROGRESS', {
+      fontFamily: FONT, fontSize: '11px', color: TextColors.mutedBlue,
+      letterSpacing: 3,
+    }).setOrigin(0, 0);
+    this.bottomBarContainer.add(pLabel);
+
+    // Track background
+    this.barProgressTrack = this.add.graphics();
+    this.barProgressTrack.fillStyle(0x1a1a2e, 0.8);
+    this.barProgressTrack.fillRoundedRect(pBarX, clueBarY + 14, pBarW, pBarH, 5);
+    this.barProgressTrack.lineStyle(1, DecoColors.gold, 0.25);
+    this.barProgressTrack.strokeRoundedRect(pBarX, clueBarY + 14, pBarW, pBarH, 5);
+    this.bottomBarContainer.add(this.barProgressTrack);
+
+    // Fill bar
+    this.barProgressFill = this.add.graphics();
+    this.barProgressFill.setData('barX', pBarX);
+    this.barProgressFill.setData('barY', clueBarY + 14);
+    this.barProgressFill.setData('barW', pBarW);
+    this.barProgressFill.setData('barH', pBarH);
+    this.bottomBarContainer.add(this.barProgressFill);
+
+    // Percentage text
+    this.barProgressPct = this.add.text(pBarRightEdge + 8, clueBarY + 8, '', {
+      fontFamily: FONT, fontSize: '16px', color: TextColors.goldDim,
+      fontStyle: 'bold',
+    }).setOrigin(0, 0);
+    this.bottomBarContainer.add(this.barProgressPct);
+
     // ════════════════════════════════════════════════════════════════════════
     // Expandable info panel (slides up from above the bottom bar)
     // Contains: Chapter / Room / Objective / Stats / Progress
@@ -747,6 +798,18 @@ export class UIScene extends Phaser.Scene {
       }
     }
 
+    // Always-visible bottom bar — room clue counter
+    if (this.barRoomClueText) {
+      const remaining = roomClueTotal - roomClueFound;
+      if (remaining > 0) {
+        this.barRoomClueText.setText(`\u{1F50D} ${roomClueFound}/${roomClueTotal} CLUES`);
+        this.barRoomClueText.setColor('#8a9aaa');
+      } else {
+        this.barRoomClueText.setText(`\u2713 ${roomClueTotal}/${roomClueTotal} CLUES`);
+        this.barRoomClueText.setColor('#7acc7a');
+      }
+    }
+
     // Total items across all rooms (all items regardless of progression)
     let totalItemsAll = 0;
     let foundItemsAll = 0;
@@ -794,6 +857,24 @@ export class UIScene extends Phaser.Scene {
     if (this.borderProgressPct) {
       const pct = totalClues > 0 ? Math.round((foundClues / totalClues) * 100) : 0;
       this.borderProgressPct.setText(`${pct}%`);
+    }
+
+    // Always-visible bottom bar — progress bar
+    if (this.barProgressFill) {
+      const bX = this.barProgressFill.getData('barX') as number;
+      const bY = this.barProgressFill.getData('barY') as number;
+      const bW = this.barProgressFill.getData('barW') as number;
+      const bH = this.barProgressFill.getData('barH') as number;
+      const pct = totalClues > 0 ? foundClues / totalClues : 0;
+      this.barProgressFill.clear();
+      if (pct > 0) {
+        this.barProgressFill.fillStyle(DecoColors.gold, 0.7);
+        this.barProgressFill.fillRoundedRect(bX, bY, Math.max(bH, bW * pct), bH, 5);
+      }
+    }
+    if (this.barProgressPct) {
+      const pct = totalClues > 0 ? Math.round((foundClues / totalClues) * 100) : 0;
+      this.barProgressPct.setText(`${pct}%`);
     }
 
     // Quest hint

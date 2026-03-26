@@ -27,16 +27,16 @@ const SFX_MANIFEST: Record<string, string> = {
   click: 'audio/sfx_click.mp3',
   hover: 'audio/sfx_click.mp3',
   spotlightClick: 'audio/sfx_spotlight_click.mp3',
-  phoneRing: 'audio/vo/sfx_phone_ring.mp3',
 };
 
 // ─── Audio cache & playback ──────────────────────────────────────────────────
 const audioCache = new Map<string, HTMLAudioElement>();
 let preloaded = false;
 
-// Managed phone ringing state
+// Managed phone ringing state (programmatic — classic rotary phone ring via Web Audio API)
 let phoneRingTimer: ReturnType<typeof setInterval> | null = null;
-let phoneRingSound: HTMLAudioElement | null = null;
+let phoneRingCtx: AudioContext | null = null;
+let phoneRingGain: GainNode | null = null;
 
 /** Preload all SFX files. Call once during boot. */
 export function preloadSFX(): Promise<void> {
@@ -106,6 +106,48 @@ function fadeOutAudio(sound: HTMLAudioElement, duration = 300): void {
   }, interval);
 }
 
+/** Play a single phone ring burst using Web Audio API (two-tone, ~0.8s). */
+function playPhoneRingBurst(): void {
+  if (masterVolume <= 0) return;
+  try {
+    if (!phoneRingCtx) phoneRingCtx = new AudioContext();
+    const ctx = phoneRingCtx;
+    const now = ctx.currentTime;
+    const vol = 0.25 * masterVolume;
+
+    // Master gain for this burst
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(vol, now);
+    gain.gain.setValueAtTime(vol, now + 0.7);
+    gain.gain.linearRampToValueAtTime(0, now + 0.85);
+    gain.connect(ctx.destination);
+    phoneRingGain = gain;
+
+    // Two-tone ring (440 Hz + 480 Hz) — classic US phone ring
+    for (const freq of [440, 480]) {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      osc.start(now);
+      osc.stop(now + 0.85);
+    }
+
+    // Amplitude modulation (20 Hz tremolo for "ringing" character)
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.type = 'square';
+    lfo.frequency.value = 20;
+    lfoGain.gain.value = vol * 0.5;
+    lfo.connect(lfoGain);
+    lfoGain.connect(gain.gain);
+    lfo.start(now);
+    lfo.stop(now + 0.85);
+  } catch {
+    // Web Audio not available — silent fallback
+  }
+}
+
 /** Stop all currently playing SFX clones — call on scene transitions.
  *  Fades out over ~300ms for a smooth transition. */
 function stopAllSFX(): void {
@@ -115,12 +157,12 @@ function stopAllSFX(): void {
   activeClones.clear();
   // Also stop managed phone ringing
   if (phoneRingTimer) {
-    clearInterval(phoneRingTimer);
+    clearTimeout(phoneRingTimer as unknown as number);
     phoneRingTimer = null;
   }
-  if (phoneRingSound) {
-    fadeOutAudio(phoneRingSound, 300);
-    phoneRingSound = null;
+  if (phoneRingGain) {
+    try { phoneRingGain.gain.linearRampToValueAtTime(0, phoneRingCtx!.currentTime + 0.1); } catch { /* ok */ }
+    phoneRingGain = null;
   }
 }
 
@@ -195,25 +237,31 @@ export const UISounds = {
   gobletClink(): void {},
   bodyThud(): void {},
   ghostWhisper(): void {},
-  phoneRing(): void { playSFX('phoneRing', 0.6); },
+  phoneRing(): void { playPhoneRingBurst(); },
   phoneRingStart(): void {
     if (phoneRingTimer) return;
-    const ring = () => {
-      if (masterVolume <= 0) return;
-      const path = SFX_MANIFEST['phoneRing'];
-      if (!path) return;
-      const cached = audioCache.get(path);
-      if (!cached) return;
-      phoneRingSound = cached.cloneNode(true) as HTMLAudioElement;
-      phoneRingSound.volume = Math.min(1, 0.35 * masterVolume);
-      phoneRingSound.play().catch(() => {});
+    // Classic pattern: ring-ring … pause … ring-ring … pause
+    // Two short bursts (0.85s each, 0.4s gap) then 3s silence
+    let burstCount = 0;
+    const doBurst = () => {
+      playPhoneRingBurst();
+      burstCount++;
+      if (burstCount % 2 === 1) {
+        // Schedule second burst after 0.4s gap
+        phoneRingTimer = setTimeout(doBurst, 400) as unknown as ReturnType<typeof setInterval>;
+      } else {
+        // Pause 3s before next pair
+        phoneRingTimer = setTimeout(doBurst, 3000) as unknown as ReturnType<typeof setInterval>;
+      }
     };
-    ring();
-    phoneRingTimer = setInterval(ring, 4000);
+    doBurst();
   },
   phoneRingStop(): void {
-    if (phoneRingTimer) { clearInterval(phoneRingTimer); phoneRingTimer = null; }
-    if (phoneRingSound) { fadeOutAudio(phoneRingSound, 300); phoneRingSound = null; }
+    if (phoneRingTimer) { clearTimeout(phoneRingTimer as unknown as number); phoneRingTimer = null; }
+    if (phoneRingGain) {
+      try { phoneRingGain.gain.linearRampToValueAtTime(0, phoneRingCtx!.currentTime + 0.1); } catch { /* ok */ }
+      phoneRingGain = null;
+    }
   },
   doorCreak(): void {},
   heartbeat(): void {},

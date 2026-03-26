@@ -230,6 +230,7 @@ export class BootScene extends Phaser.Scene {
       'vo_carson_phone_01', 'vo_carson_phone_02',
       'vo_carson_phone_03', 'vo_carson_phone_04',
       // Phone call — Nancy
+      'vo_nancy_phone_pickup',
       'vo_nancy_phone_01', 'vo_nancy_phone_02', 'vo_nancy_phone_03',
       // Vivian intro revisit — dialogue lines
       'vo_vivian_revisit_01', 'vo_vivian_revisit_02', 'vo_vivian_revisit_03',

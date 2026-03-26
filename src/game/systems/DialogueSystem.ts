@@ -12,6 +12,8 @@ interface DialogueLine {
   text: string;
   /** Optional voiceover audio key (loaded in BootScene, e.g. "vo_vivian_intro_01") */
   vo?: string;
+  /** Optional flag to trigger when this line starts displaying */
+  triggerEvent?: string;
 }
 
 interface DialogueChoice {

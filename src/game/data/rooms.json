@@ -192,7 +192,7 @@
           "label": "Office Door",
           "type": "navigate",
           "targetRoom": "managers_office",
-          "showWhen": "chapter_2"
+          "showWhen": "diego_booth"
         },
         {
           "id": "lobby_water_stain",

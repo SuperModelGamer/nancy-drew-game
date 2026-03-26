@@ -1103,7 +1103,7 @@
         {
           "id": "incoming_parents",
           "lines": [
-            { "speaker": "Nancy", "text": "Someone's already on the line — the phone was ringing when I picked it up." },
+            { "speaker": "Nancy", "text": "Someone's already on the line — the phone was ringing when I picked it up.", "vo": "vo_nancy_phone_pickup" },
             { "speaker": "Carson Drew", "text": "Nancy? Oh good, you made it. Hannah said you left in a hurry this morning — something about a theater and a ghost?", "vo": "vo_carson_phone_01" },
             { "speaker": "Nancy", "text": "Hi Dad. Yes, I'm at the Monarch Theatre. Vivian Delacroix called me — she thinks the ghost of an actress from 1928 is haunting the place. And someone was poisoned here last night.", "vo": "vo_nancy_phone_01" },
             { "speaker": "Carson Drew", "text": "Poisoned? Nancy, that changes things. Be very careful. If someone in that building is willing to use poison, they're dangerous.", "vo": "vo_carson_phone_02" },
