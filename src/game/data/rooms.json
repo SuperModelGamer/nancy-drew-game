@@ -128,7 +128,19 @@
           "label": "Vivian Delacroix",
           "type": "talk",
           "dialogueId": "vivian_intro_revisit",
-          "showWhen": "left_lobby_after_intro"
+          "showWhen": "left_lobby_after_intro",
+          "hideWhen": "vivian_full_trust"
+        },
+        {
+          "id": "lobby_vivian_done",
+          "x": 734,
+          "y": 664,
+          "width": 109,
+          "height": 418,
+          "label": "Vivian Delacroix",
+          "type": "talk",
+          "dialogueId": "vivian_intro_done",
+          "showWhen": "vivian_full_trust"
         },
         {
           "id": "lobby_marble_floor",
@@ -314,6 +326,17 @@
           "hideWhen": "edwin_personal_revealed"
         },
         {
+          "id": "aud_edwin_done",
+          "x": 615,
+          "y": 645,
+          "width": 236,
+          "height": 393,
+          "label": "Edwin Hale",
+          "type": "talk",
+          "dialogueId": "edwin_auditorium_done",
+          "showWhen": "edwin_personal_revealed"
+        },
+        {
           "id": "aud_orchestra_pit",
           "x": 902,
           "y": 692,
@@ -480,7 +503,31 @@
           "label": "Stella Morrow",
           "type": "talk",
           "dialogueId": "stella_backstage",
-          "showWhen": "vivian_intro"
+          "showWhen": "vivian_intro",
+          "hideWhen": "stella_backstage"
+        },
+        {
+          "id": "bs_stella_revisit",
+          "x": 731,
+          "y": 625,
+          "width": 220,
+          "height": 535,
+          "label": "Stella Morrow",
+          "type": "talk",
+          "dialogueId": "stella_backstage_revisit",
+          "showWhen": "stella_backstage",
+          "hideWhen": "stella_confession"
+        },
+        {
+          "id": "bs_stella_done",
+          "x": 731,
+          "y": 625,
+          "width": 220,
+          "height": 535,
+          "label": "Stella Morrow",
+          "type": "talk",
+          "dialogueId": "stella_backstage_done",
+          "showWhen": "stella_confession"
         },
         {
           "id": "bs_notice_board",
@@ -895,7 +942,30 @@
           "label": "Diego Reyes",
           "type": "talk",
           "dialogueId": "diego_booth",
+          "hideWhen": "diego_booth"
+        },
+        {
+          "id": "pb_diego_revisit",
+          "x": 394,
+          "y": 431,
+          "width": 314,
+          "height": 664,
+          "label": "Diego Reyes",
+          "type": "talk",
+          "dialogueId": "diego_booth_revisit",
+          "showWhen": "diego_booth",
           "hideWhen": "cipher_discussed"
+        },
+        {
+          "id": "pb_diego_done",
+          "x": 394,
+          "y": 431,
+          "width": 314,
+          "height": 664,
+          "label": "Diego Reyes",
+          "type": "talk",
+          "dialogueId": "diego_booth_done",
+          "showWhen": "cipher_discussed"
         },
         {
           "id": "pb_writing_desk",
