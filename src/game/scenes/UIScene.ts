@@ -1538,15 +1538,15 @@ export class UIScene extends Phaser.Scene {
     const entryGap = 10;
     const ruledStart = pageTop + 4;
 
-    // Ruled lines
+    // Ruled lines — fill the entire page height
     const ruledGfx = this.add.graphics();
     ruledGfx.lineStyle(1, BOOK_STAIN, 0.12);
-    for (let ly = ruledStart; ly < pageBottom - 30; ly += lineSpacing) {
+    for (let ly = ruledStart; ly <= pageBottom; ly += lineSpacing) {
       ruledGfx.lineBetween(pageLeft + 4, ly, pageLeft + pageW - 4, ly);
     }
     // Red margin line
     ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.18);
-    ruledGfx.lineBetween(marginX, pageTop, marginX, pageBottom - 30);
+    ruledGfx.lineBetween(marginX, pageTop, marginX, pageBottom);
     this.journalContent.add(ruledGfx);
 
     let y = ruledStart + 2;
@@ -1585,7 +1585,7 @@ export class UIScene extends Phaser.Scene {
       });
 
       // Check if this entry would overflow the page
-      if (y + text.height > pageBottom - 30 && count > 0) {
+      if (y + text.height > pageBottom && count > 0) {
         text.destroy();
         break;
       }
@@ -1639,8 +1639,8 @@ export class UIScene extends Phaser.Scene {
     let idx = 0;
     while (idx < journal.length) {
       // Estimate left page capacity
-      const leftCount = this.estimatePageCapacity(journal, idx, leftPageW, pageBottom - pageTop - 40);
-      const rightCount = this.estimatePageCapacity(journal, idx + leftCount, rightPageW, pageBottom - pageTop - 40);
+      const leftCount = this.estimatePageCapacity(journal, idx, leftPageW, pageBottom - pageTop);
+      const rightCount = this.estimatePageCapacity(journal, idx + leftCount, rightPageW, pageBottom - pageTop);
       spreads.push({ start: idx, leftCount, rightCount });
       idx += leftCount + rightCount;
     }
@@ -1665,11 +1665,11 @@ export class UIScene extends Phaser.Scene {
       const ruledGfx = this.add.graphics();
       const rMarginX = rightPageLeft + 40;
       ruledGfx.lineStyle(1, BOOK_STAIN, 0.12);
-      for (let ly = pageTop + 4; ly < pageBottom - 30; ly += 30) {
+      for (let ly = pageTop + 4; ly <= pageBottom; ly += 30) {
         ruledGfx.lineBetween(rightPageLeft + 4, ly, rightPageRight - 4, ly);
       }
       ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.18);
-      ruledGfx.lineBetween(rMarginX, pageTop, rMarginX, pageBottom - 30);
+      ruledGfx.lineBetween(rMarginX, pageTop, rMarginX, pageBottom);
       this.journalContent.add(ruledGfx);
     }
 
