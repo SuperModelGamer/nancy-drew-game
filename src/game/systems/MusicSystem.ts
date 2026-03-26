@@ -145,11 +145,20 @@ export class MusicSystem {
       return;
     }
 
+    // Capture the audio element we're stopping so that if play() starts a
+    // new track during the fadeout, cleanup only kills the OLD element.
+    const stoppingAudio = this.currentAudio;
+    this.playing = false;
+    this.currentTrack = null;
+    this.currentAudio = null;
+
     if (fade) {
-      await this.fadeOut(this.currentAudio, 1.5);
+      await this.fadeOut(stoppingAudio, 1.5);
     }
 
-    this.cleanup();
+    // Only clean up the element we faded — don't touch currentAudio
+    // which may have been set to a new track by play() in the meantime
+    try { stoppingAudio.pause(); stoppingAudio.src = ''; } catch { /* ok */ }
   }
 
   /** Update volume in real-time. */
