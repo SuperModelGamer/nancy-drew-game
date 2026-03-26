@@ -23,6 +23,14 @@ const BTN_CHEVRON = 6;
 // Pre-index items for O(1) lookup
 const itemMap = new Map(itemsData.items.map(i => [i.id, i]));
 
+// Items that can be equipped to the cursor (used as requiredItem on hotspots)
+const equippableItems = new Set<string>();
+for (const room of (roomsData as { rooms: { hotspots?: { requiredItem?: string }[] }[] }).rooms) {
+  for (const hs of room.hotspots || []) {
+    if (hs.requiredItem) equippableItems.add(hs.requiredItem);
+  }
+}
+
 // Journal pagination
 const JOURNAL_ENTRIES_PER_PAGE = 6;
 
@@ -76,8 +84,8 @@ export class UIScene extends Phaser.Scene {
   private roomItemCounterText: Phaser.GameObjects.Text | null = null;
   private selectedItemId: string | null = null;
   private evidenceLayout = { leftX: 0, contentTop: 0, contentH: 0, contentBottom: 0, leftW: 0, rightW: 0, rightX: 0 };
-  private evidenceDetailScroll = 0;
-  private evidenceDetailMaxScroll = 0;
+  private evidenceGridScroll = 0;
+  private evidenceGridMaxScroll = 0;
 
   // ── Journal panel state ──
   private journalOpen = false;
@@ -151,6 +159,13 @@ export class UIScene extends Phaser.Scene {
     // ─── Settings panel (hidden by default) ───
     this.settingsContainer = this.createSettingsPanel();
     this.settingsContainer.setVisible(false);
+
+    // Evidence panel scroll
+    this.input.on('wheel', (_p: Phaser.Input.Pointer, _go: Phaser.GameObjects.GameObject[], _dx: number, dy: number) => {
+      if (!this.evidenceOpen || this.evidenceGridMaxScroll <= 0) return;
+      this.evidenceGridScroll = Phaser.Math.Clamp(this.evidenceGridScroll + dy * 0.5, 0, this.evidenceGridMaxScroll);
+      this.itemsGrid.setY(-this.evidenceGridScroll);
+    });
 
     // Listen for inventory changes — update both evidence panel and right panel stats
     const onInventoryChange = () => {
@@ -960,6 +975,7 @@ export class UIScene extends Phaser.Scene {
 
   private openEvidence(): void {
     this.evidenceOpen = true;
+    this.evidenceGridScroll = 0;
     UISounds.panelOpen();
     this.resetDetailPanel();
     this.refreshInventoryGrid();
@@ -1127,9 +1143,15 @@ export class UIScene extends Phaser.Scene {
     const leftX = paperLeft + 26;
     const rightX = leftX + leftW + 26;
 
-    // Items grid
+    // Items grid (scrollable)
     this.itemsGrid = this.add.container(0, 0);
     this.evidenceContent.add(this.itemsGrid);
+
+    // Mask the items grid to the left column area
+    const gridMaskGfx = this.make.graphics({});
+    gridMaskGfx.fillRect(leftX, contentTop, leftW, contentH);
+    const gridMask = new Phaser.Display.Masks.GeometryMask(this, gridMaskGfx);
+    this.itemsGrid.setMask(gridMask);
 
     // Right detail panel — subtle inset
     const detailCenterX = rightX + rightW / 2;
@@ -1280,9 +1302,11 @@ export class UIScene extends Phaser.Scene {
           // Already inspected and equipped — unequip
           inventory.selectItem(null);
         } else {
-          // Inspect and equip in one click
           this.showItemDetail(itemId);
-          inventory.selectItem(itemId);
+          // Only equip items that are actually usable on hotspots
+          if (equippableItems.has(itemId) && !inventory.isUsed(itemId)) {
+            inventory.selectItem(itemId);
+          }
         }
         this.refreshInventoryGrid();
       });
@@ -1303,6 +1327,14 @@ export class UIScene extends Phaser.Scene {
 
       this.itemsGrid.add([cardBg, icon, label]);
     });
+
+    // Calculate grid scroll bounds
+    const totalRows = Math.ceil(items.length / cols);
+    const gridTotalH = gridStartY + totalRows * (cardH + gap) + 20;
+    const visibleBottom = contentTop + contentH - 60; // leave room for counters
+    this.evidenceGridMaxScroll = Math.max(0, gridTotalH - visibleBottom);
+    this.evidenceGridScroll = Math.min(this.evidenceGridScroll, this.evidenceGridMaxScroll);
+    this.itemsGrid.setY(-this.evidenceGridScroll);
 
     // Update discovery counters
     this.updateDiscoveryCounters();
@@ -1461,9 +1493,6 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     this.evidenceContent.add(this.detailLoreText);
 
-    // Calculate total content overflow for scroll support
-    const totalContentBottom = descBottom + 14 + this.detailLoreText.height + 10;
-    this.evidenceDetailMaxScroll = Math.max(0, totalContentBottom - contentBottom);
   }
 
   private hideLoreText(): void {
