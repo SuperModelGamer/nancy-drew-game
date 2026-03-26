@@ -29,6 +29,8 @@ interface CinematicEvent {
   triggerFlag: string;
   /** If set, plays via VideoCinematicScene (native HTML video). */
   videoKey?: string;
+  /** Timed text overlays shown on top of the video cinematic. */
+  overlayText?: { text: string; delay: number; duration?: number; style?: 'title' | 'subtitle' | 'time' | 'body'; y?: number }[];
   slides: Slide[];
   onComplete?: {
     setFlag?: string;
@@ -184,7 +186,12 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
     id: 'ghost_rumors',
     triggerRoom: 'backstage',
     triggerFlag: '',
-    videoKey: 'cinematic_ghost_rumors',
+    videoKey: 'cinematic_backstage_entry',
+    overlayText: [
+      { text: 'NIGHT 1 — 11:30 PM', delay: 500, duration: 3500, style: 'time', y: 16 },
+      { text: 'Behind the Curtain', delay: 1200, duration: 3500, style: 'title', y: 30 },
+      { text: 'Past the velvet and the gilt,\nthe Monarch shows its bones.\nRope. Iron. Shadow.', delay: 4500, style: 'body', y: 80 },
+    ],
     slides: [
       {
         lines: [
@@ -512,6 +519,7 @@ export class CinematicScene extends BaseSlideScene {
         videoKey: event.videoKey,
         targetScene: 'RoomScene',
         targetData: { roomId: data.targetRoom, skipCinematic: true },
+        overlayText: event.overlayText,
         onComplete: event.onComplete,
       });
       return;

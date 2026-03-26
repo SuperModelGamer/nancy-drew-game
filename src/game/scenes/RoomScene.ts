@@ -244,8 +244,15 @@ export class RoomScene extends Phaser.Scene {
       basement: 'dreamy_flashback',         // emotional revelation
     };
     const targetTrack = ROOM_MUSIC[this.currentRoom.id] || 'signs_to_nowhere';
+    // Always ensure the correct track plays on room entry
     if (!music.isPlaying() || music.getCurrentTrack()?.id !== targetTrack) {
       music.play(targetTrack);
+    }
+    // Belt-and-suspenders: if music was stopped by a cinematic, retry after a brief delay
+    if (!music.isPlaying()) {
+      this.time.delayedCall(500, () => {
+        if (!music.isPlaying()) music.play(targetTrack);
+      });
     }
 
     // Ambient phone ringing in lobby — starts after talking to Vivian, stops on pickup

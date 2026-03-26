@@ -22,11 +22,20 @@ import { UISounds } from '../utils/sounds';
 
 const GOLD = 'rgba(201, 168, 76,';
 
+interface OverlayTextLine {
+  text: string;
+  delay: number;       // ms from video start
+  duration?: number;   // ms to show (default: stays until next or video end)
+  style?: 'title' | 'subtitle' | 'time' | 'body';
+  y?: number;          // vertical position as % (0-100, default 50)
+}
+
 interface VideoCinematicData {
   videoKey: string;
   targetScene: string;
   targetData?: Record<string, unknown>;
   subtitles?: unknown[];          // kept for interface compat — ignored
+  overlayText?: OverlayTextLine[];
   onComplete?: {
     setFlag?: string;
     addJournal?: string;
@@ -106,6 +115,44 @@ export class VideoCinematicScene extends Phaser.Scene {
       object-fit: cover;
     `;
     this.container.appendChild(this.videoEl);
+
+    // ── Text overlays — timed text that fades in over the video ──
+    if (this.videoData.overlayText?.length) {
+      for (const line of this.videoData.overlayText) {
+        setTimeout(() => {
+          if (this.ended || !this.container) return;
+          const el = document.createElement('div');
+          const yPos = line.y ?? 50;
+          const styleMap: Record<string, string> = {
+            title: `font-size: 64px; font-weight: bold; letter-spacing: 8px; font-family: 'Playfair Display SC', 'Crimson Text', Georgia, serif; color: ${GOLD} 0.95); text-shadow: 0 3px 16px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.5);`,
+            subtitle: `font-size: 32px; font-style: italic; letter-spacing: 4px; font-family: 'Crimson Text', Georgia, serif; color: ${GOLD} 0.8); text-shadow: 0 2px 10px rgba(0,0,0,0.8);`,
+            time: `font-size: 26px; letter-spacing: 8px; font-family: 'Crimson Text', Georgia, serif; color: rgba(180,180,200,0.85); text-transform: uppercase; text-shadow: 0 2px 10px rgba(0,0,0,0.8);`,
+            body: `font-size: 28px; line-height: 1.6; font-family: 'Crimson Text', Georgia, serif; color: rgba(240,224,184,0.9); text-shadow: 0 2px 12px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.5); max-width: 700px;`,
+          };
+          el.innerHTML = line.text.replace(/\n/g, '<br>');
+          el.style.cssText = `
+            position: absolute;
+            top: ${yPos}%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 12;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            pointer-events: none;
+            ${styleMap[line.style || 'body']}
+          `;
+          this.container!.appendChild(el);
+          requestAnimationFrame(() => { el.style.opacity = '1'; });
+          if (line.duration) {
+            setTimeout(() => {
+              el.style.opacity = '0';
+              setTimeout(() => el.remove(), 900);
+            }, line.duration);
+          }
+        }, line.delay);
+      }
+    }
 
     // Skip button — gold, matching IntroScene exactly
     this.skipBtn = document.createElement('button');
