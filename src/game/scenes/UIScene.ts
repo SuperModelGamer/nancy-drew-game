@@ -82,7 +82,7 @@ export class UIScene extends Phaser.Scene {
   private journalContainer!: Phaser.GameObjects.Container;
   private journalContent!: Phaser.GameObjects.Container;
   private journalPage = 0;
-  private journalBookLayout = { panelW: 0, panelX: 0, contentTop: 0, contentBottom: 0 };
+  private journalBookLayout = { panelW: 0, panelH: 0, panelX: 0, panelY: 0, panelLeft: 0, panelTop: 0, paperLeft: 0, paperTop: 0, paperW: 0, paperH: 0, contentTop: 0, contentBottom: 0, headerY: 0 };
 
   // ── Settings panel state ──
   private settingsOpen = false;
@@ -475,23 +475,20 @@ export class UIScene extends Phaser.Scene {
     gearBtn.on('pointerdown', () => { UISounds.click(); this.toggleSettings(); });
     this.bottomBarContainer.add(gearBtn);
 
-    // ── Always-visible room clue counter (left side, vertically aligned with buttons) ──
-    // Positioned between audio controls and EVIDENCE button
-    const clueBarX = audioBtnX + 60; // right of speaker icon + volume slider
+    // ── Always-visible room clue counter (far left, outside speaker icon) ──
+    const clueBarX = audioBtnX - 50; // left of speaker icon
     this.barRoomClueText = this.add.text(clueBarX, btnCenterY, '', {
       fontFamily: FONT, fontSize: '18px', color: '#8a9aaa',
       fontStyle: 'bold', letterSpacing: 1,
-    }).setOrigin(0, 0.5);
+    }).setOrigin(1, 0.5); // right-aligned so it grows leftward
     this.bottomBarContainer.add(this.barRoomClueText);
 
-    // ── Always-visible progress bar (right side, vertically aligned with buttons) ──
-    // Positioned between JOURNAL button and settings gear
-    const gearX = btnCenterX + btnSpacing * 2.3;
-    const journalRight = btnCenterX + btnSpacing * 1.5 + BTN_W / 2;
+    // ── Always-visible progress bar (far right, outside settings gear) ──
+    const gearRightEdge = btnCenterX + btnSpacing * 2.3 + 36;
     const pBarW = 120;
     const pBarH = 10;
-    const pBarX = journalRight + 16; // 16px gap after JOURNAL button
-    const pBarY = btnCenterY + 6; // slightly below center for bar under label
+    const pBarX = gearRightEdge + 12;
+    const pBarY = btnCenterY + 6;
 
     // Progress label
     const pLabel = this.add.text(pBarX, btnCenterY - 12, 'PROGRESS', {
@@ -1504,12 +1501,20 @@ export class UIScene extends Phaser.Scene {
       }
     }
 
-    this.journalBookLayout = {
-      panelW: layout.paperW,
-      panelX: layout.panelX,
-      contentTop: layout.contentTop,
-      contentBottom: layout.contentBottom,
-    };
+    this.journalBookLayout = { ...layout };
+
+    // Draw center spine dividing the two pages
+    const spineGfx = this.add.graphics();
+    const spineX = layout.panelX;
+    spineGfx.lineStyle(3, BOOK_SPINE, 0.45);
+    spineGfx.lineBetween(spineX, layout.contentTop - 4, spineX, layout.contentBottom + 4);
+    spineGfx.lineStyle(1, BOOK_SPINE, 0.2);
+    spineGfx.lineBetween(spineX - 4, layout.contentTop - 4, spineX - 4, layout.contentBottom + 4);
+    spineGfx.lineBetween(spineX + 4, layout.contentTop - 4, spineX + 4, layout.contentBottom + 4);
+    // Shadow along spine
+    spineGfx.fillStyle(0x000000, 0.06);
+    spineGfx.fillRect(spineX - 12, layout.contentTop - 4, 24, layout.contentBottom - layout.contentTop + 8);
+    container.add(spineGfx);
 
     this.journalContent = this.add.container(0, 0);
     container.add(this.journalContent);
@@ -1517,147 +1522,189 @@ export class UIScene extends Phaser.Scene {
     return container;
   }
 
+  /** Render one page of journal entries. Returns the number of entries actually rendered. */
+  private renderJournalPage(
+    entries: string[],
+    startGlobalIdx: number,
+    pageLeft: number,
+    pageW: number,
+    pageTop: number,
+    pageBottom: number,
+  ): number {
+    const pad = 24;
+    const entryLeft = pageLeft + pad;
+    const entryTextW = pageW - pad * 2;
+    const entryGap = 14;
+
+    let y = pageTop + 8;
+    let count = 0;
+
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i];
+      const globalIdx = startGlobalIdx + i;
+      const isThinking = entry.startsWith('Thinking:');
+      const isEvidence = entry.startsWith('Found ');
+
+      let displayText = entry;
+      if (isThinking) displayText = entry.replace(/^Thinking:\s*/, '');
+
+      const xJitter = ((globalIdx * 7) % 5) - 2;
+
+      let fontSize: number;
+      let color: string;
+      let prefix: string;
+
+      if (isThinking) {
+        fontSize = 26; color = '#5a4a3a'; prefix = '— ';
+      } else if (isEvidence) {
+        fontSize = 26; color = '#3a2a1a'; prefix = '• ';
+      } else {
+        fontSize = 28; color = '#2a1a0a'; prefix = '';
+      }
+
+      const text = this.add.text(entryLeft + xJitter, y, prefix + displayText, {
+        fontFamily: JOURNAL_HAND,
+        fontSize: `${fontSize}px`,
+        color,
+        fontStyle: isThinking ? 'normal' : 'bold',
+        wordWrap: { width: isThinking ? entryTextW - 16 : entryTextW },
+        lineSpacing: 6,
+      });
+
+      // Check if this entry would overflow the page
+      if (y + text.height > pageBottom && count > 0) {
+        text.destroy();
+        break;
+      }
+
+      const angle = ((globalIdx * 13 + 5) % 7 - 3) * 0.08;
+      text.setRotation(angle * Math.PI / 180);
+
+      this.journalContent.add(text);
+      y += text.height + entryGap;
+      count++;
+    }
+
+    return count;
+  }
+
   private refreshJournalContent(): void {
     this.journalContent.removeAll(true);
 
-    const { panelW, panelX, contentTop, contentBottom } = this.journalBookLayout;
+    const { panelX, paperLeft, paperW, contentTop, contentBottom } = this.journalBookLayout;
     const save = SaveSystem.getInstance();
     const journal = save.getJournal();
 
-    const contentLeft = panelX - panelW / 2 + 40;
-    const contentRight = panelX + panelW / 2 - 40;
-    const usableW = contentRight - contentLeft;
+    // ─── Two-page geometry ───
+    const pageGutter = 22;
+    const leftPageLeft = paperLeft + 20;
+    const leftPageRight = panelX - pageGutter;
+    const rightPageLeft = panelX + pageGutter;
+    const rightPageRight = paperLeft + paperW - 20;
+    const leftPageW = leftPageRight - leftPageLeft;
+    const rightPageW = rightPageRight - rightPageLeft;
 
-    // Ruled lines — notebook style
-    const ruledGfx = this.add.graphics();
-    const lineSpacing = 32;
-    const ruledStart = contentTop + 12;
-    const ruledEnd = contentBottom - 50;
-    ruledGfx.lineStyle(1, BOOK_STAIN, 0.15);
-    for (let ly = ruledStart; ly < ruledEnd; ly += lineSpacing) {
-      ruledGfx.lineBetween(contentLeft + 8, ly, contentRight - 8, ly);
-    }
-    // Red margin line
-    const marginX = contentLeft + 48;
-    ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.22);
-    ruledGfx.lineBetween(marginX, contentTop + 4, marginX, contentBottom - 45);
-    this.journalContent.add(ruledGfx);
+    const pageTop = contentTop + 8;
+    const pageBottom = contentBottom - 10;
 
     if (journal.length === 0) {
-      const empty = this.add.text(panelX, (contentTop + contentBottom) / 2,
+      const empty = this.add.text(
+        panelX, (pageTop + pageBottom) / 2,
         "Nothing yet...\n\nExplore the theater and talk to people\nto fill this journal.", {
-          fontFamily: JOURNAL_HAND, fontSize: '32px', color: '#8a7a6a',
-          fontStyle: 'normal', align: 'center', lineSpacing: 10,
+          fontFamily: JOURNAL_HAND, fontSize: '30px', color: '#8a7a6a',
+          align: 'center', lineSpacing: 8,
         }).setOrigin(0.5);
       this.journalContent.add(empty);
       return;
     }
 
-    // Pagination
-    const totalPages = Math.ceil(journal.length / JOURNAL_ENTRIES_PER_PAGE);
-    if (this.journalPage >= totalPages) this.journalPage = totalPages - 1;
+    // ── Pre-compute spread capacities to figure out pagination ──
+    // Each "spread" = left page + right page. We need to know how many entries
+    // fit per spread so we can paginate correctly.
+    // Strategy: walk through entries, simulating layout to count per-spread capacity.
+    const spreads: { start: number; leftCount: number; rightCount: number }[] = [];
+    let idx = 0;
+    while (idx < journal.length) {
+      // Estimate left page capacity
+      const leftCount = this.estimatePageCapacity(journal, idx, leftPageW, pageBottom - pageTop);
+      const rightCount = this.estimatePageCapacity(journal, idx + leftCount, rightPageW, pageBottom - pageTop);
+      spreads.push({ start: idx, leftCount, rightCount });
+      idx += leftCount + rightCount;
+    }
+
+    const totalSpreads = spreads.length;
+    if (this.journalPage >= totalSpreads) this.journalPage = totalSpreads - 1;
     if (this.journalPage < 0) this.journalPage = 0;
 
-    const startIdx = this.journalPage * JOURNAL_ENTRIES_PER_PAGE;
-    const endIdx = Math.min(startIdx + JOURNAL_ENTRIES_PER_PAGE, journal.length);
-    const pageEntries = journal.slice(startIdx, endIdx);
+    const spread = spreads[this.journalPage];
 
-    const entryLeft = marginX + 14;
-    const entryTextW = usableW - 76;
-    const entryGap = 10;
+    // ── Render left page ──
+    const leftEntries = journal.slice(spread.start, spread.start + spread.leftCount);
+    this.renderJournalPage(leftEntries, spread.start, leftPageLeft, leftPageW, pageTop, pageBottom);
 
-    // Flow entries naturally from the top
-    let y = ruledStart + 4;
-
-    pageEntries.forEach((entry, i) => {
-      const globalIdx = startIdx + i;
-      const isThinking = entry.startsWith('Thinking:');
-      const isEvidence = entry.startsWith('Found ');
-
-      // Clean up display text
-      let displayText = entry;
-      if (isThinking) {
-        displayText = entry.replace(/^Thinking:\s*/, '');
-      }
-
-      // Slight x jitter for handwritten feel
-      const xJitter = ((globalIdx * 7) % 5) - 2;
-
-      // Determine entry style
-      let fontSize: number;
-      let color: string;
-      let prefix: string;
-      let fontWeight: string;
-
-      if (isThinking) {
-        // Nancy's inner thoughts — italic style, softer ink, indented with dash
-        fontSize = 26;
-        color = '#5a4a3a';
-        prefix = '— ';
-        fontWeight = '500';
-      } else if (isEvidence) {
-        // Evidence/item pickups — smaller, with a bullet marker
-        fontSize = 26;
-        color = '#3a2a1a';
-        prefix = '• ';
-        fontWeight = '500';
-      } else {
-        // Observations and clues — bold handwritten
-        fontSize = 28;
-        color = '#2a1a0a';
-        prefix = '';
-        fontWeight = '600';
-      }
-
-      // Render entry text in Caveat handwritten font
-      const text = this.add.text(entryLeft + xJitter, y, prefix + displayText, {
-        fontFamily: JOURNAL_HAND,
-        fontSize: `${fontSize}px`,
-        color,
-        fontStyle: fontWeight === '600' ? 'bold' : 'normal',
-        wordWrap: { width: isThinking ? entryTextW - 12 : entryTextW },
-        lineSpacing: lineSpacing - fontSize + 4,
-      });
-
-      // Slight rotation for handwritten feel (±0.3 degrees)
-      const angle = ((globalIdx * 13 + 5) % 7 - 3) * 0.1;
-      text.setRotation(angle * Math.PI / 180);
-
-      this.journalContent.add(text);
-
-      // Next entry starts after this text
-      y += text.height + entryGap;
-    });
-
-    // Page navigation — handwritten style footer
-    const navY = contentBottom - 18;
-
-    const pageText = this.add.text(panelX, navY, `- ${this.journalPage + 1} / ${totalPages} -`, {
-      fontFamily: JOURNAL_HAND, fontSize: '24px', color: '#8a7a6a',
-    }).setOrigin(0.5);
-    this.journalContent.add(pageText);
-
-    if (this.journalPage > 0) {
-      const prevBtn = this.add.text(contentLeft + 20, navY, '< back', {
-        fontFamily: JOURNAL_HAND, fontSize: '26px', color: '#5a3a2a', fontStyle: 'bold',
-      }).setOrigin(0, 0.5);
-      prevBtn.setInteractive({ cursor: POINTER_CURSOR });
-      prevBtn.on('pointerover', () => prevBtn.setColor(TAB_GOLD_STR));
-      prevBtn.on('pointerout', () => prevBtn.setColor('#5a3a2a'));
-      prevBtn.on('pointerdown', () => { this.journalPage--; this.refreshJournalContent(); });
-      this.journalContent.add(prevBtn);
+    // ── Render right page ──
+    const rightStart = spread.start + spread.leftCount;
+    const rightEntries = journal.slice(rightStart, rightStart + spread.rightCount);
+    if (rightEntries.length > 0) {
+      this.renderJournalPage(rightEntries, rightStart, rightPageLeft, rightPageW, pageTop, pageBottom);
     }
 
-    if (this.journalPage < totalPages - 1) {
-      const nextBtn = this.add.text(contentRight - 20, navY, 'more >', {
-        fontFamily: JOURNAL_HAND, fontSize: '26px', color: '#5a3a2a', fontStyle: 'bold',
-      }).setOrigin(1, 0.5);
-      nextBtn.setInteractive({ cursor: POINTER_CURSOR });
-      nextBtn.on('pointerover', () => nextBtn.setColor(TAB_GOLD_STR));
-      nextBtn.on('pointerout', () => nextBtn.setColor('#5a3a2a'));
-      nextBtn.on('pointerdown', () => { this.journalPage++; this.refreshJournalContent(); });
-      this.journalContent.add(nextBtn);
+    // ── Page navigation — centered at bottom across both pages ──
+    if (totalSpreads > 1) {
+      const navY = pageBottom + 2;
+
+      const pageText = this.add.text(panelX, navY, `— ${this.journalPage + 1} / ${totalSpreads} —`, {
+        fontFamily: JOURNAL_HAND, fontSize: '22px', color: '#8a7a6a',
+      }).setOrigin(0.5);
+      this.journalContent.add(pageText);
+
+      if (this.journalPage > 0) {
+        const prevBtn = this.add.text(panelX - 120, navY, '< prev', {
+          fontFamily: JOURNAL_HAND, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
+        }).setOrigin(1, 0.5);
+        prevBtn.setInteractive({ cursor: POINTER_CURSOR });
+        prevBtn.on('pointerover', () => prevBtn.setColor(TAB_GOLD_STR));
+        prevBtn.on('pointerout', () => prevBtn.setColor('#5a3a2a'));
+        prevBtn.on('pointerdown', () => { this.journalPage--; this.refreshJournalContent(); });
+        this.journalContent.add(prevBtn);
+      }
+
+      if (this.journalPage < totalSpreads - 1) {
+        const nextBtn = this.add.text(panelX + 120, navY, 'next >', {
+          fontFamily: JOURNAL_HAND, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
+        }).setOrigin(0, 0.5);
+        nextBtn.setInteractive({ cursor: POINTER_CURSOR });
+        nextBtn.on('pointerover', () => nextBtn.setColor(TAB_GOLD_STR));
+        nextBtn.on('pointerout', () => nextBtn.setColor('#5a3a2a'));
+        nextBtn.on('pointerdown', () => { this.journalPage++; this.refreshJournalContent(); });
+        this.journalContent.add(nextBtn);
+      }
     }
+  }
+
+  /** Estimate how many entries fit on a single page given available width and height. */
+  private estimatePageCapacity(entries: string[], startIdx: number, pageW: number, maxH: number): number {
+    let y = 8; // matches pageTop + 8 offset in renderJournalPage
+    const pad = 24;
+    const entryGap = 14;
+    const textW = pageW - pad * 2;
+    let count = 0;
+
+    for (let i = startIdx; i < entries.length; i++) {
+      const entry = entries[i];
+      const text = entry.startsWith('Thinking:') ? entry.replace(/^Thinking:\s*/, '') : entry;
+      const prefix = entry.startsWith('Thinking:') ? '— ' : entry.startsWith('Found ') ? '• ' : '';
+      const fullText = prefix + text;
+      const charsPerLine = Math.floor(textW / 14);
+      const numLines = Math.max(1, Math.ceil(fullText.length / charsPerLine));
+      const entryH = numLines * 32 + entryGap; // 32 ≈ fontSize + lineSpacing
+
+      if (y + entryH > maxH && count > 0) break;
+      y += entryH;
+      count++;
+    }
+
+    return Math.max(count, startIdx < entries.length ? 1 : 0);
   }
 
   // ─── Settings Panel ──────────────────────────────────────────────────────────

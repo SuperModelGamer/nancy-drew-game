@@ -201,8 +201,9 @@ export class RoomScene extends Phaser.Scene {
     });
 
     // Check chapter progression — show transition if advanced
+    // Skip chapter 2 transition — the backstage video cinematic handles that moment
     const newChapter = ChapterSystem.getInstance().checkProgression();
-    if (newChapter) {
+    if (newChapter && newChapter !== 2) {
       this.scene.launch('ChapterTransitionScene', { chapter: newChapter });
     }
 

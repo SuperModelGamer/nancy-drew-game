@@ -188,9 +188,8 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
     triggerFlag: '',
     videoKey: 'cinematic_backstage_entry',
     overlayText: [
-      { text: 'NIGHT 1 — 11:30 PM', delay: 500, duration: 3500, style: 'time', y: 16 },
-      { text: 'Behind the Curtain', delay: 1200, duration: 3500, style: 'title', y: 30 },
-      { text: 'Past the velvet and the gilt,\nthe Monarch shows its bones.\nRope. Iron. Shadow.', delay: 4500, style: 'body', y: 80 },
+      { text: 'NIGHT 1 — 11:30 PM', delay: 400, duration: 7000, style: 'time', y: 12 },
+      { text: 'Two poisonings. Same method.\nNearly a century apart.', delay: 2500, style: 'body', y: 85 },
     ],
     slides: [
       {
