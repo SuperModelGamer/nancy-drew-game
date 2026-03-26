@@ -27,7 +27,8 @@ const SFX_MANIFEST: Record<string, string> = {
   click: 'audio/sfx_click.mp3',
   hover: 'audio/sfx_click.mp3',
   spotlightClick: 'audio/sfx_spotlight_click.mp3',
-  phoneRing: 'audio/vo/sfx_phone_ring.mp3',
+  phoneRing: 'audio/BELLMisc-Dramatic_old_telepho-Elevenlabs.mp3',
+  phoneDialTone: 'audio/COMTelph-A_faint_buzz_or_dial-Elevenlabs.mp3',
 };
 
 // ─── Audio cache & playback ──────────────────────────────────────────────────
@@ -215,6 +216,7 @@ export const UISounds = {
     if (phoneRingTimer) { clearInterval(phoneRingTimer); phoneRingTimer = null; }
     if (phoneRingSound) { fadeOutAudio(phoneRingSound, 300); phoneRingSound = null; }
   },
+  phoneDialTone(): void { playSFX('phoneDialTone', 0.5); },
   doorCreak(): void {},
   heartbeat(): void {},
   lightSurge(): void {},

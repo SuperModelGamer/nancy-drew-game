@@ -140,6 +140,8 @@ export class DialogueSystem {
 
   // Track current speaker for entrance animations
   private lastSpeaker = '';
+  // Last NPC speaker that persists after dialogue ends (for suspect auto-select)
+  private lastNPCSpeaker = '';
   // Last NPC portrait key — shown dimmed when Nancy speaks
   private lastPortraitKey: string | null = null;
   // Whether current dialogue has ANY speaker with a portrait (for stable layout)
@@ -519,6 +521,7 @@ export class DialogueSystem {
       this.lastPortraitKey = portraitKey;
     }
     this.lastSpeaker = line.speaker;
+    if (line.speaker !== 'Nancy') this.lastNPCSpeaker = line.speaker;
 
     // ── 8–9. Speaker nameplate (overlaid on portrait bottom, or centered above dialogue) ──
     const speakerColor = this.getSpeakerColor(line.speaker);
@@ -845,9 +848,13 @@ export class DialogueSystem {
     });
   }
 
-  /** Returns the last NPC speaker name (for defaulting suspect dossier tab). */
   getLastSpeaker(): string {
     return this.lastSpeaker;
+  }
+
+  /** Returns the last NPC speaker (persists after dialogue ends, for suspect auto-select). */
+  getLastNPCSpeaker(): string {
+    return this.lastNPCSpeaker;
   }
 
   // ─── Speaker Data ─────────────────────────────────────────────────────────

@@ -23,6 +23,14 @@ const BTN_CHEVRON = 6;
 // Pre-index items for O(1) lookup
 const itemMap = new Map(itemsData.items.map(i => [i.id, i]));
 
+// Items that can be equipped to the cursor (used as requiredItem on hotspots)
+const equippableItems = new Set<string>();
+for (const room of (roomsData as { rooms: { hotspots?: { requiredItem?: string }[] }[] }).rooms) {
+  for (const hs of room.hotspots || []) {
+    if (hs.requiredItem) equippableItems.add(hs.requiredItem);
+  }
+}
+
 // Journal pagination
 const JOURNAL_ENTRIES_PER_PAGE = 6;
 
@@ -76,6 +84,8 @@ export class UIScene extends Phaser.Scene {
   private roomItemCounterText: Phaser.GameObjects.Text | null = null;
   private selectedItemId: string | null = null;
   private evidenceLayout = { leftX: 0, contentTop: 0, contentH: 0, contentBottom: 0, leftW: 0, rightW: 0, rightX: 0 };
+  private evidenceGridScroll = 0;
+  private evidenceGridMaxScroll = 0;
 
   // ── Journal panel state ──
   private journalOpen = false;
@@ -149,6 +159,13 @@ export class UIScene extends Phaser.Scene {
     // ─── Settings panel (hidden by default) ───
     this.settingsContainer = this.createSettingsPanel();
     this.settingsContainer.setVisible(false);
+
+    // Evidence panel scroll
+    this.input.on('wheel', (_p: Phaser.Input.Pointer, _go: Phaser.GameObjects.GameObject[], _dx: number, dy: number) => {
+      if (!this.evidenceOpen || this.evidenceGridMaxScroll <= 0) return;
+      this.evidenceGridScroll = Phaser.Math.Clamp(this.evidenceGridScroll + dy * 0.5, 0, this.evidenceGridMaxScroll);
+      this.itemsGrid.setY(-this.evidenceGridScroll);
+    });
 
     // Listen for inventory changes — update both evidence panel and right panel stats
     const onInventoryChange = () => {
@@ -407,10 +424,14 @@ export class UIScene extends Phaser.Scene {
     const buttons = [
       { label: 'EVIDENCE', color: DecoColors.gold, x: btnCenterX - btnSpacing * 1.5, action: () => this.toggleEvidence() },
       { label: 'SUSPECTS', color: 0xb4a0d4, x: btnCenterX - btnSpacing * 0.5, action: () => {
-        const speaker = DialogueSystem.getInstance().getLastSpeaker();
+        const speaker = DialogueSystem.getInstance().getLastNPCSpeaker();
         const speakerToSuspect: Record<string, string> = {
-          'Vivian': 'vivian', 'Edwin': 'edwin', 'Stella': 'stella',
-          'Ashworth': 'ashworth', 'Diego': 'diego',
+          'Vivian': 'vivian', 'Vivian Delacroix': 'vivian',
+          'Edwin': 'edwin', 'Edwin Hale': 'edwin',
+          'Stella': 'stella', 'Stella Morrow': 'stella',
+          'Ashworth': 'ashworth', 'Roland Ashworth': 'ashworth',
+          'Diego': 'diego', 'Diego Reyes': 'diego',
+          'Carson Drew': '', 'Ned': '',
         };
         this.registry.set('currentDialogueSuspect', speakerToSuspect[speaker] || null);
         this.scene.launch('SuspectScene');
@@ -954,6 +975,7 @@ export class UIScene extends Phaser.Scene {
 
   private openEvidence(): void {
     this.evidenceOpen = true;
+    this.evidenceGridScroll = 0;
     UISounds.panelOpen();
     this.resetDetailPanel();
     this.refreshInventoryGrid();
@@ -1121,9 +1143,15 @@ export class UIScene extends Phaser.Scene {
     const leftX = paperLeft + 26;
     const rightX = leftX + leftW + 26;
 
-    // Items grid
+    // Items grid (scrollable)
     this.itemsGrid = this.add.container(0, 0);
     this.evidenceContent.add(this.itemsGrid);
+
+    // Mask the items grid to the left column area
+    const gridMaskGfx = this.make.graphics({});
+    gridMaskGfx.fillRect(leftX, contentTop, leftW, contentH);
+    const gridMask = new Phaser.Display.Masks.GeometryMask(this, gridMaskGfx);
+    this.itemsGrid.setMask(gridMask);
 
     // Right detail panel — subtle inset
     const detailCenterX = rightX + rightW / 2;
@@ -1274,9 +1302,11 @@ export class UIScene extends Phaser.Scene {
           // Already inspected and equipped — unequip
           inventory.selectItem(null);
         } else {
-          // Inspect and equip in one click
           this.showItemDetail(itemId);
-          inventory.selectItem(itemId);
+          // Only equip items that are actually usable on hotspots
+          if (equippableItems.has(itemId) && !inventory.isUsed(itemId)) {
+            inventory.selectItem(itemId);
+          }
         }
         this.refreshInventoryGrid();
       });
@@ -1297,6 +1327,14 @@ export class UIScene extends Phaser.Scene {
 
       this.itemsGrid.add([cardBg, icon, label]);
     });
+
+    // Calculate grid scroll bounds
+    const totalRows = Math.ceil(items.length / cols);
+    const gridTotalH = gridStartY + totalRows * (cardH + gap) + 20;
+    const visibleBottom = contentTop + contentH - 60; // leave room for counters
+    this.evidenceGridMaxScroll = Math.max(0, gridTotalH - visibleBottom);
+    this.evidenceGridScroll = Math.min(this.evidenceGridScroll, this.evidenceGridMaxScroll);
+    this.itemsGrid.setY(-this.evidenceGridScroll);
 
     // Update discovery counters
     this.updateDiscoveryCounters();
@@ -1455,10 +1493,6 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     this.evidenceContent.add(this.detailLoreText);
 
-    // Crop the lore text if it overflows available space
-    if (this.detailLoreText.height > availableH) {
-      this.detailLoreText.setCrop(0, 0, this.detailLoreText.width, availableH);
-    }
   }
 
   private hideLoreText(): void {
@@ -1618,47 +1652,44 @@ export class UIScene extends Phaser.Scene {
       return;
     }
 
-    // ── Pre-compute spread capacities to figure out pagination ──
-    // Each "spread" = left page + right page. We need to know how many entries
-    // fit per spread so we can paginate correctly.
-    // Strategy: walk through entries, simulating layout to count per-spread capacity.
-    const spreads: { start: number; leftCount: number; rightCount: number }[] = [];
-    let idx = 0;
-    while (idx < journal.length) {
-      // Estimate left page capacity
-      const leftCount = this.estimatePageCapacity(journal, idx, leftPageW, pageBottom - pageTop);
-      const rightCount = this.estimatePageCapacity(journal, idx + leftCount, rightPageW, pageBottom - pageTop);
-      spreads.push({ start: idx, leftCount, rightCount });
-      idx += leftCount + rightCount;
+    // ── Render-based pagination: render left page, then right page ──
+    // We skip forward by this.journalPage spreads worth of entries.
+    // To find where each spread starts, we render off-screen to measure.
+    let spreadStart = 0;
+    for (let s = 0; s < this.journalPage; s++) {
+      const leftFit = this.measurePageCapacity(journal, spreadStart, leftPageW, pageBottom - pageTop);
+      const rightFit = this.measurePageCapacity(journal, spreadStart + leftFit, rightPageW, pageBottom - pageTop);
+      spreadStart += leftFit + rightFit;
+      if (spreadStart >= journal.length) { spreadStart = 0; break; }
     }
 
-    const totalSpreads = spreads.length;
-    if (this.journalPage >= totalSpreads) this.journalPage = totalSpreads - 1;
-    if (this.journalPage < 0) this.journalPage = 0;
+    // Render left page
+    const leftEntries = journal.slice(spreadStart);
+    const leftRendered = this.renderJournalPage(leftEntries, spreadStart, leftPageLeft, leftPageW, pageTop, pageBottom);
 
-    const spread = spreads[this.journalPage];
-
-    // ── Render left page ──
-    const leftEntries = journal.slice(spread.start, spread.start + spread.leftCount);
-    this.renderJournalPage(leftEntries, spread.start, leftPageLeft, leftPageW, pageTop, pageBottom);
-
-    // ── Render right page ──
-    const rightStart = spread.start + spread.leftCount;
-    const rightEntries = journal.slice(rightStart, rightStart + spread.rightCount);
+    // Render right page
+    const rightStart = spreadStart + leftRendered;
+    const rightEntries = journal.slice(rightStart);
+    let rightRendered = 0;
     if (rightEntries.length > 0) {
-      this.renderJournalPage(rightEntries, rightStart, rightPageLeft, rightPageW, pageTop, pageBottom);
+      rightRendered = this.renderJournalPage(rightEntries, rightStart, rightPageLeft, rightPageW, pageTop, pageBottom);
     }
+
+    const totalOnSpread = leftRendered + rightRendered;
+    const hasMore = rightStart + rightRendered < journal.length;
+    const hasPrev = this.journalPage > 0;
 
     // ── Page navigation — centered at bottom across both pages ──
-    if (totalSpreads > 1) {
+    if (hasMore || hasPrev) {
       const navY = pageBottom + 2;
+      const totalSpreads = this.countTotalSpreads(journal, leftPageW, rightPageW, pageBottom - pageTop);
 
       const pageText = this.add.text(panelX, navY, `— ${this.journalPage + 1} / ${totalSpreads} —`, {
         fontFamily: JOURNAL_HAND, fontSize: '22px', color: '#8a7a6a',
       }).setOrigin(0.5);
       this.journalContent.add(pageText);
 
-      if (this.journalPage > 0) {
+      if (hasPrev) {
         const prevBtn = this.add.text(panelX - 120, navY, '< prev', {
           fontFamily: JOURNAL_HAND, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
         }).setOrigin(1, 0.5);
@@ -1669,7 +1700,7 @@ export class UIScene extends Phaser.Scene {
         this.journalContent.add(prevBtn);
       }
 
-      if (this.journalPage < totalSpreads - 1) {
+      if (hasMore) {
         const nextBtn = this.add.text(panelX + 120, navY, 'next >', {
           fontFamily: JOURNAL_HAND, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
         }).setOrigin(0, 0.5);
@@ -1682,29 +1713,51 @@ export class UIScene extends Phaser.Scene {
     }
   }
 
-  /** Estimate how many entries fit on a single page given available width and height. */
-  private estimatePageCapacity(entries: string[], startIdx: number, pageW: number, maxH: number): number {
-    let y = 8; // matches pageTop + 8 offset in renderJournalPage
+  /** Measure how many entries fit on a page by creating temporary text objects. */
+  private measurePageCapacity(entries: string[], startIdx: number, pageW: number, maxH: number): number {
     const pad = 24;
+    const entryTextW = pageW - pad * 2;
     const entryGap = 14;
-    const textW = pageW - pad * 2;
+    let y = 8;
     let count = 0;
 
     for (let i = startIdx; i < entries.length; i++) {
       const entry = entries[i];
-      const text = entry.startsWith('Thinking:') ? entry.replace(/^Thinking:\s*/, '') : entry;
-      const prefix = entry.startsWith('Thinking:') ? '— ' : entry.startsWith('Found ') ? '• ' : '';
-      const fullText = prefix + text;
-      const charsPerLine = Math.floor(textW / 14);
-      const numLines = Math.max(1, Math.ceil(fullText.length / charsPerLine));
-      const entryH = numLines * 32 + entryGap; // 32 ≈ fontSize + lineSpacing
+      const isThinking = entry.startsWith('Thinking:');
+      let displayText = isThinking ? entry.replace(/^Thinking:\s*/, '') : entry;
+      const prefix = isThinking ? '— ' : entry.startsWith('Found ') ? '• ' : '';
+      const fontSize = (isThinking || entry.startsWith('Found ')) ? 26 : 28;
 
-      if (y + entryH > maxH && count > 0) break;
-      y += entryH;
+      const temp = this.add.text(0, 0, prefix + displayText, {
+        fontFamily: JOURNAL_HAND,
+        fontSize: `${fontSize}px`,
+        fontStyle: isThinking ? 'normal' : 'bold',
+        wordWrap: { width: isThinking ? entryTextW - 16 : entryTextW },
+        lineSpacing: 6,
+      }).setVisible(false);
+
+      const h = temp.height;
+      temp.destroy();
+
+      if (y + h > maxH && count > 0) break;
+      y += h + entryGap;
       count++;
     }
 
     return Math.max(count, startIdx < entries.length ? 1 : 0);
+  }
+
+  /** Count total spreads for page numbering. */
+  private countTotalSpreads(entries: string[], leftW: number, rightW: number, pageH: number): number {
+    let idx = 0;
+    let spreads = 0;
+    while (idx < entries.length) {
+      const leftFit = this.measurePageCapacity(entries, idx, leftW, pageH);
+      const rightFit = this.measurePageCapacity(entries, idx + leftFit, rightW, pageH);
+      idx += leftFit + rightFit;
+      spreads++;
+    }
+    return Math.max(1, spreads);
   }
 
   // ─── Settings Panel ──────────────────────────────────────────────────────────

@@ -1184,7 +1184,7 @@
         {
           "id": "hangup",
           "lines": [
-            { "speaker": "Nancy", "text": "I set the receiver back in its cradle. The phone clicks and goes silent." }
+            { "speaker": "Nancy", "text": "I set the receiver back in its cradle. The phone clicks and goes silent.", "triggerEvent": "phone_hangup" }
           ]
         }
       ]
