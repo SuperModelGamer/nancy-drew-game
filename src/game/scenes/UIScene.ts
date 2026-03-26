@@ -31,9 +31,6 @@ for (const room of (roomsData as { rooms: { hotspots?: { requiredItem?: string }
   }
 }
 
-// Journal pagination
-const JOURNAL_ENTRIES_PER_PAGE = 6;
-
 // Book visual constants (shared by Evidence + Journal panels)
 const BOOK_LEATHER = 0x3a2a1a;
 const BOOK_PAPER = 0xF5E6C8;
