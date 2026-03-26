@@ -664,7 +664,8 @@ export class RoomScene extends Phaser.Scene {
             // Add journal entry for key evidence pickups
             const item = itemsData.items.find(i => i.id === hotspot.itemId);
             if (item) {
-              SaveSystem.getInstance().addJournalEntry(`Found ${item.name} in the ${this.currentRoom.name}.`);
+              const roomName = this.currentRoom.name.replace(/^The\s+/, '');
+              SaveSystem.getInstance().addJournalEntry(`Found ${item.name} in the ${roomName}.`);
             }
             // Refresh hotspots so the picked-up item disappears immediately
             this.createHotspots();

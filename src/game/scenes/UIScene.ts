@@ -24,7 +24,7 @@ const BTN_CHEVRON = 6;
 const itemMap = new Map(itemsData.items.map(i => [i.id, i]));
 
 // Journal pagination
-const JOURNAL_ENTRIES_PER_PAGE = 4;
+const JOURNAL_ENTRIES_PER_PAGE = 6;
 
 // Book visual constants (shared by Evidence + Journal panels)
 const BOOK_LEATHER = 0x3a2a1a;
@@ -35,6 +35,8 @@ const BOOK_SPINE = 0x2a1a0a;
 const BOOK_MARGIN_RED = 0xcc6666;
 const BOOK_STAIN = 0x8B7355;
 const JOURNAL_FONT = "'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif";
+const JOURNAL_HAND = "'Caveat', cursive";
+const JOURNAL_TITLE = "'Playfair Display SC', Georgia, serif";
 const TAB_GOLD = 0xc9a84c;
 const TAB_GOLD_STR = '#c9a84c';
 const LEATHER_BORDER = 14;
@@ -1407,6 +1409,17 @@ export class UIScene extends Phaser.Scene {
 
     const layout = this.drawBookPanel(container, "NANCY'S JOURNAL", () => this.closeJournal());
 
+    // Replace the default title with Playfair Display SC for the journal
+    const children = container.list as Phaser.GameObjects.GameObject[];
+    for (const child of children) {
+      if (child instanceof Phaser.GameObjects.Text && child.text === "NANCY'S JOURNAL") {
+        child.setFontFamily(JOURNAL_TITLE);
+        child.setFontSize(34);
+        child.setLetterSpacing(8);
+        break;
+      }
+    }
+
     this.journalBookLayout = {
       panelW: layout.paperW,
       panelX: layout.panelX,
@@ -1431,26 +1444,26 @@ export class UIScene extends Phaser.Scene {
     const contentRight = panelX + panelW / 2 - 40;
     const usableW = contentRight - contentLeft;
 
-    // Ruled lines — notebook style, consistent spacing
+    // Ruled lines — notebook style
     const ruledGfx = this.add.graphics();
-    const lineSpacing = 36;
+    const lineSpacing = 32;
     const ruledStart = contentTop + 12;
     const ruledEnd = contentBottom - 50;
-    ruledGfx.lineStyle(1, BOOK_STAIN, 0.18);
+    ruledGfx.lineStyle(1, BOOK_STAIN, 0.15);
     for (let ly = ruledStart; ly < ruledEnd; ly += lineSpacing) {
-      ruledGfx.lineBetween(contentLeft, ly, contentRight, ly);
+      ruledGfx.lineBetween(contentLeft + 8, ly, contentRight - 8, ly);
     }
     // Red margin line
-    const marginX = contentLeft + 60;
-    ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.28);
+    const marginX = contentLeft + 48;
+    ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.22);
     ruledGfx.lineBetween(marginX, contentTop + 4, marginX, contentBottom - 45);
     this.journalContent.add(ruledGfx);
 
     if (journal.length === 0) {
       const empty = this.add.text(panelX, (contentTop + contentBottom) / 2,
-        "No entries yet.\n\nExplore the theater and talk to people\nto fill Nancy's journal.", {
-          fontFamily: JOURNAL_FONT, fontSize: '28px', color: '#6a5a4a',
-          fontStyle: 'italic', align: 'center', lineSpacing: 10,
+        "Nothing yet...\n\nExplore the theater and talk to people\nto fill this journal.", {
+          fontFamily: JOURNAL_HAND, fontSize: '32px', color: '#8a7a6a',
+          fontStyle: 'normal', align: 'center', lineSpacing: 10,
         }).setOrigin(0.5);
       this.journalContent.add(empty);
       return;
@@ -1465,46 +1478,84 @@ export class UIScene extends Phaser.Scene {
     const endIdx = Math.min(startIdx + JOURNAL_ENTRIES_PER_PAGE, journal.length);
     const pageEntries = journal.slice(startIdx, endIdx);
 
-    const entryLeft = marginX + 18;
-    const entryTextW = usableW - 90;
-    const fontSize = 28;
-    const entryGap = 14; // gap between entries
+    const entryLeft = marginX + 14;
+    const entryTextW = usableW - 76;
+    const entryGap = 10;
 
-    // Flow entries naturally from the top — no artificial even spacing
-    let y = ruledStart + 6;
+    // Flow entries naturally from the top
+    let y = ruledStart + 4;
 
     pageEntries.forEach((entry, i) => {
       const globalIdx = startIdx + i;
-      const xJitter = ((globalIdx * 7) % 3) - 1;
+      const isThinking = entry.startsWith('Thinking:');
+      const isEvidence = entry.startsWith('Found ');
 
-      // Entry number — positioned in the margin area
-      const bullet = this.add.text(contentLeft + 8 + xJitter, y, `${globalIdx + 1}.`, {
-        fontFamily: JOURNAL_FONT, fontSize: `${fontSize}px`, color: BOOK_BULLET, fontStyle: 'italic',
+      // Clean up display text
+      let displayText = entry;
+      if (isThinking) {
+        displayText = entry.replace(/^Thinking:\s*/, '');
+      }
+
+      // Slight x jitter for handwritten feel
+      const xJitter = ((globalIdx * 7) % 5) - 2;
+
+      // Determine entry style
+      let fontSize: number;
+      let color: string;
+      let prefix: string;
+      let fontWeight: string;
+
+      if (isThinking) {
+        // Nancy's inner thoughts — italic style, softer ink, indented with dash
+        fontSize = 26;
+        color = '#5a4a3a';
+        prefix = '— ';
+        fontWeight = '500';
+      } else if (isEvidence) {
+        // Evidence/item pickups — smaller, with a bullet marker
+        fontSize = 26;
+        color = '#3a2a1a';
+        prefix = '• ';
+        fontWeight = '500';
+      } else {
+        // Observations and clues — bold handwritten
+        fontSize = 28;
+        color = '#2a1a0a';
+        prefix = '';
+        fontWeight = '600';
+      }
+
+      // Render entry text in Caveat handwritten font
+      const text = this.add.text(entryLeft + xJitter, y, prefix + displayText, {
+        fontFamily: JOURNAL_HAND,
+        fontSize: `${fontSize}px`,
+        color,
+        fontStyle: fontWeight === '600' ? 'bold' : 'normal',
+        wordWrap: { width: isThinking ? entryTextW - 12 : entryTextW },
+        lineSpacing: lineSpacing - fontSize + 4,
       });
 
-      // Entry text — flows naturally, line spacing matches ruled lines
-      const text = this.add.text(entryLeft + xJitter, y, entry, {
-        fontFamily: JOURNAL_FONT, fontSize: `${fontSize}px`, color: BOOK_INK,
-        wordWrap: { width: entryTextW }, lineSpacing: lineSpacing - fontSize,
-      });
+      // Slight rotation for handwritten feel (±0.3 degrees)
+      const angle = ((globalIdx * 13 + 5) % 7 - 3) * 0.1;
+      text.setRotation(angle * Math.PI / 180);
 
-      this.journalContent.add([bullet, text]);
+      this.journalContent.add(text);
 
-      // Next entry starts after this text, with a small gap
+      // Next entry starts after this text
       y += text.height + entryGap;
     });
 
-    // Page navigation — styled like a book footer
+    // Page navigation — handwritten style footer
     const navY = contentBottom - 18;
 
-    const pageText = this.add.text(panelX, navY, `— page ${this.journalPage + 1} of ${totalPages} —`, {
-      fontFamily: JOURNAL_FONT, fontSize: '22px', color: '#7a6a5a', fontStyle: 'italic',
+    const pageText = this.add.text(panelX, navY, `- ${this.journalPage + 1} / ${totalPages} -`, {
+      fontFamily: JOURNAL_HAND, fontSize: '24px', color: '#8a7a6a',
     }).setOrigin(0.5);
     this.journalContent.add(pageText);
 
     if (this.journalPage > 0) {
-      const prevBtn = this.add.text(contentLeft + 20, navY, '◀  Previous', {
-        fontFamily: JOURNAL_FONT, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
+      const prevBtn = this.add.text(contentLeft + 20, navY, '< back', {
+        fontFamily: JOURNAL_HAND, fontSize: '26px', color: '#5a3a2a', fontStyle: 'bold',
       }).setOrigin(0, 0.5);
       prevBtn.setInteractive({ cursor: POINTER_CURSOR });
       prevBtn.on('pointerover', () => prevBtn.setColor(TAB_GOLD_STR));
@@ -1514,8 +1565,8 @@ export class UIScene extends Phaser.Scene {
     }
 
     if (this.journalPage < totalPages - 1) {
-      const nextBtn = this.add.text(contentRight - 20, navY, 'Next  ▶', {
-        fontFamily: JOURNAL_FONT, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
+      const nextBtn = this.add.text(contentRight - 20, navY, 'more >', {
+        fontFamily: JOURNAL_HAND, fontSize: '26px', color: '#5a3a2a', fontStyle: 'bold',
       }).setOrigin(1, 0.5);
       nextBtn.setInteractive({ cursor: POINTER_CURSOR });
       nextBtn.on('pointerover', () => nextBtn.setColor(TAB_GOLD_STR));
