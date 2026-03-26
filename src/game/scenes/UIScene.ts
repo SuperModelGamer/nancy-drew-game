@@ -1531,25 +1531,12 @@ export class UIScene extends Phaser.Scene {
     pageTop: number,
     pageBottom: number,
   ): number {
-    const lineSpacing = 30;
-    const marginX = pageLeft + 40;
-    const entryLeft = marginX + 12;
-    const entryTextW = pageW - 68;
-    const entryGap = 10;
-    const ruledStart = pageTop + 4;
+    const pad = 24;
+    const entryLeft = pageLeft + pad;
+    const entryTextW = pageW - pad * 2;
+    const entryGap = 14;
 
-    // Ruled lines — fill the entire page height
-    const ruledGfx = this.add.graphics();
-    ruledGfx.lineStyle(1, BOOK_STAIN, 0.12);
-    for (let ly = ruledStart; ly <= pageBottom; ly += lineSpacing) {
-      ruledGfx.lineBetween(pageLeft + 4, ly, pageLeft + pageW - 4, ly);
-    }
-    // Red margin line
-    ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.18);
-    ruledGfx.lineBetween(marginX, pageTop, marginX, pageBottom);
-    this.journalContent.add(ruledGfx);
-
-    let y = ruledStart + 2;
+    let y = pageTop + 8;
     let count = 0;
 
     for (let i = 0; i < entries.length; i++) {
@@ -1580,8 +1567,8 @@ export class UIScene extends Phaser.Scene {
         fontSize: `${fontSize}px`,
         color,
         fontStyle: isThinking ? 'normal' : 'bold',
-        wordWrap: { width: isThinking ? entryTextW - 12 : entryTextW },
-        lineSpacing: lineSpacing - fontSize + 2,
+        wordWrap: { width: isThinking ? entryTextW - 16 : entryTextW },
+        lineSpacing: 6,
       });
 
       // Check if this entry would overflow the page
@@ -1660,17 +1647,6 @@ export class UIScene extends Phaser.Scene {
     const rightEntries = journal.slice(rightStart, rightStart + spread.rightCount);
     if (rightEntries.length > 0) {
       this.renderJournalPage(rightEntries, rightStart, rightPageLeft, rightPageW, pageTop, pageBottom);
-    } else {
-      // Right page is empty — draw ruled lines anyway for visual consistency
-      const ruledGfx = this.add.graphics();
-      const rMarginX = rightPageLeft + 40;
-      ruledGfx.lineStyle(1, BOOK_STAIN, 0.12);
-      for (let ly = pageTop + 4; ly <= pageBottom; ly += 30) {
-        ruledGfx.lineBetween(rightPageLeft + 4, ly, rightPageRight - 4, ly);
-      }
-      ruledGfx.lineStyle(1.5, BOOK_MARGIN_RED, 0.18);
-      ruledGfx.lineBetween(rMarginX, pageTop, rMarginX, pageBottom);
-      this.journalContent.add(ruledGfx);
     }
 
     // ── Page navigation — centered at bottom across both pages ──
@@ -1708,10 +1684,10 @@ export class UIScene extends Phaser.Scene {
 
   /** Estimate how many entries fit on a single page given available width and height. */
   private estimatePageCapacity(entries: string[], startIdx: number, pageW: number, maxH: number): number {
-    let y = 0;
-    const lineH = 30;
-    const entryGap = 10;
-    const textW = pageW - 68;
+    let y = 8; // matches pageTop + 8 offset in renderJournalPage
+    const pad = 24;
+    const entryGap = 14;
+    const textW = pageW - pad * 2;
     let count = 0;
 
     for (let i = startIdx; i < entries.length; i++) {
@@ -1721,7 +1697,7 @@ export class UIScene extends Phaser.Scene {
       const fullText = prefix + text;
       const charsPerLine = Math.floor(textW / 14);
       const numLines = Math.max(1, Math.ceil(fullText.length / charsPerLine));
-      const entryH = numLines * lineH + entryGap;
+      const entryH = numLines * 32 + entryGap; // 32 ≈ fontSize + lineSpacing
 
       if (y + entryH > maxH && count > 0) break;
       y += entryH;
