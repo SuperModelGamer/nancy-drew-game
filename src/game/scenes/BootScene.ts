@@ -233,7 +233,7 @@ export class BootScene extends Phaser.Scene {
       'vo_nancy_phone_01', 'vo_nancy_phone_02', 'vo_nancy_phone_03',
       // Vivian intro revisit — dialogue lines
       'vo_vivian_revisit_01', 'vo_vivian_revisit_02', 'vo_vivian_revisit_03',
-      'vo_vivian_holding_01', 'vo_vivian_holding_02', 'vo_vivian_holding_04',
+      'vo_vivian_holding_01', 'vo_vivian_holding_02', 'vo_vivian_holding_03', 'vo_vivian_holding_04',
       'vo_vivian_history_01', 'vo_vivian_history_02', 'vo_vivian_history_03', 'vo_vivian_history_04',
       'vo_vivian_strange_01', 'vo_vivian_strange_02', 'vo_vivian_strange_03', 'vo_vivian_strange_04',
       'vo_vivian_farewell_01',
