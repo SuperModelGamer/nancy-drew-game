@@ -170,8 +170,9 @@
           "height": 233,
           "label": "Coat Check",
           "type": "inspect",
-          "description": "An old coat check — mothballs and empty hangers. Wait. There's a modern rain jacket on one hook. That doesn't belong here. The pockets have a granola bar wrapper and... a receipt from a chemical supply company. Dated last week. Someone bought antimony tartrate, glycol fog fluid, and UV-reactive paint. Paid cash — smart, no card trail. But they left the receipt in their pocket — not so smart. Antimony is a poison. Glycol is used in fog machines. UV paint makes things glow in the dark. Whoever bought this had a very specific plan. I'd better hang onto this information.",
-          "setsFlag": "found_chemical_receipt"
+          "description": "An old coat check — mothballs and empty hangers. Wait. There's a modern rain jacket on one hook. That doesn't belong here. The pockets have a granola bar wrapper and... a receipt from ChemSource Industrial Supply. Dated last week. Someone bought antimony potassium tartrate (pharmaceutical grade), glycol fog fluid, and UV-reactive paint. Paid cash — no card trail. But the account name on the receipt is 'Monarch Properties LLC.' That's not a person's name. That's a company. And it sounds an awful lot like a shell corporation someone would set up to buy a theater. Antimony is a poison. Glycol is for fog machines. UV paint makes things glow. Whoever bought this had a very specific plan — and a very specific building in mind.",
+          "setsFlag": "found_chemical_receipt",
+          "showWhen": "day_2"
         },
         {
           "id": "lobby_wall_sconce",
@@ -1308,6 +1309,49 @@
         },
 
         {
+          "id": "mo_snoop_laptop",
+          "x": 1373,
+          "y": 614,
+          "width": 168,
+          "height": 129,
+          "label": "Ashworth's Laptop (Quick!)",
+          "type": "inspect",
+          "description": "His email is open. I scroll fast — there. An email to his lawyer: 'File the condemnation order BEFORE the historical review goes through. If they grant landmark status first, we lose everything.' And below that, a draft to the insurance adjuster: 'The hazard clause triggers upon confirmed toxic contamination of the premises. Proceed with expedited assessment.' He was planning the condemnation timeline around the poisoning. Before it happened.",
+          "showWhen": "ashworth_snooping",
+          "hideWhen": "ashworth_motive_revealed",
+          "setsFlag": "found_condemnation_email",
+          "onceOnly": true
+        },
+        {
+          "id": "mo_snoop_trash",
+          "x": 1100,
+          "y": 900,
+          "width": 120,
+          "height": 100,
+          "label": "Wastebasket (Quick!)",
+          "type": "inspect",
+          "description": "A crumpled receipt from ChemSource Industrial Supply. The order: antimony potassium tartrate, 25g, pharmaceutical grade. Paid cash. The shipping address is a P.O. box, but the account name — 'Monarch Properties LLC' — that's Ashworth's shell company. The same one on the coat check receipt. He ordered the poison himself.",
+          "showWhen": "ashworth_snooping",
+          "hideWhen": "ashworth_motive_revealed",
+          "setsFlag": "found_ashworth_receipt",
+          "onceOnly": true
+        },
+        {
+          "id": "mo_snoop_burner",
+          "x": 550,
+          "y": 480,
+          "width": 100,
+          "height": 70,
+          "label": "Under the Pillow (Quick!)",
+          "type": "inspect",
+          "description": "A prepaid burner phone wedged under Ashworth's pillow. One contact: 'M. Lawson.' Three outgoing calls in the last week, all after 11 PM. The last text message sent: 'Contamination confirmed. File hazard assessment Monday.' That was sent the night BEFORE the police confirmed the poisoning. He knew what the test results would show because he already knew what was in the tea.",
+          "showWhen": "ashworth_snooping",
+          "hideWhen": "ashworth_motive_revealed",
+          "setsFlag": "found_burner_phone",
+          "onceOnly": true
+        },
+
+        {
           "id": "mo_alt_cot",
           "x": 480,
           "y": 550,
@@ -1326,7 +1370,7 @@
           "height": 90,
           "label": "Pillow",
           "type": "inspect",
-          "description": "The pillow still has the impression of his head in it. There's a folded piece of paper underneath — a handwritten note in shaky block letters: 'I KNOW WHAT YOU DID TO THE FONTAINE GIRL.' Someone was threatening Ashworth. And judging by the sleeping arrangement, it was working.",
+          "description": "The pillow still has the impression of his head in it. There's a folded piece of paper underneath — a handwritten note in shaky block letters: 'I KNOW WHAT YOU'RE REALLY DOING. THE DEMOLITION. THE INSURANCE. ALL OF IT. STOP NOW.' Someone was threatening Ashworth — and they knew about the insurance scheme. The handwriting is shaky but deliberate. Judging by the sleeping arrangement, the threat was working. Ashworth was scared enough to sleep on top of it.",
           "showWhen": "ashworth_motive_revealed",
           "setsFlag": "found_threat_to_ashworth",
           "onceOnly": true
@@ -1376,6 +1420,18 @@
           "type": "inspect",
           "description": "The painting of the Monarch's opening night, 1924. From this angle I notice something I missed before — the frame is slightly crooked. He moved it recently. The wall safe behind it is hanging open... and empty. Whatever was inside, Ashworth took it with him when he ran.",
           "showWhen": "ashworth_motive_revealed"
+        },
+        {
+          "id": "mo_alt_laptop",
+          "x": 1373,
+          "y": 614,
+          "width": 168,
+          "height": 129,
+          "label": "Laptop (Unlocked)",
+          "type": "inspect",
+          "description": "He left his laptop open. Without Ashworth hovering over my shoulder, I can read everything. The email to his lawyer is damning: 'File the condemnation order BEFORE the historical review. If they grant landmark status, we lose the insurance payout and the demolition timeline.' Below that, a sent email to 'M. Lawson, Hazard Assessment Services': 'Expect confirmed toxic contamination results within 48 hours. Begin paperwork for expedited condemnation.' That email was sent THREE DAYS before the poisoning. He wasn't predicting the future. He was planning it.",
+          "showWhen": "ashworth_motive_revealed",
+          "setsFlag": "found_damning_emails"
         },
         {
           "id": "mo_alt_door",
@@ -1649,7 +1705,7 @@
           "height": 120,
           "label": "Edwin Hale",
           "type": "talk",
-          "dialogueId": "edwin_confronted",
+          "dialogueId": "edwin_basement_confrontation",
           "showWhen": "edwins_notebook"
         },
         {

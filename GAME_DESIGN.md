@@ -16,7 +16,20 @@ When Ashworth collapses from a mysterious poisoning on the eve of demolition, Vi
 
 As Nancy, the player explores the theater, questions four suspects, collects evidence, solves puzzles, and uncovers two intertwined mysteries — a modern-day poisoning and a century-old murder.
 
-**The twist:** Theater historian Edwin Hale discovered proof that Margaux Fontaine was poisoned by her jealous understudy, Cecilia Drake, who went on to become famous using the role she stole. To stop the demolition and expose the 1928 murder, Edwin has been staging "ghost" sightings using the theater's original special effects — trapdoors, fog machines, hidden passages behind the walls. When Ashworth discovered his scheme, Edwin poisoned him (non-lethally) to buy time. The ghost is a lie built to reveal a truth.
+**The twist — two crimes, two culprits:**
+
+1. **Edwin Hale staged the ghost.** He discovered proof that Margaux Fontaine was poisoned by her jealous understudy, Cecilia Drake, who went on to become famous using the role she stole. To stop the demolition and expose the 1928 murder, Edwin has been staging "ghost" sightings using the theater's original special effects — trapdoors, fog machines, hidden passages behind the walls. He's guilty of trespassing, property damage, and fraud — sympathetic crimes driven by family grief. He's the "flawed person."
+
+2. **Ashworth poisoned himself.** The "victim" is the real villain. His demolition insurance pays $2.3 million — but only if the building is condemned as a hazard. A confirmed poisoning triggers an additional hazard condemnation clause worth $400K. Ashworth used the same poison (antimony) as the 1928 murder to make it look connected to the ghost activity, buying him a crime scene that condemns the building. The dose was precisely non-lethal because he calculated it himself. When he "flees," he's not scared — he's filing condemnation paperwork. He's guilty of insurance fraud, self-poisoning, and conspiracy to destroy a historical landmark. He's the "bad person."
+
+**Why this works as a Nancy Drew mystery:**
+- The player suspects Edwin early (ghost staging) → confirms him mid-game → then realizes the poisoning evidence doesn't fit him
+- The "victim who's actually the culprit" is a classic mystery trope
+- Every clue was fair and visible — the player can go back and realize Ashworth's victimhood was calculated performance
+- The emotional gut punch: "He looked me in the eye and told me someone poisoned him. He was the someone."
+- Vivian stays clean as the quest giver the player can trust
+- Stella is flawed (prop theft) but not criminal
+- Diego is the investigator-ally who helps Nancy crack the Ashworth connection
 
 ---
 
@@ -37,38 +50,41 @@ As Nancy, the player explores the theater, questions four suspects, collects evi
 - **Dialogue unlocks:** learned_about_margaux, learned_about_ashworth, dressing_room_key
 
 ### Edwin Hale — The Theater Historian
-- **Role:** Hidden antagonist (sympathetic)
+- **Role:** Sympathetic antagonist (ghost stager — NOT the poisoner)
 - **Age:** 50s
 - **Location:** Auditorium (Chapter 1–2), Basement (Chapter 3 — caught)
-- **Motive:** Obsessive preservationist. Discovered proof of Margaux's murder and believes exposing it will grant the theater landmark status, saving it from demolition
-- **Secret:** He IS the ghost. He's been using the theater's 1920s special effects system (fog machines, trapdoors, a hidden passage network) to stage hauntings. He poisoned Ashworth's tea with a non-lethal compound when Ashworth caught him in the basement
-- **Key info he provides:** Theater architecture, the history of *The Crimson Veil*, details about Cecilia Drake, "helpful" theories that subtly misdirect
-- **Dialogue unlocks:** learned_about_crimson_veil, learned_about_effects_system, basement_mentioned
+- **Motive:** Obsessive preservationist. Discovered proof of Margaux's murder and believes exposing it will grant the theater landmark status, saving it from demolition. His grandfather was Margaux's lover — Edwin has been carrying a promise since childhood.
+- **Secret:** He IS the ghost. He's been using the theater's 1920s special effects system (fog machines, trapdoors, a hidden passage network) to stage hauntings. He did NOT poison Ashworth — his basement chemicals are crude and homemade, incompatible with the pharmaceutical-grade antimony found in Ashworth's tea.
+- **Lies to Nancy:** Claims he hasn't been in the basement "in years" — Stella contradicts this, having seen him go down at 2 AM.
+- **Key info he provides:** Theater architecture, the history of *The Crimson Veil*, details about Cecilia Drake, "helpful" theories that subtly misdirect. During confrontation, he inadvertently reveals that only Ashworth had unsupervised access to his own tea kettle.
+- **Dialogue unlocks:** learned_about_crimson_veil, learned_about_effects_system, basement_mentioned, edwin_basement_lie, edwin_denies_poison, edwin_confronted
 
-### Roland Ashworth — The Developer
-- **Role:** Victim / suspect (recovering from poisoning)
+### Roland Ashworth — The Developer (TRUE VILLAIN)
+- **Role:** Self-poisoner / insurance fraudster / false victim
 - **Age:** 40s
-- **Location:** Manager's Office (Chapter 2–3, bedridden)
-- **Motive:** Wants to demolish the theater for profit. Not sympathetic, but didn't deserve to be poisoned
-- **Secret:** He discovered someone had been living in the basement and using the old effects systems — he was poisoned because he found out too much
-- **Key info he provides:** What he saw before collapsing, financial records showing someone's been accessing the theater at night, blueprints with hidden rooms marked
-- **Dialogue unlocks:** learned_about_basement_intruder, saw_figure_before_collapse
+- **Location:** Manager's Office (Chapter 2–3, bedridden → flees)
+- **Motive:** The demolition insurance pays $2.3M. He rejected an $800K offer from the Historical Society. A confirmed poisoning triggers a hazard condemnation clause worth $400K — fast-tracking demolition and maximizing insurance payout.
+- **Secret:** He poisoned HIMSELF with a precisely non-lethal dose of commercially-sourced antimony. His shell company (Monarch Properties LLC) purchased the poison. He manufactured a "crime scene" to condemn the building. His "figure in the doorway" testimony is fabricated — nobody else saw anyone. When confronted about the insurance, he panics and flees — not out of fear, but to file condemnation paperwork.
+- **Key clues planted for the player:** Insurance documents in the safe, condemnation emails on his laptop, chemical receipts matching his shell company, the precise non-lethal dose, the pre-poisoning email to the insurance adjuster, the buried building inspection, the pattern of insurance fraud across his previous properties.
+- **Dialogue unlocks:** learned_about_basement_intruder, saw_figure_before_collapse, ashworth_motive_revealed, ashworth_snooping
 
 ### Stella Morrow — The Stage Manager
-- **Role:** Red herring / information source
+- **Role:** Red herring / reluctant protector
 - **Age:** 30s
 - **Location:** Backstage (Chapter 1–2), Catwalk (Chapter 3)
-- **Motive:** Has keys to every room. Practical, no-nonsense. Seems suspicious because she's been secretly selling valuable theater props and artifacts to fund her mother's medical bills
-- **Secret:** She's been stealing and selling props — but she's not the ghost or the poisoner. She's terrified the investigation will expose her theft
-- **Key info she provides:** Backstage access, technical theater knowledge, who had access to what and when, the old effects manual
-- **Dialogue unlocks:** learned_about_missing_props, effects_manual_location, catwalk_access
+- **Motive:** Has keys to every room. Practical, no-nonsense. Seems suspicious because she's been secretly selling valuable theater props to fund her mother's medical bills ($47K and counting).
+- **Secret:** She's been stealing and selling props — but she's not the ghost or the poisoner. She KNOWS Edwin is the ghost and has been covering for him to protect the landmark petition. She was caught on the phone discussing this — if the player overhears, it unlocks a confrontation option.
+- **Nancy Drew mechanic:** Player can eavesdrop on Stella's phone call (cinematic) before entering backstage on Day 2. This sets the `overheard_stella` flag and unlocks "Who were you on the phone with?" as a dialogue choice.
+- **Key info she provides:** Backstage access, technical theater knowledge, who had access to what and when, the old effects manual. She also has a note from Ashworth in her lockbox: "Get me what I asked for and I'll delay the demolition six months." — evidence that Ashworth was leveraging her prop theft.
+- **Dialogue unlocks:** learned_about_missing_props, effects_manual_location, catwalk_access, overheard_stella, stella_phone_confession
 
-### Diego Reyes — The Playwright
-- **Role:** Minor character / clue source
+### Diego Reyes — The Playwright (INVESTIGATOR-ALLY)
+- **Role:** Key ally who helps crack the Ashworth connection
 - **Age:** 20s
-- **Location:** Projection Booth (Chapter 2)
-- **Provides:** Found the original annotated script of *The Crimson Veil* with strange margin notes (which encode the truth about Margaux's murder). Renting rehearsal space. Heard noises from the basement at night. Offers a fresh outsider perspective
-- **Dialogue unlocks:** annotated_script_found, heard_basement_noises
+- **Location:** Projection Booth (Chapter 2–3)
+- **Provides:** Found the original annotated script of *The Crimson Veil* with strange margin notes (encoding the truth about Margaux's murder). But more importantly, he found the chemical receipt in the coat check AND a matching receipt in Ashworth's trash. He's the one who connects the shell company to Ashworth.
+- **Nancy Drew mechanic:** Collaborative deduction — Diego and Nancy match receipts together, leading to the "he ordered the poison used on him" realization. This is a dialogue-driven investigation scene, not a puzzle.
+- **Dialogue unlocks:** annotated_script_found, heard_basement_noises, diego_receipt_match
 
 ---
 
@@ -117,18 +133,31 @@ The game is divided into three chapters. Each chapter unlocks new rooms, new dia
 
 ### Chapter 3: Final Act
 **Rooms:** All previous + Catwalk, Basement
-**Goal:** Descend into the basement, unmask the ghost, confront the truth, resolve both mysteries
+**Goal:** Confirm Edwin as ghost stager, discover his chemicals DON'T match the poisoning, realize Ashworth is the true villain, prove self-poisoning on the evidence board
 
 | Step | Action | Type | Unlocks |
 |------|--------|------|---------|
-| 1 | Catwalk — examine the lighting rig, find Edwin's notebook | Pickup | edwins_notebook item |
-| 2 | Read notebook — Edwin's research into Margaux's murder, his plan to save the theater | Inspect | Journal: "Edwin Hale has been investigating Margaux's death for years" |
-| 3 | Use basement key on basement door (Backstage) | Use item | Basement room |
-| 4 | Basement — discover the ghost setup (fog machine controls, trapdoor mechanism, costume) | Explore | Journal: "This is how the ghost was made" |
-| 5 | Confront Edwin Hale in the basement | Dialogue | Full confession — he staged everything, he poisoned Ashworth |
-| 6 | Final puzzle — Evidence Board: connect the clues to prove both cases | Puzzle (arrange) | Case closed |
-| 7 | Choose ending | Choice | Ending variant |
-| 8 | Epilogue text based on choice | Narrative | Credits |
+| 1 | Catwalk — TENSION SEQUENCE: creaking walkway, lights go out, solve lighting puzzle in darkness | Puzzle + atmosphere | edwins_notebook item |
+| 2 | WARNING NOTE — return to auditorium, find threatening note pinned to stage: "Stop digging or the next fall won't be an accident" | Cinematic | found_warning_note |
+| 3 | Lobby coat check — find the chemical receipt (gated to Day 2). "Monarch Properties LLC" | Inspect | found_chemical_receipt |
+| 4 | Ashworth's office — confront him about insurance (requires Bess's phone call). He panics, steps out → SNOOPING SEQUENCE | Dialogue + timed | ashworth_snooping → search desk, laptop, trash, pillow |
+| 5 | Ashworth flees — office transforms (alt background). Laptop unlocked, filing cabinets ransacked, safe empty, damning emails exposed | Explore | ashworth_motive_revealed, found_damning_emails, found_insurance_timeline |
+| 6 | Tea analysis — the compound is pharmaceutical grade, NOT Edwin's crude basement chemicals | Puzzle (chemistry) | poison_identified → critical finding separates Edwin from poisoning |
+| 7 | Use basement key on basement door (Backstage) | Use item | Basement room |
+| 8 | Basement — discover the ghost setup. Edwin's chemicals are visibly amateur, confirming they don't match | Explore | Journal: "This is how the ghost was made — but not how the poisoning was done" |
+| 9 | Confront Edwin — he confesses to ghost staging, DENIES poisoning. Player chooses approach (compassionate/accusatory). He reveals nobody else accessed Ashworth's tea kettle | Dialogue | edwin_confronted, edwin_denies_poison |
+| 10 | Evidence Board — TWO crime boards: 1928 murder + modern poisoning. Player must assign evidence to correct case, identify Cecilia as 1928 culprit, identify Ashworth self-poisoning as modern culprit | Puzzle (deduction) | case_closed |
+| 11 | Choose ending | Choice | Ending variant |
+| 12 | Epilogue text based on choice | Narrative | Credits |
+
+**Key Chapter 3 reveals in order:**
+1. Edwin's notebook proves he planned the ghost (expected — red herring for poisoning deepens)
+2. Warning note raises stakes — someone is watching Nancy
+3. Ashworth's snooping reveals incriminating emails/receipts
+4. Tea analysis proves the poison is commercial, not homemade (separates Edwin from poisoning)
+5. Edwin's basement chemicals visually confirm they're crude (double confirmation)
+6. Edwin's confrontation: he confesses to ghost, denies poison — and the player BELIEVES him because of #4 and #5
+7. Evidence board: player must conclude Ashworth poisoned himself — the "victim" is the villain
 
 ---
 
@@ -220,9 +249,14 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 | Type | UI | Input |
 |------|-----|-------|
 | `combination` | Three rotating number dials | Player sets each dial, submits |
-| `logic` | Text input with prompt | Player types a word/phrase |
-| `sequence` | Tap-to-order items | Player arranges items in correct sequence |
-| `compare` | Side-by-side view | Player identifies matching elements |
+| `cipher` | Drag letters to answer slots | Player selects circled letters in order |
+| `uv_trace` | UV lamp reveals letters that fade in/out | Player traces letter shapes with cursor before they fade |
+| `chemistry` | Multi-step lab analysis | Player selects reagents, compares results, identifies source |
+| `evidence_board` | Two-timeline drag-and-drop board | Player assigns evidence to cases, selects culprits |
+| `film_assembly` | Drag frames to light table | Player orders film frames chronologically |
+| `symbol_match` | Four rotating symbol dials | Player aligns theatrical symbols |
+| `lighting_board` | Colored switch panel | Player presses switches in sequence |
+| `maze` | Node-based passage map | Player navigates branching passages using blueprints |
 
 ### Puzzle List
 
@@ -230,14 +264,14 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 |--------|------|----------|--------|--------------------|
 | Dressing Room Trunk | combination | Dressing Room | 10-31-28 | Playbill date (Oct 31 1928), diary entry, Vivian dialogue |
 | Script Cipher | logic | Projection Booth (annotated script) | "goblet" | Margin notes, effects manual, Diego's observations |
-| Vanity Mirror | logic | Dressing Room (requires magnifying glass) | "cd" | Mirror wax message, wall photos, playbill understudy listing |
+| Vanity Mirror (UV Trace) | uv_trace | Dressing Room (requires UV lamp) | "cd" → Cecilia Drake | UV light reveals fading letters on mirror; player traces them to reveal "C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me." Then deduction: who is C.D.? |
 | Film Frames | sequence | Projection Booth (requires magnifying glass) | toast-drink-collapse-understudy | Script stage directions, playbill, diary entries |
 | Stella's Lockbox | combination | Backstage | 4200 | Call board inventory notice ($4,200 missing), Stella's dialogue |
 | Office Wall Safe | combination | Manager's Office | 1928 | Ashworth's ghost book, heritage filing, playbills everywhere |
 | Lighting Sequence | sequence | Catwalk | red-blue-white-red | Effects manual, annotated script symbols, Edwin's seat note |
 | Hidden Passage | logic | Basement (requires blueprints) | "dressing room" | Blueprints, heating vent in dressing room, passage entrance |
-| Poison Identification | logic | Inventory (requires teacup + alchemy book) | "antimony" | Alchemy book annotations, diary symptoms, basement chemicals |
-| Evidence Board | sequence | Basement (final) | cecilia-goblet-margaux-edwin-ghost-ashworth | All journal entries and collected evidence |
+| Poison Identification | chemistry | Office (requires teacup + alchemy book) | antimony (pharmaceutical grade) | Alchemy book, diary symptoms. **Critical 4th step:** compare purity — commercial vs Edwin's crude chemicals. This separates Edwin from the poisoning. |
+| Evidence Board | evidence_board | Basement (final) | Two cases: 1928 murder (Cecilia) + modern poisoning (Ashworth self-inflicted) | Player assigns evidence cards to correct timeline, selects culprit for each. Ghost evidence is "neither" case. Ashworth's testimony is a red herring. |
 
 ### Puzzle Feedback
 - **Wrong answer:** Gentle shake animation, "That doesn't seem right" text, no penalty
@@ -310,7 +344,57 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 
 ---
 
-## 8. JOURNAL / CLUE BOARD
+## 8. NANCY DREW MECHANICS
+
+These are the signature detective gameplay elements that make this feel like a real Nancy Drew game — not just clicking and reading.
+
+### Snooping Under Pressure (Ashworth's Office)
+- **Trigger:** Ask Ashworth about insurance during Day 2 revisit → he panics and steps out
+- **Mechanic:** `ashworth_snooping` flag is set. Three hidden hotspots appear in the office: laptop, wastebasket, pillow. The player can examine any of them while he's gone.
+- **Each hotspot sets a flag** (found_condemnation_email, found_ashworth_receipt, found_burner_phone) and is `onceOnly`
+- **Design goal:** Classic Nancy Drew "search the room before they come back" tension
+
+### Eavesdropping (Stella's Phone Call)
+- **Trigger:** Entering backstage on Day 2
+- **Mechanic:** Cinematic plays before the room loads — Nancy overhears Stella on the phone discussing Edwin and the ghost. Sets `overheard_stella` flag.
+- **Consequence:** Unlocks "Who were you on the phone with?" as a confrontation option in Stella's dialogue
+- **Design goal:** Give the player information advantage — they know Stella is hiding something before the conversation starts
+
+### Catching a Lie (Edwin's Basement Denial)
+- **Setup:** Edwin tells Nancy he "hasn't been in the basement in years" during Day 2 revisit
+- **Payoff:** Stella independently confirms she sees him going down there at 2 AM. The player notices the contradiction.
+- **Mechanic:** `edwin_basement_lie` flag is set. No immediate consequence — it's a credibility marker that makes the basement confrontation more satisfying.
+
+### Danger / Warning Moment
+- **Trigger:** Returning to auditorium after unlocking the catwalk
+- **Mechanic:** Cinematic — Nancy finds a threatening note pinned to the stage: "Stop digging or the next fall won't be an accident."
+- **Sets flag:** `found_warning_note`. Player doesn't know who left it — could be Edwin, could be Ashworth. Adds genuine tension.
+
+### Phone Friends as Investigation Tools
+- **Day 2 phone calls** give the player ACTION ITEMS, not just flavor:
+  - **Bess:** Ashworth's company has filed 3 insurance claims in 5 years. Pattern of fraud.
+  - **George:** Building inspection was buried. Inspector M. Lawson signed off on Ashworth's previous demolitions.
+  - **Ned:** Non-lethal dose is harder to calculate than lethal. Easier if you're doing it to yourself.
+- Each call sets a flag that unlocks new dialogue options and investigation paths
+
+### Collaborative Deduction (Diego + Nancy)
+- **Trigger:** Talk to Diego in projection booth after finding coat check receipt
+- **Mechanic:** Dialogue-driven scene where Diego shows Nancy matching receipts from the coat check and Ashworth's trash. Same shell company, same compound. They deduce together that Ashworth ordered the poison used on him.
+- **Sets flag:** `diego_receipt_match`. This is the player's "aha" moment.
+
+### Multi-Step UV Mirror Puzzle
+- **Type:** `uv_trace` — player traces shimmering letters with cursor before they fade
+- **Three lines revealed progressively:** "C.D. brings the tea" → "C.D. changed the goblet" → "C.D. will be the death of me"
+- **Each line gets harder** (shimmer duration decreases, fade is faster)
+- **Then deduction:** Player selects "Cecilia Drake" from multiple choice options
+
+### Chemistry Mini-Game (Poison Analysis)
+- **Four steps:** Heat sample → Add reagent (choose from 3) → Compare profile (choose from 3) → **Determine source** (choose: Edwin's crude chemicals vs commercial pharmaceutical vs inconclusive)
+- **The 4th step is the twist:** It proves the poison is commercial-grade, NOT from Edwin's basement. This is the moment the player should start questioning the "Edwin did everything" theory.
+
+---
+
+## 9. JOURNAL / CLUE BOARD
 
 ### Journal
 - Accessed via "Journal" button in the UI bar
@@ -320,11 +404,16 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 - New entries flash the Journal button gold briefly
 
 ### Evidence Board (Chapter 3 — Final Puzzle)
-- Visual board where collected evidence is arranged
-- Player places journal entries / items in chronological order to connect both mysteries
-- Two timelines must be solved: the 1928 murder AND the modern-day poisoning
-- Completing the board triggers the final confrontation with Edwin
-- This IS the final puzzle — it proves Nancy has pieced both stories together
+- **Two crime boards side by side:** 1928 Murder and Modern Poisoning
+- Player drags evidence cards to the correct case board
+- For each case, player must identify: **culprit**, **method**, and assign the correct evidence
+- **1928 case:** Cecilia Drake → poisoned prop goblet → Margaux died on stage
+- **Modern case:** Roland Ashworth (self-inflicted) → pharmaceutical-grade antimony → insurance fraud scheme
+- Ghost-related evidence (Edwin's notebook, fog controls) belongs to NEITHER case — they're a separate crime
+- Ashworth's "figure in the doorway" testimony is flagged as a red herring — nobody corroborated it
+- **Wrong answer feedback:** "The basement chemicals don't match the toxicology report" / "That evidence belongs to the other timeline"
+- Completing the board triggers the case resolution — Nancy realizes the "victim" poisoned himself
+- This IS the final puzzle — it proves the player has separated three threads: 1928 murder, ghost staging, and insurance fraud
 
 ### Journal Entry Examples
 
@@ -339,7 +428,7 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 
 ---
 
-## 9. SAVE SYSTEM
+## 10. SAVE SYSTEM
 
 - Auto-save on room transitions and after major events (puzzle solved, chapter change)
 - Manual save via pause menu
@@ -349,7 +438,7 @@ Each puzzle has a UI modal that appears over the game. All puzzles are solvable 
 
 ---
 
-## 10. UI / UX
+## 11. UI / UX
 
 ### Screen Layout (during gameplay)
 
@@ -389,7 +478,7 @@ Full-screen game viewport with thin gold art-deco frame (6px borders). A floatin
 
 ---
 
-## 11. AUDIO
+## 12. AUDIO
 
 ### Audio Systems (Built)
 
@@ -464,7 +553,7 @@ In `dialogue.json`, add `"vo": "vo_vivian_intro_01"` to any line that has record
 
 ---
 
-## 11b. VISUAL ENHANCEMENT SYSTEMS
+## 12b. VISUAL ENHANCEMENT SYSTEMS
 
 ### Multi-Perspective Room Backgrounds
 
@@ -597,7 +686,7 @@ Files: `assets/cinematics/{videoKey}.mp4` (1080p preferred, H.264)
 
 ---
 
-## 11c. DIFFICULTY MODES (Future)
+## 12c. DIFFICULTY MODES (Future)
 
 ### Junior Detective / Senior Detective
 
@@ -616,7 +705,7 @@ If fail states are ever added (e.g., getting caught by Edwin, time-sensitive eve
 
 ---
 
-## 12. IMPLEMENTATION STATUS
+## 13. IMPLEMENTATION STATUS
 
 ### What's Built
 
@@ -712,31 +801,31 @@ If fail states are ever added (e.g., getting caught by Edwin, time-sensitive eve
 
 ---
 
-## 13. THE THREE ENDINGS
+## 14. THE THREE ENDINGS
 
-After completing the Evidence Board, Nancy confronts Edwin. The player makes a final choice:
+After completing the Evidence Board, Nancy has proven two things: Edwin staged the ghost, and Ashworth poisoned himself for insurance fraud. The player makes a final choice about how to handle both truths.
 
-### Ending A: Justice
-**Choice:** "I'm calling the police. You poisoned someone, Edwin."
-- Edwin is arrested. The 1928 murder evidence is turned over to historians. The theater's fate is uncertain — the landmark petition is filed but may not save it in time. Ashworth recovers and likely proceeds with demolition.
-- **Tone:** Bittersweet. Justice is served, but the theater may still fall. Nancy upholds the law.
-- **Final line:** *"Sometimes the truth isn't enough to save what we love. But it's always enough to matter."*
+### Ending A: Full Justice
+**Choice:** "I'm calling the police. Both of them — Edwin for the ghost fraud, Ashworth for the insurance scheme."
+- Edwin is charged with trespassing and property damage (misdemeanor). Ashworth is arrested for insurance fraud and filing a false police report (felony). The 1928 murder evidence is turned over to historians. Cecilia Drake's legacy is destroyed. The landmark petition is filed and the theater is likely saved — but Edwin won't be there to see it.
+- **Tone:** Bittersweet. Justice is complete, but the man who loved the theater most will be barred from entering it. Nancy upholds the law without exception.
+- **Final line:** *"Sometimes the truth saves what we love by destroying the people who loved it most. That's not justice — that's just how it works."*
 
 ### Ending B: Exposure
-**Choice:** "Let's go public. The 1928 murder, the cover-up — all of it. Together."
-- Nancy and Edwin hold a press conference. The story goes viral. Public pressure forces a landmark designation hearing. Edwin faces charges for the poisoning but becomes a folk hero. The theater is likely saved.
-- **Tone:** Hopeful but complex. Edwin did wrong, but the greater truth prevails. Nancy bends the rules.
-- **Final line:** *"The Monarch's lights came on for the first time in years. Not for a ghost — for the woman who deserved to be remembered."*
+**Choice:** "We go public with everything. The 1928 murder, the ghost, Ashworth's fraud. Let the world decide."
+- Nancy and Edwin hold a press conference. The 1928 murder goes viral. Public pressure forces emergency landmark designation. Ashworth's insurance scheme is exposed by journalists. Edwin faces minor charges but becomes a folk hero — the man who faked a ghost to save a theater. Ashworth faces federal fraud charges. The theater is definitively saved.
+- **Tone:** Hopeful and triumphant. Edwin did wrong, but the greater truth prevails. The theater gets a second life. Nancy bends the rules to serve a bigger justice.
+- **Final line:** *"The Monarch's lights came on for the first time in years. Not for a ghost — for the woman who deserved to be remembered. And for the man who never stopped fighting for her."*
 
-### Ending C: Mercy
-**Choice:** "Walk away, Edwin. Disappear. I'll make sure Margaux's story gets told."
-- Nancy lets Edwin go. She anonymously leaks the 1928 murder evidence to the press. The theater is saved, Margaux's name is cleared, but Ashworth's poisoning is never solved. Nancy compromises her principles.
-- **Tone:** Morally grey. The theater is saved and the old wrong is righted, but a new wrong goes unpunished.
-- **Final line:** *"I told myself it was the right call. I still tell myself that. Most days, I believe it."*
+### Ending C: Selective Truth
+**Choice:** "I'll report Ashworth. But Edwin — you walk away. Quietly. I'll make sure Margaux's story gets told."
+- Nancy turns in Ashworth for the insurance fraud but lets Edwin go. She files the landmark petition herself using Cecilia's confession letter. The theater is saved. Edwin disappears — maybe to write that book, maybe just to grieve in peace. The ghost staging is never publicly explained. Some people still believe.
+- **Tone:** Morally complex. The theater is saved and the real criminal is caught, but Nancy chose who deserves punishment and who deserves mercy. She's not comfortable with that, and neither should the player be.
+- **Final line:** *"I told myself I did the right thing. The theater is saved. Ashworth is in custody. Margaux is remembered. But sometimes at night, I think about Edwin in that basement, keeping a promise to a dead man, and I wonder — when does love become a crime? And who gets to decide?"*
 
 ---
 
-## 14. DESIGN PRINCIPLES
+## 15. DESIGN PRINCIPLES
 
 These are non-negotiable rules that every contributor (human or AI agent) must follow:
 
@@ -753,7 +842,7 @@ These are non-negotiable rules that every contributor (human or AI agent) must f
 
 ---
 
-## 15. AGENT WORKFLOW
+## 16. AGENT WORKFLOW
 
 When assigning tasks to an AI coding agent (Codex, Claude, etc.), follow this sequence:
 
@@ -782,7 +871,7 @@ Run npm run build when done. Summarize all changes.
 
 ---
 
-## 16. ASSET TRACKER
+## 17. ASSET TRACKER
 
 Complete inventory of all assets — what exists, what needs to be created. Updated as assets are completed.
 
