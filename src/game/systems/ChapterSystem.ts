@@ -22,7 +22,7 @@ const CHAPTER_MILESTONES: ChapterMilestone[] = [
       { type: 'flag', id: 'learned_about_margaux' },
       { type: 'flag', id: 'learned_about_crimson_veil' },
     ],
-    journalEntry: 'Chapter 2: The investigation deepens. I\'ve learned about Margaux Fontaine and The Crimson Veil. Time to explore the theater thoroughly — the dressing rooms, projection booth, and anyone who might know more.',
+    journalEntry: 'The investigation deepens. I\'ve learned about Margaux Fontaine and The Crimson Veil. Time to explore the theater thoroughly — the dressing rooms, projection booth, and anyone who might know more.',
   },
   {
     // Chapter 3: Unlocked after finding key evidence and discovering the ghost is fake
@@ -32,7 +32,7 @@ const CHAPTER_MILESTONES: ChapterMilestone[] = [
       { type: 'item', id: 'margaux_diary' },
       { type: 'flag', id: 'learned_about_cecilia' },
     ],
-    journalEntry: 'Chapter 3: I know where the basement key is hidden, I have Margaux\'s diary, and I know about Cecilia Drake. The pieces are coming together. Someone is staging a ghost — and I think I know who.',
+    journalEntry: 'I know where the basement key is hidden, I have Margaux\'s diary, and I know about Cecilia Drake. The pieces are coming together. Someone is staging a ghost — and I think I know who.',
   },
   {
     // Chapter 4: Unlocked after solving major puzzles and confronting Edwin
@@ -42,7 +42,7 @@ const CHAPTER_MILESTONES: ChapterMilestone[] = [
       { type: 'puzzle', id: 'trunk_puzzle' },
       { type: 'flag', id: 'saw_ghost' },
     ],
-    journalEntry: 'Chapter 4: I\'ve found the basement key, opened Margaux\'s trunk, and seen the "ghost" firsthand. But something doesn\'t add up — the poisoning and the ghost feel like two different crimes. Time to go below the stage and find out.',
+    journalEntry: 'I\'ve found the basement key, opened Margaux\'s trunk, and seen the "ghost" firsthand. But something doesn\'t add up — the poisoning and the ghost feel like two different crimes. Time to go below the stage and find out.',
   },
   {
     // Chapter 5: The endgame — after confronting Edwin AND discovering Ashworth's fraud
@@ -52,7 +52,7 @@ const CHAPTER_MILESTONES: ChapterMilestone[] = [
       { type: 'item', id: 'cecilia_letter' },
       { type: 'flag', id: 'ashworth_motive_revealed' },
     ],
-    journalEntry: 'Chapter 5: Edwin confessed to the ghost staging — but he didn\'t poison Ashworth. The chemicals don\'t match. The insurance records don\'t lie. And the "victim" ran when I got too close. It\'s time to prove what really happened — and who the real criminal is.',
+    journalEntry: 'Edwin confessed to the ghost staging — but he didn\'t poison Ashworth. The chemicals don\'t match. The insurance records don\'t lie. And the "victim" ran when I got too close. It\'s time to prove what really happened — and who the real criminal is.',
   },
 ];
 
@@ -111,13 +111,17 @@ export class ChapterSystem {
   }
 
   getChapterTitle(chapter: number): string {
+    // Internal chapters 1-5 map to 3 nights over 72 hours
+    // Ch 1-2 = Night 1 (arrive, meet cast, ghost sighting — 72→48 hours)
+    // Ch 3   = Night 2 (deep investigation, snooping, catwalk — 48→24 hours)
+    // Ch 4-5 = Night 3 (basement, confrontation, evidence board — final 24 hours)
     const titles: Record<number, string> = {
-      1: 'Act I — The Invitation',
-      2: 'Act II — Behind the Curtain',
-      3: 'Act III — The Ghost\'s Secret',
-      4: 'Act IV — Beneath the Stage',
-      5: 'Act V — The Final Curtain',
+      1: 'Night 1 — 72 Hours Remain',
+      2: 'Night 1 — 72 Hours Remain',
+      3: 'Night 2 — 48 Hours Remain',
+      4: 'Night 3 — 24 Hours Remain',
+      5: 'Night 3 — The Final Hours',
     };
-    return titles[chapter] || `Chapter ${chapter}`;
+    return titles[chapter] || `Night ${chapter}`;
   }
 }

@@ -3,34 +3,34 @@ import { TextColors, FONT } from '../utils/constants';
 
 const TRANSITIONS: Record<number, { title: string; subtitle: string; time: string; description: string }> = {
   1: {
-    title: 'Act I',
-    subtitle: 'The Invitation',
-    time: 'Night 1 — 9:00 PM',
+    title: 'Night 1',
+    subtitle: '72 Hours Remain',
+    time: '9:00 PM — Three Days Until Demolition',
     description: 'The Monarch Theatre stands dark against the city skyline.\nA single light burns in the lobby window.\nI push through the heavy front doors, and the smell of a century hits me — velvet, dust, and something faintly like roses.',
   },
   2: {
-    title: 'Act II',
+    title: 'Night 1',
     subtitle: 'Behind the Curtain',
-    time: 'Night 1 — 11:30 PM',
+    time: '11:30 PM',
     description: 'The theater grows quieter as midnight approaches.\nTwo people have been poisoned in this building. Same method. Nearly a century apart.\nSomewhere below the stage, machinery hums — and I don\'t think it\'s supposed to.',
   },
   3: {
-    title: 'Act III',
-    subtitle: 'The Ghost\'s Secret',
-    time: 'Day 2 — 2:00 AM',
-    description: 'I\'ve been in this theater for five hours and I\'ve already seen a ghost.\nOr someone who wants me to think I have.\nThe fog machine, the costumes, the whispered lines — someone is performing, and I\'m the audience.',
+    title: 'Night 2',
+    subtitle: '48 Hours Remain',
+    time: '10:00 PM — Two Days Until Demolition',
+    description: 'I barely slept. Every time I closed my eyes, I saw that face on the stage.\nBut I spent the day on the phone. Bess found a pattern. George found a cover-up.\nTonight I go deeper. The ghost is a lie — but the poisoning might be a bigger one.',
   },
   4: {
-    title: 'Act IV',
-    subtitle: 'Beneath the Stage',
-    time: 'Day 2 — 6:00 AM',
-    description: 'Dawn light filters through dusty windows, but it doesn\'t reach the basement.\nThe key feels heavy in my pocket. Every clue has led here.\nWhatever truth the Monarch is hiding, it\'s waiting below the stage.',
+    title: 'Night 3',
+    subtitle: '24 Hours Remain',
+    time: '11:00 PM — Final Night',
+    description: 'The basement key feels heavy in my pocket.\nI know who staged the ghost. I know who fled the building.\nWhatever truth the Monarch is hiding, it\'s buried below the stage.\nTwenty-four hours. Then the wrecking ball.',
   },
   5: {
-    title: 'Act V',
-    subtitle: 'The Final Curtain',
-    time: 'Day 2 — 8:00 AM',
-    description: 'The demolition crew arrives in twelve hours.\nI know who poisoned Ashworth. I know who\'s been playing ghost.\nNow I have to decide what to do about it.',
+    title: 'Night 3',
+    subtitle: 'The Final Hours',
+    time: '2:00 AM — Hours Until Demolition',
+    description: 'Edwin confessed to the ghost. But not the poisoning.\nThe chemicals don\'t match. The insurance records don\'t lie.\nThe "victim" ran when I got too close.\nOne puzzle left. One truth to prove.',
   },
 };
 

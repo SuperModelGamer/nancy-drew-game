@@ -755,6 +755,107 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
       addJournal: 'Someone left a threatening note pinned to the stage: "Stop digging or the next fall won\'t be an accident." They know I was on the catwalk. They\'re watching. The question is — who has more to lose? Edwin protecting his ghost scheme, or Ashworth protecting his insurance fraud?',
     },
   },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CINEMATIC 7: "Night 3 — 24 Hours"
+  // Plays on first entry to the basement.
+  // Time passage: Night 2 → Night 3. Nancy drove home, barely slept again,
+  // and came back for the final night. 24 hours until demolition.
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'night_3_transition',
+    triggerRoom: 'basement',
+    triggerFlag: '',
+    videoKey: 'cinematic_night3_transition',
+    slides: [
+      {
+        lines: [
+          'I drove home at dawn.',
+          '',
+          'The sun was coming up over River Heights',
+          'and I couldn\'t stop thinking about',
+          'Ashworth\'s laptop.',
+        ],
+        effect: 'fade',
+        pauseAfter: 2500,
+        bgImage: 'intro_exterior',
+        bgAlpha: 0.4,
+        camera: { scaleFrom: 1.0, scaleTo: 1.04, panY: -3 },
+        vignetteIntensity: 0.7,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'Two crimes.',
+          'Two criminals.',
+          '',
+          'Edwin staged a ghost to save a theater.',
+          'But someone else staged a poisoning',
+          'to destroy it.',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 3000,
+        bgImage: 'intro_poison_bottle',
+        bgAlpha: 0.35,
+        camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: 5 },
+        vignetteIntensity: 0.8,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'I spent the day at my desk.',
+          'Notes spread across every surface.',
+          'Insurance records. Chemical receipts.',
+          'A shell company called Monarch Properties LLC.',
+          '',
+          'The "victim" who ran when I got too close.',
+        ],
+        effect: 'fade',
+        pauseAfter: 3000,
+        vignetteIntensity: 0.75,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'Tonight I go back for the last time.',
+          '',
+          'Twenty-four hours until the wrecking ball.',
+          'Twenty-four hours to prove what',
+          'really happened.',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 2500,
+        bgImage: 'intro_exterior',
+        bgAlpha: 0.3,
+        camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: -5 },
+        vignetteIntensity: 0.85,
+        letterbox: true,
+        audio: [
+          { key: 'proc:ghostDrone', delay: 200, volume: 0.1 },
+        ],
+      },
+      {
+        lines: [
+          'The basement.',
+          '',
+          'That\'s where it ends.',
+          'That\'s where the truth is buried.',
+          'Literally.',
+        ],
+        effect: 'dramatic',
+        pauseAfter: 2000,
+        vignetteIntensity: 0.9,
+        letterbox: true,
+        audio: [
+          { key: 'proc:shimmer', delay: 500 },
+        ],
+      },
+    ],
+    onComplete: {
+      setFlag: 'night_3',
+      addJournal: 'Night 3. The final night. Twenty-four hours until the Monarch comes down. I know Edwin staged the ghost. I know Ashworth staged the poisoning. Now I need to prove both — and whatever\'s hidden in the basement walls is the last piece.',
+    },
+  },
 ];
 
 // ─── Public helper for checking triggerable cinematics ───────────────────────
