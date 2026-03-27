@@ -433,12 +433,14 @@
         },
         {
           "id": "unusual",
+          "triggerEvent": "learned_about_missing_props",
           "lines": [
             { "speaker": "Stella", "text": "Unusual? In this building? Where do I start?" },
             { "speaker": "Stella", "text": "Three months ago I found fresh footprints in old prop storage — a section nobody uses. Size eleven men's shoes. I mentioned it to Ashworth. He told me to 'stop being dramatic.' I'm a stage manager. Being dramatic is literally my job." },
             { "speaker": "Nancy", "text": "And more recently?" },
             { "speaker": "Stella", "text": "Noises. From below the stage. The kind of mechanical sounds this building hasn't made in decades. And the fog machine — I maintain it, I know exactly how much fluid is in it. Someone's been using it at night. I check the levels every morning. They don't lie." },
-            { "speaker": "Stella", "text": "Look, I don't know what's going on down there. But someone is using my equipment without permission, and that bothers me more than any ghost." }
+            { "speaker": "Stella", "text": "And props have been disappearing. Small things at first — a candlestick, a period-correct clock. Then bigger items. A Tiffany lamp from the balcony, gone. I keep a full inventory. Things don't just walk off." },
+            { "speaker": "Stella", "text": "Look, I don't know what's going on down there. But someone is using my equipment and taking my props without permission, and that bothers me more than any ghost." }
           ],
           "nextNode": "end"
         },
@@ -1437,12 +1439,22 @@
               "requiredFlag": "saw_ghost"
             },
             {
+              "text": "I saw the ghost, Stella. Someone's using your equipment to stage it.",
+              "nextNode": "ghost_confrontation",
+              "requiredFlag": "saw_ghost"
+            },
+            {
               "text": "You seem stressed.",
               "nextNode": "stressed"
             },
             {
               "text": "Tell me about working backstage.",
               "nextNode": "backstage_life"
+            },
+            {
+              "text": "I found blueprints with hidden passages marked. Do you know about these?",
+              "nextNode": "passages_reaction",
+              "requiredItem": "blueprints"
             },
             {
               "text": "Is there anything else I should know?",
@@ -1478,6 +1490,23 @@
               "nextNode": "start"
             }
           ]
+        },
+        {
+          "id": "ghost_confrontation",
+          "lines": [
+            { "speaker": "Stella", "text": "You saw — okay. Sit down. And don't drop that sandbag." },
+            { "speaker": "Stella", "text": "I've been going back and forth about telling you this for days. Losing sleep. Which is saying something, because I was already running on fumes." },
+            { "speaker": "Nancy", "text": "Someone is using the fog machines, the trapdoor, and the lighting rig to stage a ghost. Professional-grade work." },
+            { "speaker": "Stella", "text": "I know. Because there's only one person in this building with the knowledge and the obsession to pull that off. And it's not me." },
+            { "speaker": "Nancy", "text": "Edwin." },
+            { "speaker": "Stella", "text": "I've seen him going down to the basement at night. Two AM, three AM — always through the backstage door. I hear the trapdoor mechanism warming up. The counterweights shifting. Then fog rolls across the stage and the show starts." },
+            { "speaker": "Stella", "text": "I left him a note under the basement door — 'Stop now or I go to the police.' He never responded. Never even acknowledged it." },
+            { "speaker": "Nancy", "text": "Why didn't you say anything sooner?" },
+            { "speaker": "Stella", "text": "Because part of me wanted it to work, okay? If a ghost story could get this building landmark status, could stop the wrecking ball — who was I to ruin that? This theater is the only thing I've got left." },
+            { "speaker": "Stella", "text": "But then Ashworth got poisoned. And I realized Edwin had crossed a line that I can't pretend away. You need to get down to that basement." }
+          ],
+          "nextNode": "stella_reveals_edwin",
+          "triggerEvent": "stella_confession"
         },
         {
           "id": "stella_on_ghost",
@@ -1552,6 +1581,47 @@
             { "speaker": "Stella", "text": "I measured. Of course I measured. I also took a photo, which is on my phone, which I will show you if you ask nicely. I don't do things halfway, Drew. Unlike some people in this building who shall remain nameless but whose initials are R.A." }
           ],
           "nextNode": "start"
+        },
+        {
+          "id": "passages_reaction",
+          "lines": [
+            { "speaker": "Stella", "text": "Where did you get — let me see those." },
+            { "speaker": "Stella", "text": "I knew about the passages — the effects manual mentions them in chapter six. But I've never seen a complete map like this. Someone drew these annotations by hand. Recently." },
+            { "speaker": "Nancy", "text": "The markings show connections between the basement, the dressing room, the orchestra pit, and the lobby. Someone could move through the entire building without being seen." },
+            { "speaker": "Stella", "text": "Someone like our ghost." },
+            { "speaker": "Stella", "text": "Okay, look — this passage connects the basement to the dressing room. And this one goes from behind the orchestra pit to the lobby. Whoever mapped these knew exactly what they were doing." }
+          ],
+          "choices": [
+            {
+              "text": "Have you ever been in the passages yourself?",
+              "nextNode": "passage_experience"
+            },
+            {
+              "text": "Can you get me to the catwalk? If someone's been running a light show, that's where they set it up.",
+              "nextNode": "catwalk_unlock"
+            }
+          ]
+        },
+        {
+          "id": "passage_experience",
+          "lines": [
+            { "speaker": "Stella", "text": "Once. Last month. Two AM — I was here doing lighting inventory because apparently that's my life now. I heard footsteps behind the backstage wall. Told myself it was the building settling." },
+            { "speaker": "Stella", "text": "But buildings don't settle in rhythm. Someone was walking back there. Steady, purposeful. They knew exactly where they were going." },
+            { "speaker": "Nancy", "text": "Someone who's studied these blueprints." },
+            { "speaker": "Stella", "text": "There's only one person who knows this theater well enough to navigate those passages in the dark. And he's been here every day for fifteen years. Do the math." },
+            { "speaker": "Stella", "text": "You need to get to the catwalk. I'll unlock the ladder — the lock sticks, but I'll deal with it. There's a lighting board up there. If someone's been running a light show, that's where they programmed it." }
+          ],
+          "triggerEvent": "catwalk_access"
+        },
+        {
+          "id": "catwalk_unlock",
+          "lines": [
+            { "speaker": "Stella", "text": "The catwalk. Yeah, that's exactly what I was thinking." },
+            { "speaker": "Stella", "text": "I'll unlock the ladder for you — fair warning, it's original 1920s metalwork and it creaks like a horror movie. But the lighting board up there controls everything — fog cues, spot sequences, the whole show." },
+            { "speaker": "Nancy", "text": "If someone programmed a ghost performance, the evidence would be up there." },
+            { "speaker": "Stella", "text": "Just be careful. I've already got one person poisoned and a ghost haunting the building — I don't need someone falling off a ninety-year-old catwalk. And whatever you find... remember that not everyone in this theater is a villain. Some of us are just trying to keep the lights on. Literally." }
+          ],
+          "triggerEvent": "catwalk_access"
         },
         {
           "id": "farewell",

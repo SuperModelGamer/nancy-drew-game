@@ -128,7 +128,7 @@
           "label": "Vivian Delacroix",
           "type": "talk",
           "dialogueId": "vivian_intro_revisit",
-          "showWhen": "left_lobby_after_intro",
+          "showWhen": "ashworth_office",
           "hideWhen": "vivian_full_trust"
         },
         {
@@ -194,6 +194,17 @@
           "dialogueId": "phone_calls",
           "showWhen": "vivian_intro",
           "hideWhen": "called_ned"
+        },
+        {
+          "id": "lobby_phone_done",
+          "x": 438,
+          "y": 634,
+          "width": 81,
+          "height": 44,
+          "label": "Lobby Phone",
+          "type": "talk",
+          "dialogueId": "phone_calls_done",
+          "showWhen": "called_ned"
         },
         {
           "id": "lobby_managers_door",
@@ -416,7 +427,7 @@
           "label": "To Dressing Rooms",
           "type": "navigate",
           "targetRoom": "dressing_room",
-          "showWhen": "chapter_2"
+          "showWhen": "stella_backstage"
         },
         {
           "id": "aud_projection_stairs",
@@ -675,9 +686,9 @@
           "y": 971,
           "width": 166,
           "height": 163,
-          "label": "To Projection Booth",
+          "label": "To Dressing Room",
           "type": "navigate",
-          "targetRoom": "projection_booth",
+          "targetRoom": "dressing_room",
           "showWhen": "stella_backstage"
         }
       ]
