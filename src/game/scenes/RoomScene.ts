@@ -256,7 +256,7 @@ export class RoomScene extends Phaser.Scene {
       });
     }
 
-    // Ambient phone ringing in lobby — starts after talking to Vivian, stops on pickup
+    // Ambient phone ringing in lobby — starts after Vivian's dialogue ENDS, stops on pickup
     this.phoneRinging = false;
     if (this.currentRoom.id === 'lobby') {
       const save = SaveSystem.getInstance();
@@ -274,31 +274,43 @@ export class RoomScene extends Phaser.Scene {
       }
 
       // Also listen for vivian_intro completing mid-scene (first playthrough)
+      // Wait for dialogue to fully end before starting the ring
       const checkPhoneAfterIntro = () => {
         if (save.getFlag('vivian_intro') && !save.getFlag('used_hotspot_lobby_phone') && !this.phoneRinging) {
-          this.time.delayedCall(2000, () => {
-            if (!this.phoneRinging && !save.getFlag('used_hotspot_lobby_phone')) {
-              this.phoneRinging = true;
-              UISounds.phoneRingStart();
-            }
+          save.offChange(checkPhoneAfterIntro);
+          const waitForDialogueEnd = this.time.addEvent({
+            delay: 500,
+            loop: true,
+            callback: () => {
+              let dialogueActive = false;
+              try { dialogueActive = DialogueSystem.getInstance().isActive(); } catch { /* not ready */ }
+              if (!dialogueActive) {
+                waitForDialogueEnd.destroy();
+                this.time.delayedCall(1500, () => {
+                  if (!this.phoneRinging && !save.getFlag('used_hotspot_lobby_phone')) {
+                    this.phoneRinging = true;
+                    UISounds.phoneRingStart();
+                  }
+                });
+              }
+            },
           });
         }
       };
       save.onChange(checkPhoneAfterIntro);
       this.events.once('shutdown', () => save.offChange(checkPhoneAfterIntro));
-    }
 
-    // Play dial tone SFX when Nancy hangs up the phone (only if not already triggered)
-    const saveInst = SaveSystem.getInstance();
-    if (!saveInst.getFlag('phone_hangup')) {
-      const checkPhoneHangup = () => {
-        if (saveInst.getFlag('phone_hangup')) {
-          UISounds.phoneDialTone();
-          saveInst.offChange(checkPhoneHangup);
-        }
-      };
-      saveInst.onChange(checkPhoneHangup);
-      this.events.once('shutdown', () => saveInst.offChange(checkPhoneHangup));
+      // Play dial tone SFX when Nancy hangs up the phone (lobby only)
+      if (!save.getFlag('phone_hangup')) {
+        const checkPhoneHangup = () => {
+          if (save.getFlag('phone_hangup')) {
+            UISounds.phoneDialTone();
+            save.offChange(checkPhoneHangup);
+          }
+        };
+        save.onChange(checkPhoneHangup);
+        this.events.once('shutdown', () => save.offChange(checkPhoneHangup));
+      }
     }
 
     // Stop phone ringing on scene shutdown (room transition)

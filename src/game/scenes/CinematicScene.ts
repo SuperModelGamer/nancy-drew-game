@@ -33,9 +33,13 @@ interface CinematicEvent {
   overlayText?: { text: string; delay: number; duration?: number; style?: 'title' | 'subtitle' | 'time' | 'body'; y?: number }[];
   slides: Slide[];
   onComplete?: {
-    setFlag?: string;
+    setFlag?: string | string[];
     addJournal?: string;
   };
+  /** When true, the next cinematic check fires immediately (no skipCinematic on return). */
+  chainNext?: boolean;
+  /** Override the room the player returns to after the cinematic (defaults to triggerRoom). */
+  targetRoomOverride?: string;
 }
 
 const CINEMATIC_EVENTS: CinematicEvent[] = [
@@ -303,15 +307,18 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // CINEMATIC 4: "The Apparition"
-  // Plays when returning to auditorium after hearing ghost rumors.
-  // Nancy sees the ghost herself — first person, pulse-pounding.
+  // CINEMATIC 4: "The Apparition / The Next Night"
+  // Plays when returning to auditorium after meeting Diego in the booth.
+  // Combined ghost sighting + time passage in one cinematic.
+  // Nancy sees the ghost, leaves shaken, and returns the next night.
+  // After the cinematic, the player lands in the lobby for Day 2.
   // ═══════════════════════════════════════════════════════════════════════════
   {
-    id: 'ghost_sighting_auditorium',
+    id: 'ghost_and_day2',
     triggerRoom: 'auditorium',
-    triggerFlag: 'seen_event_ghost_rumors',
-    videoKey: 'cinematic_ghost_sighting',
+    triggerFlag: 'diego_booth',
+    videoKey: 'cinematic_ghost_and_day2',
+    targetRoomOverride: 'lobby',
     slides: [
       {
         lines: [
@@ -450,17 +457,80 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
           { key: 'proc:shimmer', delay: 500 },
         ],
       },
+      // --- Time passage begins ---
       {
         lines: [
-          'Ghost or hoax — someone is going',
-          'to a lot of trouble',
-          'to haunt this theater.',
+          'I drove home at 2 AM with',
+          'the smell of old roses',
+          'still in my hair.',
+        ],
+        effect: 'fade',
+        pauseAfter: 2500,
+        bgImage: 'intro_exterior',
+        bgAlpha: 0.4,
+        camera: { scaleFrom: 1.0, scaleTo: 1.04, panY: -3 },
+        vignetteIntensity: 0.8,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'I barely slept.',
           '',
+          'Every time I closed my eyes,',
+          'I saw that face on the stage.',
+          'High cheekbones. Dark eyes.',
+          'The face of a woman dead for',
+          'ninety-seven years.',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 3000,
+        bgImage: 'intro_ghost_stage',
+        bgAlpha: 0.35,
+        camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: 5 },
+        fogIntensity: 0.08,
+        vignetteIntensity: 0.85,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'But ghosts don\'t use fog machines.',
+          'Ghosts don\'t need trapdoors.',
+          '',
+          'Someone in that theater is staging',
+          'a very convincing performance.',
           'And I\'m going to find out who.',
         ],
         effect: 'fade',
-        pauseAfter: 1500,
+        pauseAfter: 3000,
         vignetteIntensity: 0.8,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'I spent the day reviewing my notes.',
+          'The dressing room. The mirror.',
+          'Margaux\'s trunk.',
+          '',
+          'There are pieces I missed.',
+          'Puzzles I wasn\'t ready for.',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 2500,
+        bgImage: 'intro_exterior',
+        bgAlpha: 0.3,
+        vignetteIntensity: 0.7,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'Tonight, I go back.',
+          '',
+          'Forty-eight hours until demolition.',
+          'Time to find the truth.',
+        ],
+        effect: 'dramatic',
+        pauseAfter: 2000,
+        vignetteIntensity: 0.9,
         letterbox: true,
         audio: [
           { key: 'proc:ghostDrone', delay: 200, volume: 0.1 },
@@ -468,8 +538,8 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
       },
     ],
     onComplete: {
-      setFlag: 'saw_ghost',
-      addJournal: 'I saw her — or something pretending to be her. A woman in white on the stage, the face of Margaux Fontaine. She vanished when the lights surged. The scent of old roses lingered. Ghost or hoax, someone is going to a lot of trouble. I\'m going to find out who.',
+      setFlag: ['saw_ghost', 'day_2'],
+      addJournal: 'I saw her — or something pretending to be her. A woman in white on the stage, the face of Margaux Fontaine. She vanished when the lights surged. I drove home shaken, but I barely slept. Ghosts don\'t use fog machines. Someone is performing. I came back the next night — forty-eight hours until demolition. Time to find the truth.',
     },
   },
 ];
@@ -514,10 +584,11 @@ export class CinematicScene extends BaseSlideScene {
     // If a video version exists, redirect to VideoCinematicScene (native HTML video)
     if (event.videoKey) {
       this.redirectedToVideo = true;
+      const videoDestination = event.targetRoomOverride || data.targetRoom;
       this.scene.start('VideoCinematicScene', {
         videoKey: event.videoKey,
         targetScene: 'RoomScene',
-        targetData: { roomId: data.targetRoom, skipCinematic: true },
+        targetData: { roomId: videoDestination, skipCinematic: !event.chainNext },
         overlayText: event.overlayText,
         onComplete: event.onComplete,
       });
@@ -572,7 +643,9 @@ export class CinematicScene extends BaseSlideScene {
       this.scene.setActive(true, 'UIScene');
       this.scene.bringToTop('UIScene');
     }
-    this.scene.start('RoomScene', { roomId: this.targetRoom, skipCinematic: true });
+    const destination = this.cinematicData.targetRoomOverride || this.targetRoom;
+    const skip = !this.cinematicData.chainNext;
+    this.scene.start('RoomScene', { roomId: destination, skipCinematic: skip });
   }
 
   private completeEvent(): void {
@@ -583,7 +656,12 @@ export class CinematicScene extends BaseSlideScene {
     save.setFlag(`seen_event_${this.cinematicData.id}`, true);
     if (this.cinematicData.onComplete) {
       if (this.cinematicData.onComplete.setFlag) {
-        save.setFlag(this.cinematicData.onComplete.setFlag, true);
+        const flags = Array.isArray(this.cinematicData.onComplete.setFlag)
+          ? this.cinematicData.onComplete.setFlag
+          : [this.cinematicData.onComplete.setFlag];
+        for (const flag of flags) {
+          save.setFlag(flag, true);
+        }
       }
       if (this.cinematicData.onComplete.addJournal) {
         save.addJournalEntry(this.cinematicData.onComplete.addJournal);

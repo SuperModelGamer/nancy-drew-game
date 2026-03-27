@@ -86,7 +86,7 @@
           "description": "An ornate staircase — the carpet is worn right down the center, but the brass handrails are recently polished. Whoever's been walking through this lobby has been taking care of the place. That's not demolition crew behavior.",
           "requiredItem": "master_key",
           "targetRoom": "auditorium",
-          "showWhen": "vivian_intro"
+          "showWhen": "ashworth_office"
         },
         {
           "id": "lobby_playbills",
@@ -128,7 +128,7 @@
           "label": "Vivian Delacroix",
           "type": "talk",
           "dialogueId": "vivian_intro_revisit",
-          "showWhen": "left_lobby_after_intro",
+          "showWhen": "day_2",
           "hideWhen": "vivian_full_trust"
         },
         {
@@ -194,6 +194,17 @@
           "dialogueId": "phone_calls",
           "showWhen": "vivian_intro",
           "hideWhen": "called_ned"
+        },
+        {
+          "id": "lobby_phone_done",
+          "x": 438,
+          "y": 634,
+          "width": 81,
+          "height": 44,
+          "label": "Lobby Phone",
+          "type": "talk",
+          "dialogueId": "phone_calls_done",
+          "showWhen": "called_ned"
         },
         {
           "id": "lobby_managers_door",
@@ -322,7 +333,7 @@
           "label": "Edwin Hale",
           "type": "talk",
           "dialogueId": "edwin_auditorium_revisit",
-          "showWhen": "stella_backstage",
+          "showWhen": "day_2",
           "hideWhen": "edwin_personal_revealed"
         },
         {
@@ -416,7 +427,7 @@
           "label": "To Dressing Rooms",
           "type": "navigate",
           "targetRoom": "dressing_room",
-          "showWhen": "chapter_2"
+          "showWhen": "stella_backstage"
         },
         {
           "id": "aud_projection_stairs",
@@ -515,7 +526,7 @@
           "label": "Stella Morrow",
           "type": "talk",
           "dialogueId": "stella_backstage_revisit",
-          "showWhen": "stella_backstage",
+          "showWhen": "day_2",
           "hideWhen": "stella_confession"
         },
         {
@@ -549,7 +560,7 @@
           "type": "pickup",
           "itemId": "effects_manual",
           "onceOnly": true,
-          "showWhen": "learned_ghost_rumors"
+          "showWhen": "day_2"
         },
         {
           "id": "bs_prop_table",
@@ -670,14 +681,14 @@
           "showWhen": "catwalk_access"
         },
         {
-          "id": "bs_back_aud",
+          "id": "bs_to_dressing",
           "x": 86,
           "y": 971,
           "width": 166,
           "height": 163,
-          "label": "To Projection Booth",
+          "label": "To Dressing Room",
           "type": "navigate",
-          "targetRoom": "projection_booth",
+          "targetRoom": "dressing_room",
           "showWhen": "stella_backstage"
         }
       ]
@@ -727,7 +738,8 @@
           "type": "locked",
           "description": "I hold the magnifying glass up to the mirror and tilt it in the light. There — barely visible — letters traced in wax on the glass surface. My hands are shaking a little. Margaux wrote this. Nearly a hundred years ago, she sat right where I'm standing and wrote: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.' She knew. She knew who was killing her, and nobody listened.",
           "requiredItem": "magnifying_glass",
-          "puzzleId": "mirror_puzzle"
+          "puzzleId": "mirror_puzzle",
+          "showWhen": "day_2"
         },
         {
           "id": "dr_diary",
@@ -740,7 +752,7 @@
           "description": "Inside the drawer: a leather-bound diary with M.F. embossed in gold on the cover.",
           "itemId": "margaux_diary",
           "onceOnly": true,
-          "showWhen": "learned_1928_murder"
+          "showWhen": "day_2"
         },
         {
           "id": "dr_perfume_bottles",
@@ -821,7 +833,8 @@
           "label": "Locked Trunk",
           "type": "locked",
           "description": "An antique trunk with a combination lock. Three dials, each numbered 0–9. The trunk is engraved with Margaux's initials: M.F.",
-          "puzzleId": "trunk_puzzle"
+          "puzzleId": "trunk_puzzle",
+          "showWhen": "day_2"
         },
         {
           "id": "dr_alchemy_book",
@@ -865,6 +878,16 @@
           "type": "inspect",
           "showWhen": "vivian_full_trust",
           "description": "A box tucked in the corner — Vivian's private archive. She said I could look through Margaux's personal effects. Inside: bundles of letters tied with ribbon, playbills annotated in Margaux's hand, and a sealed envelope marked 'For Vivian — if something happens to me.' It was never opened. Vivian couldn't bring herself to read it. Inside is a single page in Margaux's handwriting: 'I know what C. has been putting in my tea. I can taste it. But I won't stop performing — this role is mine and I will die on that stage before I give it up. If you're reading this, ma petite étoile, then I did.' The bravest and most heartbreaking thing I've ever read."
+        },
+        {
+          "id": "dr_to_booth",
+          "x": 50,
+          "y": 500,
+          "width": 150,
+          "height": 200,
+          "label": "To Projection Booth",
+          "type": "navigate",
+          "targetRoom": "projection_booth"
         },
         {
           "id": "dr_back",
@@ -953,7 +976,7 @@
           "label": "Diego Reyes",
           "type": "talk",
           "dialogueId": "diego_booth_revisit",
-          "showWhen": "diego_booth",
+          "showWhen": "day_2",
           "hideWhen": "cipher_discussed"
         },
         {
@@ -1110,7 +1133,7 @@
           "label": "Roland Ashworth",
           "type": "talk",
           "dialogueId": "ashworth_office_revisit",
-          "showWhen": "ashworth_office",
+          "showWhen": "day_2",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1210,7 +1233,7 @@
           "type": "locked",
           "description": "A modern wall safe behind a painting of the theater. It has an electronic keypad.",
           "puzzleId": "office_safe_puzzle",
-          "showWhen": "learned_copycat_poisoning",
+          "showWhen": "chapter_3",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
