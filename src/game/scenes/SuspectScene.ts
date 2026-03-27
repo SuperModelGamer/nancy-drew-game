@@ -278,6 +278,8 @@ export class SuspectScene extends Phaser.Scene {
     if (currentDialogueSuspect) {
       const idx = SUSPECTS.findIndex(s => s.id === currentDialogueSuspect);
       if (idx >= 0 && isMet(SUSPECTS[idx])) this.selectedIndex = idx;
+      // Clear so tab switching via restart doesn't get overridden
+      this.registry.remove('currentDialogueSuspect');
     }
     if (!isMet(SUSPECTS[this.selectedIndex])) {
       const firstMet = SUSPECTS.findIndex(s => isMet(s));

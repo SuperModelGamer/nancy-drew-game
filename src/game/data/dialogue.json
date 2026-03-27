@@ -1391,29 +1391,33 @@
           "id": "start",
           "lines": [
             { "speaker": "Edwin", "text": "Ms. Drew. You've returned. Excellent. I was just cataloging the acoustic irregularities in rows F through J — there's a dead spot near seat F-7 that I believe was caused by a 1943 renovation, but the documentation is frustratingly vague. Would you like to hear my theory?" },
-            { "speaker": "Nancy", "text": "Maybe later. I had some questions—" },
+            { "speaker": "Nancy", "text": "Maybe later. I had some questions—", "vo": "vo_nancy_revisit_01" },
             { "speaker": "Edwin", "text": "Of course, of course. Everyone always wants to talk about murder. Nobody wants to discuss acoustic engineering. Story of my life, really." }
           ],
           "choices": [
             {
               "text": "Your grandfather was James Hale — Margaux's lover.",
               "nextNode": "grandfather",
-              "requiredFlag": "saw_ghost"
+              "requiredFlag": "saw_ghost",
+              "vo": "vo_nancy_choice_grandfather"
             },
             {
               "text": "I found Margaux's diary. She knew she was being poisoned.",
               "nextNode": "diary_reaction",
-              "requiredItem": "margaux_diary"
+              "requiredItem": "margaux_diary",
+              "vo": "vo_nancy_choice_diary_edwin"
             },
             {
               "text": "Stella says props have been going missing. Do you know anything about that?",
               "nextNode": "edwin_on_props",
-              "requiredFlag": "learned_about_missing_props"
+              "requiredFlag": "learned_about_missing_props",
+              "vo": "vo_nancy_choice_props"
             },
             {
               "text": "The effects manual describes systems that could fake all of that.",
               "nextNode": "effects_challenge",
-              "requiredItem": "effects_manual"
+              "requiredItem": "effects_manual",
+              "vo": "vo_nancy_choice_effects"
             },
             {
               "text": "What are you working on?",
@@ -1436,13 +1440,13 @@
         {
           "id": "grandfather",
           "lines": [
-            { "speaker": "Edwin", "text": "...Who told you — how did you—" },
-            { "speaker": "Nancy", "text": "Vivian. She recognized the name." },
-            { "speaker": "Edwin", "text": "I... yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux... they were..." },
-            { "speaker": "Edwin", "text": "He never got over her death. Forty-three years, Nancy. He spent forty-three years insisting it wasn't an accident. Nobody believed him. He died in 1971 — March 14th — still fighting. Still writing letters to the police department." },
-            { "speaker": "Edwin", "text": "I promised him I'd find the truth. I was twelve years old and I promised. That's why I'm here. That's why I've always been here." },
-            { "speaker": "Nancy", "text": "That's a heavy promise to carry for over fifty years." },
-            { "speaker": "Edwin", "text": "Some promises are worth the weight." }
+            { "speaker": "Edwin", "text": "...Who told you — how did you—", "vo": "vo_edwin_grandfather_01" },
+            { "speaker": "Nancy", "text": "Vivian. She recognized the name.", "vo": "vo_nancy_grandfather_01" },
+            { "speaker": "Edwin", "text": "I... yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux... they were...", "vo": "vo_edwin_grandfather_02" },
+            { "speaker": "Edwin", "text": "He never got over her death. Forty-three years, Nancy. He spent forty-three years insisting it wasn't an accident. Nobody believed him. He died in 1971 — March 14th — still fighting. Still writing letters to the police department.", "vo": "vo_edwin_grandfather_03" },
+            { "speaker": "Edwin", "text": "I promised him I'd find the truth. I was twelve years old and I promised. That's why I'm here. That's why I've always been here.", "vo": "vo_edwin_grandfather_04" },
+            { "speaker": "Nancy", "text": "That's a heavy promise to carry for over fifty years.", "vo": "vo_nancy_grandfather_02" },
+            { "speaker": "Edwin", "text": "Some promises are worth the weight.", "vo": "vo_edwin_grandfather_05" }
           ],
           "nextNode": "farewell",
           "triggerEvent": "edwin_personal_revealed"
@@ -1450,11 +1454,11 @@
         {
           "id": "diary_reaction",
           "lines": [
-            { "speaker": "Edwin", "text": "You found her — wait. You found her diary? Where? In the dressing room?" },
-            { "speaker": "Edwin", "text": "...May I see it? Please. I've been looking for primary sources — firsthand accounts — about Margaux for fifteen years. This is... this is unprecedented." },
-            { "speaker": "Nancy", "text": "She writes about feeling sick after tea, about a metallic taste. And she suspected someone specific." },
-            { "speaker": "Edwin", "text": "Then she knew. She knew, and nobody listened. The police, the theater owners — they all called it an accident because it was easier." },
-            { "speaker": "Edwin", "text": "That diary could be the evidence we need. Don't lose it, Nancy." }
+            { "speaker": "Edwin", "text": "You found her — wait. You found her diary? Where? In the dressing room?", "vo": "vo_edwin_diary_01" },
+            { "speaker": "Edwin", "text": "...May I see it? Please. I've been looking for primary sources — firsthand accounts — about Margaux for fifteen years. This is... this is unprecedented.", "vo": "vo_edwin_diary_02" },
+            { "speaker": "Nancy", "text": "She writes about feeling sick after tea, about a metallic taste. And she suspected someone specific.", "vo": "vo_nancy_diary_edwin_01" },
+            { "speaker": "Edwin", "text": "Then she knew. She knew, and nobody listened. The police, the theater owners — they all called it an accident because it was easier.", "vo": "vo_edwin_diary_03" },
+            { "speaker": "Edwin", "text": "That diary could be the evidence we need. Don't lose it, Nancy.", "vo": "vo_edwin_diary_04" }
           ],
           "nextNode": "farewell",
           "triggerEvent": "showed_edwin_diary"
@@ -1462,24 +1466,24 @@
         {
           "id": "edwin_on_props",
           "lines": [
-            { "speaker": "Edwin", "text": "Missing props? That's... concerning. Some of those pieces are historically significant — the Tiffany lamps alone date to 1923, and the candelabra is original to the opening gala." },
-            { "speaker": "Nancy", "text": "Stella seems worried about it." },
-            { "speaker": "Edwin", "text": "Stella has her — well, she has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are the real mystery. The props are a — a separate matter entirely. A distraction." },
-            { "speaker": "Nancy", "text": "You seem very sure they're separate. How would you know that unless you knew what was actually going on?" },
-            { "speaker": "Edwin", "text": "I — that's not what I — I'm a historian, Nancy. I know how to sort through noise to find the signal. That's literally my job. I'm not hiding anything, if that's what you're implying. I'm trying to help you prioritize." },
-            { "speaker": "Nancy", "text": "I didn't say you were hiding anything." },
-            { "speaker": "Edwin", "text": "No. No, you didn't. I just — forget I said that. The answer to this mystery is on the stage, not on a prop shelf. I'd stake my reputation on it. What's left of it." }
+            { "speaker": "Edwin", "text": "Missing props? That's... concerning. Some of those pieces are historically significant — the Tiffany lamps alone date to 1923, and the candelabra is original to the opening gala.", "vo": "vo_edwin_props_01" },
+            { "speaker": "Nancy", "text": "Stella seems worried about it.", "vo": "vo_nancy_props_01" },
+            { "speaker": "Edwin", "text": "Stella has her — well, she has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are the real mystery. The props are a — a separate matter entirely. A distraction.", "vo": "vo_edwin_props_02" },
+            { "speaker": "Nancy", "text": "You seem very sure they're separate. How would you know that unless you knew what was actually going on?", "vo": "vo_nancy_props_02" },
+            { "speaker": "Edwin", "text": "I — that's not what I — I'm a historian, Nancy. I know how to sort through noise to find the signal. That's literally my job. I'm not hiding anything, if that's what you're implying. I'm trying to help you prioritize.", "vo": "vo_edwin_props_03" },
+            { "speaker": "Nancy", "text": "I didn't say you were hiding anything.", "vo": "vo_nancy_props_03" },
+            { "speaker": "Edwin", "text": "No. No, you didn't. I just — forget I said that. The answer to this mystery is on the stage, not on a prop shelf. I'd stake my reputation on it. What's left of it.", "vo": "vo_edwin_props_04" }
           ],
           "nextNode": "farewell"
         },
         {
           "id": "effects_challenge",
           "lines": [
-            { "speaker": "Edwin", "text": "You've read the — you've actually read the effects manual? The whole thing? That's... thorough." },
-            { "speaker": "Edwin", "text": "Yes, theoretically, someone could use the old systems to stage a convincing ghost. Fog machines, the trapdoor — which is a Graves & Sons counterweight model, very reliable — proper lighting. It would be — it would be quite an undertaking." },
-            { "speaker": "Edwin", "text": "But they'd need extensive knowledge of the building. Months of preparation. They'd need to have — to have practiced. Extensively. Not that I've thought about it in detail. I'm just — speaking generally. As a historian." },
-            { "speaker": "Nancy", "text": "Like saving the theater from demolition?" },
-            { "speaker": "Edwin", "text": "...That would certainly be a reason. Hypothetically speaking. But you'd want to — I mean, a person would want to look at all the suspects before jumping to conclusions. That's just good detective work, isn't it?" }
+            { "speaker": "Edwin", "text": "You've read the — you've actually read the effects manual? The whole thing? That's... thorough.", "vo": "vo_edwin_effects_01" },
+            { "speaker": "Edwin", "text": "Yes, theoretically, someone could use the old systems to stage a convincing ghost. Fog machines, the trapdoor — which is a Graves & Sons counterweight model, very reliable — proper lighting. It would be — it would be quite an undertaking.", "vo": "vo_edwin_effects_02" },
+            { "speaker": "Edwin", "text": "But they'd need extensive knowledge of the building. Months of preparation. They'd need to have — to have practiced. Extensively. Not that I've thought about it in detail. I'm just — speaking generally. As a historian.", "vo": "vo_edwin_effects_03" },
+            { "speaker": "Nancy", "text": "Like saving the theater from demolition?", "vo": "vo_nancy_effects_01" },
+            { "speaker": "Edwin", "text": "...That would certainly be a reason. Hypothetically speaking. But you'd want to — I mean, a person would want to look at all the suspects before jumping to conclusions. That's just good detective work, isn't it?", "vo": "vo_edwin_effects_04" }
           ],
           "nextNode": "farewell"
         },

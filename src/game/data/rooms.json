@@ -128,7 +128,19 @@
           "label": "Vivian Delacroix",
           "type": "talk",
           "dialogueId": "vivian_intro_revisit",
-          "showWhen": "left_lobby_after_intro"
+          "showWhen": "left_lobby_after_intro",
+          "hideWhen": "vivian_full_trust"
+        },
+        {
+          "id": "lobby_vivian_done",
+          "x": 734,
+          "y": 664,
+          "width": 109,
+          "height": 418,
+          "label": "Vivian Delacroix",
+          "type": "talk",
+          "dialogueId": "vivian_intro_done",
+          "showWhen": "vivian_full_trust"
         },
         {
           "id": "lobby_marble_floor",
@@ -192,7 +204,7 @@
           "label": "Office Door",
           "type": "navigate",
           "targetRoom": "managers_office",
-          "showWhen": "diego_booth"
+          "showWhen": "vivian_intro"
         },
         {
           "id": "lobby_water_stain",
@@ -312,6 +324,17 @@
           "dialogueId": "edwin_auditorium_revisit",
           "showWhen": "stella_backstage",
           "hideWhen": "edwin_personal_revealed"
+        },
+        {
+          "id": "aud_edwin_done",
+          "x": 615,
+          "y": 645,
+          "width": 236,
+          "height": 393,
+          "label": "Edwin Hale",
+          "type": "talk",
+          "dialogueId": "edwin_auditorium_done",
+          "showWhen": "edwin_personal_revealed"
         },
         {
           "id": "aud_orchestra_pit",
@@ -480,7 +503,31 @@
           "label": "Stella Morrow",
           "type": "talk",
           "dialogueId": "stella_backstage",
-          "showWhen": "vivian_intro"
+          "showWhen": "vivian_intro",
+          "hideWhen": "stella_backstage"
+        },
+        {
+          "id": "bs_stella_revisit",
+          "x": 731,
+          "y": 625,
+          "width": 220,
+          "height": 535,
+          "label": "Stella Morrow",
+          "type": "talk",
+          "dialogueId": "stella_backstage_revisit",
+          "showWhen": "stella_backstage",
+          "hideWhen": "stella_confession"
+        },
+        {
+          "id": "bs_stella_done",
+          "x": 731,
+          "y": 625,
+          "width": 220,
+          "height": 535,
+          "label": "Stella Morrow",
+          "type": "talk",
+          "dialogueId": "stella_backstage_done",
+          "showWhen": "stella_confession"
         },
         {
           "id": "bs_notice_board",
@@ -628,9 +675,9 @@
           "y": 971,
           "width": 166,
           "height": 163,
-          "label": "Back to Auditorium",
+          "label": "To Projection Booth",
           "type": "navigate",
-          "targetRoom": "auditorium",
+          "targetRoom": "projection_booth",
           "showWhen": "stella_backstage"
         }
       ]
@@ -895,7 +942,30 @@
           "label": "Diego Reyes",
           "type": "talk",
           "dialogueId": "diego_booth",
+          "hideWhen": "diego_booth"
+        },
+        {
+          "id": "pb_diego_revisit",
+          "x": 394,
+          "y": 431,
+          "width": 314,
+          "height": 664,
+          "label": "Diego Reyes",
+          "type": "talk",
+          "dialogueId": "diego_booth_revisit",
+          "showWhen": "diego_booth",
           "hideWhen": "cipher_discussed"
+        },
+        {
+          "id": "pb_diego_done",
+          "x": 394,
+          "y": 431,
+          "width": 314,
+          "height": 664,
+          "label": "Diego Reyes",
+          "type": "talk",
+          "dialogueId": "diego_booth_done",
+          "showWhen": "cipher_discussed"
         },
         {
           "id": "pb_writing_desk",
@@ -1029,6 +1099,18 @@
           "label": "Roland Ashworth",
           "type": "talk",
           "dialogueId": "ashworth_office",
+          "hideWhen": "ashworth_office"
+        },
+        {
+          "id": "mo_ashworth_revisit",
+          "x": 518,
+          "y": 367,
+          "width": 347,
+          "height": 584,
+          "label": "Roland Ashworth",
+          "type": "talk",
+          "dialogueId": "ashworth_office_revisit",
+          "showWhen": "ashworth_office",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1041,6 +1123,7 @@
           "type": "inspect",
           "clueImage": "clue_mo_blueprints",
           "description": "Demolition blueprints for the Monarch. But someone has drawn all over them in red pen — hidden passages, sealed rooms, a tunnel network beneath the stage. This isn't demolition planning. This is exploration. And the handwriting... small, precise, meticulous. That's Edwin's handwriting. What are Edwin's notes doing on Ashworth's blueprints?",
+          "showWhen": "edwin_auditorium",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1079,6 +1162,7 @@
           "description": "A porcelain teacup with dried residue at the bottom. I lean close — there's a faint metallic smell. Whatever Ashworth drank, the evidence is still right here. I should take this. Carefully.",
           "itemId": "poisoned_teacup",
           "onceOnly": true,
+          "showWhen": "ashworth_office",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1090,6 +1174,7 @@
           "label": "Laptop",
           "type": "inspect",
           "description": "Ashworth's laptop, open to an email chain. The latest: 'The historical society's petition is meaningless. Proceed with demolition on schedule.' Cold. But his unsent reply draft is more interesting: 'There's someone in the building at night. I have proof.' He never sent it. Why not? Did something stop him? Or did something happen to him before he could hit send?",
+          "showWhen": "ashworth_office",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1101,6 +1186,7 @@
           "label": "Filing Cabinet",
           "type": "inspect",
           "description": "A metal filing cabinet. Most drawers are demolition permits and contractor invoices. But the bottom drawer — jackpot. A folder labeled 'HISTORICAL SIGNIFICANCE ASSESSMENT — MONARCH THEATRE' from the city's heritage department. Status: 'Pending Review.' Someone filed for landmark status. And Ashworth buried it in his own filing cabinet. He's racing to demolish before this review goes through. That's not illegal, but it's not exactly ethical either.",
+          "showWhen": "ashworth_office",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1136,6 +1222,7 @@
           "label": "Office Window",
           "type": "inspect",
           "description": "The office window overlooks the alley behind the theater. Rain streaks down the glass, but I can see clearly enough — there's a service entrance to the basement down there, and it's propped open with a brick. Someone's been coming and going without using the main entrance. That's how they avoid being seen. I need to find my way down there.",
+          "showWhen": "ashworth_office",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1158,6 +1245,7 @@
           "label": "Open Drawer",
           "type": "inspect",
           "description": "A desk drawer left slightly open. Inside: a flashlight and a book — 'Ghosts of the American Theatre.' The chapter on the Monarch is bookmarked, with passages underlined in shaky pen. Ashworth was researching the ghost. The tough businessman who calls everyone a 'vulture' and threatens lawsuits before breakfast was reading ghost stories with the lights on. He's more frightened than he'd ever admit. Join the club, Ashworth.",
+          "showWhen": "ashworth_office",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
