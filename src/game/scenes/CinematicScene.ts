@@ -472,6 +472,103 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
       addJournal: 'I saw her — or something pretending to be her. A woman in white on the stage, the face of Margaux Fontaine. She vanished when the lights surged. The scent of old roses lingered. Ghost or hoax, someone is going to a lot of trouble. I\'m going to find out who.',
     },
   },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CINEMATIC 5: "The Next Night"
+  // Plays when Nancy returns to the lobby after seeing the ghost.
+  // Time passage — Nancy leaves, processes what she saw, returns the next night
+  // with new determination and a plan. This gates Day 2 content.
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'time_passage_day_2',
+    triggerRoom: 'lobby',
+    triggerFlag: 'saw_ghost',
+    videoKey: 'cinematic_time_passage',
+    slides: [
+      {
+        lines: [
+          'I drove home at 2 AM with',
+          'the smell of old roses',
+          'still in my hair.',
+        ],
+        effect: 'fade',
+        pauseAfter: 2500,
+        bgImage: 'intro_exterior',
+        bgAlpha: 0.4,
+        camera: { scaleFrom: 1.0, scaleTo: 1.04, panY: -3 },
+        vignetteIntensity: 0.8,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'I barely slept.',
+          '',
+          'Every time I closed my eyes,',
+          'I saw that face on the stage.',
+          'High cheekbones. Dark eyes.',
+          'The face of a woman dead for',
+          'ninety-seven years.',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 3000,
+        bgImage: 'intro_ghost_stage',
+        bgAlpha: 0.35,
+        camera: { scaleFrom: 1.0, scaleTo: 1.06, panY: 5 },
+        fogIntensity: 0.08,
+        vignetteIntensity: 0.85,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'But ghosts don\'t use fog machines.',
+          'Ghosts don\'t need trapdoors.',
+          '',
+          'Someone in that theater is staging',
+          'a very convincing performance.',
+          'And I\'m going to find out who.',
+        ],
+        effect: 'fade',
+        pauseAfter: 3000,
+        vignetteIntensity: 0.8,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'I spent the day reviewing my notes.',
+          'The dressing room. The mirror.',
+          'Margaux\'s trunk.',
+          '',
+          'There are pieces I missed.',
+          'Puzzles I wasn\'t ready for.',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 2500,
+        bgImage: 'intro_exterior',
+        bgAlpha: 0.3,
+        vignetteIntensity: 0.7,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'Tonight, I go back.',
+          '',
+          'Forty-eight hours until demolition.',
+          'Time to find the truth.',
+        ],
+        effect: 'dramatic',
+        pauseAfter: 2000,
+        vignetteIntensity: 0.9,
+        letterbox: true,
+        audio: [
+          { key: 'proc:ghostDrone', delay: 200, volume: 0.1 },
+        ],
+      },
+    ],
+    onComplete: {
+      setFlag: 'day_2',
+      addJournal: 'I came back the next night. Forty-eight hours until demolition. The ghost was real enough to see, but too perfect to be supernatural. Someone is performing — and I missed clues in the dressing room that I need to go back for.',
+    },
+  },
 ];
 
 // ─── Public helper for checking triggerable cinematics ───────────────────────

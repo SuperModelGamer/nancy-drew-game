@@ -427,7 +427,7 @@
           "label": "To Dressing Rooms",
           "type": "navigate",
           "targetRoom": "dressing_room",
-          "showWhen": "stella_backstage"
+          "showWhen": "day_2"
         },
         {
           "id": "aud_projection_stairs",
@@ -686,10 +686,21 @@
           "y": 971,
           "width": 166,
           "height": 163,
+          "label": "Back to Auditorium",
+          "type": "navigate",
+          "targetRoom": "auditorium",
+          "showWhen": "stella_backstage"
+        },
+        {
+          "id": "bs_to_dressing",
+          "x": 86,
+          "y": 971,
+          "width": 166,
+          "height": 163,
           "label": "To Dressing Room",
           "type": "navigate",
           "targetRoom": "dressing_room",
-          "showWhen": "stella_backstage"
+          "showWhen": "day_2"
         }
       ]
     },
@@ -1221,7 +1232,7 @@
           "type": "locked",
           "description": "A modern wall safe behind a painting of the theater. It has an electronic keypad.",
           "puzzleId": "office_safe_puzzle",
-          "showWhen": "learned_copycat_poisoning",
+          "showWhen": "chapter_3",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
