@@ -57,10 +57,10 @@
           "lines": [
             { "speaker": "Vivian", "text": "Roland Ashworth bought the Monarch six months ago. Plans to demolish it — mon beau théâtre — in three days. Luxury condominiums, he says. As if the world needs more of those. Last night, he was found unconscious in his office. Some kind of toxin — non-lethal, but très deliberate. He's recovering upstairs, furious and suspicious of everyone.", "vo": "vo_vivian_ashworth_01" },
             { "speaker": "Nancy", "text": "Does he have enemies here?", "vo": "vo_nancy_ashworth_01" },
-            { "speaker": "Vivian", "text": "Everyone in this theater has a reason to want the demolition stopped. Myself included. I won't insult your intelligence by pretending otherwise.", "vo": "vo_vivian_ashworth_02" }
+            { "speaker": "Vivian", "text": "Everyone in this theater has a reason to want the demolition stopped. Myself included. I won't insult your intelligence by pretending otherwise.", "vo": "vo_vivian_ashworth_02", "triggerEvent": "learned_about_ashworth" }
           ],
           "nextNode": "end",
-          "triggerEvent": "learned_about_ashworth"
+          "triggerEvent": "learned_about_margaux"
         },
         {
           "id": "about_others",
@@ -378,7 +378,7 @@
           "id": "end",
           "lines": [
             { "speaker": "Edwin", "text": "If you need anything — history, floor plans, old records, architectural details — I'm your man. I know this building better than anyone alive. Better than anyone who's ever lived, probably. Forgive the immodesty.", "vo": "vo_edwin_end_01" },
-            { "speaker": "Edwin", "text": "Oh, and Nancy? If you see the ghost... try talking to her. You never know. Stranger things have happened. Well — actually, have they? I'd need to check my notes.", "vo": "vo_edwin_end_02" }
+            { "speaker": "Edwin", "text": "Oh, and Nancy? If you see the ghost... try talking to her. You never know. Stranger things have happened. Well — actually, have they? I'd need to check my notes.", "vo": "vo_edwin_end_02", "triggerEvent": "learned_about_crimson_veil" }
           ]
         }
       ]
