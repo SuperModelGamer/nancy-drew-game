@@ -656,8 +656,8 @@
           "label": "Stella's Lockbox",
           "type": "locked",
           "puzzleId": "lockbox_puzzle",
-          "showWhen": "learned_about_missing_props",
-          "description": "A metal lockbox shoved under Stella's work station. Four rotating dials, each engraved with little theatrical symbols — masks, spotlights, curtains, roses, and more. She doesn't want anyone getting into this. I need to find the right combination of symbols. Knowing Stella, the answer is probably somewhere nearby."
+          "showWhen": "stella_confession",
+          "description": "Stella's gone — but her lockbox isn't. It's shoved under the work station, four rotating dials engraved with theatrical symbols — masks, spotlights, curtains, roses. She didn't want anyone getting into this. Now that she's cleared out, I can finally take a closer look. The right combination of symbols has to be somewhere nearby."
         },
         {
           "id": "bs_table_lamp",
