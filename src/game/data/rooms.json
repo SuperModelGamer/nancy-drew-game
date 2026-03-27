@@ -128,7 +128,7 @@
           "label": "Vivian Delacroix",
           "type": "talk",
           "dialogueId": "vivian_intro_revisit",
-          "showWhen": "ashworth_office",
+          "showWhen": "day_2",
           "hideWhen": "vivian_full_trust"
         },
         {
@@ -333,7 +333,7 @@
           "label": "Edwin Hale",
           "type": "talk",
           "dialogueId": "edwin_auditorium_revisit",
-          "showWhen": "stella_backstage",
+          "showWhen": "day_2",
           "hideWhen": "edwin_personal_revealed"
         },
         {
@@ -526,7 +526,7 @@
           "label": "Stella Morrow",
           "type": "talk",
           "dialogueId": "stella_backstage_revisit",
-          "showWhen": "diego_booth",
+          "showWhen": "day_2",
           "hideWhen": "stella_confession"
         },
         {
@@ -976,7 +976,7 @@
           "label": "Diego Reyes",
           "type": "talk",
           "dialogueId": "diego_booth_revisit",
-          "showWhen": "diego_booth",
+          "showWhen": "day_2",
           "hideWhen": "cipher_discussed"
         },
         {
@@ -1133,7 +1133,7 @@
           "label": "Roland Ashworth",
           "type": "talk",
           "dialogueId": "ashworth_office_revisit",
-          "showWhen": "ashworth_office",
+          "showWhen": "day_2",
           "hideWhen": "ashworth_motive_revealed"
         },
         {

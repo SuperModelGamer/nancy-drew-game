@@ -1076,10 +1076,10 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Vivian", "text": "Ah, Nancy. Back again. You have that look — the one my late husband used to get when he was reading the last chapter of a mystery novel. That impatient furrow between the eyebrows.", "vo": "vo_vivian_revisit_01" },
-            { "speaker": "Nancy", "text": "I just have a few more questions, Vivian.", "vo": "vo_nancy_revisit_01" },
-            { "speaker": "Vivian", "text": "Of course you do. Sit, sit. I was just making tea — oh, don't give me that look, it's chamomile, perfectly safe. I made it myself. Although I suppose that's exactly what a poisoner would say, non?", "vo": "vo_vivian_revisit_02" },
-            { "speaker": "Vivian", "text": "I'm joking, ma chère. Mostly.", "vo": "vo_vivian_revisit_03" }
+            { "speaker": "Vivian", "text": "Nancy! You came back. I wasn't sure you would — after what happened last night. Mon Dieu, when I heard you saw her too... I barely slept.", "vo": "vo_vivian_revisit_01" },
+            { "speaker": "Nancy", "text": "That makes two of us. I have more questions, Vivian. A lot more.", "vo": "vo_nancy_revisit_01" },
+            { "speaker": "Vivian", "text": "Of course you do. Sit, sit. I was just making tea — oh, don't give me that look, it's chamomile, perfectly safe. I made it myself. Although I suppose after yesterday, none of us should trust anything served in this theater, non?", "vo": "vo_vivian_revisit_02" },
+            { "speaker": "Vivian", "text": "I'm joking, ma chère. Mostly. You look like you haven't eaten. There are biscuits in the tin — take two, you'll need the energy.", "vo": "vo_vivian_revisit_03" }
           ],
           "choices": [
             {
@@ -1270,9 +1270,9 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Edwin", "text": "Ms. Drew. You've returned. Excellent. I was just cataloging the acoustic irregularities in rows F through J — there's a dead spot near seat F-7 that I believe was caused by a 1943 renovation, but the documentation is frustratingly vague. Would you like to hear my theory?" },
-            { "speaker": "Nancy", "text": "Maybe later. I had some questions—", "vo": "vo_nancy_revisit_01" },
-            { "speaker": "Edwin", "text": "Of course, of course. Everyone always wants to talk about murder. Nobody wants to discuss acoustic engineering. Story of my life, really." }
+            { "speaker": "Edwin", "text": "Ms. Drew. Two nights in a row. I must say, I didn't expect you to come back after... well. After what you saw last night. Most people would have called the police. Or a priest." },
+            { "speaker": "Nancy", "text": "I'm not most people. And what I saw wasn't a ghost, Edwin.", "vo": "vo_nancy_revisit_01" },
+            { "speaker": "Edwin", "text": "No? Fascinating. You sound very certain for someone who watched a dead woman materialize on stage. But please — questions. I've had all day to think, and I suspect you have too." }
           ],
           "choices": [
             {
@@ -1416,10 +1416,10 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Stella", "text": "Oh good, you're back. I was getting bored of being suspicious all by myself. Hold this." },
-            { "speaker": "Nancy", "text": "What is—" },
-            { "speaker": "Stella", "text": "It's a sandbag counterweight. Don't drop it unless you want to find out what a broken toe feels like. I'm rebalancing the fly system because apparently nobody else in this building knows how to maintain rigging that's older than their grandparents." },
-            { "speaker": "Stella", "text": "Questions. Go." }
+            { "speaker": "Stella", "text": "Oh good, you came back. I half-expected you to bail after last night. Most of the crew won't even set foot in this building anymore — I had two stagehands quit over text this morning." },
+            { "speaker": "Nancy", "text": "Because of the ghost?" },
+            { "speaker": "Stella", "text": "Because of the 'ghost.' Yeah. Air quotes. You and I both know fog machines don't run themselves. Hold this — sandbag counterweight, don't drop it — I'm rebalancing the fly system since apparently I'm the only person left in this building who actually works." },
+            { "speaker": "Stella", "text": "Questions. Go. I've had a whole day to stew and I'm ready to talk." }
           ],
           "choices": [
             {
@@ -1638,9 +1638,9 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Diego", "text": "Nancy! Perfect timing — I need a second opinion. Does this sound too melodramatic? 'The chandelier swayed like a crystal pendulum counting down the hours to murder.' Too much?" },
-            { "speaker": "Nancy", "text": "For real life? Yes. For a play?" },
-            { "speaker": "Diego", "text": "See, that's the problem. I can't tell anymore. I've been living in this theater for three months and reality is getting... blurry. Yesterday I narrated myself making coffee. Out loud. 'He poured the dark liquid with trembling hands, knowing that caffeine was his only ally in this house of shadows.' My roommate back home would stage an intervention." }
+            { "speaker": "Diego", "text": "Nancy! You actually came back! After last night I thought — well, I wrote three different scenes about it already. 'The detective returns to the scene of the haunting, drawn by something she can't name.' Too on the nose?" },
+            { "speaker": "Nancy", "text": "Did you see anything last night after I left?" },
+            { "speaker": "Diego", "text": "I heard it. From up here — the lights surging, then nothing. Dead silence for about ten seconds. Then the front door slammed. I assumed that was you leaving. I didn't sleep, Nancy. I sat up here with every light on, writing. Twelve pages. Mostly garbage. But a couple of lines... I think I finally understand what fear does to a story." }
           ],
           "choices": [
             {
@@ -1712,9 +1712,9 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Ashworth", "text": "You again. Don't you people ever just... go away? I have seventeen missed calls from my lawyer, twelve from my contractor, and one from my mother who apparently saw 'something about a ghost on the internet' and wants to know if I'm eating enough fiber." },
-            { "speaker": "Nancy", "text": "I just need a few more minutes—" },
-            { "speaker": "Ashworth", "text": "Everyone just needs 'a few more minutes.' The Historical Society needed a few more minutes. The building inspector needed a few more minutes. My ex-wife needed a few more minutes to decide if she loved me. She decided no, by the way. Took her nine years of 'a few more minutes.'" }
+            { "speaker": "Ashworth", "text": "You again. I was hoping last night's little light show would've scared you off. It certainly scared off half my demolition crew — they're threatening hazard pay now. Hazard pay! For a building with a fog machine!" },
+            { "speaker": "Nancy", "text": "I need a few more minutes of your time, Mr. Ashworth." },
+            { "speaker": "Ashworth", "text": "Of course you do. Everyone just needs 'a few more minutes.' The Historical Society needed a few more minutes. My lawyer called six times today — six! And my mother saw 'something about a ghost' on the internet and wants to know if I'm eating enough fiber. As if fiber prevents hauntings." }
           ],
           "choices": [
             {

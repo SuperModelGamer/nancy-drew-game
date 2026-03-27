@@ -37,7 +37,7 @@ interface VideoCinematicData {
   subtitles?: unknown[];          // kept for interface compat — ignored
   overlayText?: OverlayTextLine[];
   onComplete?: {
-    setFlag?: string;
+    setFlag?: string | string[];
     addJournal?: string;
   };
 }
@@ -220,7 +220,12 @@ export class VideoCinematicScene extends Phaser.Scene {
     if (this.videoData.onComplete) {
       const save = SaveSystem.getInstance();
       if (this.videoData.onComplete.setFlag) {
-        save.setFlag(this.videoData.onComplete.setFlag, true);
+        const flags = Array.isArray(this.videoData.onComplete.setFlag)
+          ? this.videoData.onComplete.setFlag
+          : [this.videoData.onComplete.setFlag];
+        for (const flag of flags) {
+          save.setFlag(flag, true);
+        }
       }
       if (this.videoData.onComplete.addJournal) {
         save.addJournalEntry(this.videoData.onComplete.addJournal);
