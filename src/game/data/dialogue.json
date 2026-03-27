@@ -396,165 +396,22 @@
           ],
           "choices": [
             {
-              "text": "Has anything gone missing from backstage?",
-              "nextNode": "missing_props"
-            },
-            {
-              "text": "Do you know how the special effects work?",
-              "nextNode": "effects"
-            },
-            {
               "text": "Where were you when Ashworth collapsed?",
               "nextNode": "alibi"
             },
             {
-              "text": "I found your note to the basement intruder — 'Stop now or I go to the police.'",
-              "nextNode": "confronted_note",
-              "requiredFlag": "saw_threatening_note"
+              "text": "What's it like working backstage here?",
+              "nextNode": "backstage_work"
             },
             {
-              "text": "Edwin told me about The Crimson Veil — Margaux was poisoned on stage. Could someone fake a ghost using the old systems?",
-              "nextNode": "stella_on_ghost",
-              "requiredFlag": "learned_about_crimson_veil"
+              "text": "Have you noticed anything unusual lately?",
+              "nextNode": "unusual"
+            },
+            {
+              "text": "I'll keep looking around.",
+              "nextNode": "end"
             }
           ]
-        },
-        {
-          "id": "stella_on_ghost",
-          "lines": [
-            { "speaker": "Stella", "text": "Edwin told you about The Crimson Veil? Of course he did. You can't say hello to that man without getting a forty-minute lecture on 1928." },
-            { "speaker": "Stella", "text": "Could someone fake a ghost? Yes. Easily. I could do it in my sleep. The fog machines still work. The trapdoor is original and functional. The lighting board on the catwalk can create any effect you want." },
-            { "speaker": "Nancy", "text": "You sound like you've thought about it." },
-            { "speaker": "Stella", "text": "I'm a stage manager. It's literally my job to know how everything in this building works. I've been doing this for eight years — I could run a haunting with my eyes closed. But if you're asking whether I staged a ghost — no. God, no. I have enough problems without adding 'theatrical necromancy' to my résumé." },
-            { "speaker": "Nancy", "text": "Who else would know the systems well enough?" },
-            { "speaker": "Stella", "text": "Edwin. Full stop. He knows this building better than I do, and I hate admitting that. Fifteen years of studying every passage, every mechanism, every hidden corner. If anyone could make a convincing ghost... look, just — talk to Edwin." }
-          ],
-          "nextNode": "start",
-          "triggerEvent": "effects_manual_location"
-        },
-        {
-          "id": "missing_props",
-          "lines": [
-            { "speaker": "Stella", "text": "Missing? No. Nothing's missing. Everything is exactly where it —" },
-            { "speaker": "Stella", "text": "..." },
-            { "speaker": "Stella", "text": "Okay. Some things have been... relocated. For safekeeping. Look — valuable antique props, irreplaceable costumes — they shouldn't be destroyed with the building. That's just common sense. Anyone would do the same." },
-            { "speaker": "Nancy", "text": "Relocated where, exactly?" },
-            { "speaker": "Stella", "text": "Does it matter? I'm not going to stand here and justify basic preservation to a detective who's supposed to be investigating a poisoning. Those props are irreplaceable. I did what I had to do. That doesn't make me a poisoner. I'm tired, Nancy, not homicidal." }
-          ],
-          "choices": [
-            {
-              "text": "I found your lockbox. $4,200 in sold props — is that for your mother's medical bills?",
-              "nextNode": "lockbox_confronted",
-              "requiredItem": "stella_records",
-              "requiredFlag": "saw_ghost"
-            },
-            {
-              "text": "I'm not accusing you. Tell me about the effects system.",
-              "nextNode": "effects",
-              "triggerEvent": "learned_about_missing_props"
-            },
-            {
-              "text": "We'll come back to the props later.",
-              "nextNode": "end",
-              "triggerEvent": "learned_about_missing_props"
-            }
-          ]
-        },
-        {
-          "id": "lockbox_confronted",
-          "lines": [
-            { "speaker": "Stella", "text": "You opened my — that was locked. How did you even — you know what, it doesn't matter." },
-            { "speaker": "Stella", "text": "I didn't do anything wrong. I didn't —" },
-            { "speaker": "Stella", "text": "..." },
-            { "speaker": "Stella", "text": "Fine. Yes. My mother has stage four lymphoma. The bills are — you want a number? $47,000 and counting. So yes. I sold some props. Props that were going to be smashed into dust in three days anyway. At least this way someone — at least my mom gets something out of this disaster." },
-            { "speaker": "Nancy", "text": "I'm not here about the props, Stella. I'm here about the poisoning." },
-            { "speaker": "Stella", "text": "Then why are you opening my lockbox? Why are you digging through my —" },
-            { "speaker": "Stella", "text": "No. You know what. Fine. You want the truth? I know who's been in the basement. I've known for weeks. I wrote him a note. He ignored it." },
-            { "speaker": "Nancy", "text": "Who?" },
-            { "speaker": "Stella", "text": "Edwin. It's always been Edwin." }
-          ],
-          "nextNode": "stella_reveals_edwin",
-          "triggerEvent": "stella_confession"
-        },
-        {
-          "id": "stella_reveals_edwin",
-          "lines": [
-            { "speaker": "Stella", "text": "I've seen him going down there at night. I know the sounds — the trapdoor mechanism, the fog machine warming up. He's been staging the ghost." },
-            { "speaker": "Stella", "text": "I didn't tell anyone because... honestly? I wanted the theater saved too. If a ghost story kept the demolition from happening, I wasn't going to stop it." },
-            { "speaker": "Stella", "text": "But then Ashworth got poisoned, and I realized Edwin had gone too far. I left him that note. He never responded." },
-            { "speaker": "Nancy", "text": "Where's the basement key?" },
-            { "speaker": "Stella", "text": "Behind the lighting panel. Edwin thinks he's the only one who knows, but I've been stage manager here for eight years. I know every hiding spot in this building." }
-          ],
-          "triggerEvent": "basement_key_location"
-        },
-        {
-          "id": "confronted_note",
-          "lines": [
-            { "speaker": "Stella", "text": "Where did you find that? That was — I put that under —" },
-            { "speaker": "Nancy", "text": "On the stage floor. 'Stop now or I go to the police — S.M.' You wrote it." },
-            { "speaker": "Stella", "text": "It could be anyone's initials. Sandra Mitchell, Steve — no. Fine. I wrote it. Three days ago. Slipped it under the basement door. Whoever's down there never responded." },
-            { "speaker": "Nancy", "text": "You know who's in the basement." },
-            { "speaker": "Stella", "text": "I don't — I'm not sure. I have suspicions. But I need to know something first. Are you going to report what I've done? The props?" },
-            { "speaker": "Nancy", "text": "I'm interested in the truth, Stella. All of it." },
-            { "speaker": "Stella", "text": "The truth. Right. Because that always works out so well for the person telling it." }
-          ],
-          "choices": [
-            {
-              "text": "Tell me who's in the basement and I'll focus on the poisoning.",
-              "nextNode": "stella_reveals_edwin",
-              "triggerEvent": "stella_confession",
-              "requiredItem": "stella_records",
-              "requiredFlag": "saw_ghost"
-            },
-            {
-              "text": "Let's talk about the effects system first.",
-              "nextNode": "effects"
-            }
-          ]
-        },
-        {
-          "id": "effects",
-          "lines": [
-            { "speaker": "Stella", "text": "The Monarch was state-of-the-art in 1925. Fog machines, trapdoors, a fly system, even hidden passages behind the walls for quick costume changes." },
-            { "speaker": "Stella", "text": "There should be an effects manual on the tech shelf — a big binder. It has diagrams of everything." },
-            { "speaker": "Nancy", "text": "Could someone use those systems to fake a ghost?" },
-            { "speaker": "Stella", "text": "If they knew what they were doing? Absolutely. Fog, a trapdoor entrance, the right lighting cue... you could make someone appear and vanish in seconds." }
-          ],
-          "choices": [
-            {
-              "text": "Who would know the systems well enough?",
-              "nextNode": "who_knows",
-              "triggerEvent": "effects_manual_location"
-            },
-            {
-              "text": "I've already read the manual. Someone's added fresh notes to it.",
-              "nextNode": "manual_notes",
-              "requiredItem": "effects_manual",
-              "triggerEvent": "effects_manual_location"
-            },
-            {
-              "text": "Thanks, Stella. I'll check out that manual.",
-              "nextNode": "end",
-              "triggerEvent": "effects_manual_location"
-            }
-          ]
-        },
-        {
-          "id": "manual_notes",
-          "lines": [
-            { "speaker": "Stella", "text": "Fresh notes? Let me see..." },
-            { "speaker": "Stella", "text": "This handwriting — it's meticulous, almost academic. I've seen writing like this on the call board. On notes left around the theater." },
-            { "speaker": "Stella", "text": "This looks like Edwin Hale's handwriting." }
-          ],
-          "nextNode": "end"
-        },
-        {
-          "id": "who_knows",
-          "lines": [
-            { "speaker": "Stella", "text": "Me, obviously. Edwin Hale probably — he's studied every inch of this place. Vivian grew up here, so she'd know the basics." },
-            { "speaker": "Stella", "text": "But the hidden passages? Those aren't common knowledge. You'd need the original blueprints or the effects manual to even know they exist." }
-          ],
-          "nextNode": "end"
         },
         {
           "id": "alibi",
@@ -563,6 +420,27 @@
             { "speaker": "Stella", "text": "I didn't poison anyone. I don't even drink tea. Coffee. Black. Three cups minimum. That's my poison." }
           ],
           "nextNode": "start"
+        },
+        {
+          "id": "backstage_work",
+          "lines": [
+            { "speaker": "Stella", "text": "Eight years. Eight years of keeping this place running on spit and duct tape. I know every rope, every pulley, every creaky floorboard. The fly system alone takes two hours to balance properly — and nobody thanks you for it until something falls on the lead actor." },
+            { "speaker": "Nancy", "text": "You must know this building inside out." },
+            { "speaker": "Stella", "text": "Better than anyone. Well — maybe Edwin would argue that. But I know the working parts. The mechanical parts. Edwin knows the history. There's a difference between reading about a trapdoor and actually operating one." },
+            { "speaker": "Stella", "text": "Not that it matters in three days when they bulldoze the whole thing." }
+          ],
+          "nextNode": "start"
+        },
+        {
+          "id": "unusual",
+          "lines": [
+            { "speaker": "Stella", "text": "Unusual? In this building? Where do I start?" },
+            { "speaker": "Stella", "text": "Three months ago I found fresh footprints in old prop storage — a section nobody uses. Size eleven men's shoes. I mentioned it to Ashworth. He told me to 'stop being dramatic.' I'm a stage manager. Being dramatic is literally my job." },
+            { "speaker": "Nancy", "text": "And more recently?" },
+            { "speaker": "Stella", "text": "Noises. From below the stage. The kind of mechanical sounds this building hasn't made in decades. And the fog machine — I maintain it, I know exactly how much fluid is in it. Someone's been using it at night. I check the levels every morning. They don't lie." },
+            { "speaker": "Stella", "text": "Look, I don't know what's going on down there. But someone is using my equipment without permission, and that bothers me more than any ghost." }
+          ],
+          "nextNode": "end"
         },
         {
           "id": "end",

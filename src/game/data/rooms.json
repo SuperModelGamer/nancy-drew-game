@@ -515,7 +515,7 @@
           "label": "Stella Morrow",
           "type": "talk",
           "dialogueId": "stella_backstage_revisit",
-          "showWhen": "stella_backstage",
+          "showWhen": "diego_booth",
           "hideWhen": "stella_confession"
         },
         {
@@ -549,7 +549,7 @@
           "type": "pickup",
           "itemId": "effects_manual",
           "onceOnly": true,
-          "showWhen": "learned_ghost_rumors"
+          "showWhen": "diego_booth"
         },
         {
           "id": "bs_prop_table",
