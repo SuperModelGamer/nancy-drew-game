@@ -86,7 +86,7 @@
           "description": "An ornate staircase — the carpet is worn right down the center, but the brass handrails are recently polished. Whoever's been walking through this lobby has been taking care of the place. That's not demolition crew behavior.",
           "requiredItem": "master_key",
           "targetRoom": "auditorium",
-          "showWhen": "vivian_intro"
+          "showWhen": "ashworth_office"
         },
         {
           "id": "lobby_playbills",
