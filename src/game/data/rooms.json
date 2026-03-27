@@ -560,7 +560,7 @@
           "type": "pickup",
           "itemId": "effects_manual",
           "onceOnly": true,
-          "showWhen": "diego_booth"
+          "showWhen": "day_2"
         },
         {
           "id": "bs_prop_table",
