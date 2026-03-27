@@ -3,20 +3,37 @@
     {
       "id": "trunk_puzzle",
       "name": "Margaux's Trunk",
-      "type": "combination",
-      "description": "An antique trunk with a three-dial combination lock. Each dial shows numbers 0–9. Something precious is locked inside. The combination is a date that mattered to Margaux more than any other.",
+      "type": "mechanical_lock",
+      "description": "An antique trunk with three rotating brass rings. Each ring is engraved with theatrical symbols — masks, candles, moons, skulls, roses — and each symbol corresponds to a number on a faded cipher card tucked inside Margaux's diary. Find the date that mattered most to her and translate it through the symbols.",
       "answer": "10-31-28",
       "clues": [
         "The 1928 playbill is dated October 31, 1928.",
         "Margaux's diary: 'I will lock away what matters most before the final curtain on the 31st.'",
-        "Vivian: 'Margaux always used dates she could never forget — she called it her last Halloween.'"
+        "Vivian: 'Margaux always used dates she could never forget — she called it her last Halloween.'",
+        "The cipher card in the diary maps each symbol to a number: mask=1, candle=0, moon=3, skull=2, rose=8."
       ],
       "unlocks": "margaux_locket",
       "hints": [
         "The trunk was locked the night of the final performance.",
-        "Think about the date of The Crimson Veil's last show.",
-        "October is the 10th month. The show was on the 31st. The year was 1928."
-      ]
+        "Think about the date of The Crimson Veil's last show — then translate each digit using the cipher card.",
+        "October is the 10th month. The show was on the 31st. The year was 1928. Now match each digit to its symbol."
+      ],
+      "interactiveData": {
+        "rings": [
+          { "id": "ring_1", "label": "Month (tens)", "symbols": ["candle", "mask", "skull", "moon", "star", "feather", "key", "crown", "rose", "dagger"], "correctSymbol": "mask" },
+          { "id": "ring_2", "label": "Month (ones)", "symbols": ["candle", "mask", "skull", "moon", "star", "feather", "key", "crown", "rose", "dagger"], "correctSymbol": "candle" },
+          { "id": "ring_3", "label": "Day (tens)", "symbols": ["candle", "mask", "skull", "moon", "star", "feather", "key", "crown", "rose", "dagger"], "correctSymbol": "moon" },
+          { "id": "ring_4", "label": "Day (ones)", "symbols": ["candle", "mask", "skull", "moon", "star", "feather", "key", "crown", "rose", "dagger"], "correctSymbol": "mask" },
+          { "id": "ring_5", "label": "Year (tens)", "symbols": ["candle", "mask", "skull", "moon", "star", "feather", "key", "crown", "rose", "dagger"], "correctSymbol": "skull" },
+          { "id": "ring_6", "label": "Year (ones)", "symbols": ["candle", "mask", "skull", "moon", "star", "feather", "key", "crown", "rose", "dagger"], "correctSymbol": "rose" }
+        ],
+        "cipherCard": {
+          "candle": 0, "mask": 1, "skull": 2, "moon": 3, "star": 4,
+          "feather": 5, "key": 6, "crown": 7, "rose": 8, "dagger": 9
+        },
+        "rotateSound": "sfx_brass_click",
+        "unlockSound": "sfx_trunk_open"
+      }
     },
     {
       "id": "script_cipher",
@@ -69,29 +86,68 @@
     {
       "id": "evidence_board",
       "name": "The Evidence Board",
-      "type": "sequence",
-      "description": "Two intertwined timelines must be connected: the 1928 murder of Margaux Fontaine, and the modern-day poisoning of Roland Ashworth. Arrange six pieces of evidence in chronological order to prove both cases.",
-      "answer": "cecilia-goblet-margaux-edwin-ghost-ashworth",
+      "type": "dual_deduction",
+      "description": "Two crimes. Two boards. Drag each piece of evidence to the correct crime board — the 1928 murder OR the modern-day poisoning — then identify the culprit and method for each. The answer isn't who you think.",
+      "answer": "1928:cecilia-goblet-margaux|modern:ashworth-self-commercial_antimony",
       "clues": [
         "Cecilia's Letters: She ordered poison from a pharmacist in October 1928.",
-        "Script Cipher + Mirror Message: Cecilia swapped the prop goblet for a real one.",
+        "Script Cipher + Mirror Message: Cecilia swapped the prop goblet.",
         "Diary + Playbill: Margaux drank the poison on stage, October 31, 1928.",
-        "Edwin's Notebook: He discovered the proof decades later and devised the Ghost Project.",
-        "Fog Controls + Ghost Costume: Edwin staged the hauntings using the theater's effects.",
-        "Poisoned Teacup + Ashworth's testimony: Edwin poisoned Ashworth when he was discovered."
+        "Edwin's Notebook: He discovered the proof and devised the Ghost Project — NO mention of poison.",
+        "Basement chemicals: Crude, homemade antimony compounds. Don't match the toxicology report.",
+        "Chemical receipt: Commercial-grade antimony ordered by Ashworth's shell company.",
+        "Laptop email: 'File the condemnation order BEFORE the historical review.'",
+        "Insurance documents: Poisoning triggers a hazard clause worth $400K on top of the demolition payout.",
+        "Toxicology report: Precise non-lethal dose of pharmaceutical-grade antimony. Not homemade.",
+        "Bess's research: Ashworth filed three insurance claims on properties he demolished in five years."
       ],
       "unlocks": "case_closed",
       "hints": [
-        "Start with the oldest event — who acted first in 1928?",
-        "The 1928 timeline has three steps: plan, execute, result.",
-        "The modern timeline also has three steps: discover, stage, cover up."
-      ]
+        "The 1928 case is straightforward — who had motive to replace Margaux?",
+        "For the modern case, look at the CHEMISTRY. The basement compounds don't match the toxicology.",
+        "Who ordered commercial-grade antimony? Follow the receipt.",
+        "The dose was precisely non-lethal. Who would know exactly how much to take without dying?",
+        "Sometimes the victim isn't a victim at all."
+      ],
+      "interactiveData": {
+        "boards": [
+          {
+            "id": "1928",
+            "label": "The 1928 Murder",
+            "slots": [
+              { "type": "culprit", "label": "Who?", "options": ["Cecilia Drake", "Edwin Hale", "Roland Ashworth", "Stella Morrow"], "correct": "Cecilia Drake" },
+              { "type": "method", "label": "How?", "options": ["Poisoned prop goblet", "Poisoned tea", "Self-administered dose", "Tampered stage equipment"], "correct": "Poisoned prop goblet" },
+              { "type": "motive", "label": "Why?", "options": ["Take the lead role", "Save the theater", "Insurance fraud", "Cover up theft"], "correct": "Take the lead role" }
+            ]
+          },
+          {
+            "id": "modern",
+            "label": "The Modern Poisoning",
+            "slots": [
+              { "type": "culprit", "label": "Who?", "options": ["Cecilia Drake", "Edwin Hale", "Roland Ashworth", "Stella Morrow"], "correct": "Roland Ashworth" },
+              { "type": "method", "label": "How?", "options": ["Poisoned prop goblet", "Poisoned tea", "Self-administered dose", "Tampered stage equipment"], "correct": "Self-administered dose" },
+              { "type": "motive", "label": "Why?", "options": ["Take the lead role", "Save the theater", "Insurance fraud", "Cover up theft"], "correct": "Insurance fraud" }
+            ]
+          }
+        ],
+        "evidenceCards": [
+          { "id": "cecilia_letter", "text": "Cecilia's poison order — Oct 1928", "correctBoard": "1928" },
+          { "id": "mirror_message", "text": "C.D. brings the tea. C.D. changed the goblet.", "correctBoard": "1928" },
+          { "id": "playbill", "text": "Margaux died on stage — Oct 31, 1928", "correctBoard": "1928" },
+          { "id": "chemical_receipt", "text": "Commercial antimony — Ashworth's shell company", "correctBoard": "modern" },
+          { "id": "insurance_docs", "text": "Hazard clause — $400K bonus for poisoning incident", "correctBoard": "modern" },
+          { "id": "toxicology", "text": "Pharmaceutical-grade, precise non-lethal dose", "correctBoard": "modern" },
+          { "id": "laptop_email", "text": "Ashworth: 'File condemnation BEFORE historical review'", "correctBoard": "modern" },
+          { "id": "edwins_notebook", "text": "The Ghost Project — fog, lights, costume. No poison.", "correctBoard": "neither" },
+          { "id": "basement_chemicals", "text": "Crude homemade compounds — don't match toxicology", "correctBoard": "neither" }
+        ]
+      }
     },
     {
       "id": "mirror_puzzle",
       "name": "The Vanity Mirror",
-      "type": "mirror_reveal",
-      "description": "The UV lamp reveals hidden wax writing on Margaux's mirror — glowing purple letters invisible to the naked eye. She left an accusation nearly a century ago. Sweep the UV light across the foggy mirror to reveal what's hidden beneath.",
+      "type": "uv_trace",
+      "description": "The UV lamp reveals faint glowing letters on Margaux's mirror — wax writing invisible to the naked eye for nearly a century. The letters shimmer in and out of view. Carefully trace each letter while it glows to lock it in and reveal the full message.",
       "answer": "cd",
       "clues": [
         "The mirror message: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.'",
@@ -105,9 +161,19 @@
         "The initials stand for a first and last name."
       ],
       "interactiveData": {
-        "revealText": "C.D.",
-        "subText": "brings the tea. changed the goblet. will be the death of me.",
-        "revealThreshold": 0.8
+        "traceSequence": [
+          { "letter": "C", "glowDuration": 3000, "fadeDuration": 1500, "position": { "x": 0.35, "y": 0.3 }, "traceAccuracy": 0.7 },
+          { "letter": ".", "glowDuration": 2000, "fadeDuration": 1000, "position": { "x": 0.4, "y": 0.32 }, "traceAccuracy": 0.6 },
+          { "letter": "D", "glowDuration": 3000, "fadeDuration": 1500, "position": { "x": 0.45, "y": 0.3 }, "traceAccuracy": 0.7 },
+          { "letter": ".", "glowDuration": 2000, "fadeDuration": 1000, "position": { "x": 0.5, "y": 0.32 }, "traceAccuracy": 0.6 }
+        ],
+        "revealLines": [
+          { "text": "C.D. brings the tea.", "delay": 0 },
+          { "text": "C.D. changed the goblet.", "delay": 1500 },
+          { "text": "C.D. will be the death of me.", "delay": 3000 }
+        ],
+        "uvColor": "#9b59b6",
+        "glowPulseRate": 800
       }
     },
     {
@@ -192,8 +258,8 @@
     {
       "id": "passage_navigation",
       "name": "Hidden Passage Navigation",
-      "type": "maze",
-      "description": "The hidden passages behind the theater's walls form a network. Using the blueprints, trace a path from the basement entrance to the dressing room.",
+      "type": "dark_maze",
+      "description": "The passages behind the theater walls are pitch black. Nancy's flashlight illuminates only a few feet ahead. Use the blueprints as a map — but some paths have collapsed since 1925. Listen for sounds and feel for air currents to find the right way. Dead ends hold environmental clues; wrong turns cost flashlight battery.",
       "answer": "dressing room",
       "clues": [
         "The blueprints show passages connecting the basement to several rooms.",

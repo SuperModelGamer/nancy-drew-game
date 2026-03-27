@@ -951,6 +951,24 @@
             },
             {
               "text": "Call Bess and George.",
+              "nextNode": "bess_george_day2",
+              "requiredFlag": "day_2",
+              "hideWhenFlag": "called_friends_day2"
+            },
+            {
+              "text": "Call Dad.",
+              "nextNode": "carson_day2",
+              "requiredFlag": "day_2",
+              "hideWhenFlag": "called_dad_day2"
+            },
+            {
+              "text": "Call Ned.",
+              "nextNode": "ned_day2",
+              "requiredFlag": "day_2",
+              "hideWhenFlag": "called_ned_day2"
+            },
+            {
+              "text": "Call Bess and George.",
               "nextNode": "bess_george",
               "requiredFlag": "learned_about_cecilia"
             },
@@ -994,6 +1012,46 @@
           ],
           "nextNode": "start",
           "triggerEvent": "answered_parents_call"
+        },
+        {
+          "id": "bess_george_day2",
+          "lines": [
+            { "speaker": "Bess", "text": "Nancy! Okay so George and I couldn't sleep last night — we've been researching Roland Ashworth. This guy is sketchy." },
+            { "speaker": "George", "text": "His company, Monarch Holdings LLC, has filed insurance claims on three properties in the last five years. All three were demolished after 'incidents' — a fire, a flood, and a structural failure. Every single one paid out above market value." },
+            { "speaker": "Bess", "text": "That's a PATTERN, Nancy. Three buildings, three 'accidents,' three big payouts. And now there's a poisoning at the fourth one?" },
+            { "speaker": "Nancy", "text": "Can you find out the insurance terms for the Monarch specifically?" },
+            { "speaker": "George", "text": "Already on it. I'll email you what I find. But Nancy — if Ashworth has a history of manufacturing insurance claims, maybe the question isn't who poisoned him. Maybe it's whether he was really poisoned at all." },
+            { "speaker": "Bess", "text": "George! That's dark. I love it. Also — are you eating? You sound like you haven't eaten." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "called_friends_day2"
+        },
+        {
+          "id": "carson_day2",
+          "lines": [
+            { "speaker": "Carson Drew", "text": "Nancy. Good timing — I just got off the phone with a colleague in real estate law. I asked about hazard condemnation clauses." },
+            { "speaker": "Nancy", "text": "Dad, I didn't even tell you about —" },
+            { "speaker": "Carson Drew", "text": "You mentioned a poisoning in a building slated for demolition. I've been a lawyer long enough to know where that goes. Listen carefully: if a violent crime occurs in a building under historical review, the owner can file for emergency condemnation under the municipal hazard code. That skips the landmark review entirely." },
+            { "speaker": "Nancy", "text": "So the poisoning could actually help someone who wants to demolish the theater." },
+            { "speaker": "Carson Drew", "text": "It wouldn't just help. It would be the fastest path to a wrecking ball. And if the insurance policy has a hazard rider — which most commercial policies do — the payout increases significantly. Nancy, follow the money. It always tells the truth, even when people don't." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "called_dad_day2"
+        },
+        {
+          "id": "ned_day2",
+          "lines": [
+            { "speaker": "Ned", "text": "Hey, Nan. I've been thinking about what you told me last night. About the poison." },
+            { "speaker": "Nancy", "text": "The antimony?" },
+            { "speaker": "Ned", "text": "Yeah. I looked it up — I know, I know, you're the detective. But hear me out. Antimony poisoning has very specific symptoms depending on the dose. A lethal dose causes organ failure within hours. But a sub-lethal dose? Dizziness, nausea, collapse. Dramatic-looking but not actually dangerous." },
+            { "speaker": "Nancy", "text": "Ashworth collapsed at nine, was hospitalized by 9:30. Discharged the next morning." },
+            { "speaker": "Ned", "text": "That's a textbook sub-lethal dose, Nancy. Whoever measured that knew exactly what they were doing. Either they were merciful... or they needed the victim to survive. Think about who benefits from Ashworth being poisoned but alive." },
+            { "speaker": "Nancy", "text": "Ned Nickerson, you may have just cracked this case wide open." },
+            { "speaker": "Ned", "text": "Does that mean I get to take you to dinner when you solve it?" },
+            { "speaker": "Nancy", "text": "Solve it first. Then we'll talk." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "called_ned_day2"
         },
         {
           "id": "bess_george",
@@ -1308,6 +1366,10 @@
               "nextNode": "knowledge"
             },
             {
+              "text": "Have you ever been down to the basement?",
+              "nextNode": "basement_lie"
+            },
+            {
               "text": "Have you been sleeping here?",
               "nextNode": "sleeping"
             },
@@ -1402,6 +1464,18 @@
           "nextNode": "start"
         },
         {
+          "id": "basement_lie",
+          "lines": [
+            { "speaker": "Edwin", "text": "The basement? Goodness, no. I haven't been down there in years. Not since they sealed it — water damage, structural concerns, the usual litany of neglect. I believe the door is locked." },
+            { "speaker": "Nancy", "text": "You've never gone down to check on the foundation? For your research?" },
+            { "speaker": "Edwin", "text": "My research is architectural and acoustic, Ms. Drew. Above ground. I have no interest in damp concrete and rusty pipes. Why do you ask?" },
+            { "speaker": "Nancy", "text": "Just covering my bases." },
+            { "speaker": "Edwin", "text": "Ah. Well. There are no bases to cover down there, I assure you. Just mold and regret." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "edwin_lied_about_basement"
+        },
+        {
           "id": "farewell",
           "lines": [
             { "speaker": "Edwin", "text": "Right. Back to the rivets. If you need anything, I'll be here. I'm always here. That's either dedication or pathology, depending on who you ask." }
@@ -1437,6 +1511,11 @@
               "nextNode": "lockbox_confronted",
               "requiredItem": "stella_records",
               "requiredFlag": "saw_ghost"
+            },
+            {
+              "text": "Who were you on the phone with just now, Stella?",
+              "nextNode": "phone_confrontation",
+              "requiredFlag": "overheard_stella"
             },
             {
               "text": "I saw the ghost, Stella. Someone's using your equipment to stage it.",
@@ -1490,6 +1569,18 @@
               "nextNode": "start"
             }
           ]
+        },
+        {
+          "id": "phone_confrontation",
+          "lines": [
+            { "speaker": "Stella", "text": "I — how long were you standing there?" },
+            { "speaker": "Nancy", "text": "Long enough. 'She doesn't know about Edwin. Not yet.' What don't I know, Stella?" },
+            { "speaker": "Stella", "text": "...You're good. You're really good. Fine. Sit down. And don't drop that sandbag — this is going to take a minute." },
+            { "speaker": "Stella", "text": "That was my sister on the phone. She's been telling me to go to the police for weeks. I've been stalling because... because I'm a coward, apparently." },
+            { "speaker": "Nancy", "text": "Tell me about Edwin." }
+          ],
+          "nextNode": "stella_reveals_edwin",
+          "triggerEvent": "stella_confession"
         },
         {
           "id": "ghost_confrontation",
@@ -1730,10 +1821,26 @@
               "nextNode": "enemies"
             },
             {
+              "text": "How much is the insurance payout on this building?",
+              "nextNode": "insurance_question",
+              "requiredFlag": "called_friends_day2"
+            },
+            {
               "text": "I'll leave you to your calls.",
               "nextNode": "farewell"
             }
           ]
+        },
+        {
+          "id": "insurance_question",
+          "lines": [
+            { "speaker": "Ashworth", "text": "I — excuse me? That's none of your —" },
+            { "speaker": "Nancy", "text": "A friend of mine looked into your company. Monarch Holdings LLC. Three properties, three incidents, three big payouts. That's a pattern, Mr. Ashworth." },
+            { "speaker": "Ashworth", "text": "Those were all — that's completely — you have NO idea what you're talking about. Those were legitimate claims. Legitimate. I have lawyers who—" },
+            { "speaker": "Nancy", "text": "Does the Monarch's policy have a hazard condemnation rider?" },
+            { "speaker": "Ashworth", "text": "I'm not — I need to make a phone call. Right now. Don't touch anything while I'm gone. I mean it, Drew." }
+          ],
+          "triggerEvent": "ashworth_snooping"
         },
         {
           "id": "feeling",

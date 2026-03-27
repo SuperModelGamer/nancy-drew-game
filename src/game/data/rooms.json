@@ -170,7 +170,8 @@
           "height": 233,
           "label": "Coat Check",
           "type": "inspect",
-          "description": "An old coat check — mothballs and empty hangers. Wait. There's a modern rain jacket on one hook. That doesn't belong here. The pockets have a granola bar wrapper and... a receipt from a chemical supply company. Dated last week. Someone bought antimony tartrate, glycol fog fluid, and UV-reactive paint. Paid cash — smart, no card trail. But they left the receipt in their pocket — not so smart. Antimony is a poison. Glycol is used in fog machines. UV paint makes things glow in the dark. Whoever bought this had a very specific plan. I'd better hang onto this information.",
+          "description": "An old coat check — mothballs and empty hangers. Wait. There's a modern rain jacket on one hook. Ashworth's size. The pockets have a granola bar wrapper and... a receipt from 'Meridian Chemical Supply.' Dated last week. Someone ordered antimony tartrate — pharmaceutical grade, precise quantity. Paid through a company called 'Monarch Holdings LLC.' That's not the Historical Society. That's not Edwin. I've seen that company name somewhere before — on Ashworth's desk. Why would Ashworth be ordering the same compound that was used to poison him?",
+          "showWhen": "chapter_3",
           "setsFlag": "found_chemical_receipt"
         },
         {
@@ -755,7 +756,7 @@
           "height": 366,
           "label": "Vanity Mirror",
           "type": "locked",
-          "description": "I switch on the UV lamp and sweep it across the mirror. The vanity lights catch the beam and scatter it — but then I see them. Letters. Glowing faintly purple against the glass. Traced in wax that's been invisible for nearly a century. My hands are shaking. Margaux wrote this. She sat right where I'm standing and wrote: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.' She knew. She knew who was killing her, and nobody listened.",
+          "description": "I switch on the UV lamp and sweep it across the mirror. The vanity lights catch the beam — and then I see them. Faint purple shapes shimmering on the glass, flickering in and out like they're fighting to be seen. Letters. Traced in wax nearly a century ago. If I can carefully trace each one while it glows, I might be able to lock in the full message. My hands are shaking. Margaux wrote something on this mirror the night she died.",
           "requiredItem": "uv_lamp",
           "puzzleId": "mirror_puzzle",
           "showWhen": "day_2"
@@ -1231,6 +1232,42 @@
           "description": "Ashworth's laptop, open to an email chain. The latest: 'The historical society's petition is meaningless. Proceed with demolition on schedule.' Cold. But his unsent reply draft is more interesting: 'There's someone in the building at night. I have proof.' He never sent it. Why not? Did something stop him? Or did something happen to him before he could hit send?",
           "showWhen": "ashworth_office",
           "hideWhen": "ashworth_motive_revealed"
+        },
+        {
+          "id": "mo_laptop_exposed",
+          "x": 1373,
+          "y": 614,
+          "width": 168,
+          "height": 129,
+          "label": "Ashworth's Laptop",
+          "type": "inspect",
+          "description": "Ashworth left in such a hurry he didn't close his laptop. The browser has three tabs open. Tab one: an email to his lawyer — 'File the condemnation order BEFORE the historical review. The poisoning incident gives us grounds under the hazard clause.' Tab two: the Monarch Holdings LLC bank statement — a $340 payment to Meridian Chemical Supply. The same company on the coat check receipt. Tab three: a calculator with the number 2,700,000. That's the demolition insurance plus the hazard bonus. He wasn't the victim. He was the architect.",
+          "showWhen": "ashworth_motive_revealed",
+          "setsFlag": "found_ashworth_emails"
+        },
+        {
+          "id": "mo_snoop_trash",
+          "x": 1550,
+          "y": 850,
+          "width": 100,
+          "height": 100,
+          "label": "Waste Basket",
+          "type": "inspect",
+          "description": "A crumpled receipt in the waste basket — from Meridian Chemical Supply. The order: 'Antimony potassium tartrate, 50g, pharmaceutical grade.' Paid through Monarch Holdings LLC. This is Ashworth's trash can. Ashworth's company. Why would the poisoning victim be ordering the exact compound used to poison him?",
+          "showWhen": "ashworth_snooping",
+          "setsFlag": "found_ashworth_receipt"
+        },
+        {
+          "id": "mo_snoop_cot",
+          "x": 200,
+          "y": 750,
+          "width": 250,
+          "height": 150,
+          "label": "Rumpled Cot",
+          "type": "inspect",
+          "description": "Under Ashworth's pillow — a burner phone. Cheap, prepaid, no contacts saved. But there are three outgoing calls, all to the same number. I recognize the area code — that's a law firm. Why does a man with seventeen missed calls from his lawyer need a second, secret phone to call a different one?",
+          "showWhen": "ashworth_snooping",
+          "setsFlag": "found_burner_phone"
         },
         {
           "id": "mo_filing_cabinet",

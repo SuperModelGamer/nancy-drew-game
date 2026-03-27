@@ -307,6 +307,92 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // CINEMATIC 3.5: "Overheard"
+  // Plays on backstage entry on Day 2.
+  // Nancy overhears Stella on the phone before entering the room.
+  // Sets up tension for the Stella confrontation.
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'stella_eavesdrop',
+    triggerRoom: 'backstage',
+    triggerFlag: 'day_2',
+    videoKey: 'cinematic_stella_eavesdrop',
+    slides: [
+      {
+        lines: [
+          'I was halfway through the backstage door',
+          'when I heard Stella\'s voice.',
+          '',
+          'Sharp. Low. The way people talk',
+          'when they don\'t want to be heard.',
+        ],
+        effect: 'fade',
+        pauseAfter: 2000,
+        bgImage: 'cine_backstage_door',
+        bgAlpha: 0.5,
+        camera: { scaleFrom: 1.0, scaleTo: 1.04, panX: -3 },
+        vignetteIntensity: 0.7,
+        letterbox: true,
+      },
+      {
+        lines: [
+          '"I told you I\'d handle it..."',
+          '',
+          '"No, she doesn\'t know about Edwin.',
+          'Not yet."',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 3000,
+        bgImage: 'cine_backstage_door',
+        bgAlpha: 0.45,
+        camera: { scaleFrom: 1.02, scaleTo: 1.06, panX: 3 },
+        vignetteIntensity: 0.75,
+        letterbox: true,
+        audio: [
+          { key: 'proc:phonemurmur', delay: 200, volume: 0.2 },
+        ],
+      },
+      {
+        lines: [
+          '"Just give me two more days',
+          'before you call anyone.',
+          'I\'m handling it. I\'m handling it."',
+          '',
+          'A long pause. Then she hung up.',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 2500,
+        bgImage: 'cine_backstage_door',
+        bgAlpha: 0.4,
+        camera: { scaleFrom: 1.04, scaleTo: 1.08, panX: -2 },
+        vignetteIntensity: 0.8,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'I waited a beat.',
+          'Then I walked in like I hadn\'t',
+          'heard a thing.',
+          '',
+          'But I had.',
+          'And I wasn\'t going to forget it.',
+        ],
+        effect: 'fade',
+        pauseAfter: 2000,
+        vignetteIntensity: 0.7,
+        letterbox: true,
+        audio: [
+          { key: 'proc:ghostDrone', delay: 300, volume: 0.08 },
+        ],
+      },
+    ],
+    onComplete: {
+      setFlag: 'overheard_stella',
+      addJournal: 'I overheard Stella on the phone before she knew I was there. "She doesn\'t know about Edwin. Not yet." Stella knows more than she\'s been telling me. She\'s protecting someone — or protecting herself.',
+    },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // CINEMATIC 4: "The Apparition / The Next Night"
   // Plays when returning to auditorium after meeting Diego in the booth.
   // Combined ghost sighting + time passage in one cinematic.
