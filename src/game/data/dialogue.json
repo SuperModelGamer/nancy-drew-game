@@ -134,7 +134,7 @@
             { "speaker": "Vivian", "text": "J? I... oui, yes. Margaux had a great love. Un grand amour. A man named James — James Hale. He was a stagehand here at the Monarch." },
             { "speaker": "Nancy", "text": "Hale? As in Edwin Hale?" },
             { "speaker": "Vivian", "text": "Edwin is James's grandson. That's why he's so... how shall I say... consumed by this theater, by Margaux's story. It's personal for him. His grandfather lost the love of his life on that stage." },
-            { "speaker": "Nancy", "text": "That changes everything." }
+            { "speaker": "Nancy", "text": "Edwin Hale has been obsessing over this theater for fifteen years. And now I know why — it's not academic. It's personal. That changes the whole equation." }
           ],
           "nextNode": "end",
           "triggerEvent": "learned_about_hale_family"
@@ -813,7 +813,7 @@
             { "speaker": "Bess", "text": "Three insurance claims in the last five years. All on properties he demolished. One was a warehouse that had a 'mysterious fire' two weeks before demo. Another was a school that got condemned for 'environmental contamination.' Sound familiar?" },
             { "speaker": "Nancy", "text": "A pattern of manufactured hazards to trigger insurance payouts." },
             { "speaker": "Bess", "text": "Exactly. Each time, the insurance payout was way more than the property was worth. He's not a developer, Nancy. He's a con artist with a demolition crew." },
-            { "speaker": "Nancy", "text": "Bess, you might have just cracked this case wide open." },
+            { "speaker": "Nancy", "text": "Three properties. Three insurance payouts. And now a fourth — with a poisoning to speed things along. Bess, this isn't a one-time scheme. It's a business model." },
             { "speaker": "Bess", "text": "I LIVE for this. Also, is Diego still there? George says I'm not allowed to ask but I'm asking anyway." }
           ],
           "nextNode": "start",
@@ -824,9 +824,9 @@
           "lines": [
             { "speaker": "George", "text": "Hey, Nan. I pulled the county records on the Monarch Theatre like you asked." },
             { "speaker": "George", "text": "Here's the interesting part — there was a building inspection six months ago. The inspector flagged structural concerns that should have delayed demolition by at least eight months. But the report was never filed with the county. It just... vanished." },
-            { "speaker": "Nancy", "text": "Someone buried it." },
+            { "speaker": "Nancy", "text": "Buried. By someone who didn't want the building to pass inspection." },
             { "speaker": "George", "text": "Gets better. I cross-referenced the inspector's name with Ashworth's other properties. Same inspector signed off on two of his previous demolitions — both times after similar reports 'went missing.' The inspector's name is M. Lawson." },
-            { "speaker": "Nancy", "text": "M. Lawson. I've seen that name before." },
+            { "speaker": "Nancy", "text": "M. Lawson. I've seen that name — on Ashworth's burner phone." },
             { "speaker": "George", "text": "Thought you might have. Also — the sealed inspection from six months ago? It rated the theater as structurally sound. The building isn't in danger. Someone is manufacturing the justification to tear it down." }
           ],
           "nextNode": "start",
@@ -841,7 +841,7 @@
             { "speaker": "Ned", "text": "Here's the thing, Nan — the lethal dose is really specific. For a man Ashworth's size, you'd need about 300 milligrams to be dangerous. But a non-lethal dose — one that makes you sick but doesn't kill you — is almost harder to calculate. Whoever did this knew exactly how much to use." },
             { "speaker": "Nancy", "text": "Or they were doing it to themselves and wanted to make sure they'd survive." },
             { "speaker": "Ned", "text": "...Whoa. That's dark, Nan. But yeah — if someone wanted to fake a poisoning convincingly without actually dying, knowing the exact dosage would be critical. And that's way easier to calibrate when you're the one taking it." },
-            { "speaker": "Nancy", "text": "Thank you, Ned. That's exactly what I needed to hear." },
+            { "speaker": "Nancy", "text": "Ned, you just confirmed something I've been afraid to say out loud. The dose wasn't an attack — it was a performance." },
             { "speaker": "Ned", "text": "Be careful in there. And call me if you need anything. I mean it — anything." }
           ],
           "nextNode": "start",
@@ -1429,9 +1429,9 @@
             { "speaker": "Stella", "text": "That was my sister on the phone. She's a paralegal. I asked her what happens if someone gets caught staging a haunting in a building they don't own — trespassing, property damage, fraud. She said it's bad, Nancy. Really bad." },
             { "speaker": "Nancy", "text": "So you were trying to protect Edwin?" },
             { "speaker": "Stella", "text": "I was trying to protect the theater. If Edwin gets arrested, the landmark petition dies. If the petition dies, Ashworth demolishes everything in three days. I was buying time." },
-            { "speaker": "Stella", "text": "But the poisoning changed everything. I can't protect someone who — who might have —" },
-            { "speaker": "Nancy", "text": "You don't think Edwin poisoned Ashworth." },
-            { "speaker": "Stella", "text": "I don't know what I think anymore. I just know I'm tired of lying about it. Ask me what you want to ask me." }
+            { "speaker": "Stella", "text": "But the poisoning changed everything. Even if Edwin didn't do it — and I don't think he did — I'm standing in a building where someone used poison and I've been keeping secrets. That's a bad place to be standing, Nancy." },
+            { "speaker": "Nancy", "text": "Then stop standing there. Tell me what you know." },
+            { "speaker": "Stella", "text": "I'm tired of lying about it. Ask me what you want to ask me." }
           ],
           "nextNode": "start",
           "triggerEvent": "stella_phone_confession"
@@ -1559,7 +1559,7 @@
           "lines": [
             { "speaker": "Diego", "text": "The coat check receipt? Yeah — I found that two days ago. I've been staring at it trying to figure out who it belongs to." },
             { "speaker": "Diego", "text": "ChemSource Industrial Supply. The account name is 'Monarch Properties LLC.' I looked it up — it's a shell company. No website, no employees, just a P.O. box." },
-            { "speaker": "Nancy", "text": "Monarch Properties LLC. That name is interesting." },
+            { "speaker": "Nancy", "text": "Monarch Properties LLC. That's not a person — that's a shell company. And the name sounds a lot like someone who owns a certain theater." },
             { "speaker": "Diego", "text": "It gets more interesting. I found a crumpled receipt in Ashworth's trash yesterday — same company. Same account name. He orders takeout, leaves the containers everywhere. But he also left this." },
             { "speaker": "Nancy", "text": "Wait — you went through Ashworth's trash?" },
             { "speaker": "Diego", "text": "I'm a writer, Nancy. Observing people's garbage is basically a professional requirement. Hemingway used to —" },
@@ -1571,7 +1571,7 @@
             { "speaker": "Diego", "text": "...Oh. Oh no. Nancy, are you saying he—" },
             { "speaker": "Nancy", "text": "I'm not saying anything yet. But I need you to keep this between us." },
             { "speaker": "Diego", "text": "This is going in the play. You can't stop me. This is the best twist I've ever — okay, okay, between us. For now. But Nancy, if Ashworth poisoned himself... why?" },
-            { "speaker": "Nancy", "text": "That's what I'm going to find out." }
+            { "speaker": "Nancy", "text": "Insurance. Two point three million dollars of it. That's what I'm going to prove." }
           ],
           "nextNode": "start",
           "triggerEvent": "diego_receipt_match"
@@ -1662,7 +1662,7 @@
             { "speaker": "Nancy", "text": "Public records, Mr. Ashworth. Your company has filed three insurance claims on demolished properties in five years." },
             { "speaker": "Ashworth", "text": "That's — those are completely separate — you're conflating — look. Business insurance is standard practice. Every developer carries it. Every single one." },
             { "speaker": "Nancy", "text": "And the building inspector, M. Lawson? The same inspector who signed off on your last two demolitions?" },
-            { "speaker": "Ashworth", "text": "I need to take this." }
+            { "speaker": "Ashworth", "text": "That's — I don't — my phone is ringing. I need to take this. Right now. In the hallway. Don't touch anything." }
           ],
           "choices": [
             {
@@ -1674,8 +1674,8 @@
         {
           "id": "snooping_begins",
           "lines": [
-            { "speaker": "Ashworth", "text": "Excuse me — my lawyer. I need to take this in the hallway." },
-            { "speaker": "Nancy", "text": "Ashworth pulls out his phone and steps out, closing the door behind him. He didn't lock it. And he left everything on his desk. I don't have long — he could come back any second. What can I find before he returns?" }
+            { "speaker": "Nancy", "text": "His face went white when I said Lawson's name. He's fumbling with his phone — I don't think it's actually ringing." },
+            { "speaker": "Nancy", "text": "He pulls his phone from his pocket and steps into the hallway. The door clicks shut behind him — but he didn't lock it. His laptop is still open. The desk is covered in papers. My heart is pounding. I might have sixty seconds. What can I find?" }
           ],
           "triggerEvent": "ashworth_snooping"
         },
@@ -1789,7 +1789,7 @@
           "lines": [
             { "speaker": "Edwin", "text": "Nancy. I... I suppose I knew this moment would come." },
             { "speaker": "Edwin", "text": "You've found it all, haven't you. The fog machine controls. The trapdoor mechanism. The costume." },
-            { "speaker": "Nancy", "text": "The Ghost Project, Edwin. Your notebook is very thorough." }
+            { "speaker": "Nancy", "text": "The Ghost Project. Forty-seven rehearsals. Every lighting cue mapped to the second. Your notebook doesn't miss a detail, Edwin." }
           ],
           "choices": [
             {
@@ -1873,7 +1873,7 @@
             { "speaker": "Nancy", "text": "Edwin, the ghost staging — that's trespassing, property damage, possibly fraud. You know that." },
             { "speaker": "Edwin", "text": "I know. I've known since the first night. Every time I ran the sequence, I knew I was breaking the law. And every time, I told myself it was worth it." },
             { "speaker": "Edwin", "text": "Was it? I still don't know. But Margaux Fontaine was murdered on this stage ninety-seven years ago, and nobody ever answered for it. If my ghost made one person ask questions — if it bought this building one more day — then maybe it was worth it." },
-            { "speaker": "Nancy", "text": "I'll figure out the poisoning, Edwin. But you need to stay here until I do." },
+            { "speaker": "Nancy", "text": "The ghost is your crime. The poisoning is someone else's. And I think I know whose. Stay here, Edwin — I'm not done yet." },
             { "speaker": "Edwin", "text": "I'm not going anywhere. I've been in this building for fifteen years. A few more hours won't hurt." }
           ],
           "triggerEvent": "edwin_confronted"
