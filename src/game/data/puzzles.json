@@ -69,29 +69,68 @@
     {
       "id": "evidence_board",
       "name": "The Evidence Board",
-      "type": "sequence",
-      "description": "Two intertwined timelines must be connected: the 1928 murder of Margaux Fontaine, and the modern-day poisoning of Roland Ashworth. Arrange six pieces of evidence in chronological order to prove both cases.",
-      "answer": "cecilia-goblet-margaux-edwin-ghost-ashworth",
+      "type": "evidence_board",
+      "description": "Two crimes. Two timelines. One evidence board. Sort the clues into the correct case — the 1928 murder and the modern-day poisoning — then identify who committed each crime and how.",
+      "answer": "1928:cecilia-goblet-margaux|modern:insurance-compound-self_inflicted",
       "clues": [
-        "Cecilia's Letters: She ordered poison from a pharmacist in October 1928.",
-        "Script Cipher + Mirror Message: Cecilia swapped the prop goblet for a real one.",
-        "Diary + Playbill: Margaux drank the poison on stage, October 31, 1928.",
-        "Edwin's Notebook: He discovered the proof decades later and devised the Ghost Project.",
-        "Fog Controls + Ghost Costume: Edwin staged the hauntings using the theater's effects.",
-        "Poisoned Teacup + Ashworth's testimony: Edwin poisoned Ashworth when he was discovered."
+        "1928 CASE — Cecilia Drake ordered poison from a pharmacist in October 1928.",
+        "1928 CASE — The script cipher and mirror message prove Cecilia swapped the prop goblet.",
+        "1928 CASE — Margaux drank the poison on stage, October 31, 1928. The understudy took her place.",
+        "MODERN CASE — Ashworth's insurance documents show a $400K hazard condemnation clause triggered by the poisoning.",
+        "MODERN CASE — The chemical receipt from the coat check traces to a shell company registered to Ashworth.",
+        "MODERN CASE — The tea analysis shows a commercially-sourced pharmaceutical compound — NOT the crude chemicals in Edwin's basement.",
+        "GHOST STAGING — Edwin's notebook details 'The Ghost Project' — fog, lights, trapdoor. No mention of poison.",
+        "GHOST STAGING — Edwin's basement chemicals are homemade and amateur. They don't match the poisoning compound.",
+        "RED HERRING — Ashworth's testimony claims he saw a 'figure watching him fall.' But nobody else saw anyone near the office."
       ],
       "unlocks": "case_closed",
       "hints": [
-        "Start with the oldest event — who acted first in 1928?",
-        "The 1928 timeline has three steps: plan, execute, result.",
-        "The modern timeline also has three steps: discover, stage, cover up."
-      ]
+        "There are TWO separate crimes here. The ghost staging and the poisoning were done by different people.",
+        "The tea analysis is key — the poison used on Ashworth is pharmaceutical grade, not homemade. Who had access to commercial chemicals?",
+        "Ask yourself: who benefits financially from the poisoning? Follow the insurance money.",
+        "The 'victim' ordered the same compound that poisoned him. The dose was precisely non-lethal. What if nobody poisoned Ashworth... except Ashworth?"
+      ],
+      "interactiveData": {
+        "cases": [
+          {
+            "id": "1928_murder",
+            "label": "1928 — Murder of Margaux Fontaine",
+            "culprit": "Cecilia Drake",
+            "method": "Poisoned prop goblet",
+            "slots": ["cecilia_ordered_poison", "goblet_swapped", "margaux_died"]
+          },
+          {
+            "id": "modern_poisoning",
+            "label": "Present — Poisoning of Roland Ashworth",
+            "culprit": "Roland Ashworth (self-inflicted)",
+            "method": "Self-poisoning for insurance fraud",
+            "slots": ["insurance_motive", "commercial_compound", "self_inflicted"]
+          }
+        ],
+        "evidenceCards": [
+          { "id": "cecilia_ordered_poison", "label": "Cecilia's poison order (1928)", "case": "1928_murder" },
+          { "id": "goblet_swapped", "label": "Prop goblet swapped for real one", "case": "1928_murder" },
+          { "id": "margaux_died", "label": "Margaux collapsed on stage, Oct 31", "case": "1928_murder" },
+          { "id": "insurance_motive", "label": "Insurance payout + hazard clause", "case": "modern_poisoning" },
+          { "id": "commercial_compound", "label": "Commercial antimony from Ashworth's shell company", "case": "modern_poisoning" },
+          { "id": "self_inflicted", "label": "Precise non-lethal dose, no witnesses", "case": "modern_poisoning" },
+          { "id": "ghost_notebook", "label": "Edwin's Ghost Project notebook", "case": "neither" },
+          { "id": "basement_chemicals", "label": "Edwin's homemade chemicals (don't match)", "case": "neither" },
+          { "id": "figure_testimony", "label": "Ashworth's claim he saw a figure", "case": "red_herring" }
+        ],
+        "culpritOptions": ["Edwin Hale", "Stella Morrow", "Cecilia Drake", "Roland Ashworth (self-inflicted)", "Diego Reyes", "Vivian Delacroix"],
+        "wrongFeedback": {
+          "edwin_modern": "The basement chemicals don't match the toxicology report. Edwin's compounds are crude and homemade — the poison used on Ashworth is pharmaceutical grade.",
+          "wrong_case": "That evidence belongs to the other timeline. Look at the dates and context carefully.",
+          "wrong_culprit": "The evidence doesn't support that conclusion. Follow the money — who benefits from the poisoning?"
+        }
+      }
     },
     {
       "id": "mirror_puzzle",
       "name": "The Vanity Mirror",
-      "type": "mirror_reveal",
-      "description": "Using the magnifying glass, you've revealed wax writing on Margaux's mirror. She left an accusation. Drag the lens across the foggy mirror to reveal what's hidden beneath.",
+      "type": "uv_trace",
+      "description": "Under UV light, faint letters shimmer on Margaux's mirror — wax writing, invisible for nearly a century. The letters glow purple and unstable, fading in and out. Trace each letter with your cursor while it's visible to lock it in. Miss the shape or go too slow and it fades, forcing you to wait for it to shimmer back.",
       "answer": "cd",
       "clues": [
         "The mirror message: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.'",
@@ -105,9 +144,37 @@
         "The initials stand for a first and last name."
       ],
       "interactiveData": {
-        "revealText": "C.D.",
-        "subText": "brings the tea. changed the goblet. will be the death of me.",
-        "revealThreshold": 0.8
+        "traceLines": [
+          {
+            "id": "line1",
+            "text": "C.D. brings the tea.",
+            "letters": ["C", ".", "D", "."],
+            "shimmerDuration": 3000,
+            "fadeDuration": 1500,
+            "traceAccuracy": 0.7
+          },
+          {
+            "id": "line2",
+            "text": "C.D. changed the goblet.",
+            "letters": ["C", ".", "D", "."],
+            "shimmerDuration": 2500,
+            "fadeDuration": 1200,
+            "traceAccuracy": 0.7
+          },
+          {
+            "id": "line3",
+            "text": "C.D. will be the death of me.",
+            "letters": ["C", ".", "D", "."],
+            "shimmerDuration": 2000,
+            "fadeDuration": 1000,
+            "traceAccuracy": 0.75
+          }
+        ],
+        "uvGlowColor": "0x9966FF",
+        "lockedGlowColor": "0xFFFFFF",
+        "deductionPrompt": "The initials C.D. — who in the theater's history has those initials?",
+        "deductionOptions": ["Cecilia Drake", "Charles Devereaux", "Catherine Dane"],
+        "correctDeduction": "Cecilia Drake"
       }
     },
     {
@@ -244,26 +311,27 @@
       "id": "tea_analysis",
       "name": "Poison Identification",
       "type": "chemistry",
-      "description": "Analyze the poisoned teacup residue in the lab. Follow the three-step procedure to identify the compound used against Ashworth.",
-      "answer": "antimony",
+      "description": "Analyze the poisoned teacup residue. Follow the four-step procedure to identify not just WHAT the compound is, but WHERE it came from — and that distinction changes everything.",
+      "answer": "antimony_commercial",
       "clues": [
         "The alchemy book in the dressing room has a section on antimony compounds heavily annotated by Margaux.",
-        "The teacup residue has a metallic, crystalline appearance.",
+        "The teacup residue has a metallic, crystalline appearance — unusually pure and uniform.",
         "Margaux's diary mentions a 'metallic taste' — the same symptom antimony poisoning causes.",
-        "The chemical bottles in the basement include pharmaceutical antimony compounds."
+        "The chemical bottles in Edwin's basement are crude, hand-labeled, clearly homemade. The teacup residue looks nothing like them.",
+        "The coat check receipt lists 'antimony potassium tartrate, pharmaceutical grade' from a chemical supply company."
       ],
       "unlocks": "poison_identified",
       "hints": [
         "Margaux annotated one specific section of the alchemy book — what compound?",
-        "The same poison was used in 1928 and in the modern day.",
-        "It's a metallic element — Margaux wrote 'These are my symptoms exactly' next to it."
+        "The same type of poison was used in 1928 and today — but the SOURCE is different.",
+        "Compare the purity of the teacup sample to what you found in the basement. One is homemade, one is commercial."
       ],
       "interactiveData": {
         "steps": [
           {
             "action": "Heat sample",
             "description": "Apply heat to the residue sample",
-            "result": "White powder dissolves into clear solution with metallic sheen"
+            "result": "White powder dissolves into clear solution with metallic sheen. Note: the crystals are remarkably uniform — this is a refined compound, not a crude mixture."
           },
           {
             "action": "Add reagent",
@@ -277,8 +345,8 @@
             "correctResult": "Dark orange precipitate forms — characteristic of a metallic sulfide"
           },
           {
-            "action": "Observe result",
-            "description": "Examine the precipitate under magnification",
+            "action": "Identify compound",
+            "description": "Examine the precipitate under magnification and compare to reference profiles",
             "options": ["Compare to arsenic profile", "Compare to antimony profile", "Compare to mercury profile"],
             "correctOption": "Compare to antimony profile",
             "wrongFeedback": {
@@ -286,6 +354,17 @@
               "Compare to mercury profile": "Mercury sulfide is black, not orange-red. This isn't mercury."
             },
             "correctResult": "Orange-red precipitate matches antimony trisulfide (Sb₂S₃). Compound identified: ANTIMONY"
+          },
+          {
+            "action": "Determine source",
+            "description": "Compare the sample purity to known sources. Is this compound homemade or commercially produced?",
+            "options": ["Matches Edwin's basement chemicals (crude, hand-mixed)", "Matches commercial pharmaceutical grade (pure, uniform)", "Inconclusive — could be either"],
+            "correctOption": "Matches commercial pharmaceutical grade (pure, uniform)",
+            "wrongFeedback": {
+              "Matches Edwin's basement chemicals (crude, hand-mixed)": "Look again at the crystal structure. Edwin's chemicals are uneven and impure. This sample has perfect uniformity — it was manufactured in a lab, not mixed in a basement.",
+              "Inconclusive — could be either": "The purity difference is stark. This compound has zero impurities and uniform crystal size. That level of refinement only comes from pharmaceutical manufacturing."
+            },
+            "correctResult": "CRITICAL FINDING: The antimony in Ashworth's tea is pharmaceutical grade — commercially sourced. It does NOT match the crude compounds in Edwin's basement. Whoever poisoned Ashworth bought this from a chemical supplier, not from a homemade lab. This changes everything."
           }
         ]
       }

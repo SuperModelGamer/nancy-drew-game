@@ -542,6 +542,219 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
       addJournal: 'I saw her — or something pretending to be her. A woman in white on the stage, the face of Margaux Fontaine. She vanished when the lights surged. I drove home shaken, but I barely slept. Ghosts don\'t use fog machines. Someone is performing. I came back the next night — forty-eight hours until demolition. Time to find the truth.',
     },
   },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CINEMATIC 5: "Overheard"
+  // Plays on first entry to backstage on Day 2.
+  // Nancy overhears Stella on the phone — she's hiding something about Edwin.
+  // Sets the overheard_stella flag, which unlocks a confrontation dialogue option.
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'stella_eavesdropping',
+    triggerRoom: 'backstage',
+    triggerFlag: 'day_2',
+    videoKey: 'cinematic_stella_eavesdrop',
+    slides: [
+      {
+        lines: [
+          'I push through the backstage door',
+          'and freeze.',
+          '',
+          'Stella\'s voice — sharp, urgent —',
+          'drifting from behind the costume racks.',
+        ],
+        effect: 'fade',
+        pauseAfter: 2500,
+        bgImage: 'intro_lobby_dark',
+        bgAlpha: 0.4,
+        camera: { scaleFrom: 1.0, scaleTo: 1.04, panX: -3 },
+        vignetteIntensity: 0.7,
+        letterbox: true,
+        audio: [
+          { key: 'proc:eerieWhistle', delay: 800, volume: 0.1 },
+        ],
+      },
+      {
+        lines: [
+          '"I told you I\'d handle it..."',
+          '',
+          'She\'s on the phone. Pacing.',
+          'She hasn\'t heard me come in.',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 2500,
+        bgImage: 'intro_lobby_dark',
+        bgAlpha: 0.35,
+        camera: { scaleFrom: 1.02, scaleTo: 1.06, panX: 5 },
+        vignetteIntensity: 0.75,
+        letterbox: true,
+      },
+      {
+        lines: [
+          '"No, she doesn\'t know about Edwin.',
+          'Not yet. Just give me two more days',
+          'before you call anyone..."',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 3000,
+        bgImage: 'intro_lobby_dark',
+        bgAlpha: 0.3,
+        camera: { scaleFrom: 1.04, scaleTo: 1.08, panX: -5 },
+        vignetteIntensity: 0.8,
+        letterbox: true,
+        effects: [
+          { type: 'heartbeat', delay: 500, duration: 3000 },
+        ],
+      },
+      {
+        lines: [
+          '"I know what he\'s been doing down there.',
+          'I\'ve known for weeks.',
+          'But if this gets out before I can —"',
+          '',
+          'A long pause. She exhales.',
+        ],
+        effect: 'fade',
+        pauseAfter: 3000,
+        bgImage: 'intro_lobby_dark',
+        bgAlpha: 0.3,
+        camera: { scaleFrom: 1.06, scaleTo: 1.1, panY: -3 },
+        vignetteIntensity: 0.85,
+        letterbox: true,
+      },
+      {
+        lines: [
+          '"Fine. Fine. I\'ll tell her.',
+          'But on my terms. Not yours."',
+          '',
+          'She hangs up.',
+          'I hear her take a long, shaky breath.',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 2500,
+        bgImage: 'intro_lobby_dark',
+        bgAlpha: 0.25,
+        vignetteIntensity: 0.8,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'I step back quietly.',
+          'Let the door click shut behind me.',
+          'Count to five.',
+          '',
+          'Then I walk in like I heard nothing.',
+        ],
+        effect: 'fade',
+        pauseAfter: 2000,
+        vignetteIntensity: 0.7,
+        letterbox: true,
+      },
+    ],
+    onComplete: {
+      setFlag: 'overheard_stella',
+      addJournal: 'I overheard Stella on the phone — she knows what Edwin has been doing in the basement. She\'s been covering for him. "She doesn\'t know about Edwin. Not yet." She\'s protecting someone. The question is whether she\'s protecting Edwin... or herself.',
+    },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CINEMATIC 6: "The Warning"
+  // Plays on first return to auditorium after completing the catwalk.
+  // Nancy finds a threatening note — someone knows she's getting close.
+  // ═══════════════════════════════════════════════════════════════════════════
+  {
+    id: 'the_warning',
+    triggerRoom: 'auditorium',
+    triggerFlag: 'catwalk_access',
+    videoKey: 'cinematic_warning_note',
+    slides: [
+      {
+        lines: [
+          'Something is different.',
+          '',
+          'The auditorium seats look the same.',
+          'The ghost light still burns.',
+          'But there\'s something on the stage',
+          'that wasn\'t there before.',
+        ],
+        effect: 'fade',
+        pauseAfter: 2500,
+        bgImage: 'cine_ghost_empty',
+        bgAlpha: 0.4,
+        camera: { scaleFrom: 1.0, scaleTo: 1.08, panY: 5 },
+        vignetteIntensity: 0.7,
+        letterbox: true,
+        audio: [
+          { key: 'proc:ghostDrone', delay: 200, volume: 0.1 },
+        ],
+      },
+      {
+        lines: [
+          'A single sheet of paper.',
+          'Pinned to the stage floor with a hatpin.',
+          '',
+          'Block letters. Black ink.',
+          'No signature.',
+        ],
+        effect: 'typewriter',
+        pauseAfter: 2500,
+        bgImage: 'cine_ghost_empty',
+        bgAlpha: 0.35,
+        camera: { scaleFrom: 1.06, scaleTo: 1.15, panY: 8 },
+        vignetteIntensity: 0.8,
+        letterbox: true,
+      },
+      {
+        lines: [
+          '"STOP DIGGING',
+          'OR THE NEXT FALL',
+          'WON\'T BE AN ACCIDENT."',
+        ],
+        effect: 'dramatic',
+        pauseAfter: 3500,
+        vignetteIntensity: 0.9,
+        letterbox: true,
+        effects: [
+          { type: 'screenShake', delay: 200, duration: 400 },
+          { type: 'heartbeat', delay: 0, duration: 4000 },
+        ],
+        audio: [
+          { key: 'proc:heartbeat', delay: 0 },
+          { key: 'proc:heartbeat', delay: 1000 },
+        ],
+      },
+      {
+        lines: [
+          'My hands are steady.',
+          'My heart isn\'t.',
+          '',
+          'Someone knows I was on the catwalk.',
+          'Someone is watching.',
+        ],
+        effect: 'fade',
+        pauseAfter: 2500,
+        vignetteIntensity: 0.85,
+        letterbox: true,
+      },
+      {
+        lines: [
+          'Good.',
+          '',
+          'That means I\'m getting close.',
+        ],
+        effect: 'dramatic',
+        pauseAfter: 2000,
+        vignetteIntensity: 0.8,
+        letterbox: true,
+        audio: [
+          { key: 'proc:shimmer', delay: 500 },
+        ],
+      },
+    ],
+    onComplete: {
+      setFlag: 'found_warning_note',
+      addJournal: 'Someone left a threatening note pinned to the stage: "Stop digging or the next fall won\'t be an accident." They know I was on the catwalk. They\'re watching. The question is — who has more to lose? Edwin protecting his ghost scheme, or Ashworth protecting his insurance fraud?',
+    },
+  },
 ];
 
 // ─── Public helper for checking triggerable cinematics ───────────────────────

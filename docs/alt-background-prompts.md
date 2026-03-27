@@ -243,6 +243,59 @@
 
 ---
 
+## MANAGER'S OFFICE
+
+### 15. `office_ashworth_present.png`
+**Attach:** `assets/backgrounds/managers_office.png`
+
+> Using the attached image as a direct style and composition reference, create a variant of this manager's office. Keep the exact same camera angle, layout, and art style. Changes from the base image:
+>
+> - Ashworth's temporary living setup is visible: a military-style cot with rumpled sheets along one wall, a pillow, a bottle of antacid on the floor beside it
+> - The desk is buried under papers — demolition permits, contractor invoices, insurance forms
+> - A laptop sits open on the desk, its screen casting a cool blue glow
+> - Takeout containers are stacking up — the man hasn't left this room
+> - A green banker's lamp casts warm light across the desk area
+> - The painting on the wall (1924 theater opening night) is slightly crooked, as if bumped recently
+> - The overall feeling is: a businessman's temporary command center, not a theatrical office. Modern technology crammed into vintage architecture.
+>
+> Keep the mahogany desk, filing cabinet, window, painting, and all architectural elements in the exact same positions. The additions are Ashworth's personal effects layered onto the existing office.
+
+### 16. `office_ashworth_fled.png`
+**Attach:** `assets/backgrounds/managers_office.png`
+
+> Using the attached image as a direct style and composition reference, create a variant of this manager's office. Keep the exact same camera angle, layout, and art style. Changes from the base image:
+>
+> - The room has been RANSACKED from the inside — Ashworth left in a panic
+> - Filing cabinet drawers are yanked open, some hanging off their rails
+> - Papers are scattered across the floor — some deliberately dropped, some fallen
+> - The cot sheets are tangled and thrown aside
+> - The laptop is still open on the desk but the screen shows a blank email draft
+> - The painting on the wall is notably crooked — revealing the outline of a wall safe behind it, hanging OPEN and EMPTY
+> - Ashworth's coat is missing from the hook. His briefcase is gone.
+> - A half-empty coffee cup sits cold on the desk — abandoned mid-sip
+> - The banker's lamp is still on, casting its warm glow over the chaos
+> - The overall mood: a crime scene left behind by the criminal himself. He took what he needed and ran.
+>
+> Keep the desk, filing cabinet, window, door, and all architectural elements in the exact same positions. The key hotspot areas (desk/laptop, filing cabinets, painting/safe area, cot/pillow) must remain clearly visible and accessible.
+
+### 17. `office_snooping.png`
+**Attach:** `assets/backgrounds/managers_office.png`
+
+> Using the attached image as a direct style and composition reference, create a variant of this manager's office. Keep the exact same camera angle, layout, and art style. Changes from the base image:
+>
+> - Same as the `office_ashworth_present` variant, BUT:
+> - Ashworth is GONE — his chair is empty, pushed back as if he stood suddenly
+> - The door to the hallway is slightly AJAR — he just stepped out
+> - The laptop screen is brighter, more inviting — it's unguarded, beckoning
+> - The wastebasket near the desk has a crumpled receipt visible at the top
+> - The cot pillow has a barely visible edge of something underneath it (a phone)
+> - The overall mood is tense and opportunistic — the room is temporarily unguarded
+> - A faint golden glow from the desk lamp creates a "spotlight" effect on the laptop and desk area, drawing the player's eye to the searchable hotspots
+>
+> Keep all architectural elements in exact same positions. The key change: Ashworth is absent and the room feels accessible.
+
+---
+
 ## Notes for All Prompts
 
 - **Resolution:** 1920×1080 pixels

@@ -658,7 +658,9 @@
             { "speaker": "Ashworth", "text": "I was working late. Had a cup of tea from the kettle — same as every night. Earl Grey, two sugars, not that it matters. Within twenty minutes, my vision went sideways and I couldn't stand. I'm a big man, Drew. I don't just fall down." },
             { "speaker": "Ashworth", "text": "Before I blacked out, I saw... someone. A shape in the doorway. Just standing there. Watching me fall." },
             { "speaker": "Nancy", "text": "Can you describe them?" },
-            { "speaker": "Ashworth", "text": "Dark clothes. Average build. They didn't help. They didn't call out. They just watched, like I was — like I was a show. And then they were gone. I woke up on the floor with Stella shaking me." }
+            { "speaker": "Ashworth", "text": "Dark clothes. Average build. They didn't help. They didn't call out. They just watched, like I was — like I was a show. And then they were gone. I woke up on the floor with Stella shaking me." },
+            { "speaker": "Nancy", "text": "Did anyone else see this figure?" },
+            { "speaker": "Ashworth", "text": "No one else was — I was alone in the office. But I know what I saw. I'm not making this up." }
           ],
           "choices": [
             {
@@ -950,6 +952,24 @@
               "hideWhenFlag": "answered_parents_call"
             },
             {
+              "text": "Call Bess — ask about Ashworth's company.",
+              "nextNode": "bess_day2",
+              "requiredFlag": "day_2",
+              "hideWhenFlag": "called_bess_day2"
+            },
+            {
+              "text": "Call George — ask about county records.",
+              "nextNode": "george_day2",
+              "requiredFlag": "day_2",
+              "hideWhenFlag": "called_george_day2"
+            },
+            {
+              "text": "Call Ned — ask about the poisoning.",
+              "nextNode": "ned_day2",
+              "requiredFlag": "day_2",
+              "hideWhenFlag": "called_ned_day2"
+            },
+            {
               "text": "Call Bess and George.",
               "nextNode": "bess_george",
               "requiredFlag": "learned_about_cecilia"
@@ -994,6 +1014,47 @@
           ],
           "nextNode": "start",
           "triggerEvent": "answered_parents_call"
+        },
+        {
+          "id": "bess_day2",
+          "lines": [
+            { "speaker": "Bess", "text": "Nancy! I've been digging into Ashworth's company — Monarch Properties LLC. And girl, it's shady." },
+            { "speaker": "Bess", "text": "Three insurance claims in the last five years. All on properties he demolished. One was a warehouse that had a 'mysterious fire' two weeks before demo. Another was a school that got condemned for 'environmental contamination.' Sound familiar?" },
+            { "speaker": "Nancy", "text": "A pattern of manufactured hazards to trigger insurance payouts." },
+            { "speaker": "Bess", "text": "Exactly. Each time, the insurance payout was way more than the property was worth. He's not a developer, Nancy. He's a con artist with a demolition crew." },
+            { "speaker": "Nancy", "text": "Bess, you might have just cracked this case wide open." },
+            { "speaker": "Bess", "text": "I LIVE for this. Also, is Diego still there? George says I'm not allowed to ask but I'm asking anyway." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "called_bess_day2"
+        },
+        {
+          "id": "george_day2",
+          "lines": [
+            { "speaker": "George", "text": "Hey, Nan. I pulled the county records on the Monarch Theatre like you asked." },
+            { "speaker": "George", "text": "Here's the interesting part — there was a building inspection six months ago. The inspector flagged structural concerns that should have delayed demolition by at least eight months. But the report was never filed with the county. It just... vanished." },
+            { "speaker": "Nancy", "text": "Someone buried it." },
+            { "speaker": "George", "text": "Gets better. I cross-referenced the inspector's name with Ashworth's other properties. Same inspector signed off on two of his previous demolitions — both times after similar reports 'went missing.' The inspector's name is M. Lawson." },
+            { "speaker": "Nancy", "text": "M. Lawson. I've seen that name before." },
+            { "speaker": "George", "text": "Thought you might have. Also — the sealed inspection from six months ago? It rated the theater as structurally sound. The building isn't in danger. Someone is manufacturing the justification to tear it down." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "called_george_day2"
+        },
+        {
+          "id": "ned_day2",
+          "lines": [
+            { "speaker": "Ned", "text": "Nancy? Hey. You okay? You sounded shaken on your voicemail last night." },
+            { "speaker": "Nancy", "text": "I'm fine, Ned. But I need your help with something. Can you look up antimony poisoning for me?" },
+            { "speaker": "Ned", "text": "Antimony? Sure, give me a sec... okay. Antimony potassium tartrate — also called tartar emetic. It's a metallic compound. Used historically in medicine, also as a poison. Symptoms include nausea, vomiting, cardiac irregularities." },
+            { "speaker": "Ned", "text": "Here's the thing, Nan — the lethal dose is really specific. For a man Ashworth's size, you'd need about 300 milligrams to be dangerous. But a non-lethal dose — one that makes you sick but doesn't kill you — is almost harder to calculate. Whoever did this knew exactly how much to use." },
+            { "speaker": "Nancy", "text": "Or they were doing it to themselves and wanted to make sure they'd survive." },
+            { "speaker": "Ned", "text": "...Whoa. That's dark, Nan. But yeah — if someone wanted to fake a poisoning convincingly without actually dying, knowing the exact dosage would be critical. And that's way easier to calibrate when you're the one taking it." },
+            { "speaker": "Nancy", "text": "Thank you, Ned. That's exactly what I needed to hear." },
+            { "speaker": "Ned", "text": "Be careful in there. And call me if you need anything. I mean it — anything." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "called_ned_day2"
         },
         {
           "id": "bess_george",
@@ -1312,6 +1373,10 @@
               "nextNode": "sleeping"
             },
             {
+              "text": "Have you been in the basement recently?",
+              "nextNode": "basement_lie"
+            },
+            {
               "text": "I'll let you get back to your research.",
               "nextNode": "farewell"
             }
@@ -1402,6 +1467,17 @@
           "nextNode": "start"
         },
         {
+          "id": "basement_lie",
+          "lines": [
+            { "speaker": "Edwin", "text": "The basement? No. No, I haven't been down there in years. Not since they sealed it off — the door has been locked since the renovation in 2019. I wouldn't even know how to get down there now." },
+            { "speaker": "Nancy", "text": "Really? Because someone has been using the trapdoor mechanism. The fog machine controls are down there. And Stella says she's heard footsteps at 2 AM." },
+            { "speaker": "Edwin", "text": "Stella says a lot of things. She's — look, I'm a historian, not a spelunker. I study documents. Blueprints. I don't go crawling around in basements in the middle of the night." },
+            { "speaker": "Edwin", "text": "If someone has been down there, that's — that's concerning. But it isn't me. I can assure you of that." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "edwin_basement_lie"
+        },
+        {
           "id": "farewell",
           "lines": [
             { "speaker": "Edwin", "text": "Right. Back to the rivets. If you need anything, I'll be here. I'm always here. That's either dedication or pathology, depending on who you ask." }
@@ -1442,6 +1518,11 @@
               "text": "I saw the ghost, Stella. Someone's using your equipment to stage it.",
               "nextNode": "ghost_confrontation",
               "requiredFlag": "saw_ghost"
+            },
+            {
+              "text": "Who were you on the phone with, Stella?",
+              "nextNode": "phone_confrontation",
+              "requiredFlag": "overheard_stella"
             },
             {
               "text": "You seem stressed.",
@@ -1503,7 +1584,7 @@
             { "speaker": "Stella", "text": "I left him a note under the basement door — 'Stop now or I go to the police.' He never responded. Never even acknowledged it." },
             { "speaker": "Nancy", "text": "Why didn't you say anything sooner?" },
             { "speaker": "Stella", "text": "Because part of me wanted it to work, okay? If a ghost story could get this building landmark status, could stop the wrecking ball — who was I to ruin that? This theater is the only thing I've got left." },
-            { "speaker": "Stella", "text": "But then Ashworth got poisoned. And I realized Edwin had crossed a line that I can't pretend away. You need to get down to that basement." }
+            { "speaker": "Stella", "text": "But then Ashworth got poisoned. And I don't know if Edwin did that too or not — honestly, it doesn't feel like him. But something is very wrong in this building and it's bigger than a fake ghost. You need to get down to that basement." }
           ],
           "nextNode": "stella_reveals_edwin",
           "triggerEvent": "stella_confession"
@@ -1542,11 +1623,27 @@
           "lines": [
             { "speaker": "Stella", "text": "I've seen him going down there at night. I know the sounds — the trapdoor mechanism, the fog machine warming up. He's been staging the ghost." },
             { "speaker": "Stella", "text": "I didn't tell anyone because... honestly? I wanted the theater saved too. If a ghost story kept the demolition from happening, I wasn't going to stop it." },
-            { "speaker": "Stella", "text": "But then Ashworth got poisoned, and I realized Edwin had gone too far. I left him that note. He never responded." },
+            { "speaker": "Stella", "text": "But then Ashworth got poisoned, and everything changed. I don't think Edwin did that — the ghost staging is one thing, but poison? That's not him. Still, someone in this building crossed a line. I left Edwin a note warning him to stop. He never responded." },
             { "speaker": "Nancy", "text": "Where's the basement key?" },
             { "speaker": "Stella", "text": "Behind the lighting panel. Edwin thinks he's the only one who knows, but I've been stage manager here for eight years. I know every hiding spot in this building." }
           ],
           "triggerEvent": "basement_key_location"
+        },
+        {
+          "id": "phone_confrontation",
+          "lines": [
+            { "speaker": "Stella", "text": "You — how did you — were you listening?" },
+            { "speaker": "Nancy", "text": "I heard enough. 'She doesn't know about Edwin.' You've been covering for him." },
+            { "speaker": "Stella", "text": "I wasn't covering, I was — okay. Fine. Yes. I know what Edwin's been doing in the basement. I've known for three weeks." },
+            { "speaker": "Stella", "text": "That was my sister on the phone. She's a paralegal. I asked her what happens if someone gets caught staging a haunting in a building they don't own — trespassing, property damage, fraud. She said it's bad, Nancy. Really bad." },
+            { "speaker": "Nancy", "text": "So you were trying to protect Edwin?" },
+            { "speaker": "Stella", "text": "I was trying to protect the theater. If Edwin gets arrested, the landmark petition dies. If the petition dies, Ashworth demolishes everything in three days. I was buying time." },
+            { "speaker": "Stella", "text": "But the poisoning changed everything. I can't protect someone who — who might have —" },
+            { "speaker": "Nancy", "text": "You don't think Edwin poisoned Ashworth." },
+            { "speaker": "Stella", "text": "I don't know what I think anymore. I just know I'm tired of lying about it. Ask me what you want to ask me." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "stella_phone_confession"
         },
         {
           "id": "stressed",
@@ -1656,10 +1753,37 @@
               "nextNode": "opinions"
             },
             {
+              "text": "Diego, I found a chemical receipt in the coat check. Have you seen anything like that?",
+              "nextNode": "receipt_matching",
+              "requiredFlag": "found_chemical_receipt"
+            },
+            {
               "text": "I'll let you get back to writing.",
               "nextNode": "farewell"
             }
           ]
+        },
+        {
+          "id": "receipt_matching",
+          "lines": [
+            { "speaker": "Diego", "text": "The coat check receipt? Yeah — I found that two days ago. I've been staring at it trying to figure out who it belongs to." },
+            { "speaker": "Diego", "text": "ChemSource Industrial Supply. The account name is 'Monarch Properties LLC.' I looked it up — it's a shell company. No website, no employees, just a P.O. box." },
+            { "speaker": "Nancy", "text": "Monarch Properties LLC. That name is interesting." },
+            { "speaker": "Diego", "text": "It gets more interesting. I found a crumpled receipt in Ashworth's trash yesterday — same company. Same account name. He orders takeout, leaves the containers everywhere. But he also left this." },
+            { "speaker": "Nancy", "text": "Wait — you went through Ashworth's trash?" },
+            { "speaker": "Diego", "text": "I'm a writer, Nancy. Observing people's garbage is basically a professional requirement. Hemingway used to —" },
+            { "speaker": "Nancy", "text": "Focus, Diego." },
+            { "speaker": "Diego", "text": "Right. So. Same company. Same shell corporation. The coat check receipt lists antimony potassium tartrate — that's the poison, right? And Ashworth's receipt has... antimony potassium tartrate. Same compound. Same source." },
+            { "speaker": "Nancy", "text": "He ordered the poison that was used on him." },
+            { "speaker": "Diego", "text": "That doesn't make sense. Unless..." },
+            { "speaker": "Nancy", "text": "Unless it makes perfect sense." },
+            { "speaker": "Diego", "text": "...Oh. Oh no. Nancy, are you saying he—" },
+            { "speaker": "Nancy", "text": "I'm not saying anything yet. But I need you to keep this between us." },
+            { "speaker": "Diego", "text": "This is going in the play. You can't stop me. This is the best twist I've ever — okay, okay, between us. For now. But Nancy, if Ashworth poisoned himself... why?" },
+            { "speaker": "Nancy", "text": "That's what I'm going to find out." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "diego_receipt_match"
         },
         {
           "id": "the_play",
@@ -1730,10 +1854,39 @@
               "nextNode": "enemies"
             },
             {
+              "text": "Your insurance pays $2.3 million if the building is condemned. That's a lot of money.",
+              "nextNode": "insurance_nervous",
+              "requiredFlag": "called_bess_day2"
+            },
+            {
               "text": "I'll leave you to your calls.",
               "nextNode": "farewell"
             }
           ]
+        },
+        {
+          "id": "insurance_nervous",
+          "lines": [
+            { "speaker": "Ashworth", "text": "Where did you hear — who told you about the insurance? That's confidential business information." },
+            { "speaker": "Nancy", "text": "Public records, Mr. Ashworth. Your company has filed three insurance claims on demolished properties in five years." },
+            { "speaker": "Ashworth", "text": "That's — those are completely separate — you're conflating — look. Business insurance is standard practice. Every developer carries it. Every single one." },
+            { "speaker": "Nancy", "text": "And the building inspector, M. Lawson? The same inspector who signed off on your last two demolitions?" },
+            { "speaker": "Ashworth", "text": "I need to take this." }
+          ],
+          "choices": [
+            {
+              "text": "(Watch him leave. This is my chance to search the office.)",
+              "nextNode": "snooping_begins"
+            }
+          ]
+        },
+        {
+          "id": "snooping_begins",
+          "lines": [
+            { "speaker": "Ashworth", "text": "Excuse me — my lawyer. I need to take this in the hallway." },
+            { "speaker": "Nancy", "text": "Ashworth pulls out his phone and steps out, closing the door behind him. He didn't lock it. And he left everything on his desk. I don't have long — he could come back any second. What can I find before he returns?" }
+          ],
+          "triggerEvent": "ashworth_snooping"
         },
         {
           "id": "feeling",
@@ -1833,6 +1986,135 @@
           "lines": [
             { "speaker": "Ashworth", "text": "We're done, Drew. I've answered your questions. I've shown you my office. I've been more cooperative than any man who was recently poisoned should have to be." },
             { "speaker": "Ashworth", "text": "The demolition is in seventy-two hours. Either find the poisoner by then or get out of my way. Preferably both." }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "edwin_basement_confrontation",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Edwin", "text": "Nancy. I... I suppose I knew this moment would come." },
+            { "speaker": "Edwin", "text": "You've found it all, haven't you. The fog machine controls. The trapdoor mechanism. The costume." },
+            { "speaker": "Nancy", "text": "The Ghost Project, Edwin. Your notebook is very thorough." }
+          ],
+          "choices": [
+            {
+              "text": "You staged the haunting. All of it.",
+              "nextNode": "ghost_confession"
+            },
+            {
+              "text": "Tell me about the poisoning.",
+              "nextNode": "poison_denial"
+            },
+            {
+              "text": "Why, Edwin? Why go this far?",
+              "nextNode": "motivation"
+            }
+          ]
+        },
+        {
+          "id": "ghost_confession",
+          "lines": [
+            { "speaker": "Edwin", "text": "Yes. All of it. The fog. The lights. The figure on stage. The whispers in the walls. I spent four months planning it — every cue, every timing, every sightline." },
+            { "speaker": "Edwin", "text": "The ghost of Margaux Fontaine. My greatest production. And I'm not even a theater person — I'm a historian. But I learned. I practiced at 3 AM when nobody was here. I ran the sequence forty-seven times before the first public performance." },
+            { "speaker": "Nancy", "text": "You scared people, Edwin. The crew quit. Ashworth—" },
+            { "speaker": "Edwin", "text": "Ashworth was going to destroy this building! Every passage, every secret, every piece of evidence that Margaux was murdered — buried under condominiums. I couldn't let that happen. Not after what my grandfather—" },
+            { "speaker": "Edwin", "text": "I made a promise. To a man who spent forty-three years fighting for the truth. I was twelve years old and I promised him I'd finish what he started. So yes. I faked a ghost. I would do it again." }
+          ],
+          "choices": [
+            {
+              "text": "And the poisoning? Was that part of the plan too?",
+              "nextNode": "poison_denial"
+            },
+            {
+              "text": "I believe you about the ghost. But I need to know about Ashworth.",
+              "nextNode": "poison_denial"
+            }
+          ]
+        },
+        {
+          "id": "poison_denial",
+          "lines": [
+            { "speaker": "Edwin", "text": "Poison? I would never — that's not — Nancy, I was trying to SAVE this place, not hurt anyone!" },
+            { "speaker": "Edwin", "text": "Look at these bottles. Look at them! They're homemade. I mixed fog fluid and stage effects compounds. I couldn't poison someone if I tried — I'm a historian, not a chemist!" },
+            { "speaker": "Nancy", "text": "The poison used on Ashworth was pharmaceutical grade antimony. Commercially sourced. Your chemicals are crude and hand-mixed." },
+            { "speaker": "Edwin", "text": "Because they ARE crude! I followed recipes from a 1920s stage effects manual! The most dangerous thing in these bottles is the glycol fog fluid, and that just makes you cough!" },
+            { "speaker": "Nancy", "text": "Edwin, I need you to look me in the eye. Did you poison Roland Ashworth?" },
+            { "speaker": "Edwin", "text": "No. God, no. I staged a ghost to save a theater. I trespassed. I used equipment that wasn't mine. I scared people. I lied — I lied to you, to Vivian, to everyone. And I'm sorry for all of it." },
+            { "speaker": "Edwin", "text": "But I did not poison that man. I would never. That's not — that's not who I am." }
+          ],
+          "choices": [
+            {
+              "text": "I believe you, Edwin.",
+              "nextNode": "compassionate_end"
+            },
+            {
+              "text": "Then who did?",
+              "nextNode": "who_did_it"
+            },
+            {
+              "text": "Tell me about Cecilia's letter.",
+              "nextNode": "cecilia_letter",
+              "requiredFlag": "found_cecilia_letter"
+            }
+          ],
+          "triggerEvent": "edwin_denies_poison"
+        },
+        {
+          "id": "who_did_it",
+          "lines": [
+            { "speaker": "Edwin", "text": "I don't know. I genuinely don't know. But Nancy — I was here that night. I was in the basement when Ashworth collapsed." },
+            { "speaker": "Edwin", "text": "I heard him fall. Through the ceiling — a thud, then silence. And I was terrified. Not because he was hurt, but because I thought they'd blame me. So I stayed down here. Like a coward." },
+            { "speaker": "Nancy", "text": "Did you see anyone else near the office that night?" },
+            { "speaker": "Edwin", "text": "No. But here's the thing that's been eating at me. Ashworth's tea. He makes it the same way every night — Earl Grey, two sugars, from the kettle in his office. Nobody brings it to him. Nobody touches that kettle except him." },
+            { "speaker": "Nancy", "text": "You're saying nobody had access to poison his tea." },
+            { "speaker": "Edwin", "text": "I'm saying the only person who had regular, unsupervised access to that kettle was Ashworth himself. Make of that what you will." }
+          ],
+          "nextNode": "compassionate_end",
+          "triggerEvent": "edwin_points_to_ashworth"
+        },
+        {
+          "id": "compassionate_end",
+          "lines": [
+            { "speaker": "Nancy", "text": "Edwin, the ghost staging — that's trespassing, property damage, possibly fraud. You know that." },
+            { "speaker": "Edwin", "text": "I know. I've known since the first night. Every time I ran the sequence, I knew I was breaking the law. And every time, I told myself it was worth it." },
+            { "speaker": "Edwin", "text": "Was it? I still don't know. But Margaux Fontaine was murdered on this stage ninety-seven years ago, and nobody ever answered for it. If my ghost made one person ask questions — if it bought this building one more day — then maybe it was worth it." },
+            { "speaker": "Nancy", "text": "I'll figure out the poisoning, Edwin. But you need to stay here until I do." },
+            { "speaker": "Edwin", "text": "I'm not going anywhere. I've been in this building for fifteen years. A few more hours won't hurt." }
+          ],
+          "triggerEvent": "edwin_confronted"
+        },
+        {
+          "id": "cecilia_letter",
+          "lines": [
+            { "speaker": "Edwin", "text": "You found it. Cecilia Drake's confession. The letter she wrote and never sent." },
+            { "speaker": "Edwin", "text": "She confessed to switching the prop goblet for a real one. She put poison in the wine for the Act III death scene. And when Margaux drank from it on stage..." },
+            { "speaker": "Edwin", "text": "My grandfather was in the wings. He watched her fall. He caught her. And she died in his arms." },
+            { "speaker": "Edwin", "text": "I found that letter three months ago, hidden in a wall cavity in the passage between the basement and the dressing room. It's the proof my grandfather spent his life looking for." },
+            { "speaker": "Nancy", "text": "This is enough for the landmark petition, Edwin. This is documented proof of a historical crime." },
+            { "speaker": "Edwin", "text": "I know. That's why I couldn't let Ashworth tear down the walls. The letter was IN the walls. If the demolition happened before I found it, it would have been destroyed. Ninety-seven years of truth, ground to dust." }
+          ],
+          "nextNode": "compassionate_end",
+          "triggerEvent": "cecilia_confession_confirmed"
+        },
+        {
+          "id": "motivation",
+          "lines": [
+            { "speaker": "Edwin", "text": "Because this theater contains proof that Margaux Fontaine was murdered. And Ashworth was going to destroy it." },
+            { "speaker": "Edwin", "text": "The hidden passages, the wall cavities, the sealed rooms — they're an archive. An accidental time capsule. Cecilia Drake hid a confession letter inside these walls, and it took me three months of searching to find it." },
+            { "speaker": "Edwin", "text": "If the demolition happens, that letter is destroyed. The passages collapse. Every piece of evidence gets bulldozed into rubble." },
+            { "speaker": "Edwin", "text": "I couldn't let that happen. Not after my grandfather spent forty-three years fighting for this truth." },
+            { "speaker": "Nancy", "text": "So you staged a ghost to stop the demolition." },
+            { "speaker": "Edwin", "text": "Ghost sightings trigger historical review. Historical review delays demolition. It was the only plan I had. And it was working — until someone poisoned Ashworth and turned a ghost story into a crime scene." }
+          ],
+          "choices": [
+            {
+              "text": "Let's talk about the poisoning.",
+              "nextNode": "poison_denial"
+            }
           ]
         }
       ]
