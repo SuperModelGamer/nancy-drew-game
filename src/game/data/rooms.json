@@ -897,7 +897,8 @@
           "height": 181,
           "label": "Back to Auditorium",
           "type": "navigate",
-          "targetRoom": "auditorium"
+          "targetRoom": "auditorium",
+          "showWhen": "day_2"
         }
       ]
     },
