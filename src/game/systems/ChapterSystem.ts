@@ -42,16 +42,17 @@ const CHAPTER_MILESTONES: ChapterMilestone[] = [
       { type: 'puzzle', id: 'trunk_puzzle' },
       { type: 'flag', id: 'saw_ghost' },
     ],
-    journalEntry: 'Chapter 4: I\'ve found the basement key, opened Margaux\'s trunk, and seen the "ghost" firsthand. It\'s time to go below the stage and confront whoever is behind all of this.',
+    journalEntry: 'Chapter 4: I\'ve found the basement key, opened Margaux\'s trunk, and seen the "ghost" firsthand. But something doesn\'t add up — the poisoning and the ghost feel like two different crimes. Time to go below the stage and find out.',
   },
   {
-    // Chapter 5: The endgame — after confronting Edwin
+    // Chapter 5: The endgame — after confronting Edwin AND discovering Ashworth's fraud
     chapter: 5,
     conditions: [
-      { type: 'flag', id: 'edwin_personal_revealed' },
+      { type: 'flag', id: 'edwin_confronted' },
       { type: 'item', id: 'cecilia_letter' },
+      { type: 'flag', id: 'ashworth_motive_revealed' },
     ],
-    journalEntry: 'Chapter 5: Edwin has confessed. The 1928 murder is solved — Cecilia Drake poisoned Margaux Fontaine. Now I have to decide what happens next. Justice, exposure, or mercy.',
+    journalEntry: 'Chapter 5: Edwin confessed to the ghost staging — but he didn\'t poison Ashworth. The chemicals don\'t match. The insurance records don\'t lie. And the "victim" ran when I got too close. It\'s time to prove what really happened — and who the real criminal is.',
   },
 ];
 
