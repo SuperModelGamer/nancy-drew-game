@@ -36,6 +36,8 @@ interface CinematicEvent {
     setFlag?: string;
     addJournal?: string;
   };
+  /** When true, the next cinematic check fires immediately (no skipCinematic on return). */
+  chainNext?: boolean;
 }
 
 const CINEMATIC_EVENTS: CinematicEvent[] = [
@@ -471,17 +473,18 @@ const CINEMATIC_EVENTS: CinematicEvent[] = [
       setFlag: 'saw_ghost',
       addJournal: 'I saw her — or something pretending to be her. A woman in white on the stage, the face of Margaux Fontaine. She vanished when the lights surged. The scent of old roses lingered. Ghost or hoax, someone is going to a lot of trouble. I\'m going to find out who.',
     },
+    chainNext: true,
   },
 
   // ═══════════════════════════════════════════════════════════════════════════
   // CINEMATIC 5: "The Next Night"
-  // Plays when Nancy returns to the lobby after seeing the ghost.
+  // Chains directly after the ghost encounter (same room, auditorium).
   // Time passage — Nancy leaves, processes what she saw, returns the next night
   // with new determination and a plan. This gates Day 2 content.
   // ═══════════════════════════════════════════════════════════════════════════
   {
     id: 'time_passage_day_2',
-    triggerRoom: 'lobby',
+    triggerRoom: 'auditorium',
     triggerFlag: 'saw_ghost',
     videoKey: 'cinematic_time_passage',
     slides: [
@@ -614,7 +617,7 @@ export class CinematicScene extends BaseSlideScene {
       this.scene.start('VideoCinematicScene', {
         videoKey: event.videoKey,
         targetScene: 'RoomScene',
-        targetData: { roomId: data.targetRoom, skipCinematic: true },
+        targetData: { roomId: data.targetRoom, skipCinematic: !event.chainNext },
         overlayText: event.overlayText,
         onComplete: event.onComplete,
       });
@@ -669,7 +672,9 @@ export class CinematicScene extends BaseSlideScene {
       this.scene.setActive(true, 'UIScene');
       this.scene.bringToTop('UIScene');
     }
-    this.scene.start('RoomScene', { roomId: this.targetRoom, skipCinematic: true });
+    // chainNext: let the next cinematic fire immediately (e.g. ghost → time passage)
+    const skip = !this.cinematicData.chainNext;
+    this.scene.start('RoomScene', { roomId: this.targetRoom, skipCinematic: skip });
   }
 
   private completeEvent(): void {
