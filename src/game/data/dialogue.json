@@ -953,6 +953,11 @@
               "vo": "vo_nancy_choice_mirror"
             },
             {
+              "text": "Vivian, I reconstructed the 1928 film footage. Cecilia was already in costume, waiting in the wings before Margaux fell.",
+              "nextNode": "film_evidence",
+              "requiredFlag": "film_proves_murder"
+            },
+            {
               "text": "How are you holding up?",
               "nextNode": "holding_up",
               "vo": "vo_nancy_choice_holding_up"
@@ -1100,6 +1105,18 @@
             { "speaker": "Vivian", "text": "My office — there are private archives. Margaux's personal effects. Take whatever you need. Just bring me the truth." }
           ],
           "triggerEvent": "vivian_full_trust"
+        },
+        {
+          "id": "film_evidence",
+          "lines": [
+            { "speaker": "Vivian", "text": "She was already — already in costume? Already waiting?" },
+            { "speaker": "Nancy", "text": "Frame by frame. Margaux raises the goblet. She drinks. She collapses. And in the final frame, Cecilia Drake is standing in the wings, in full costume, hand on the curtain. She wasn't reacting to an emergency. She was waiting for her entrance." },
+            { "speaker": "Vivian", "text": "Soixante-dix-sept ans. Ninety-seven years that film sat in a canister. And it was watching the whole time. It saw what happened. It remembered when the rest of the world forgot." },
+            { "speaker": "Nancy", "text": "It's proof, Vivian. Not just an accusation — visual proof that Cecilia knew what was going to happen before it happened." },
+            { "speaker": "Vivian", "text": "My Margaux. She fell, and the camera saw, and nobody looked. Until you." }
+          ],
+          "nextNode": "start",
+          "triggerEvent": "vivian_saw_film_evidence"
         },
         {
           "id": "mirror_accusation",
@@ -1850,6 +1867,11 @@
               "text": "Tell me about Cecilia's letter.",
               "nextNode": "cecilia_letter",
               "requiredFlag": "found_cecilia_letter"
+            },
+            {
+              "text": "Edwin, I found Ashworth's safe. The insurance documents inside... I think HE poisoned himself.",
+              "nextNode": "ashworth_safe_reveal",
+              "requiredItem": "ashworth_files"
             }
           ],
           "triggerEvent": "edwin_denies_poison"
@@ -1890,6 +1912,21 @@
           ],
           "nextNode": "compassionate_end",
           "triggerEvent": "cecilia_confession_confirmed"
+        },
+        {
+          "id": "ashworth_safe_reveal",
+          "lines": [
+            { "speaker": "Edwin", "text": "You found — what? His safe? I didn't even know there was a safe in that office." },
+            { "speaker": "Nancy", "text": "Behind the painting. Insurance documents, Edwin. Ashworth's demolition policy pays $2.3 million. But there's a hazard condemnation clause — if the building is contaminated, the payout increases by $400,000." },
+            { "speaker": "Edwin", "text": "Contaminated... as in poisoned." },
+            { "speaker": "Nancy", "text": "A confirmed toxic contamination of the premises triggers expedited condemnation. Fast-track demolition. Maximum insurance payout. And the dose was precisely non-lethal." },
+            { "speaker": "Edwin", "text": "He — he did it to himself? Ashworth poisoned himself? That's — I spent weeks terrified they'd blame me! I was hiding in this basement, barely sleeping, checking the ceilings for footsteps — and the whole time he was upstairs playing victim?" },
+            { "speaker": "Nancy", "text": "He used the same compound as the 1928 murder. Antimony. Bought it from a chemical supply company under a shell corporation. He made it look connected to the ghost activity to add another layer of chaos." },
+            { "speaker": "Edwin", "text": "That's... that's diabolically clever. And I say that as someone who spent four months learning how to fake a ghost." },
+            { "speaker": "Edwin", "text": "Nancy, I need you to understand something. I would have confessed to the poisoning. If you'd accused me, I would have — I was so guilty about everything else that I almost believed I'd done it. He nearly framed a man who was already framing himself." }
+          ],
+          "nextNode": "compassionate_end",
+          "triggerEvent": "safe_evidence_shared"
         },
         {
           "id": "motivation",

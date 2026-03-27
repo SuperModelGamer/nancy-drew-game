@@ -260,7 +260,7 @@
       "id": "passage_navigation",
       "name": "Hidden Passage Navigation",
       "type": "maze",
-      "description": "The hidden passages behind the theater's walls form a network. Using the blueprints, trace a path from the basement entrance to the dressing room.",
+      "description": "The hidden passages behind the theater's walls form a dark network. Using Edwin's blueprints as a map, navigate the branching tunnels from the basement entrance. Somewhere in these walls, someone hid evidence almost a century ago — and the passages are the only way to reach it.",
       "answer": "dressing room",
       "clues": [
         "The blueprints show passages connecting the basement to several rooms.",

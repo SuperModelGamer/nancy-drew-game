@@ -1066,7 +1066,8 @@
           "label": "Decoded Film",
           "type": "inspect",
           "showWhen": "film_decoded",
-          "description": "Now that the frames are in order, the sequence is devastating. Frame one: a toast on stage, the goblet is raised. Frame two: Margaux drinks. Frame three: she collapses. Frame four: a figure in the wings steps forward — the understudy, already in costume, already ready. She was prepared. She knew what was going to happen. This isn't a rehearsal gone wrong. It's a murder caught on film."
+          "setsFlag": "film_proves_murder",
+          "description": "Now that the frames are in order, the sequence is devastating. Frame one: a toast on stage, the goblet is raised. Frame two: Margaux drinks. Frame three: she collapses. Frame four: a figure in the wings steps forward — the understudy, already in costume, already ready. She was prepared. She knew what was going to happen. This isn't a rehearsal gone wrong. It's a murder caught on film. And Cecilia Drake is standing in frame four with her hand on the curtain, waiting for her cue."
         },
         {
           "id": "pb_graffiti",
@@ -1664,6 +1665,7 @@
           "type": "pickup",
           "itemId": "cecilia_letter",
           "setsFlag": "found_cecilia_letter",
+          "showWhen": "passage_mapped",
           "onceOnly": true
         },
         {
@@ -1780,6 +1782,18 @@
           "puzzleId": "evidence_board",
           "description": "A corkboard covered in photographs, documents, and notes connected by strings. It's Edwin's investigation — his own version of what I do. Fifteen years of research mapped out on a board. But it's incomplete. He has the 1928 timeline but not the modern connections. I can finish this. I can connect both timelines and prove the full truth.",
           "showWhen": "case_near_close"
+        },
+        {
+          "id": "bm_case_solved",
+          "x": 660,
+          "y": 490,
+          "width": 120,
+          "height": 70,
+          "label": "Completed Evidence Board",
+          "type": "inspect",
+          "showWhen": "case_closed",
+          "setsFlag": "ready_for_ending",
+          "description": "Two crimes. Two timelines. Both solved. The 1928 murder: Cecilia Drake poisoned Margaux Fontaine's goblet, stole her role, and built a career on a dead woman's legacy. The modern poisoning: Roland Ashworth poisoned himself with commercially-sourced antimony to trigger an insurance condemnation clause, manufacturing a crime scene to fast-track the demolition of a building he'd already rigged to fail. Edwin staged a ghost. Stella sold props. But the real crimes — the old one and the new one — were committed by people who thought they'd never be caught. Margaux waited ninety-seven years for justice. Ashworth thought he'd only need seventy-two hours. They were both wrong. It's time to make the call."
         },
         {
           "id": "bm_back",
