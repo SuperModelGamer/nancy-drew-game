@@ -43,7 +43,7 @@ As Nancy, the player explores the theater, questions four suspects, collects evi
 ### Vivian Delacroix — The Retired Actress
 - **Role:** Ally and quest-giver
 - **Age:** 70s
-- **Location:** Grand Lobby (Chapter 1), Dressing Room (Chapter 2–3)
+- **Location:** Grand Lobby (Night 1), Dressing Room (Night 2–3)
 - **Motive:** Genuinely wants to save the theater. Knew Margaux Fontaine as a child — Margaux was her godmother
 - **Secret:** She has a personal stake she downplays — she's Margaux's goddaughter and the theater is the last connection to the woman who inspired her career
 - **Key info she provides:** Theater history, suspect introductions, Margaux's story, the night of the poisoning
@@ -52,7 +52,7 @@ As Nancy, the player explores the theater, questions four suspects, collects evi
 ### Edwin Hale — The Theater Historian
 - **Role:** Sympathetic antagonist (ghost stager — NOT the poisoner)
 - **Age:** 50s
-- **Location:** Auditorium (Chapter 1–2), Basement (Chapter 3 — caught)
+- **Location:** Auditorium (Night 1–2), Basement (Night 3 — caught)
 - **Motive:** Obsessive preservationist. Discovered proof of Margaux's murder and believes exposing it will grant the theater landmark status, saving it from demolition. His grandfather was Margaux's lover — Edwin has been carrying a promise since childhood.
 - **Secret:** He IS the ghost. He's been using the theater's 1920s special effects system (fog machines, trapdoors, a hidden passage network) to stage hauntings. He did NOT poison Ashworth — his basement chemicals are crude and homemade, incompatible with the pharmaceutical-grade antimony found in Ashworth's tea.
 - **Lies to Nancy:** Claims he hasn't been in the basement "in years" — Stella contradicts this, having seen him go down at 2 AM.
@@ -62,7 +62,7 @@ As Nancy, the player explores the theater, questions four suspects, collects evi
 ### Roland Ashworth — The Developer (TRUE VILLAIN)
 - **Role:** Self-poisoner / insurance fraudster / false victim
 - **Age:** 40s
-- **Location:** Manager's Office (Chapter 2–3, bedridden → flees)
+- **Location:** Manager's Office (Night 2–3, bedridden → flees)
 - **Motive:** The demolition insurance pays $2.3M. He rejected an $800K offer from the Historical Society. A confirmed poisoning triggers a hazard condemnation clause worth $400K — fast-tracking demolition and maximizing insurance payout.
 - **Secret:** He poisoned HIMSELF with a precisely non-lethal dose of commercially-sourced antimony. His shell company (Monarch Properties LLC) purchased the poison. He manufactured a "crime scene" to condemn the building. His "figure in the doorway" testimony is fabricated — nobody else saw anyone. When confronted about the insurance, he panics and flees — not out of fear, but to file condemnation paperwork.
 - **Key clues planted for the player:** Insurance documents in the safe, condemnation emails on his laptop, chemical receipts matching his shell company, the precise non-lethal dose, the pre-poisoning email to the insurance adjuster, the buried building inspection, the pattern of insurance fraud across his previous properties.
@@ -71,7 +71,7 @@ As Nancy, the player explores the theater, questions four suspects, collects evi
 ### Stella Morrow — The Stage Manager
 - **Role:** Red herring / reluctant protector
 - **Age:** 30s
-- **Location:** Backstage (Chapter 1–2), Catwalk (Chapter 3)
+- **Location:** Backstage (Night 1–2), Catwalk (Night 3)
 - **Motive:** Has keys to every room. Practical, no-nonsense. Seems suspicious because she's been secretly selling valuable theater props to fund her mother's medical bills ($47K and counting).
 - **Secret:** She's been stealing and selling props — but she's not the ghost or the poisoner. She KNOWS Edwin is the ghost and has been covering for him to protect the landmark petition. She was caught on the phone discussing this — if the player overhears, it unlocks a confrontation option.
 - **Nancy Drew mechanic:** Player can eavesdrop on Stella's phone call (cinematic) before entering backstage on Day 2. This sets the `overheard_stella` flag and unlocks "Who were you on the phone with?" as a dialogue choice.
@@ -81,7 +81,7 @@ As Nancy, the player explores the theater, questions four suspects, collects evi
 ### Diego Reyes — The Playwright (INVESTIGATOR-ALLY)
 - **Role:** Key ally who helps crack the Ashworth connection
 - **Age:** 20s
-- **Location:** Projection Booth (Chapter 2–3)
+- **Location:** Projection Booth (Night 2–3)
 - **Provides:** Found the original annotated script of *The Crimson Veil* with strange margin notes (encoding the truth about Margaux's murder). But more importantly, he found the chemical receipt in the coat check AND a matching receipt in Ashworth's trash. He's the one who connects the shell company to Ashworth.
 - **Nancy Drew mechanic:** Collaborative deduction — Diego and Nancy match receipts together, leading to the "he ordered the poison used on him" realization. This is a dialogue-driven investigation scene, not a puzzle.
 - **Dialogue unlocks:** annotated_script_found, heard_basement_noises, diego_receipt_match
@@ -90,9 +90,9 @@ As Nancy, the player explores the theater, questions four suspects, collects evi
 
 ## 3. CHAPTER STRUCTURE
 
-The game is divided into three chapters. Each chapter unlocks new rooms, new dialogue, and new puzzles. Chapter transitions are triggered by completing all required objectives.
+The game takes place over three nights within a 72-hour demolition countdown. Each night unlocks new rooms, new dialogue, and new puzzles. Night transitions are triggered by completing all required objectives and are marked by time-passage cinematics.
 
-### Chapter 1: Opening Night
+### Night 1 — 72 Hours Remain
 **Rooms:** Grand Lobby, Auditorium, Backstage
 **Goal:** Arrive at the theater, meet the cast, witness a "ghost" sighting, gather initial clues
 
@@ -108,10 +108,10 @@ The game is divided into three chapters. Each chapter unlocks new rooms, new dia
 | 8 | Find the old effects manual on the tech shelf | Pickup | effects_manual item |
 | 9 | Examine the fog machine backstage — recently used | Inspect | Journal: "Someone ran this fog machine tonight" |
 
-**Chapter 1 complete when:** Ghost witnessed + effects manual found + all three NPCs talked to
+**Night 1 complete when:** Ghost witnessed + effects manual found + all three NPCs talked to
 
-### Chapter 2: Intermission
-**Rooms:** All Chapter 1 + Dressing Room, Projection Booth, Manager's Office
+### Night 2 — 48 Hours Remain
+**Rooms:** All Night 1 + Dressing Room, Projection Booth, Manager's Office
 **Goal:** Investigate the poisoning, discover hidden passages, find proof of the 1928 murder
 
 | Step | Action | Type | Unlocks |
@@ -129,9 +129,9 @@ The game is divided into three chapters. Each chapter unlocks new rooms, new dia
 | 11 | Talk to Stella about hidden passages | Dialogue (conditional, need blueprints) | catwalk_access, basement key location |
 | 12 | Return to Backstage — find basement key hidden in the lighting panel | Pickup | basement_key item |
 
-**Chapter 2 complete when:** Script cipher solved + Ashworth interviewed + basement key obtained
+**Night 2 complete when:** Script cipher solved + Ashworth interviewed + basement key obtained
 
-### Chapter 3: Final Act
+### Night 3 — 24 Hours Remain (Final Night)
 **Rooms:** All previous + Catwalk, Basement
 **Goal:** Confirm Edwin as ghost stager, discover his chemicals DON'T match the poisoning, realize Ashworth is the true villain, prove self-poisoning on the evidence board
 
@@ -150,7 +150,7 @@ The game is divided into three chapters. Each chapter unlocks new rooms, new dia
 | 11 | Choose ending | Choice | Ending variant |
 | 12 | Epilogue text based on choice | Narrative | Credits |
 
-**Key Chapter 3 reveals in order:**
+**Key Night 3 reveals in order:**
 1. Edwin's notebook proves he planned the ghost (expected — red herring for poisoning deepens)
 2. Warning note raises stakes — someone is watching Nancy
 3. Ashworth's snooping reveals incriminating emails/receipts
@@ -400,10 +400,10 @@ These are the signature detective gameplay elements that make this feel like a r
 - Accessed via "Journal" button in the UI bar
 - Entries are added automatically when key inspections or dialogue events occur
 - Each entry has: timestamp (in-game), short title, description
-- Entries are organized by chapter
+- Entries are organized by night
 - New entries flash the Journal button gold briefly
 
-### Evidence Board (Chapter 3 — Final Puzzle)
+### Evidence Board (Night 3 — Final Puzzle)
 - **Two crime boards side by side:** 1928 Murder and Modern Poisoning
 - Player drags evidence cards to the correct case board
 - For each case, player must identify: **culprit**, **method**, and assign the correct evidence
@@ -837,7 +837,7 @@ These are non-negotiable rules that every contributor (human or AI agent) must f
 6. **Keep it moody, not scary.** This is elegant mystery, not horror. Tension through atmosphere and story, never jump scares.
 7. **Data-driven content.** Rooms, items, dialogue, and puzzles live in JSON. Adding content should not require touching game engine code.
 8. **Small, testable milestones.** Each task on the build list should result in something the player can see or do.
-9. **The 72-hour ticking clock is atmospheric, not mechanical.** We don't show a literal countdown — chapter transitions imply time passing (Night 1, Day 2, Night 2). The urgency is narrative, not gamified.
+9. **The 72-hour ticking clock is atmospheric, not mechanical.** We don't show a literal countdown timer — night transitions and title cards imply time passing (Night 1: 72 hours, Night 2: 48 hours, Night 3: 24 hours). The urgency is narrative, not gamified.
 10. **Both mysteries matter equally.** The 1928 murder isn't just backstory — it's the emotional core. The modern poisoning is the hook. Neither should overshadow the other.
 
 ---
