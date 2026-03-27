@@ -644,11 +644,6 @@
             {
               "text": "You mentioned seeing someone in the building at night.",
               "nextNode": "intruder"
-            },
-            {
-              "text": "Your wall safe contains insurance documents. The demolition is worth $2.3 million — you rejected an $800K offer to sell.",
-              "nextNode": "insurance_confronted",
-              "requiredItem": "ashworth_files"
             }
           ]
         },
@@ -690,18 +685,6 @@
             { "speaker": "Ashworth", "text": "Then stop not accusing and start acting. Get him out of my theater. I want him gone, I want his boxes gone, and I want this demolition back on schedule. Am I making myself clear?" }
           ],
           "nextNode": "end"
-        },
-        {
-          "id": "insurance_confronted",
-          "lines": [
-            { "speaker": "Ashworth", "text": "How did you — that safe was locked. I changed the combination myself." },
-            { "speaker": "Nancy", "text": "The Historical Society offered you $800,000 for the theater. You turned it down because the demolition insurance pays $2.3 million." },
-            { "speaker": "Ashworth", "text": "That's a business decision. It's called math, Drew. Not a crime." },
-            { "speaker": "Nancy", "text": "It's a motive. If the theater gets landmark status, you can't demolish it. You lose the insurance payout and have to accept the lower offer. Everyone in this building wants to save the theater — and you have a $1.5 million reason to destroy it." },
-            { "speaker": "Ashworth", "text": "I'm the victim here. Someone poisoned ME. I was on a hospital floor for six hours. So don't you dare turn this around on me — I won't have it." }
-          ],
-          "nextNode": "end",
-          "triggerEvent": "ashworth_motive_revealed"
         },
         {
           "id": "blueprints",

@@ -1316,10 +1316,10 @@
           "height": 129,
           "label": "Ashworth's Laptop (Quick!)",
           "type": "inspect",
-          "description": "His email is open. I scroll fast — there. An email to his lawyer: 'File the condemnation order BEFORE the historical review goes through. If they grant landmark status first, we lose everything.' And below that, a draft to the insurance adjuster: 'The hazard clause triggers upon confirmed toxic contamination of the premises. Proceed with expedited assessment.' He was planning the condemnation timeline around the poisoning. Before it happened.",
+          "description": "His email is open. I scroll fast — there. An email to his lawyer: 'File the condemnation order BEFORE the historical review goes through. If they grant landmark status first, we lose everything.' And below that, a draft to the insurance adjuster: 'The hazard clause triggers upon confirmed toxic contamination of the premises. Proceed with expedited assessment.' He was planning the condemnation timeline around the poisoning. Before it happened. I hear the front door slam. Ashworth isn't coming back to the office — he's leaving the building.",
           "showWhen": "ashworth_snooping",
           "hideWhen": "ashworth_motive_revealed",
-          "setsFlag": "found_condemnation_email",
+          "setsFlag": "ashworth_motive_revealed",
           "onceOnly": true
         },
         {
@@ -1663,6 +1663,7 @@
           "label": "Cecilia's Letters",
           "type": "pickup",
           "itemId": "cecilia_letter",
+          "setsFlag": "found_cecilia_letter",
           "onceOnly": true
         },
         {

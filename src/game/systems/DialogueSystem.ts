@@ -59,7 +59,7 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
   cipher_discussed: 'Diego helped me understand the script cipher — the circled letters follow the stage directions in Act III, not the dialogue.',
   heard_basement_noises: 'Diego mentioned hearing strange noises from the basement at night — mechanical sounds, like machinery running on its own.',
   saw_figure_before_collapse: 'Ashworth saw a ghostly figure moments before he collapsed. The "ghost" may have been a distraction during the poisoning.',
-  ashworth_motive_revealed: 'Ashworth admitted the demolition insurance is worth $2.3 million. He rejected an $800K offer from the Historical Society. He chose greed.',
+  ashworth_motive_revealed: 'Ashworth\'s laptop revealed emails planning the condemnation timeline BEFORE the poisoning happened. He\'s been coordinating with his lawyer and an insurance adjuster. Then he heard me snooping and ran. He\'s not a victim — he\'s the architect of the whole scheme.',
   learned_about_basement_intruder: 'Someone has been accessing the basement at night. There are fresh footprints and the fog machines have been recently serviced.',
   called_friends: 'Called Bess and George — Bess is researching antimony poisoning, George is looking into the Hale family history.',
   called_dad: 'Called Dad. He said antimony poisoning cases from the 1920s were often ruled accidental. The police may not have investigated Margaux\'s death properly.',
