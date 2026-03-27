@@ -6,10 +6,10 @@
       "description": "The grand lobby of the Monarch Theatre. A dusty chandelier hangs above cracked marble floors, and faded playbills line every wall. The brass ticket booth sits dark and empty. It smells like old velvet and forgotten glamour in here — the kind of place that used to matter to people. I can see why someone would fight to save it.",
       "altBackgrounds": [
         {
-          "key": "bg_lobby_after_ghost",
-          "showWhen": "saw_ghost",
+          "key": "bg_lobby_day2",
+          "showWhen": "day_2",
           "priority": 1,
-          "description": "The lobby feels different now. The chandelier sways slightly — there's no draft. The playbills on the walls seem to watch me. After what I saw on that stage, every shadow in this building has a new meaning."
+          "description": "The lobby looks different tonight. Vivian has settled into a wingback chair near the ticket booth with a tea set and a stack of newspapers — the front page reads 'GHOST SIGHTING AT HISTORIC MONARCH THEATRE.' The chandelier lights are warmer. She's been here all day, waiting. Waiting for me."
         },
         {
           "key": "bg_lobby_vivian_gone",
@@ -235,10 +235,10 @@
       "description": "The auditorium takes my breath away. Rows of velvet seats descend toward a grand stage, its crimson curtain drawn shut. The air is thick and still — like the room is holding its breath. A single ghost light burns at center stage. The silence in here is the kind you can feel pressing against your ears. Something creaks in the balcony above. I look up. Nothing. But the hair on my arms is standing straight up.",
       "altBackgrounds": [
         {
-          "key": "bg_auditorium_ghost_aftermath",
-          "showWhen": "saw_ghost",
+          "key": "bg_auditorium_day2",
+          "showWhen": "day_2",
           "priority": 1,
-          "description": "The auditorium looks the same, but it doesn't feel the same. The ghost light flickers where it was steady before. There's a faint haze near the stage — residual fog? Or just my imagination working overtime. The scent of old roses lingers. I keep glancing at the spot where she vanished."
+          "description": "The auditorium feels haunted in a way it didn't before. The ghost light flickers where it was steady last night. There's a faint haze near the stage — residual fog that never fully cleared. The scent of old roses lingers. Edwin has moved from his usual seat to the stage itself, kneeling near the boards with a tape measure and a notebook. He's measuring something. I keep glancing at the spot where she vanished."
         },
         {
           "key": "bg_auditorium_lights_on",
@@ -471,16 +471,16 @@
       "description": "Backstage is a maze of rigging ropes, costume racks, and stacked set pieces. It smells like sawdust and old paint. Somewhere in the shadows, something mechanical is humming — a low, steady pulse I can feel through the floorboards. A draft moves through here that shouldn't exist — the air shifts like someone just walked past me. I'm not alone back here.",
       "altBackgrounds": [
         {
-          "key": "bg_backstage_fog_active",
-          "showWhen": "saw_ghost",
+          "key": "bg_backstage_day2",
+          "showWhen": "day_2",
           "priority": 1,
-          "description": "The fog machine is still leaking. Thin wisps curl along the floor between the costume racks, making everything look like a half-remembered dream. The mechanical humming is louder now — someone turned it up, or it never turned off."
+          "description": "Backstage feels emptier tonight. Half the crew's personal items are gone — two stagehands quit after the ghost sighting. Stella is pacing near the fly system, clipboard in hand but barely looking at it. The fog machine residue still clings to the floor in thin wisps. Some prop crates have been shoved aside, like someone was searching for something in a hurry."
         },
         {
           "key": "bg_backstage_stella_gone",
           "showWhen": "stella_confession",
           "priority": 2,
-          "description": "Stella's workstation is cleared out. Her clipboard is gone, her coffee mug, the lockbox — all of it. She left in a hurry. A single prop rose sits on her chair, like an apology. The backstage feels emptier without her sharp presence organizing the chaos."
+          "description": "Stella's workstation is cleared out. Her clipboard is gone, her coffee mug — all of it. She left in a hurry. A single prop rose sits on her chair, like an apology. The backstage feels emptier without her sharp presence organizing the chaos. But her lockbox is still here, shoved under the table."
         }
       ],
       "hotspots": [
@@ -561,6 +561,19 @@
           "itemId": "effects_manual",
           "onceOnly": true,
           "showWhen": "day_2"
+        },
+        {
+          "id": "bs_uv_lamp",
+          "x": 1650,
+          "y": 720,
+          "width": 80,
+          "height": 60,
+          "label": "UV Lamp",
+          "type": "pickup",
+          "itemId": "uv_lamp",
+          "onceOnly": true,
+          "showWhen": "day_2",
+          "description": "A handheld UV lamp tucked into Stella's effects kit — the kind used to check for hidden marks on stage props. The effects manual mentioned UV-reactive wax paint was common in 1920s theater for secret cues only stagehands could see. If anyone left hidden messages in this building, this lamp would reveal them."
         },
         {
           "id": "bs_prop_table",
@@ -699,21 +712,27 @@
       "description": "Time stopped in this room in 1928. Margaux's vanity mirror is still surrounded by lightbulbs — half of them dead — reflecting dusty perfume bottles and a dried corsage. A velvet settee sits beneath moth-eaten costumes. It smells like old powder and roses. She never came back to clean up. She never came back at all. The lights flicker when I step inside — just once — and then hold steady. Probably the wiring. Probably.",
       "altBackgrounds": [
         {
+          "key": "bg_dressing_room_day2",
+          "showWhen": "day_2",
+          "priority": 1,
+          "description": "The dressing room looks different tonight — or maybe I'm just seeing it differently. My footprints from last night are visible in the dust. The trunk seems more prominent now, and the vanity mirror catches the light at a new angle. Something about this room has shifted. Like it knows someone is finally paying attention after all these years."
+        },
+        {
           "key": "bg_dressing_room_trunk_open",
           "showWhen": "margaux_locket",
-          "priority": 1,
+          "priority": 2,
           "description": "Margaux's trunk sits open now, the locket gone from its velvet cradle. The room feels lighter — like something that was waiting was finally released. The vanity mirror catches a reflection of the open trunk and for a moment, in the dusty glass, I swear I see someone standing behind me. When I turn, there's no one there. Just the scent of roses, stronger than before."
         },
         {
           "key": "bg_dressing_room_mirror_revealed",
           "showWhen": "margaux_accusation",
-          "priority": 2,
+          "priority": 3,
           "description": "The wax letters on the mirror are visible now — C.D. — shining in the vanity lights like an accusation that's waited nearly a century to be read. Margaux wrote her killer's initials on this mirror knowing she might not survive to say the name aloud. The room feels charged, electric. Someone's secret has been exposed."
         },
         {
           "key": "bg_dressing_room_passage_found",
           "showWhen": "passage_mapped",
-          "priority": 3,
+          "priority": 4,
           "description": "The heating vent panel hangs open, revealing the dark mouth of the hidden passage behind the wall. Cool air breathes from the tunnel, carrying the smell of dust and old stone. This is how Edwin moved through the building unseen — from the basement to this room, ghosting through walls. The dressing room will never feel the same."
         }
       ],
@@ -736,8 +755,8 @@
           "height": 366,
           "label": "Vanity Mirror",
           "type": "locked",
-          "description": "I hold the magnifying glass up to the mirror and tilt it in the light. There — barely visible — letters traced in wax on the glass surface. My hands are shaking a little. Margaux wrote this. Nearly a hundred years ago, she sat right where I'm standing and wrote: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.' She knew. She knew who was killing her, and nobody listened.",
-          "requiredItem": "magnifying_glass",
+          "description": "I switch on the UV lamp and sweep it across the mirror. The vanity lights catch the beam and scatter it — but then I see them. Letters. Glowing faintly purple against the glass. Traced in wax that's been invisible for nearly a century. My hands are shaking. Margaux wrote this. She sat right where I'm standing and wrote: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.' She knew. She knew who was killing her, and nobody listened.",
+          "requiredItem": "uv_lamp",
           "puzzleId": "mirror_puzzle",
           "showWhen": "day_2"
         },
@@ -908,9 +927,15 @@
       "description": "A cramped booth above the auditorium, packed with old projectors and film canisters. Diego Reyes has wedged a writing desk between the equipment — papers and coffee cups everywhere. It's cozy in a chaotic way. He's made himself at home up here, which means he hears everything that happens in the theater below.",
       "altBackgrounds": [
         {
+          "key": "bg_projection_booth_day2",
+          "showWhen": "day_2",
+          "priority": 1,
+          "description": "Diego's desk is buried under new pages — he's been writing all day. Red string connects notes pinned to the wall behind his chair, photos and sketches forming a conspiracy board of his own. The coffee cups have multiplied. He looks wired, exhausted, and weirdly happy. He's built himself a war room up here."
+        },
+        {
           "key": "bg_projection_booth_diego_working",
           "showWhen": "annotated_script_found",
-          "priority": 1,
+          "priority": 2,
           "description": "Diego has spread the annotated script across his desk, weighted down with film canisters. He's circled things, drawn arrows, stuck Post-it notes everywhere. The old projectors throw warm light across his scattered research. He's as deep into this mystery as I am."
         }
       ],
@@ -933,9 +958,9 @@
           "height": 104,
           "label": "Film Frames",
           "type": "locked",
-          "description": "I hold the magnifying glass to the film strip. I can just make out individual frames — four key moments from the rehearsal. But they're out of order. Someone spliced the film and rearranged the sequence. If I put them back in the right order, I might see exactly what happened on stage that night.",
-          "requiredItem": "magnifying_glass",
-          "puzzleId": "film_puzzle"
+          "description": "I pull the film strip from the reel and hold it up to the projector light. Four key frames from the 1928 rehearsal — but they've been spliced out of order. Someone rearranged them deliberately. I need to drag them back into the right chronological sequence. The costumes, the stage positions, the lighting — there are visual clues in each frame that tell me which comes first.",
+          "puzzleId": "film_puzzle",
+          "showWhen": "day_2"
         },
         {
           "id": "pb_film_reels",
@@ -1096,10 +1121,16 @@
       "description": "Ashworth's temporary headquarters — a modern laptop on an ornate mahogany desk, demolition blueprints pinned everywhere. There's a cot in the corner with rumpled sheets. He's been sleeping here since the poisoning. He looks pale and unwell, and the room has that stale, closed-in smell of someone who's afraid to leave.",
       "altBackgrounds": [
         {
+          "key": "bg_managers_office_day2",
+          "showWhen": "day_2",
+          "priority": 1,
+          "description": "Ashworth has moved to the window, staring out at the street with his arms crossed. The cot is more rumpled than last night — takeout containers are piling up on the side table. He looks worse. Paler. He hasn't left this building in two days. The demolition blueprints are still pinned everywhere, but he's stopped looking at them. Something has him rattled beyond the poisoning."
+        },
+        {
           "key": "bg_managers_office_empty",
           "showWhen": "ashworth_motive_revealed",
-          "priority": 1,
-          "description": "The office feels different without Ashworth looming in it. His cot is a mess of tangled sheets — he left in a hurry. The desk is still buried in papers, the laptop still open, but the man himself is gone. The room smells like cold coffee and fear. Whatever he's running from, it isn't just me."
+          "priority": 2,
+          "description": "The office feels different without Ashworth looming in it. His cot is a mess of tangled sheets — he left in a hurry. The desk is still buried in papers, the laptop still open, but the man himself is gone. The room smells like cold coffee and fear. Whatever he's running from, it isn't just me. And the painting on the wall is crooked — there's something behind it."
         }
       ],
       "hotspots": [
@@ -1234,8 +1265,7 @@
           "type": "locked",
           "description": "A modern wall safe behind a painting of the theater. It has an electronic keypad.",
           "puzzleId": "office_safe_puzzle",
-          "showWhen": "chapter_3",
-          "hideWhen": "ashworth_motive_revealed"
+          "showWhen": "ashworth_motive_revealed"
         },
         {
           "id": "mo_window",

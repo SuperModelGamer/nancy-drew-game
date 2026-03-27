@@ -91,7 +91,7 @@
       "id": "mirror_puzzle",
       "name": "The Vanity Mirror",
       "type": "mirror_reveal",
-      "description": "Using the magnifying glass, you've revealed wax writing on Margaux's mirror. She left an accusation. Drag the lens across the foggy mirror to reveal what's hidden beneath.",
+      "description": "The UV lamp reveals hidden wax writing on Margaux's mirror — glowing purple letters invisible to the naked eye. She left an accusation nearly a century ago. Sweep the UV light across the foggy mirror to reveal what's hidden beneath.",
       "answer": "cd",
       "clues": [
         "The mirror message: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.'",
@@ -114,7 +114,7 @@
       "id": "film_puzzle",
       "name": "The Film Frames",
       "type": "film_assembly",
-      "description": "Four frames from the 1928 rehearsal footage, visible through the magnifying glass. They've been spliced out of order. Drag the frames to the light table slots to reconstruct what happened on stage.",
+      "description": "Four frames from the 1928 rehearsal footage, pulled from the old projector reel. Someone spliced the film and rearranged the sequence. Drag the frames to the light table slots in the right chronological order to reconstruct what happened on stage.",
       "answer": "toast-drink-collapse-understudy",
       "clues": [
         "The script's Act III stage directions describe the sequence: toast, drink, collapse.",
