@@ -55,6 +55,24 @@ const CHAPTER_MILESTONES: ChapterMilestone[] = [
   },
 ];
 
+/** Maps condition IDs to atmospheric Nancy-voice hints for unmet conditions. */
+const CONDITION_HINTS: Record<string, string> = {
+  // Chapter 2 conditions
+  learned_about_margaux: 'I still need to learn about Margaux Fontaine.',
+  learned_about_crimson_veil: 'There\'s a play called The Crimson Veil — I should find out more.',
+  // Chapter 3 conditions
+  basement_key_location: 'Someone in this theater knows where the basement key is hidden.',
+  margaux_diary: 'Margaux\'s diary must be somewhere in this theater.',
+  learned_about_cecilia: 'I keep hearing the name Cecilia Drake. I need to find out who she was.',
+  // Chapter 4 conditions
+  basement_key: 'I need to get my hands on that basement key.',
+  trunk_puzzle: 'That old trunk in the dressing room — there has to be a way to open it.',
+  saw_ghost: 'I haven\'t seen the ghost yet. Maybe I need to be in the right place at the right time.',
+  // Chapter 5 conditions
+  edwin_personal_revealed: 'Edwin is hiding something personal. I need to press him.',
+  cecilia_letter: 'There\'s a letter from Cecilia out there. I can feel it.',
+};
+
 export class ChapterSystem {
   private static instance: ChapterSystem;
 
@@ -63,6 +81,70 @@ export class ChapterSystem {
       ChapterSystem.instance = new ChapterSystem();
     }
     return ChapterSystem.instance;
+  }
+
+  /**
+   * Returns partial-progress info for the next chapter milestone.
+   * If the player is already at the last chapter, returns null.
+   */
+  getNextChapterProgress(): { total: number; met: number; unmetHints: string[] } | null {
+    const save = SaveSystem.getInstance();
+    const inventory = InventorySystem.getInstance();
+    const puzzles = PuzzleSystem.getInstance();
+    const dialogue = DialogueSystem.getInstance();
+    const currentChapter = save.getChapter();
+
+    const milestone = CHAPTER_MILESTONES.find(m => m.chapter === currentChapter + 1);
+    if (!milestone) return null;
+
+    const unmetHints: string[] = [];
+    let met = 0;
+
+    for (const cond of milestone.conditions) {
+      let satisfied = false;
+      switch (cond.type) {
+        case 'flag':
+          satisfied = !!(save.getFlag(cond.id) || dialogue.hasTriggeredEvent(cond.id));
+          break;
+        case 'item':
+          satisfied = inventory.hasItem(cond.id);
+          break;
+        case 'puzzle':
+          satisfied = puzzles.isSolved(cond.id);
+          break;
+        case 'event':
+          satisfied = dialogue.hasTriggeredEvent(cond.id);
+          break;
+      }
+
+      if (satisfied) {
+        met++;
+      } else {
+        const hint = CONDITION_HINTS[cond.id];
+        if (hint) unmetHints.push(hint);
+      }
+    }
+
+    return { total: milestone.conditions.length, met, unmetHints };
+  }
+
+  /**
+   * Returns a formatted nudge string when the player has partial progress
+   * toward the next chapter, or null if no nudge is appropriate.
+   */
+  getProgressSummary(): string | null {
+    const progress = this.getNextChapterProgress();
+    if (!progress || progress.met === 0) return null;
+
+    const remaining = progress.total - progress.met;
+    if (remaining <= 0) return null;
+
+    const prefix = remaining === 1
+      ? 'Almost there. One more piece of the puzzle...'
+      : `Getting closer. ${remaining} things left to uncover...`;
+
+    const hint = progress.unmetHints[0];
+    return hint ? `${prefix}\n${hint}` : prefix;
   }
 
   checkProgression(): number | null {
