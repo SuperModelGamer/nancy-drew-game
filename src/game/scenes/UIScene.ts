@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { InventorySystem } from '../systems/InventorySystem';
 import { SaveSystem } from '../systems/SaveSystem';
 import { DialogueSystem } from '../systems/DialogueSystem';
+import { ChapterSystem } from '../systems/ChapterSystem';
 import roomsData from '../data/rooms.json';
 import itemsData from '../data/items.json';
 import { Colors, TextColors, FONT, Depths, computeViewfinderLayout, BOTTOM_BAR_H } from '../utils/constants';
@@ -195,6 +196,7 @@ export class UIScene extends Phaser.Scene {
   private borderProgressPct!: Phaser.GameObjects.Text;
   private borderChapterText!: Phaser.GameObjects.Text;
   private borderQuestHintText!: Phaser.GameObjects.Text;
+  private borderProgressHintText!: Phaser.GameObjects.Text;
   private panelH = 0; // total height of the slide-up panel
 
   // Always-visible bottom bar stats
@@ -586,6 +588,14 @@ export class UIScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
     this.toolbarContainer.add(this.borderQuestHintText);
 
+    this.borderProgressHintText = this.add.text(centerZoneX, infoY + 80, '', {
+      fontFamily: FONT, fontSize: '18px', color: '#a89878',
+      fontStyle: 'italic', align: 'center',
+      wordWrap: { width: 460 },
+      lineSpacing: 4,
+    }).setOrigin(0.5, 0);
+    this.toolbarContainer.add(this.borderProgressHintText);
+
     // -- RIGHT: Stats block (right-aligned) --
     const statsX = rightZoneX;
 
@@ -900,6 +910,12 @@ export class UIScene extends Phaser.Scene {
     // Quest hint
     if (this.borderQuestHintText) {
       this.borderQuestHintText.setText(this.getQuestHint());
+    }
+
+    // Chapter progress nudge
+    if (this.borderProgressHintText) {
+      const summary = ChapterSystem.getInstance().getProgressSummary();
+      this.borderProgressHintText.setText(summary || '');
     }
   }
 

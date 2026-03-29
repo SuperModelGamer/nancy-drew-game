@@ -256,28 +256,26 @@ export class RoomScene extends Phaser.Scene {
       });
     }
 
-    // Ambient phone ringing in lobby — starts after Vivian's dialogue ENDS, stops on pickup
+    // Ambient phone ringing in lobby — starts when any phone call is available, stops on pickup
     this.phoneRinging = false;
     if (this.currentRoom.id === 'lobby') {
       const save = SaveSystem.getInstance();
-      const talkedToVivian = save.getFlag('vivian_intro');
-      const phoneAnswered = save.getFlag('used_hotspot_lobby_phone');
-      const phoneDone = save.getFlag('called_ned');
-      if (talkedToVivian && !phoneAnswered && !phoneDone) {
+      if (this.hasAvailablePhoneCalls()) {
         // Delay the first ring so it feels like it starts after you arrive
         this.time.delayedCall(1500, () => {
-          if (!this.phoneRinging && !save.getFlag('used_hotspot_lobby_phone')) {
+          if (!this.phoneRinging && this.hasAvailablePhoneCalls()) {
             this.phoneRinging = true;
             UISounds.phoneRingStart();
           }
         });
       }
 
-      // Also listen for vivian_intro completing mid-scene (first playthrough)
+      // Listen for flags changing mid-scene that unlock new phone calls
+      // (e.g. vivian_intro completing on first playthrough, or day_2 triggering)
       // Wait for dialogue to fully end before starting the ring
-      const checkPhoneAfterIntro = () => {
-        if (save.getFlag('vivian_intro') && !save.getFlag('used_hotspot_lobby_phone') && !this.phoneRinging) {
-          save.offChange(checkPhoneAfterIntro);
+      const checkPhoneAfterFlagChange = () => {
+        if (this.hasAvailablePhoneCalls() && !this.phoneRinging) {
+          save.offChange(checkPhoneAfterFlagChange);
           const waitForDialogueEnd = this.time.addEvent({
             delay: 500,
             loop: true,
@@ -287,7 +285,7 @@ export class RoomScene extends Phaser.Scene {
               if (!dialogueActive) {
                 waitForDialogueEnd.destroy();
                 this.time.delayedCall(1500, () => {
-                  if (!this.phoneRinging && !save.getFlag('used_hotspot_lobby_phone')) {
+                  if (!this.phoneRinging && this.hasAvailablePhoneCalls()) {
                     this.phoneRinging = true;
                     UISounds.phoneRingStart();
                   }
@@ -297,8 +295,8 @@ export class RoomScene extends Phaser.Scene {
           });
         }
       };
-      save.onChange(checkPhoneAfterIntro);
-      this.events.once('shutdown', () => save.offChange(checkPhoneAfterIntro));
+      save.onChange(checkPhoneAfterFlagChange);
+      this.events.once('shutdown', () => save.offChange(checkPhoneAfterFlagChange));
 
       // Play dial tone SFX when Nancy hangs up the phone (lobby only)
       if (!save.getFlag('phone_hangup')) {
@@ -517,8 +515,13 @@ export class RoomScene extends Phaser.Scene {
       container.add([bg, label]);
       container.setSize(w, h);
 
-      // Tutorial glow for phone hotspot — guide new players to answer the ringing phone
-      if (hotspot.id === 'lobby_phone' && !save.getFlag('phone_glow_shown')) {
+      // Tutorial glow for phone hotspot — guide players to answer the ringing phone
+      // Shows on Day 1 (phone_glow_shown) and again on Day 2+ (phone_glow_day2_shown)
+      const showPhoneGlow = hotspot.id === 'lobby_phone' && (
+        (!save.getFlag('phone_glow_shown') && this.hasAvailablePhoneCalls()) ||
+        (!save.getFlag('phone_glow_day2_shown') && save.getFlag('phone_glow_shown') && save.getFlag('day_2') && this.hasAvailablePhoneCalls())
+      );
+      if (showPhoneGlow) {
         const glowRadius = Math.max(w, h) * 0.8;
         const glow = this.add.circle(0, 0, glowRadius, 0xc9a84c, 0.12);
         glow.setBlendMode(Phaser.BlendModes.ADD);
@@ -554,9 +557,12 @@ export class RoomScene extends Phaser.Scene {
           delay: 200,
         });
 
-        // Remove glow on first click
+        // Remove glow on click
         bg.once('pointerdown', () => {
           save.setFlag('phone_glow_shown', true);
+          if (save.getFlag('day_2')) {
+            save.setFlag('phone_glow_day2_shown', true);
+          }
           this.tweens.killTweensOf(glow);
           this.tweens.killTweensOf(ring);
           this.tweens.add({
@@ -1255,6 +1261,37 @@ export class RoomScene extends Phaser.Scene {
       }
     };
     this.input.keyboard!.on('keydown', dismissKey);
+  }
+
+  /**
+   * Returns true when there are phone calls available that the player hasn't completed yet.
+   * Used to trigger the phone ringing/glow across Day 1, Day 2, and mid-game calls.
+   */
+  private hasAvailablePhoneCalls(): boolean {
+    const save = SaveSystem.getInstance();
+
+    // Day 1: parents call after Vivian intro
+    if (save.getFlag('vivian_intro') && !save.getFlag('answered_parents_call')) {
+      return true;
+    }
+
+    // Day 2: Bess, George, and Ned calls
+    if (save.getFlag('day_2') &&
+        !(save.getFlag('called_bess_day2') && save.getFlag('called_george_day2') && save.getFlag('called_ned_day2'))) {
+      return true;
+    }
+
+    // Mid-game: call Dad after learning about Cecilia
+    if (save.getFlag('learned_about_cecilia') && !save.getFlag('called_dad')) {
+      return true;
+    }
+
+    // Mid-game: call historical society after calling Dad
+    if (save.getFlag('called_dad') && !save.getFlag('called_historical_society')) {
+      return true;
+    }
+
+    return false;
   }
 
   private navigateToRoom(roomId: string): void {

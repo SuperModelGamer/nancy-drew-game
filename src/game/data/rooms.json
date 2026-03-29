@@ -539,7 +539,20 @@
           "label": "Stella Morrow",
           "type": "talk",
           "dialogueId": "stella_backstage_done",
-          "showWhen": "stella_confession"
+          "showWhen": "stella_confession",
+          "hideWhen": "edwin_confronted"
+        },
+        {
+          "id": "bs_stella_resolution",
+          "x": 731,
+          "y": 625,
+          "width": 220,
+          "height": 535,
+          "label": "Stella Morrow",
+          "type": "talk",
+          "dialogueId": "stella_resolution",
+          "showWhen": "edwin_confronted",
+          "hideWhen": "stella_resolved"
         },
         {
           "id": "bs_notice_board",
@@ -1138,6 +1151,17 @@
           "hideWhen": "ashworth_motive_revealed"
         },
         {
+          "id": "mo_ashworth_done",
+          "x": 518,
+          "y": 367,
+          "width": 347,
+          "height": 584,
+          "label": "Roland Ashworth",
+          "type": "talk",
+          "dialogueId": "ashworth_office_done",
+          "showWhen": "ashworth_motive_revealed"
+        },
+        {
           "id": "mo_blueprints",
           "x": 1134,
           "y": 622,
@@ -1706,7 +1730,19 @@
           "label": "Edwin Hale",
           "type": "talk",
           "dialogueId": "edwin_basement_confrontation",
-          "showWhen": "edwins_notebook"
+          "showWhen": "edwins_notebook",
+          "hideWhen": "edwin_confronted"
+        },
+        {
+          "id": "bm_edwin_final",
+          "x": 1020,
+          "y": 370,
+          "width": 80,
+          "height": 120,
+          "label": "Edwin Hale",
+          "type": "talk",
+          "dialogueId": "edwin_confronted",
+          "showWhen": "case_closed"
         },
         {
           "id": "bm_old_crates",
