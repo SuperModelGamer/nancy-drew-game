@@ -66,6 +66,12 @@ const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
   called_historical_society: 'The Historical Society confirmed the Monarch is eligible for landmark status — which would block Ashworth\'s demolition. Someone doesn\'t want that to happen.',
   called_ned: 'Called Ned. He told me to be careful — old buildings fall apart at the worst moments. He\'s right, but I can\'t stop now.',
   passage_mapped: 'Mapped the hidden passage network — a route from the basement to the dressing room, completely concealed behind the walls. Edwin could move through the building unseen, staging ghost appearances from any angle.',
+  chose_justice: 'I called the police. Edwin will face charges for the poisoning, but Margaux\'s truth will come out. Justice — imperfect, but real.',
+  chose_exposure: 'We\'re going public — the 1928 murder, Edwin\'s confession, Ashworth\'s fraud. Everything. The world will know what happened at the Monarch.',
+  chose_mercy: 'I let Edwin go. He\'ll carry the weight of what he did. But Margaux\'s story will reach the Historical Society. Some truths arrive quietly.',
+  stella_protected: 'I left Stella\'s prop sales out of my report. The theater was being demolished anyway, and her mother needed help no one else would give.',
+  stella_reported: 'I included Stella\'s prop theft in my report, with full context about her mother\'s medical bills. The truth deserves to be complete.',
+  stella_resolved: 'Stella\'s fate is decided. Whatever happens, she knows someone heard her full story.',
 };
 
 // Forward-looking "Nancy's thinking" hints — added AFTER the event entry to guide the player

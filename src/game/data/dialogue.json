@@ -898,6 +898,7 @@
         },
         {
           "id": "ending_justice",
+          "triggerEvent": "chose_justice",
           "lines": [
             { "speaker": "Edwin", "text": "..." },
             { "speaker": "Edwin", "text": "I've been waiting for someone to say that. Isn't that strange? Part of me is... relieved. Genuinely relieved." },
@@ -911,6 +912,7 @@
         },
         {
           "id": "ending_exposure",
+          "triggerEvent": "chose_exposure",
           "lines": [
             { "speaker": "Edwin", "text": "Together? You'd — you'd actually do that? After everything I've —" },
             { "speaker": "Nancy", "text": "The world should know what happened to Margaux Fontaine. And they should know what you did to protect her memory — the sacrifice and the crime. All of it." },
@@ -922,6 +924,7 @@
         },
         {
           "id": "ending_mercy",
+          "triggerEvent": "chose_mercy",
           "lines": [
             { "speaker": "Edwin", "text": "You'd let me go? After what I — you can't be serious." },
             { "speaker": "Nancy", "text": "I'm letting Margaux's story be told. What happens to you... that's between you and your conscience." },
@@ -2126,6 +2129,128 @@
           "id": "start",
           "lines": [
             { "speaker": "Nancy", "text": "I pick up the receiver and listen. Just a dial tone. I've called everyone I can think of — Bess, George, Dad, Ned, even the Historical Society. Time to put down the phone and put the pieces together myself." }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stella_resolution",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Stella", "text": "So. The great detective returns. Pick your favorite felony — I've got a whole collection." },
+            { "speaker": "Stella", "text": "Theft, fraud, accessory to ghost-related intimidation... I think that last one's a misdemeanor, but I'm not a lawyer." },
+            { "speaker": "Nancy", "text": "Stella, I need to talk to you about what happens next." },
+            { "speaker": "Stella", "text": "Right. The part where everything falls apart. I've been rehearsing this scene all morning." }
+          ],
+          "choices": [
+            {
+              "text": "Tell me about your mother.",
+              "nextNode": "about_mother"
+            },
+            {
+              "text": "Why didn't you come to me sooner about Edwin?",
+              "nextNode": "why_not_sooner"
+            },
+            {
+              "text": "I need to decide what to put in my report about you.",
+              "nextNode": "the_choice"
+            }
+          ]
+        },
+        {
+          "id": "about_mother",
+          "lines": [
+            { "speaker": "Stella", "text": "Mom? She's... she's tough. Tougher than cancer, tougher than me, tougher than a $47,000 medical bill that insurance decided was 'elective.'" },
+            { "speaker": "Stella", "text": "Elective. Like she elected to get sick. Like there was a ballot." },
+            { "speaker": "Stella", "text": "She doesn't know about the props. She thinks I picked up extra shifts. If she found out I was stealing to pay for her chemo, she'd check herself out of the hospital just to ground me." },
+            { "speaker": "Nancy", "text": "She sounds like someone worth fighting for." },
+            { "speaker": "Stella", "text": "She's the only thing I've ever been sure about." }
+          ],
+          "choices": [
+            {
+              "text": "Why didn't you come to me sooner about Edwin?",
+              "nextNode": "why_not_sooner"
+            },
+            {
+              "text": "I need to decide what to put in my report about you.",
+              "nextNode": "the_choice"
+            }
+          ]
+        },
+        {
+          "id": "why_not_sooner",
+          "lines": [
+            { "speaker": "Stella", "text": "Because I thought the ghost plan would work. Stupid, right? Edwin was so convinced — scare Ashworth, save the theater, everybody wins." },
+            { "speaker": "Stella", "text": "And I needed the theater to stay open. No theater, no job. No job, no money for Mom." },
+            { "speaker": "Stella", "text": "By the time I realized Edwin was in over his head, I was in over mine. Funny how that works." },
+            { "speaker": "Nancy", "text": "You could have trusted me." },
+            { "speaker": "Stella", "text": "I don't trust easy. Occupational hazard when your whole life is held together with duct tape and denial." }
+          ],
+          "choices": [
+            {
+              "text": "Tell me about your mother.",
+              "nextNode": "about_mother"
+            },
+            {
+              "text": "I need to decide what to put in my report about you.",
+              "nextNode": "the_choice"
+            }
+          ]
+        },
+        {
+          "id": "the_choice",
+          "lines": [
+            { "speaker": "Nancy", "text": "I need to decide what to put in my report about you, Stella." },
+            { "speaker": "Stella", "text": "Yeah. I figured this was coming." },
+            { "speaker": "Stella", "text": "Just — whatever you decide. Thanks for listening to the whole story first. Most people don't bother." }
+          ],
+          "choices": [
+            {
+              "text": "The props were going to be destroyed anyway. I'm leaving them out.",
+              "nextNode": "stella_protected"
+            },
+            {
+              "text": "I have to include everything. But I'll make sure the context is clear.",
+              "nextNode": "stella_reported"
+            }
+          ]
+        },
+        {
+          "id": "stella_protected",
+          "triggerEvent": "stella_protected",
+          "lines": [
+            { "speaker": "Stella", "text": "You — you're serious? You'd do that?" },
+            { "speaker": "Stella", "text": "I..." },
+            { "speaker": "Stella", "text": "I'm not going to cry. I'm not. I'm just — the lighting in here is terrible and my eyes are doing a thing." },
+            { "speaker": "Nancy", "text": "Stella." },
+            { "speaker": "Stella", "text": "I'll pay it back. Every cent. I don't know how yet, but I will. I'll even be nice to the actors." },
+            { "speaker": "Nancy", "text": "Don't make promises you can't keep." },
+            { "speaker": "Stella", "text": "Fair. I'll pay it back and I'll be slightly less terrible to the actors. Final offer." }
+          ],
+          "nextNode": "resolution_end"
+        },
+        {
+          "id": "stella_reported",
+          "triggerEvent": "stella_reported",
+          "lines": [
+            { "speaker": "Stella", "text": "...Yeah. Okay. I knew you would." },
+            { "speaker": "Stella", "text": "And honestly? I think that's the right call. I stole things. There should be a record of that." },
+            { "speaker": "Stella", "text": "Just — the context. You said you'd include the context." },
+            { "speaker": "Nancy", "text": "Every word. Your mother, the bills, the demolition. All of it." },
+            { "speaker": "Stella", "text": "Then that's enough. That's more than I expected from anyone." },
+            { "speaker": "Stella", "text": "You know what's funny? I feel lighter. Like I've been holding my breath for six months and someone finally said 'exhale.'" }
+          ],
+          "nextNode": "resolution_end"
+        },
+        {
+          "id": "resolution_end",
+          "triggerEvent": "stella_resolved",
+          "lines": [
+            { "speaker": "Stella", "text": "Hey, Nancy? Whatever happens with the theater, with Edwin, with all of it..." },
+            { "speaker": "Stella", "text": "Thanks for seeing me. Not the stage manager, not the thief. Me." },
+            { "speaker": "Nancy", "text": "That's the job, Stella. Seeing people." }
           ]
         }
       ]
