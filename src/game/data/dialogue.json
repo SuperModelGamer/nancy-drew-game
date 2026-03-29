@@ -1928,8 +1928,33 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Stella", "text": "Drew. I've told you everything. I've told you more than everything. I've told you things I haven't told my therapist, and she charges $200 an hour." },
-            { "speaker": "Stella", "text": "Go solve the mystery. I've got a fly system to rebalance and approximately zero patience left for questions." }
+            { "speaker": "Stella", "text": "I keep checking my phone. Wondering if Edwin's going to text me something terrible. He doesn't even have my number. That's how rattled I am — I'm afraid of a text from a man who communicates exclusively through handwritten index cards." }
+          ],
+          "choices": [
+            {
+              "text": "Are you okay, Stella?",
+              "nextNode": "worried"
+            },
+            {
+              "text": "I'll handle Edwin. Stay here.",
+              "nextNode": "stay_put"
+            }
+          ]
+        },
+        {
+          "id": "worried",
+          "lines": [
+            { "speaker": "Stella", "text": "Am I okay. You know, nobody's asked me that since this started? Ashworth asked if I tampered with his tea. Edwin asked if I'd seen his notebook. Vivian asked if I'd wound the lobby clock. Nobody asked if I was okay." },
+            { "speaker": "Stella", "text": "I'm not, for the record. I just told you a man I respect is living in the basement faking a ghost, and now you're going to go confront him and I'm going to stand here pretending to adjust a batten and trying not to throw up." },
+            { "speaker": "Nancy", "text": "You did the right thing." },
+            { "speaker": "Stella", "text": "The right thing. Sure. That's what people say when the thing you did is going to keep you up at 3 AM for the next six months. Go, Drew. Before I change my mind about all of it." }
+          ]
+        },
+        {
+          "id": "stay_put",
+          "lines": [
+            { "speaker": "Stella", "text": "Where else would I go? I've been backstage for eleven years. I know every creak in this building, every draft, every weird smell from the fly gallery. This is the only place I make sense." },
+            { "speaker": "Stella", "text": "Just... when you talk to him... remember he's not a bad person. He's a historian who got desperate. There's a difference. I think." }
           ]
         }
       ]
