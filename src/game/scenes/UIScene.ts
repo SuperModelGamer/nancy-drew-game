@@ -202,6 +202,8 @@ export class UIScene extends Phaser.Scene {
   private barProgressTrack!: Phaser.GameObjects.Graphics;
   private barProgressFill!: Phaser.GameObjects.Graphics;
   private barProgressPct!: Phaser.GameObjects.Text;
+  private barQuestHintText!: Phaser.GameObjects.Text;
+  private lastBarQuestHint = '';
 
   private createBottomPanel(canvasW: number, canvasH: number, vf: ReturnType<typeof computeViewfinderLayout>): void {
     const PAD = 28;
@@ -333,6 +335,14 @@ export class UIScene extends Phaser.Scene {
     tabHit.on('pointerover', () => { this.menuToggleLabel.setColor('#ffe0a0'); drawMenuTab(true); });
     tabHit.on('pointerout', () => { this.menuToggleLabel.setColor('#c9a84c'); drawMenuTab(false); });
     this.bottomBarContainer.add(tabHit);
+
+    // ── Always-visible quest hint — subtle Nancy inner-monologue below the MENU tab ──
+    // Positioned just below the MENU tab, above the action buttons. Fades in/out when hint changes.
+    this.barQuestHintText = this.add.text(canvasW / 2, menuTabY + menuTabH + 8, '', {
+      fontFamily: `'Caveat', ${FONT}`, fontSize: '22px', color: '#d8c8a8',
+      fontStyle: 'italic', align: 'center',
+    }).setOrigin(0.5, 0).setAlpha(0);
+    this.bottomBarContainer.add(this.barQuestHintText);
 
     // ── Action buttons + audio/settings ──
     // Buttons are centered vertically in the space below the toggle label
@@ -675,6 +685,11 @@ export class UIScene extends Phaser.Scene {
         duration: 300,
         ease: 'Cubic.easeOut',
       });
+      // Hide the bar quest hint (it's duplicated in the expanded panel)
+      if (this.barQuestHintText) {
+        this.tweens.killTweensOf(this.barQuestHintText);
+        this.barQuestHintText.setAlpha(0);
+      }
       // Start auto-collapse timer (collapses after 5s of no interaction)
       this.resetAutoCollapseTimer();
     } else {
@@ -690,7 +705,18 @@ export class UIScene extends Phaser.Scene {
         y: barTop,
         duration: 250,
         ease: 'Power2',
-        onComplete: () => { if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false); },
+        onComplete: () => {
+          if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false);
+          // Restore bar quest hint when toolbar closes
+          if (this.barQuestHintText && this.lastBarQuestHint) {
+            this.tweens.add({
+              targets: this.barQuestHintText,
+              alpha: 0.7,
+              duration: 400,
+              ease: 'Sine.easeIn',
+            });
+          }
+        },
       });
     }
   }
@@ -715,7 +741,18 @@ export class UIScene extends Phaser.Scene {
           y: barTop,
           duration: 250,
           ease: 'Power2',
-          onComplete: () => { if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false); },
+          onComplete: () => {
+            if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false);
+            // Restore bar quest hint on auto-collapse
+            if (this.barQuestHintText && this.lastBarQuestHint) {
+              this.tweens.add({
+                targets: this.barQuestHintText,
+                alpha: 0.7,
+                duration: 400,
+                ease: 'Sine.easeIn',
+              });
+            }
+          },
         });
       }
     });
@@ -897,46 +934,101 @@ export class UIScene extends Phaser.Scene {
       this.barProgressPct.setText(`${pct}%`);
     }
 
-    // Quest hint
+    // Quest hint — expandable panel
     if (this.borderQuestHintText) {
       this.borderQuestHintText.setText(this.getQuestHint());
+    }
+
+    // Quest hint — always-visible bottom bar (subtle Nancy thought)
+    if (this.barQuestHintText) {
+      const hint = this.getQuestHint();
+      // Only show if the toolbar isn't expanded (avoid duplication) and hint exists
+      const shouldShow = hint.length > 0 && !this.toolbarExpanded;
+      if (hint !== this.lastBarQuestHint) {
+        this.lastBarQuestHint = hint;
+        // Fade out, update text, fade in
+        this.tweens.killTweensOf(this.barQuestHintText);
+        this.tweens.add({
+          targets: this.barQuestHintText,
+          alpha: 0,
+          duration: 200,
+          onComplete: () => {
+            this.barQuestHintText.setText(shouldShow ? `\u2014 ${hint}` : '');
+            if (shouldShow) {
+              this.tweens.add({
+                targets: this.barQuestHintText,
+                alpha: 0.7,
+                duration: 600,
+                ease: 'Sine.easeIn',
+              });
+            }
+          },
+        });
+      }
+      // Hide when toolbar is open (quest hint is already visible in expanded panel)
+      if (this.toolbarExpanded && this.barQuestHintText.alpha > 0) {
+        this.tweens.killTweensOf(this.barQuestHintText);
+        this.barQuestHintText.setAlpha(0);
+      }
     }
   }
 
   // ─── Quest Hint System ──────────────────────────────────────────────────────
 
   private static readonly QUEST_HINTS: { check: (s: SaveSystem, i: InventorySystem) => boolean; hint: string }[] = [
-    // Chapter 1
+    // ── Chapter 1: Opening Night ──
+    { check: (s) => s.getChapter() === 1 && !s.getFlag('vivian_intro'),
+      hint: 'Talk to Vivian in the lobby. She called me here for a reason.' },
+    { check: (s) => s.getChapter() === 1 && !!s.getFlag('vivian_intro') && !s.getFlag('answered_parents_call') && !s.getFlag('used_hotspot_lobby_phone'),
+      hint: 'The phone is ringing. I should answer it.' },
     { check: (s) => s.getChapter() === 1 && !s.getFlag('learned_about_margaux'),
       hint: 'Talk to Vivian in the lobby. She knows this theater better than anyone.' },
+    { check: (s) => s.getChapter() === 1 && !s.getFlag('edwin_auditorium'),
+      hint: 'Find Edwin in the auditorium. He\u2019s been studying this theater for years.' },
     { check: (s) => s.getChapter() === 1 && !s.getFlag('learned_about_crimson_veil'),
-      hint: 'Find Edwin in the auditorium. He may know about The Crimson Veil.' },
+      hint: 'Ask Edwin about The Crimson Veil. That play is at the center of everything.' },
+    { check: (s) => s.getChapter() === 1 && !s.getFlag('stella_backstage'),
+      hint: 'Stella\u2019s backstage. She manages everything in this building.' },
     { check: (s) => s.getChapter() === 1 && !!s.getFlag('learned_about_margaux') && !!s.getFlag('learned_about_crimson_veil'),
-      hint: 'Explore the theater thoroughly. Every room has secrets.' },
-    // Chapter 2
+      hint: 'Explore every corner. This theater is full of secrets.' },
+    // ── Phone calls — Day 2 (critical plot info) ──
+    { check: (s) => !!s.getFlag('day_2') && !s.getFlag('called_bess_day2'),
+      hint: 'I should call Bess. She\u2019s been digging into Ashworth\u2019s company.' },
+    { check: (s) => !!s.getFlag('day_2') && !!s.getFlag('called_bess_day2') && !s.getFlag('called_george_day2'),
+      hint: 'George might have found something in the county records.' },
+    { check: (s) => !!s.getFlag('day_2') && !!s.getFlag('called_george_day2') && !s.getFlag('called_ned_day2'),
+      hint: 'I should check in with Ned about the poisoning.' },
+    // ── Chapter 2: Intermission ──
     { check: (s, i) => s.getChapter() === 2 && !i.hasItem('margaux_diary'),
       hint: 'Find Margaux\u2019s diary. Her dressing room hasn\u2019t been touched since 1928.' },
     { check: (s) => s.getChapter() === 2 && !s.getFlag('learned_about_cecilia'),
-      hint: 'Someone named C. keeps appearing. Find out who Cecilia was.' },
+      hint: 'The initials C.D. keep appearing. Someone here knows who that is.' },
+    { check: (s) => s.getChapter() === 2 && !s.getFlag('ashworth_office'),
+      hint: 'Ashworth is recovering in the manager\u2019s office. Time to question him.' },
     { check: (s) => s.getChapter() === 2 && !s.getFlag('basement_key_location'),
       hint: 'There must be a way into the basement. Someone here knows where the key is.' },
     { check: (s) => s.getChapter() === 2,
       hint: 'Getting closer. Keep searching \u2014 every room has secrets.' },
-    // Chapter 3
+    // ── Phone calls — mid-game ──
+    { check: (s) => !!s.getFlag('learned_about_cecilia') && !s.getFlag('called_dad'),
+      hint: 'I should call Dad. He\u2019ll know about the legal side of a historical crime.' },
+    { check: (s) => !!s.getFlag('called_dad') && !s.getFlag('called_historical_society'),
+      hint: 'The Historical Society might be able to help save this theater.' },
+    // ── Chapter 3: The Ghost\u2019s Secret ──
     { check: (s, i) => s.getChapter() === 3 && !i.hasItem('basement_key'),
-      hint: 'Retrieve the basement key from its hiding place.' },
+      hint: 'The basement key is hidden backstage. Stella told me where.' },
     { check: (s) => s.getChapter() === 3 && !s.getFlag('saw_ghost'),
-      hint: 'Someone is staging a ghost. Catch them in the act.' },
+      hint: 'Someone is staging a ghost. I need to catch them in the act.' },
     { check: (s) => s.getChapter() === 3,
       hint: 'The pieces are coming together. Find the key, open the trunk, and prove the ghost is fake.' },
-    // Chapter 4
+    // ── Chapter 4: Beneath the Stage ──
     { check: (s) => s.getChapter() === 4 && !s.getFlag('edwin_personal_revealed'),
       hint: 'Go beneath the stage and confront whoever is behind this.' },
     { check: (s, i) => s.getChapter() === 4 && !i.hasItem('cecilia_letter'),
-      hint: 'Find Cecilia\u2019s letter. The truth about 1928 is down here.' },
+      hint: 'Find Cecilia\u2019s letter. The proof of Margaux\u2019s murder is down here.' },
     { check: (s) => s.getChapter() === 4,
-      hint: 'Edwin is hiding something. Get him to confess.' },
-    // Chapter 5
+      hint: 'Edwin is hiding something deeply personal. Get him to confess.' },
+    // ── Chapter 5: The Final Curtain ──
     { check: (s) => s.getChapter() === 5,
       hint: 'The case is solved. Decide: justice, exposure, or mercy.' },
   ];
