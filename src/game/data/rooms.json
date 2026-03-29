@@ -1151,6 +1151,17 @@
           "hideWhen": "ashworth_motive_revealed"
         },
         {
+          "id": "mo_ashworth_done",
+          "x": 518,
+          "y": 367,
+          "width": 347,
+          "height": 584,
+          "label": "Roland Ashworth",
+          "type": "talk",
+          "dialogueId": "ashworth_office_done",
+          "showWhen": "ashworth_motive_revealed"
+        },
+        {
           "id": "mo_blueprints",
           "x": 1134,
           "y": 622,
@@ -1719,7 +1730,19 @@
           "label": "Edwin Hale",
           "type": "talk",
           "dialogueId": "edwin_basement_confrontation",
-          "showWhen": "edwins_notebook"
+          "showWhen": "edwins_notebook",
+          "hideWhen": "edwin_confronted"
+        },
+        {
+          "id": "bm_edwin_final",
+          "x": 1020,
+          "y": 370,
+          "width": 80,
+          "height": 120,
+          "label": "Edwin Hale",
+          "type": "talk",
+          "dialogueId": "edwin_confronted",
+          "showWhen": "case_closed"
         },
         {
           "id": "bm_old_crates",

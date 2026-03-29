@@ -969,6 +969,13 @@ export class DialogueSystem {
     }
   }
 
+  /** Maps ending choice events to the EndingScene ending type. */
+  private static ENDING_EVENTS: Record<string, string> = {
+    chose_justice: 'justice',
+    chose_exposure: 'exposure',
+    chose_mercy: 'mercy',
+  };
+
   private triggerEvent(eventId: string): void {
     if (this.triggeredEvents.has(eventId)) return; // already fired this session
     this.triggeredEvents.add(eventId);
@@ -981,6 +988,18 @@ export class DialogueSystem {
     const thinkingHint = EVENT_THINKING_HINTS[eventId];
     if (thinkingHint) {
       save.addJournalEntry(thinkingHint);
+    }
+
+    // Launch EndingScene when an ending choice is made
+    const endingType = DialogueSystem.ENDING_EVENTS[eventId];
+    const sceneRef = this.scene;
+    if (endingType && sceneRef) {
+      save.save();
+      // Delay slightly so the final dialogue line is visible before transition
+      sceneRef.time.delayedCall(2000, () => {
+        sceneRef.scene.stop('UIScene');
+        sceneRef.scene.start('EndingScene', { ending: endingType });
+      });
     }
   }
 

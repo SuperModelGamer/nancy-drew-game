@@ -750,114 +750,78 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Nancy", "text": "Hello, Edwin." },
-            { "speaker": "Edwin", "text": "...Nancy. I was — I was wondering when you'd find your way down here. Hoping, actually. Dreading. Both." },
-            { "speaker": "Nancy", "text": "The fog machines. The trapdoor. The white costume. Your notebook on the catwalk. You're the ghost of the Monarch Theatre." },
-            { "speaker": "Edwin", "text": "And you're as good as Vivian said you were. Better, actually. She said you'd take a week. It's been — what, three days?" }
+            { "speaker": "Nancy", "text": "Edwin. I've solved it. Both cases — 1928 and today." },
+            { "speaker": "Edwin", "text": "...Both? You mean —" },
+            { "speaker": "Nancy", "text": "Cecilia Drake murdered Margaux Fontaine. She swapped the prop goblet for a real one and poisoned the wine in Act III. Your grandfather was right." },
+            { "speaker": "Edwin", "text": "After all these years... someone else finally sees it. Someone who isn't a Hale, who doesn't have a reason to believe it. You just... followed the evidence." },
+            { "speaker": "Nancy", "text": "And Ashworth poisoned himself." }
           ],
           "choices": [
             {
-              "text": "Why, Edwin? Why all of this?",
-              "nextNode": "confession"
+              "text": "Ashworth staged the whole thing for the insurance payout.",
+              "nextNode": "ashworth_truth"
             },
             {
-              "text": "You poisoned Ashworth.",
-              "nextNode": "poisoning",
-              "requiredFlag": "poison_identified"
-            },
-            {
-              "text": "Your grandfather was James Hale. This was never just about the theater.",
+              "text": "Your grandfather was James Hale. This was always personal for you.",
               "nextNode": "personal",
               "requiredFlag": "learned_about_hale_family"
             }
           ]
         },
         {
+          "id": "ashworth_truth",
+          "lines": [
+            { "speaker": "Edwin", "text": "He — what? Ashworth poisoned himself?" },
+            { "speaker": "Nancy", "text": "A $400,000 hazard condemnation clause in his insurance policy. If the building was deemed dangerous — say, because of a poisoning — the payout doubles. He used a pharmaceutical-grade compound, carefully dosed. Non-lethal. Just dramatic enough to trigger an investigation." },
+            { "speaker": "Edwin", "text": "That's... that's monstrous. He turned a real crime scene — a place where a woman was actually murdered — into an insurance scheme. He was going to demolish the evidence of a ninety-seven-year-old murder for money." },
+            { "speaker": "Nancy", "text": "And you were staging a ghost to stop him. Two men, two frauds, both convinced they were the hero of the story." },
+            { "speaker": "Edwin", "text": "...When you put it like that, it sounds absurd. And I suppose it is. A historian and a developer, playing games in a dead woman's theater." }
+          ],
+          "choices": [
+            {
+              "text": "The question is what happens now.",
+              "nextNode": "what_now"
+            },
+            {
+              "text": "Was any of it worth it?",
+              "nextNode": "was_it_worth_it"
+            }
+          ]
+        },
+        {
           "id": "personal",
           "lines": [
-            { "speaker": "Edwin", "text": "...You know about my grandfather? How did you — the parish records? The employment ledgers? I thought I was the only one who'd —" },
+            { "speaker": "Edwin", "text": "You found out about my grandfather." },
             { "speaker": "Nancy", "text": "James Hale. He was a stagehand here. He loved Margaux. He spent his whole life trying to prove she was murdered." },
             { "speaker": "Edwin", "text": "He died when I was twelve. November 3rd, 1986 — I remember the date because it snowed and grandfathers aren't supposed to die when it snows. The last thing he said to me was: 'Promise me you'll find the truth about Margaux.' I was a kid. I didn't understand." },
-            { "speaker": "Edwin", "text": "But I grew up. I became a historian — well, an architectural historian, technically, but the Monarch kept pulling me back. And fifteen years ago, I started keeping that promise." },
-            { "speaker": "Nancy", "text": "And six months ago, you found the proof." },
-            { "speaker": "Edwin", "text": "Cecilia Drake's letters. Hidden in a sealed compartment in the basement wall — behind the original plaster, if you can believe it. Proof that she ordered the poison. Proof that she swapped the goblet. Proof that my grandfather was right. All along, he was right." }
+            { "speaker": "Edwin", "text": "But I grew up. And fifteen years ago, I started keeping that promise. And now, because of you, it's finally done." },
+            { "speaker": "Nancy", "text": "The ghost staging, the trespassing, the fraud — that was all you. But the poisoning was Ashworth's own scheme. An insurance payout." },
+            { "speaker": "Edwin", "text": "He poisoned himself? For money? While I was down here trying to save Margaux's legacy, he was turning her theater into a — a balance sheet?" }
           ],
           "choices": [
             {
-              "text": "So why the ghost? Why not just go public?",
-              "nextNode": "confession"
-            },
-            {
-              "text": "But then you poisoned Ashworth. You became the very thing you were investigating.",
-              "nextNode": "poisoning"
-            }
-          ]
-        },
-        {
-          "id": "confession",
-          "lines": [
-            { "speaker": "Edwin", "text": "Fifteen years. Fifteen years and — well, fifteen years and four months, technically. And six months ago, I found them. Cecilia Drake's letters to a pharmacist named Whitford. She ordered the exact compound that killed Margaux." },
-            { "speaker": "Edwin", "text": "I had the proof. But Ashworth had the demolition permits. In three days, this evidence — a century of evidence — would be buried under concrete. The historical society's petition was stalled. So I did the only thing I could think of. Which was, admittedly, insane." },
-            { "speaker": "Edwin", "text": "I made Margaux's ghost real enough to matter. If the Monarch was haunted — truly, demonstrably haunted — the media attention could force a landmark designation. The demolition would be delayed. The truth would come out." },
-            { "speaker": "Nancy", "text": "You used her costume, her blocking, her lines. You studied the effects manual and rebuilt the original systems." },
-            { "speaker": "Edwin", "text": "I spent six months down here, rehearsing. Learning the trapdoor timing — four-point-two seconds from trigger to stage level — the fog sequences, the lighting cues. I wanted it to be perfect. I wanted her to be seen one last time, the way she deserved." }
-          ],
-          "choices": [
-            {
-              "text": "But then Ashworth caught you.",
-              "nextNode": "poisoning"
-            },
-            {
-              "text": "That's beautiful. But you crossed a line.",
-              "nextNode": "poisoning"
-            }
-          ]
-        },
-        {
-          "id": "poisoning",
-          "lines": [
-            { "speaker": "Edwin", "text": "Ashworth found the basement two weeks ago. He saw everything — the costume, the fog controls, the letters. He laughed. He actually laughed. He said: 'I'll have the wrecking ball here by morning.' Like it was nothing. Like sixty-five years of history was — was nothing." },
-            { "speaker": "Edwin", "text": "I panicked. I'd spent fifteen years on this. My grandfather spent fifty. Sixty-five years of work, two lifetimes, and it was all about to be crushed into rubble by a man who saw a century of art as an insurance payout." },
-            { "speaker": "Nancy", "text": "So you poisoned him." },
-            { "speaker": "Edwin", "text": "I... yes. I used antimony potassium tartrate — the same compound from Margaux's alchemy book, page forty-seven. I calculated a non-lethal dose. Point-three grams dissolved in — I'm not going to pretend the precision makes it better. I poisoned him. I put it in his tea." }
-          ],
-          "nextNode": "poisoning_guilt"
-        },
-        {
-          "id": "poisoning_guilt",
-          "lines": [
-            { "speaker": "Nancy", "text": "You used the same poison that killed Margaux." },
-            { "speaker": "Edwin", "text": "..." },
-            { "speaker": "Edwin", "text": "Do you think I don't — do you think that hasn't been eating me alive?" },
-            { "speaker": "Edwin", "text": "I couldn't sleep for three days after. I sat down here in the dark, listening. Just listening. Making sure he was still breathing upstairs. Every time a pipe creaked, I thought — what if I got the calculation wrong? What if he dies and I'm exactly what Cecilia was? A poisoner in a theater. The same theater." },
-            { "speaker": "Nancy", "text": "You poisoned a man, Edwin. You became exactly what you were investigating." },
-            { "speaker": "Edwin", "text": "I know. God help me, I know. My hands haven't stopped shaking since. Look —" },
-            { "speaker": "Edwin", "text": "I'm a historian. I catalog facts. I organize timelines. I don't — I'm not supposed to be the kind of person who does this." }
-          ],
-          "choices": [
-            {
-              "text": "Was it worth it?",
-              "nextNode": "was_it_worth_it"
-            },
-            {
-              "text": "What do you want to happen now?",
+              "text": "The question is what happens now.",
               "nextNode": "what_now"
+            },
+            {
+              "text": "Was any of it worth it?",
+              "nextNode": "was_it_worth_it"
             }
           ]
         },
         {
           "id": "was_it_worth_it",
           "lines": [
-            { "speaker": "Edwin", "text": "I saved a theater. I saved a woman's legacy. I found the truth about a murder that went unsolved for — ninety-seven years, if we're counting. And we're always counting." },
+            { "speaker": "Edwin", "text": "I found the truth about a murder that went unsolved for ninety-seven years. I kept a promise my grandfather made to a dying woman. And I committed trespassing, property damage, and fraud to do it." },
             { "speaker": "Edwin", "text": "Was it worth it?" },
-            { "speaker": "Edwin", "text": "...Ask me on a good day and I'll say yes. Ask me at three in the morning when I can hear Ashworth coughing through the floorboards and I'll say I don't know anymore. I genuinely don't know." },
+            { "speaker": "Edwin", "text": "...Ask me on a good day and I'll say yes. Ask me at three in the morning when I'm rehearsing ghost cues alone in a basement and I'll say I don't know anymore." },
             { "speaker": "Nancy", "text": "I'm asking you right now." },
-            { "speaker": "Edwin", "text": "Right now I'm a fifty-three-year-old man — fifty-three and a half, not that it matters — standing in a basement, waiting for a detective half my age to decide my fate. Right now I'm terrified. And I'm ashamed. And I'd do it all again tomorrow if it meant Margaux's name wasn't buried under concrete." },
+            { "speaker": "Edwin", "text": "Right now I'm a fifty-three-year-old man standing in a basement, waiting for a detective half my age to decide my fate. Right now I'm terrified. And I'm ashamed. And I'd do it all again tomorrow if it meant Margaux's name wasn't buried under concrete." },
             { "speaker": "Edwin", "text": "That's the truth. I wish it were simpler. I'm a historian — I'm supposed to make things simpler. But this one I can't." }
           ],
           "choices": [
             {
-              "text": "I'm calling the police. You poisoned someone, Edwin.",
+              "text": "I'm calling the police. The ghost staging, the fraud — the law should sort this out.",
               "nextNode": "ending_justice"
             },
             {
@@ -874,15 +838,15 @@
         {
           "id": "what_now",
           "lines": [
-            { "speaker": "Edwin", "text": "Honestly? I don't — I haven't thought that far ahead. Fifteen years of momentum and I don't know how to stop. I never planned for 'after.' Historians aren't supposed to become part of the story." },
-            { "speaker": "Edwin", "text": "Part of me wants to turn myself in. Part of me wants to run — I have a colleague in Edinburgh, I could disappear into an archive and never come out. And part of me wants to stand on that stage and tell the whole world what Cecilia Drake did." },
-            { "speaker": "Nancy", "text": "And what about what you did?" },
-            { "speaker": "Edwin", "text": "I'll carry that either way. Whether I'm in a jail cell or a library in Scotland or standing in this theater — I'll carry it. I poisoned a man with the same compound that killed someone my grandfather loved. The irony isn't lost on me. It's never lost on me." },
+            { "speaker": "Edwin", "text": "Honestly? I haven't thought that far ahead. Fifteen years of momentum and I don't know how to stop. I never planned for 'after.' Historians aren't supposed to become part of the story." },
+            { "speaker": "Edwin", "text": "Part of me wants to turn myself in — the ghost staging, the trespassing, all of it. Part of me wants to run. And part of me wants to stand on that stage and tell the whole world what Cecilia Drake did and what Ashworth tried to cover up." },
+            { "speaker": "Nancy", "text": "And what about what you did? The fraud. The people you scared." },
+            { "speaker": "Edwin", "text": "I'll carry that either way. Whether I'm in a courtroom or a library in Scotland or standing in this theater — I'll carry it. I faked a ghost in the same building where a real woman died. The irony isn't lost on me. It's never lost on me." },
             { "speaker": "Nancy", "text": "Then the question is what happens to the Monarch. And to Margaux's story." }
           ],
           "choices": [
             {
-              "text": "I'm calling the police. You poisoned someone, Edwin.",
+              "text": "I'm calling the police. The ghost staging, the fraud — the law should sort this out.",
               "nextNode": "ending_justice"
             },
             {
@@ -903,7 +867,8 @@
             { "speaker": "Edwin", "text": "..." },
             { "speaker": "Edwin", "text": "I've been waiting for someone to say that. Isn't that strange? Part of me is... relieved. Genuinely relieved." },
             { "speaker": "Nancy", "text": "Edwin—" },
-            { "speaker": "Edwin", "text": "No, I mean it. I've been carrying this alone for weeks. The lying, the hiding, creeping upstairs at 2 AM to check that Ashworth was still breathing. I can't — I can't keep cataloging my own lies. I'm running out of filing space." },
+            { "speaker": "Edwin", "text": "No, I mean it. I've been carrying this alone for months. The lying, the hiding, creeping through passages at 2 AM. I can't keep cataloging my own lies. I'm running out of filing space." },
+            { "speaker": "Edwin", "text": "And Ashworth — he should face charges too. Self-poisoning for an insurance payout is fraud. The Monarch deserves better than both of us." },
             { "speaker": "Edwin", "text": "Just — promise me one thing. Make sure Cecilia's letters get to the historical society. All forty-seven of them. Margaux deserves to be remembered for more than how she died." },
             { "speaker": "Nancy", "text": "I promise." },
             { "speaker": "Edwin", "text": "My grandfather kept his promise for fifty years. You'll keep yours. I can tell — you have that same look he had. Stubborn. Certain." },
@@ -915,10 +880,10 @@
           "triggerEvent": "chose_exposure",
           "lines": [
             { "speaker": "Edwin", "text": "Together? You'd — you'd actually do that? After everything I've —" },
-            { "speaker": "Nancy", "text": "The world should know what happened to Margaux Fontaine. And they should know what you did to protect her memory — the sacrifice and the crime. All of it." },
-            { "speaker": "Edwin", "text": "I'll face whatever comes. The arrest, the trial, the — I don't care. I've spent fifteen years in archives. A courtroom can't be worse. But the Monarch —" },
-            { "speaker": "Nancy", "text": "The 1928 murder, the cover-up, your grandfather's research, the landmark petition — we put it all in front of the public and let them decide what this building means." },
-            { "speaker": "Edwin", "text": "Vivian will never forgive me for the poisoning. But maybe — maybe she'll understand why. She knew my grandfather. She knows what promises mean." },
+            { "speaker": "Nancy", "text": "The world should know what happened to Margaux Fontaine. Cecilia's crime. Ashworth's fraud. And yes — your ghost. All of it." },
+            { "speaker": "Edwin", "text": "I'll face whatever comes. The charges for the staging, the trespassing — I don't care. I've spent fifteen years in archives. A courtroom can't be worse." },
+            { "speaker": "Nancy", "text": "The 1928 murder, the cover-up, Ashworth's insurance scheme, your grandfather's research — we put it all in front of the public and let them decide what this building means." },
+            { "speaker": "Edwin", "text": "Vivian will be furious about the ghost. But maybe — maybe she'll understand why. She knew my grandfather. She knows what promises mean." },
             { "speaker": "Nancy", "text": "Then let's give the Monarch one last opening night. Not for a ghost — for the woman who deserved to be remembered." }
           ]
         },
@@ -927,9 +892,9 @@
           "triggerEvent": "chose_mercy",
           "lines": [
             { "speaker": "Edwin", "text": "You'd let me go? After what I — you can't be serious." },
-            { "speaker": "Nancy", "text": "I'm letting Margaux's story be told. What happens to you... that's between you and your conscience." },
+            { "speaker": "Nancy", "text": "I'm letting Margaux's story be told. Ashworth's fraud will come out regardless. What happens to you... that's between you and your conscience." },
             { "speaker": "Edwin", "text": "My conscience. Right. My well-organized, thoroughly documented, deeply guilty conscience." },
-            { "speaker": "Edwin", "text": "...Tell Vivian I'm sorry. For all of it. For hiding down here like a — like a character in one of her old plays. For using Margaux's memory as a weapon. For not trusting her enough to ask for help. Tell her I'm sorry I couldn't say goodbye." },
+            { "speaker": "Edwin", "text": "...Tell Vivian I'm sorry. For all of it. For hiding down here like a character in one of her old plays. For using Margaux's memory as a prop. For not trusting her enough to ask for help. Tell her I'm sorry I couldn't say goodbye." },
             { "speaker": "Nancy", "text": "Edwin." },
             { "speaker": "Edwin", "text": "Yes?" },
             { "speaker": "Nancy", "text": "Your grandfather would be proud of what you found. Not how you found it. But what you found." },
