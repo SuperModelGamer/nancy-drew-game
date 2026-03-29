@@ -202,8 +202,6 @@ export class UIScene extends Phaser.Scene {
   private barProgressTrack!: Phaser.GameObjects.Graphics;
   private barProgressFill!: Phaser.GameObjects.Graphics;
   private barProgressPct!: Phaser.GameObjects.Text;
-  private barQuestHintText!: Phaser.GameObjects.Text;
-  private lastBarQuestHint = '';
 
   private createBottomPanel(canvasW: number, canvasH: number, vf: ReturnType<typeof computeViewfinderLayout>): void {
     const PAD = 28;
@@ -335,14 +333,6 @@ export class UIScene extends Phaser.Scene {
     tabHit.on('pointerover', () => { this.menuToggleLabel.setColor('#ffe0a0'); drawMenuTab(true); });
     tabHit.on('pointerout', () => { this.menuToggleLabel.setColor('#c9a84c'); drawMenuTab(false); });
     this.bottomBarContainer.add(tabHit);
-
-    // ── Always-visible quest hint — subtle Nancy inner-monologue below the MENU tab ──
-    // Positioned just below the MENU tab, above the action buttons. Fades in/out when hint changes.
-    this.barQuestHintText = this.add.text(canvasW / 2, menuTabY + menuTabH + 8, '', {
-      fontFamily: `'Caveat', ${FONT}`, fontSize: '22px', color: '#d8c8a8',
-      fontStyle: 'italic', align: 'center',
-    }).setOrigin(0.5, 0).setAlpha(0);
-    this.bottomBarContainer.add(this.barQuestHintText);
 
     // ── Action buttons + audio/settings ──
     // Buttons are centered vertically in the space below the toggle label
@@ -685,11 +675,6 @@ export class UIScene extends Phaser.Scene {
         duration: 300,
         ease: 'Cubic.easeOut',
       });
-      // Hide the bar quest hint (it's duplicated in the expanded panel)
-      if (this.barQuestHintText) {
-        this.tweens.killTweensOf(this.barQuestHintText);
-        this.barQuestHintText.setAlpha(0);
-      }
       // Start auto-collapse timer (collapses after 5s of no interaction)
       this.resetAutoCollapseTimer();
     } else {
@@ -705,18 +690,7 @@ export class UIScene extends Phaser.Scene {
         y: barTop,
         duration: 250,
         ease: 'Power2',
-        onComplete: () => {
-          if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false);
-          // Restore bar quest hint when toolbar closes
-          if (this.barQuestHintText && this.lastBarQuestHint) {
-            this.tweens.add({
-              targets: this.barQuestHintText,
-              alpha: 0.7,
-              duration: 400,
-              ease: 'Sine.easeIn',
-            });
-          }
-        },
+        onComplete: () => { if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false); },
       });
     }
   }
@@ -741,18 +715,7 @@ export class UIScene extends Phaser.Scene {
           y: barTop,
           duration: 250,
           ease: 'Power2',
-          onComplete: () => {
-            if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false);
-            // Restore bar quest hint on auto-collapse
-            if (this.barQuestHintText && this.lastBarQuestHint) {
-              this.tweens.add({
-                targets: this.barQuestHintText,
-                alpha: 0.7,
-                duration: 400,
-                ease: 'Sine.easeIn',
-              });
-            }
-          },
+          onComplete: () => { if (!this.toolbarExpanded) this.toolbarContainer.setVisible(false); },
         });
       }
     });
@@ -934,42 +897,9 @@ export class UIScene extends Phaser.Scene {
       this.barProgressPct.setText(`${pct}%`);
     }
 
-    // Quest hint — expandable panel
+    // Quest hint
     if (this.borderQuestHintText) {
       this.borderQuestHintText.setText(this.getQuestHint());
-    }
-
-    // Quest hint — always-visible bottom bar (subtle Nancy thought)
-    if (this.barQuestHintText) {
-      const hint = this.getQuestHint();
-      // Only show if the toolbar isn't expanded (avoid duplication) and hint exists
-      const shouldShow = hint.length > 0 && !this.toolbarExpanded;
-      if (hint !== this.lastBarQuestHint) {
-        this.lastBarQuestHint = hint;
-        // Fade out, update text, fade in
-        this.tweens.killTweensOf(this.barQuestHintText);
-        this.tweens.add({
-          targets: this.barQuestHintText,
-          alpha: 0,
-          duration: 200,
-          onComplete: () => {
-            this.barQuestHintText.setText(shouldShow ? `\u2014 ${hint}` : '');
-            if (shouldShow) {
-              this.tweens.add({
-                targets: this.barQuestHintText,
-                alpha: 0.7,
-                duration: 600,
-                ease: 'Sine.easeIn',
-              });
-            }
-          },
-        });
-      }
-      // Hide when toolbar is open (quest hint is already visible in expanded panel)
-      if (this.toolbarExpanded && this.barQuestHintText.alpha > 0) {
-        this.tweens.killTweensOf(this.barQuestHintText);
-        this.barQuestHintText.setAlpha(0);
-      }
     }
   }
 
@@ -1660,7 +1590,7 @@ export class UIScene extends Phaser.Scene {
     const pad = 24;
     const entryLeft = pageLeft + pad;
     const entryTextW = pageW - pad * 2;
-    const entryGap = 14;
+    const entryGap = 16;
 
     let y = pageTop + 8;
     let count = 0;
@@ -1681,11 +1611,11 @@ export class UIScene extends Phaser.Scene {
       let prefix: string;
 
       if (isThinking) {
-        fontSize = 26; color = '#5a4a3a'; prefix = '— ';
+        fontSize = 28; color = '#5a4a3a'; prefix = '\u2014 ';
       } else if (isEvidence) {
-        fontSize = 26; color = '#3a2a1a'; prefix = '• ';
+        fontSize = 28; color = '#3a2a1a'; prefix = '\u2022 ';
       } else {
-        fontSize = 28; color = '#2a1a0a'; prefix = '';
+        fontSize = 30; color = '#2a1a0a'; prefix = '';
       }
 
       const text = this.add.text(entryLeft + xJitter, y, prefix + displayText, {
@@ -1694,7 +1624,7 @@ export class UIScene extends Phaser.Scene {
         color,
         fontStyle: isThinking ? 'normal' : 'bold',
         wordWrap: { width: isThinking ? entryTextW - 16 : entryTextW },
-        lineSpacing: 6,
+        lineSpacing: 7,
       });
 
       // Check if this entry would overflow the page
@@ -1712,6 +1642,142 @@ export class UIScene extends Phaser.Scene {
     }
 
     return count;
+  }
+
+  // ─── Active Leads System ────────────────────────────────────────────────────
+  // Generates Nancy's handwritten checklist of current and completed objectives.
+
+  private static readonly ACTIVE_LEADS: { check: (s: SaveSystem, i: InventorySystem) => 'active' | 'done' | 'hidden'; text: string; doneText?: string }[] = [
+    // Chapter 1
+    { check: (s) => !s.getFlag('vivian_intro') ? 'active' : 'done',
+      text: 'Talk to Vivian', doneText: 'Talked to Vivian' },
+    { check: (s) => !s.getFlag('vivian_intro') ? 'hidden' : !s.getFlag('answered_parents_call') ? 'active' : 'done',
+      text: 'Answer the phone', doneText: 'Spoke with Dad' },
+    { check: (s) => s.getChapter() < 1 ? 'hidden' : !s.getFlag('edwin_auditorium') ? 'active' : 'done',
+      text: 'Find Edwin in the auditorium', doneText: 'Met Edwin Hale' },
+    { check: (s) => !s.getFlag('edwin_auditorium') ? 'hidden' : !s.getFlag('learned_about_crimson_veil') ? 'active' : 'done',
+      text: 'Ask about The Crimson Veil', doneText: 'Learned about The Crimson Veil' },
+    { check: (s) => s.getChapter() < 1 ? 'hidden' : !s.getFlag('stella_backstage') ? 'active' : 'done',
+      text: 'Meet Stella backstage', doneText: 'Met Stella Morrow' },
+    // Chapter 2
+    { check: (s, i) => s.getChapter() < 2 ? 'hidden' : !i.hasItem('margaux_diary') ? 'active' : 'done',
+      text: 'Find Margaux\u2019s diary', doneText: 'Found Margaux\u2019s diary' },
+    { check: (s) => s.getChapter() < 2 ? 'hidden' : !s.getFlag('learned_about_cecilia') ? 'active' : 'done',
+      text: 'Discover who C.D. is', doneText: 'Cecilia Drake \u2014 the understudy' },
+    { check: (s) => s.getChapter() < 2 ? 'hidden' : !s.getFlag('ashworth_office') ? 'active' : 'done',
+      text: 'Question Ashworth', doneText: 'Questioned Ashworth' },
+    { check: (s) => s.getChapter() < 2 ? 'hidden' : !s.getFlag('basement_key_location') ? 'active' : 'done',
+      text: 'Find the basement key', doneText: 'Stella revealed the key location' },
+    // Phone calls — Day 2
+    { check: (s) => !s.getFlag('day_2') ? 'hidden' : !s.getFlag('called_bess_day2') ? 'active' : 'done',
+      text: 'Call Bess about Ashworth', doneText: 'Bess: insurance fraud pattern' },
+    { check: (s) => !s.getFlag('day_2') ? 'hidden' : !s.getFlag('called_george_day2') ? 'active' : 'done',
+      text: 'Call George about records', doneText: 'George: buried inspection report' },
+    { check: (s) => !s.getFlag('day_2') ? 'hidden' : !s.getFlag('called_ned_day2') ? 'active' : 'done',
+      text: 'Call Ned about the poison', doneText: 'Ned: non-lethal dose is harder' },
+    // Phone calls — mid-game
+    { check: (s) => !s.getFlag('learned_about_cecilia') ? 'hidden' : !s.getFlag('called_dad') ? 'active' : 'done',
+      text: 'Call Dad about legal options', doneText: 'Dad: heritage review possible' },
+    // Chapter 3
+    { check: (s, i) => s.getChapter() < 3 ? 'hidden' : !i.hasItem('basement_key') ? 'active' : 'done',
+      text: 'Get the basement key', doneText: 'Got the basement key' },
+    { check: (s) => s.getChapter() < 3 ? 'hidden' : !s.getFlag('saw_ghost') ? 'active' : 'done',
+      text: 'Witness the ghost', doneText: 'Saw the \u201Cghost\u201D firsthand' },
+    // Chapter 4
+    { check: (s) => s.getChapter() < 4 ? 'hidden' : !s.getFlag('edwin_personal_revealed') ? 'active' : 'done',
+      text: 'Confront Edwin', doneText: 'Edwin confessed to staging the ghost' },
+    { check: (s, i) => s.getChapter() < 4 ? 'hidden' : !i.hasItem('cecilia_letter') ? 'active' : 'done',
+      text: 'Find Cecilia\u2019s letters', doneText: 'Found proof of 1928 murder' },
+    // Chapter 5
+    { check: (s) => s.getChapter() < 5 ? 'hidden' : 'active',
+      text: 'Decide Edwin\u2019s fate' },
+  ];
+
+  /** Render the Active Leads checklist on the right page of the journal. */
+  private renderActiveLeads(
+    pageLeft: number, pageW: number, pageTop: number, pageBottom: number,
+  ): void {
+    const save = SaveSystem.getInstance();
+    const inventory = InventorySystem.getInstance();
+    const pad = 24;
+    const textW = pageW - pad * 2;
+    const centerX = pageLeft + pageW / 2;
+
+    // Header
+    const header = this.add.text(centerX, pageTop + 4, 'Active Leads', {
+      fontFamily: JOURNAL_HAND, fontSize: '36px', color: '#3a2a1a',
+      fontStyle: 'bold',
+    }).setOrigin(0.5, 0);
+    this.journalContent.add(header);
+
+    // Underline
+    const lineGfx = this.add.graphics();
+    lineGfx.lineStyle(1.5, 0x3a2a1a, 0.3);
+    lineGfx.lineBetween(pageLeft + pad, pageTop + 44, pageLeft + pageW - pad, pageTop + 44);
+    this.journalContent.add(lineGfx);
+
+    let y = pageTop + 56;
+    const gap = 6;
+
+    // Collect visible leads
+    const leads = UIScene.ACTIVE_LEADS
+      .map(lead => ({ ...lead, state: lead.check(save, inventory) }))
+      .filter(lead => lead.state !== 'hidden');
+
+    // Show active leads first, then completed
+    const active = leads.filter(l => l.state === 'active');
+    const done = leads.filter(l => l.state === 'done');
+
+    // Active leads
+    for (const lead of active) {
+      if (y > pageBottom - 20) break;
+      const bullet = this.add.text(pageLeft + pad, y, '\u25CB  ' + lead.text, {
+        fontFamily: JOURNAL_HAND, fontSize: '28px', color: '#2a1a0a',
+        fontStyle: 'bold',
+        wordWrap: { width: textW - 20 }, lineSpacing: 4,
+      });
+      this.journalContent.add(bullet);
+      y += bullet.height + gap;
+    }
+
+    // Divider before completed
+    if (done.length > 0 && active.length > 0 && y < pageBottom - 40) {
+      y += 6;
+      const divGfx = this.add.graphics();
+      divGfx.lineStyle(1, 0x8a7a6a, 0.2);
+      divGfx.lineBetween(pageLeft + pad + 10, y, pageLeft + pageW - pad - 10, y);
+      this.journalContent.add(divGfx);
+      y += 12;
+    }
+
+    // Completed leads (crossed out style)
+    for (const lead of done) {
+      if (y > pageBottom - 20) break;
+      const displayText = lead.doneText || lead.text;
+      const bullet = this.add.text(pageLeft + pad, y, '\u2713  ' + displayText, {
+        fontFamily: JOURNAL_HAND, fontSize: '26px', color: '#9a8a7a',
+        wordWrap: { width: textW - 20 }, lineSpacing: 4,
+      });
+      this.journalContent.add(bullet);
+
+      // Strikethrough line
+      const strikeGfx = this.add.graphics();
+      strikeGfx.lineStyle(1.5, 0x9a8a7a, 0.4);
+      const strikeY = y + bullet.height / 2;
+      strikeGfx.lineBetween(pageLeft + pad + 28, strikeY, pageLeft + pad + 28 + Math.min(bullet.width - 28, textW - 40), strikeY);
+      this.journalContent.add(strikeGfx);
+
+      y += bullet.height + gap;
+    }
+
+    // Empty state
+    if (leads.length === 0) {
+      const empty = this.add.text(centerX, pageTop + 80, 'No leads yet...\n\nExplore and talk to people.', {
+        fontFamily: JOURNAL_HAND, fontSize: '28px', color: '#9a8a7a',
+        align: 'center', lineSpacing: 8,
+      }).setOrigin(0.5, 0);
+      this.journalContent.add(empty);
+    }
   }
 
   private refreshJournalContent(): void {
@@ -1733,76 +1799,68 @@ export class UIScene extends Phaser.Scene {
     const pageTop = contentTop + 8;
     const pageBottom = contentBottom - 10;
 
+    // ═══ LEFT PAGE: Nancy's journal entries (paginated) ═══
     if (journal.length === 0) {
+      const leftCenterX = leftPageLeft + leftPageW / 2;
       const empty = this.add.text(
-        panelX, (pageTop + pageBottom) / 2,
-        "Nothing yet...\n\nExplore the theater and talk to people\nto fill this journal.", {
+        leftCenterX, (pageTop + pageBottom) / 2,
+        "Nothing yet...\n\nExplore the theater and\ntalk to people.", {
           fontFamily: JOURNAL_HAND, fontSize: '30px', color: '#8a7a6a',
           align: 'center', lineSpacing: 8,
         }).setOrigin(0.5);
       this.journalContent.add(empty);
-      return;
-    }
-
-    // ── Render-based pagination: render left page, then right page ──
-    // We skip forward by this.journalPage spreads worth of entries.
-    // To find where each spread starts, we render off-screen to measure.
-    let spreadStart = 0;
-    for (let s = 0; s < this.journalPage; s++) {
-      const leftFit = this.measurePageCapacity(journal, spreadStart, leftPageW, pageBottom - pageTop);
-      const rightFit = this.measurePageCapacity(journal, spreadStart + leftFit, rightPageW, pageBottom - pageTop);
-      spreadStart += leftFit + rightFit;
-      if (spreadStart >= journal.length) { spreadStart = 0; break; }
-    }
-
-    // Render left page
-    const leftEntries = journal.slice(spreadStart);
-    const leftRendered = this.renderJournalPage(leftEntries, spreadStart, leftPageLeft, leftPageW, pageTop, pageBottom);
-
-    // Render right page
-    const rightStart = spreadStart + leftRendered;
-    const rightEntries = journal.slice(rightStart);
-    let rightRendered = 0;
-    if (rightEntries.length > 0) {
-      rightRendered = this.renderJournalPage(rightEntries, rightStart, rightPageLeft, rightPageW, pageTop, pageBottom);
-    }
-
-    const totalOnSpread = leftRendered + rightRendered;
-    const hasMore = rightStart + rightRendered < journal.length;
-    const hasPrev = this.journalPage > 0;
-
-    // ── Page navigation — centered at bottom across both pages ──
-    if (hasMore || hasPrev) {
-      const navY = pageBottom + 2;
-      const totalSpreads = this.countTotalSpreads(journal, leftPageW, rightPageW, pageBottom - pageTop);
-
-      const pageText = this.add.text(panelX, navY, `— ${this.journalPage + 1} / ${totalSpreads} —`, {
-        fontFamily: JOURNAL_HAND, fontSize: '22px', color: '#8a7a6a',
-      }).setOrigin(0.5);
-      this.journalContent.add(pageText);
-
-      if (hasPrev) {
-        const prevBtn = this.add.text(panelX - 120, navY, '< prev', {
-          fontFamily: JOURNAL_HAND, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
-        }).setOrigin(1, 0.5);
-        prevBtn.setInteractive({ cursor: POINTER_CURSOR });
-        prevBtn.on('pointerover', () => prevBtn.setColor(TAB_GOLD_STR));
-        prevBtn.on('pointerout', () => prevBtn.setColor('#5a3a2a'));
-        prevBtn.on('pointerdown', () => { this.journalPage--; this.refreshJournalContent(); });
-        this.journalContent.add(prevBtn);
+    } else {
+      // Paginate journal entries within the left page only
+      let pageStart = 0;
+      for (let s = 0; s < this.journalPage; s++) {
+        const fit = this.measurePageCapacity(journal, pageStart, leftPageW, pageBottom - pageTop);
+        pageStart += fit;
+        if (pageStart >= journal.length) { pageStart = 0; break; }
       }
 
-      if (hasMore) {
-        const nextBtn = this.add.text(panelX + 120, navY, 'next >', {
-          fontFamily: JOURNAL_HAND, fontSize: '24px', color: '#5a3a2a', fontStyle: 'bold',
-        }).setOrigin(0, 0.5);
-        nextBtn.setInteractive({ cursor: POINTER_CURSOR });
-        nextBtn.on('pointerover', () => nextBtn.setColor(TAB_GOLD_STR));
-        nextBtn.on('pointerout', () => nextBtn.setColor('#5a3a2a'));
-        nextBtn.on('pointerdown', () => { this.journalPage++; this.refreshJournalContent(); });
-        this.journalContent.add(nextBtn);
+      const entries = journal.slice(pageStart);
+      const rendered = this.renderJournalPage(entries, pageStart, leftPageLeft, leftPageW, pageTop, pageBottom);
+
+      const hasMore = pageStart + rendered < journal.length;
+      const hasPrev = this.journalPage > 0;
+
+      // Page navigation — bottom of the left page
+      if (hasMore || hasPrev) {
+        const navY = pageBottom + 2;
+        const leftCenterX = leftPageLeft + leftPageW / 2;
+        const totalPages = this.countLeftPages(journal, leftPageW, pageBottom - pageTop);
+
+        const pageNumText = this.add.text(leftCenterX, navY, `\u2014 ${this.journalPage + 1} / ${totalPages} \u2014`, {
+          fontFamily: JOURNAL_HAND, fontSize: '24px', color: '#8a7a6a',
+        }).setOrigin(0.5);
+        this.journalContent.add(pageNumText);
+
+        if (hasPrev) {
+          const prevBtn = this.add.text(leftCenterX - 100, navY, '\u25C0 prev', {
+            fontFamily: JOURNAL_HAND, fontSize: '26px', color: '#5a3a2a', fontStyle: 'bold',
+          }).setOrigin(1, 0.5);
+          prevBtn.setInteractive({ cursor: POINTER_CURSOR });
+          prevBtn.on('pointerover', () => prevBtn.setColor(TAB_GOLD_STR));
+          prevBtn.on('pointerout', () => prevBtn.setColor('#5a3a2a'));
+          prevBtn.on('pointerdown', () => { this.journalPage--; this.refreshJournalContent(); });
+          this.journalContent.add(prevBtn);
+        }
+
+        if (hasMore) {
+          const nextBtn = this.add.text(leftCenterX + 100, navY, 'next \u25B6', {
+            fontFamily: JOURNAL_HAND, fontSize: '26px', color: '#5a3a2a', fontStyle: 'bold',
+          }).setOrigin(0, 0.5);
+          nextBtn.setInteractive({ cursor: POINTER_CURSOR });
+          nextBtn.on('pointerover', () => nextBtn.setColor(TAB_GOLD_STR));
+          nextBtn.on('pointerout', () => nextBtn.setColor('#5a3a2a'));
+          nextBtn.on('pointerdown', () => { this.journalPage++; this.refreshJournalContent(); });
+          this.journalContent.add(nextBtn);
+        }
       }
     }
+
+    // ═══ RIGHT PAGE: Active Leads checklist ═══
+    this.renderActiveLeads(rightPageLeft, rightPageW, pageTop, pageBottom);
   }
 
   /** Measure how many entries fit on a page by creating temporary text objects. */
@@ -1817,15 +1875,15 @@ export class UIScene extends Phaser.Scene {
       const entry = entries[i];
       const isThinking = entry.startsWith('Thinking:');
       let displayText = isThinking ? entry.replace(/^Thinking:\s*/, '') : entry;
-      const prefix = isThinking ? '— ' : entry.startsWith('Found ') ? '• ' : '';
-      const fontSize = (isThinking || entry.startsWith('Found ')) ? 26 : 28;
+      const prefix = isThinking ? '\u2014 ' : entry.startsWith('Found ') ? '\u2022 ' : '';
+      const fontSize = (isThinking || entry.startsWith('Found ')) ? 28 : 30;
 
       const temp = this.add.text(0, 0, prefix + displayText, {
         fontFamily: JOURNAL_HAND,
         fontSize: `${fontSize}px`,
         fontStyle: isThinking ? 'normal' : 'bold',
         wordWrap: { width: isThinking ? entryTextW - 16 : entryTextW },
-        lineSpacing: 6,
+        lineSpacing: 7,
       }).setVisible(false);
 
       const h = temp.height;
@@ -1839,17 +1897,16 @@ export class UIScene extends Phaser.Scene {
     return Math.max(count, startIdx < entries.length ? 1 : 0);
   }
 
-  /** Count total spreads for page numbering. */
-  private countTotalSpreads(entries: string[], leftW: number, rightW: number, pageH: number): number {
+  /** Count total left-page pages for journal pagination. */
+  private countLeftPages(entries: string[], pageW: number, pageH: number): number {
     let idx = 0;
-    let spreads = 0;
+    let pages = 0;
     while (idx < entries.length) {
-      const leftFit = this.measurePageCapacity(entries, idx, leftW, pageH);
-      const rightFit = this.measurePageCapacity(entries, idx + leftFit, rightW, pageH);
-      idx += leftFit + rightFit;
-      spreads++;
+      const fit = this.measurePageCapacity(entries, idx, pageW, pageH);
+      idx += fit;
+      pages++;
     }
-    return Math.max(1, spreads);
+    return Math.max(1, pages);
   }
 
   // ─── Settings Panel ──────────────────────────────────────────────────────────
