@@ -1904,8 +1904,47 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Vivian", "text": "Nancy, ma chère. You have that look again — the furrow. Go, go. The theater will keep its secrets whether I'm talking or not. I'll be here, as always." },
-            { "speaker": "Vivian", "text": "And remember — crackers in the concession stand. Only slightly stale." }
+            { "speaker": "Vivian", "text": "Nancy. Sit with me a moment? Just — a moment. An old woman's indulgence." }
+          ],
+          "choices": [
+            {
+              "text": "Of course, Vivian.",
+              "nextNode": "sit_together"
+            },
+            {
+              "text": "How are you holding up?",
+              "nextNode": "holding_up"
+            },
+            {
+              "text": "I should keep investigating.",
+              "nextNode": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "sit_together",
+          "lines": [
+            { "speaker": "Vivian", "text": "You remind me of her, you know. Not in looks — Margaux was dark-haired, très dramatic. But in the way you move through a room. Like you're cataloging everything. Taking the measure of every shadow." },
+            { "speaker": "Vivian", "text": "She used to do that before a performance. Stand in the wings and breathe the theater in. She said the building told her things the script didn't." },
+            { "speaker": "Nancy", "text": "What kind of things?" },
+            { "speaker": "Vivian", "text": "Who was lying. Who was frightened. Who was in love. She said buildings absorb the emotions of everyone who passes through them. And theaters most of all, because theaters are where people come to feel things on purpose." },
+            { "speaker": "Vivian", "text": "I'm rambling. Go, ma chère. Solve the mystery. The crackers in the concession stand are still only slightly stale." }
+          ]
+        },
+        {
+          "id": "holding_up",
+          "lines": [
+            { "speaker": "Vivian", "text": "Some days this building feels like a friend. Some days it feels like a cage. Today it feels like both." },
+            { "speaker": "Vivian", "text": "I keep thinking — seventy-three years I've lived here. I was four when my parents brought me to meet Margaux. She picked me up and called me 'ma petite étoile.' I didn't know what it meant. I just knew I felt safe." },
+            { "speaker": "Vivian", "text": "Now the walls are coming down and I'm an old woman who's run out of people to feel safe with." },
+            { "speaker": "Nancy", "text": "You have me, Vivian." },
+            { "speaker": "Vivian", "text": "I know, chérie. That's what frightens me. I'm putting all my hope in a girl I've known for two days. But Margaux would have liked you. She always trusted the stubborn ones." }
+          ]
+        },
+        {
+          "id": "farewell",
+          "lines": [
+            { "speaker": "Vivian", "text": "Of course. Go, go. The theater will keep its secrets whether I'm talking or not. I'll be here, as always. Where else would I be?" }
           ]
         }
       ]
@@ -1916,8 +1955,45 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Edwin", "text": "I've told you everything I know, Nancy. Everything I'm — well. Everything I can. If you need architectural details or historical records, I'm your man. Otherwise, I should get back to my notes. Chapter twelve won't revise itself." },
-            { "speaker": "Edwin", "text": "You have a look in your eye that suggests you already know more than I'd like. That's... unsettling. In a professional sense." }
+            { "speaker": "Edwin", "text": "Nancy. I'm — I should be working. Chapter twelve. The 1926 renovation and its impact on acoustic — it doesn't matter. What is it?" }
+          ],
+          "choices": [
+            {
+              "text": "You seem distracted, Edwin.",
+              "nextNode": "distracted"
+            },
+            {
+              "text": "Tell me about your research.",
+              "nextNode": "research"
+            },
+            {
+              "text": "I'll let you get back to work.",
+              "nextNode": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "distracted",
+          "lines": [
+            { "speaker": "Edwin", "text": "Distracted? I'm not — I'm focused. Extremely focused. On my research. Which is about the Monarch Theatre. Which is where I am. Which is completely normal for someone who has spent fifteen years in a building that's about to be demolished in — how many hours now?" },
+            { "speaker": "Edwin", "text": "...Forty-seven. I counted this morning. I count every morning." },
+            { "speaker": "Nancy", "text": "Edwin—" },
+            { "speaker": "Edwin", "text": "I know how it sounds. A man counting down the hours until a building dies. But this place holds answers that no archive can replace. Once the walls come down, the evidence goes with them. And I'm not ready for that. I don't think I'll ever be ready for that." }
+          ]
+        },
+        {
+          "id": "research",
+          "lines": [
+            { "speaker": "Edwin", "text": "Fifteen years of notes. Four hundred and twelve index cards, cross-referenced by date, location, and subject. I have a system — three-color coding for primary sources, secondary analysis, and speculation. I don't speculate often. Historians shouldn't speculate." },
+            { "speaker": "Nancy", "text": "But you have speculated." },
+            { "speaker": "Edwin", "text": "Once. Just once. About the night Margaux died. The official report says accidental ingestion. But the stage manager's logbook — which I found behind a water pipe in 2014 — notes that the prop goblet was replaced the morning of the performance. Replaced. Not repaired, not cleaned. Replaced." },
+            { "speaker": "Edwin", "text": "That's not speculation. That's evidence hiding in plain sight for ninety-seven years. And this building is full of it." }
+          ]
+        },
+        {
+          "id": "farewell",
+          "lines": [
+            { "speaker": "Edwin", "text": "Right. Yes. Back to chapter twelve. The acoustics. Very important. Possibly the most important thing about — no, it's not. But I need to pretend it is right now. For my sanity." }
           ]
         }
       ]
@@ -1965,8 +2041,45 @@
         {
           "id": "start",
           "lines": [
-            { "speaker": "Diego", "text": "Nancy! I'd love to chat but I'm in a really good writing flow right now. The words are just — *chef's kiss* — they're happening. If I stop now, I'll lose the thread and spend three hours staring at a blinking cursor." },
-            { "speaker": "Diego", "text": "But hey — when you solve this whole thing? I want details. For the play. Strictly for artistic purposes." }
+            { "speaker": "Diego", "text": "Nancy! Good timing — I just wrote the best stage direction of my entire career. 'She enters as if the room owes her an explanation.' That's you. That's literally what you do." }
+          ],
+          "choices": [
+            {
+              "text": "How's the play coming?",
+              "nextNode": "the_play"
+            },
+            {
+              "text": "Are you okay up here alone?",
+              "nextNode": "alone"
+            },
+            {
+              "text": "I should go.",
+              "nextNode": "farewell"
+            }
+          ]
+        },
+        {
+          "id": "the_play",
+          "lines": [
+            { "speaker": "Diego", "text": "It's... honestly? It's the best thing I've ever written. Which is terrifying because it means everything before this was bad. Two years of bad plays. My parents are going to be so confused at Thanksgiving." },
+            { "speaker": "Diego", "text": "I keep writing scenes based on things that are actually happening here. The detective. The old woman guarding her theater. The historian who knows too much. It writes itself — which is either inspiration or plagiarism and I'm choosing not to examine which." },
+            { "speaker": "Nancy", "text": "Just change the names." },
+            { "speaker": "Diego", "text": "Oh, they're already changed. The detective is 'Diana.' Very original. The theater is called 'The Sovereign.' Nobody will ever figure it out." }
+          ]
+        },
+        {
+          "id": "alone",
+          "lines": [
+            { "speaker": "Diego", "text": "Alone? I'm in a projection booth above a haunted theater where someone was poisoned. 'Alone' doesn't even begin to cover it." },
+            { "speaker": "Diego", "text": "But you know what? The weird thing is, I've never written better. Fear does something to your sentences. They get shorter. More honest. I wrote a monologue at 3 AM last night that made me cry, and I don't cry. I'm from Miami. We don't cry, we just sweat emotionally." },
+            { "speaker": "Nancy", "text": "That's... not how that works." },
+            { "speaker": "Diego", "text": "See, that's exactly the kind of line Diana would say. I'm writing this down." }
+          ]
+        },
+        {
+          "id": "farewell",
+          "lines": [
+            { "speaker": "Diego", "text": "Go solve crimes. I'll be up here turning your crimes into art. When this is all over, you get a dedication page and free tickets to opening night. If there is an opening night. If there's still a theater. Okay, now I'm sad. Go." }
           ]
         }
       ]
