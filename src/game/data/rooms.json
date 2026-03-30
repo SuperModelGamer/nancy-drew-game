@@ -1109,9 +1109,15 @@
       "description": "Ashworth's temporary headquarters — a modern laptop on an ornate mahogany desk, demolition blueprints pinned everywhere. There's a cot in the corner with rumpled sheets. He's been sleeping here since the poisoning. He looks pale and unwell, and the room has that stale, closed-in smell of someone who's afraid to leave.",
       "altBackgrounds": [
         {
+          "key": "bg_managers_office_snooping",
+          "showWhen": "ashworth_snooping",
+          "priority": 1,
+          "description": "Ashworth just stepped out — the door is ajar and his chair is pushed back. The laptop screen glows invitingly, unguarded. A crumpled receipt peeks out of the wastebasket. The banker's lamp casts a warm spotlight across the desk. This is my chance to search the office before he comes back."
+        },
+        {
           "key": "bg_managers_office_empty",
           "showWhen": "ashworth_motive_revealed",
-          "priority": 1,
+          "priority": 2,
           "description": "The office feels different without Ashworth looming in it. His cot is a mess of tangled sheets — he left in a hurry. The desk is still buried in papers, the laptop still open, but the man himself is gone. The room smells like cold coffee and fear. Whatever he's running from, it isn't just me."
         }
       ],
