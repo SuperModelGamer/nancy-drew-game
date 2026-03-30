@@ -20,8 +20,11 @@ const EVIDENCE_CARDS: EvidenceCard[] = [
   { id: 'margaux', label: "Margaux's Death", description: 'Drank poison on stage\nOctober 31, 1928', icon: '💀', year: '1928' },
   { id: 'edwin', label: "Edwin's Discovery", description: 'Found proof of the\n1928 murder', icon: '🔍', year: 'Modern' },
   { id: 'ghost', label: 'The Ghost Project', description: 'Staged hauntings using\ntheater effects', icon: '👻', year: 'Modern' },
-  { id: 'ashworth', label: 'Ashworth Poisoned', description: 'Edwin poisoned Ashworth\nwhen discovered', icon: '☠️', year: 'Modern' },
+  { id: 'ashworth', label: "Ashworth's Fraud", description: 'Self-poisoned for\ninsurance payout', icon: '💰', year: 'Modern' },
 ];
+
+/** Correct chronological order: 1928 murder first, then modern events. */
+const CORRECT_ORDER = ['cecilia', 'goblet', 'margaux', 'edwin', 'ghost', 'ashworth'];
 
 export class EvidenceBoardScene extends Phaser.Scene {
   private onSolvedCallback?: () => void;
@@ -121,17 +124,19 @@ export class EvidenceBoardScene extends Phaser.Scene {
     const zoneSpacing = (boardW - 100) / 6;
     const zoneStartX = boardX - boardW / 2 + 50 + zoneSpacing / 2;
 
+    const slotLabels = ['1st', '2nd', '3rd', '4th', '5th', '6th'];
     for (let i = 0; i < 6; i++) {
       const zx = zoneStartX + i * zoneSpacing;
+      const is1928 = i < 3;
 
-      const zone = this.add.rectangle(zx, zoneY, zoneW, zoneH, 0x4A3520, 0.5);
-      zone.setStrokeStyle(2, Colors.gold, 0.4);
+      const zone = this.add.rectangle(zx, zoneY, zoneW, zoneH, is1928 ? 0x5A2020 : 0x1A3A5A, 0.35);
+      zone.setStrokeStyle(2, is1928 ? 0xc97b7b : 0x7ba3c9, 0.5);
       this.boardContainer.add(zone);
 
-      this.boardContainer.add(this.add.text(zx, zoneY - zoneH / 2 - 15, `${i + 1}`, {
+      this.boardContainer.add(this.add.text(zx, zoneY - zoneH / 2 - 15, slotLabels[i], {
         fontFamily: FONT,
-        fontSize: '18px',
-        color: TextColors.gold,
+        fontSize: '16px',
+        color: is1928 ? '#c97b7b' : '#7ba3c9',
       }).setOrigin(0.5));
 
       this.dropZones.push({ x: zx, y: zoneY, cardId: null });
@@ -325,10 +330,12 @@ export class EvidenceBoardScene extends Phaser.Scene {
     const allFilled = this.dropZones.every(zone => zone.cardId !== null);
     if (!allFilled) return;
 
-    const answer = this.dropZones.map(zone => zone.cardId).join('-');
-    const correct = PuzzleSystem.getInstance().checkAnswer('evidence_board', answer);
+    const placed = this.dropZones.map(zone => zone.cardId);
+    const correct = placed.every((id, i) => id === CORRECT_ORDER[i]);
 
     if (correct) {
+      // Mark puzzle as solved in the puzzle system
+      PuzzleSystem.getInstance().solvePuzzle('evidence_board');
       UISounds.puzzleSolve();
       this.feedbackText.setColor('#4ade80');
       this.feedbackText.setText('Case Closed!');
@@ -366,8 +373,26 @@ export class EvidenceBoardScene extends Phaser.Scene {
       });
     } else {
       UISounds.wrongAnswer();
-      this.feedbackText.setColor('#ff6b6b');
-      this.feedbackText.setText("That's not quite right...");
+      PuzzleSystem.getInstance().registerAttempt('evidence_board');
+
+      // Count correct placements for targeted feedback
+      const correctCount = placed.filter((id, i) => id === CORRECT_ORDER[i]).length;
+      const has1928Right = placed.slice(0, 3).every((id, i) => id === CORRECT_ORDER[i]);
+      const hasModernRight = placed.slice(3).every((id, i) => id === CORRECT_ORDER[i + 3]);
+
+      if (correctCount >= 4) {
+        this.feedbackText.setColor('#ff6b6b');
+        this.feedbackText.setText('Almost! A couple of cards are out of order.');
+      } else if (has1928Right) {
+        this.feedbackText.setColor('#ff6b6b');
+        this.feedbackText.setText('The 1928 case is correct. Rethink the modern timeline.');
+      } else if (hasModernRight) {
+        this.feedbackText.setColor('#ff6b6b');
+        this.feedbackText.setText('The modern case is correct. Rethink the 1928 timeline.');
+      } else {
+        this.feedbackText.setColor('#ff6b6b');
+        this.feedbackText.setText("That's not quite right...");
+      }
 
       const hint = PuzzleSystem.getInstance().getHint('evidence_board');
       if (hint) {
@@ -383,21 +408,27 @@ export class EvidenceBoardScene extends Phaser.Scene {
         repeat: 3,
       });
 
-      // Reset cards after delay
+      // Only reset incorrectly placed cards — keep correct ones in place
       this.time.delayedCall(1500, () => {
-        this.dropZones.forEach(zone => { zone.cardId = null; });
-        this.drawStringConnections();
-        this.cardContainers.forEach((container, i) => {
-          const start = this.cardStartPositions[i];
-          this.tweens.add({
-            targets: container,
-            x: start.x,
-            y: start.y,
-            duration: 400,
-            ease: 'Back.easeOut',
-            delay: i * 80,
-          });
+        this.dropZones.forEach((zone, i) => {
+          if (zone.cardId !== CORRECT_ORDER[i]) {
+            // Find the card container for this zone's card and return it
+            const card = this.cardContainers.find(c => c.getData('cardId') === zone.cardId);
+            if (card) {
+              const startIdx = card.getData('startIndex') as number;
+              const start = this.cardStartPositions[startIdx];
+              this.tweens.add({
+                targets: card,
+                x: start.x,
+                y: start.y,
+                duration: 400,
+                ease: 'Back.easeOut',
+              });
+            }
+            zone.cardId = null;
+          }
         });
+        this.drawStringConnections();
       });
     }
   }
