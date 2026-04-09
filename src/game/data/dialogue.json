@@ -417,7 +417,8 @@
             {
               "speaker": "Edwin",
               "text": "Ah — you must be the detective Vivian called. Edwin Hale. Theater historian, Emerson College adjunct, author of — well, three books on New England theater history, if we're keeping track. Please, sit anywhere. The whole auditorium's empty, as usual.",
-              "vo": "vo_edwin_start_01"
+              "vo": "vo_edwin_start_01",
+              "expression": "worried"
             },
             {
               "speaker": "Nancy",
@@ -427,12 +428,14 @@
             {
               "speaker": "Edwin",
               "text": "Fifteen years. Well — fifteen years and four months, to be precise. I started in November of 2010. The Monarch is my life's work.",
-              "vo": "vo_edwin_start_02"
+              "vo": "vo_edwin_start_02",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
               "text": "This building isn't just bricks and velvet, Ms. Drew. It's a living archive. Every floorboard, every rivet, every scratch on these armrests has a story. And if Ashworth has his way, it'll all be rubble in exactly seventy-two hours.",
-              "vo": "vo_edwin_start_03"
+              "vo": "vo_edwin_start_03",
+              "expression": "thoughtful"
             }
           ],
           "choices": [
@@ -471,7 +474,8 @@
             {
               "speaker": "Edwin",
               "text": "Missing props? That's... concerning. Some of those pieces are historically significant — the Tiffany lamps alone date to 1923, and the candelabra is original to the opening gala.",
-              "vo": "vo_edwin_props_01"
+              "vo": "vo_edwin_props_01",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -481,7 +485,8 @@
             {
               "speaker": "Edwin",
               "text": "Stella has her — well, she has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are the real mystery. The props are a — a separate matter entirely. A distraction.",
-              "vo": "vo_edwin_props_02"
+              "vo": "vo_edwin_props_02",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -491,7 +496,8 @@
             {
               "speaker": "Edwin",
               "text": "I — that's not what I — I'm a historian, Nancy. I know how to sort through noise to find the signal. That's literally my job. I'm not hiding anything, if that's what you're implying. I'm trying to help you prioritize.",
-              "vo": "vo_edwin_props_03"
+              "vo": "vo_edwin_props_03",
+              "expression": "defensive"
             },
             {
               "speaker": "Nancy",
@@ -501,7 +507,8 @@
             {
               "speaker": "Edwin",
               "text": "No. No, you didn't. I just — forget I said that. The answer to this mystery is on the stage, not on a prop shelf. I'd stake my reputation on it. What's left of it.",
-              "vo": "vo_edwin_props_04"
+              "vo": "vo_edwin_props_04",
+              "expression": "thoughtful"
             }
           ],
           "nextNode": "end"
@@ -512,12 +519,14 @@
             {
               "speaker": "Edwin",
               "text": "The Crimson Veil was the jewel of the 1928 season — premiered September 15th, ran for six weeks. A gothic melodrama about a countess who discovers her husband has been poisoning her. The irony is... well, you'll see.",
-              "vo": "vo_edwin_crimson_01"
+              "vo": "vo_edwin_crimson_01",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
               "text": "Margaux Fontaine was extraordinary in the role. Extraordinary. In the final act, her character drinks from a poisoned goblet. But on opening night — October 31st, 1928, a Thursday — the prop goblet contained real poison.",
-              "vo": "vo_edwin_crimson_02"
+              "vo": "vo_edwin_crimson_02",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -527,7 +536,8 @@
             {
               "speaker": "Edwin",
               "text": "The official story — and I use that phrase with contempt — was that a stagehand made a terrible mistake. But the stagehand was never identified. Never named, never questioned. And Margaux's understudy, Cecilia Drake, took over the role the very next night and became a star. November 1st, 1928. I have the playbill.",
-              "vo": "vo_edwin_crimson_03"
+              "vo": "vo_edwin_crimson_03",
+              "expression": "worried"
             }
           ],
           "choices": [
@@ -558,12 +568,14 @@
             {
               "speaker": "Edwin",
               "text": "You found her — wait. You found her diary? Where? In the dressing room?",
-              "vo": "vo_edwin_diary_01"
+              "vo": "vo_edwin_diary_01",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
               "text": "...May I see it? Please. I've been looking for primary sources — firsthand accounts — about Margaux for fifteen years. This is... this is unprecedented.",
-              "vo": "vo_edwin_diary_02"
+              "vo": "vo_edwin_diary_02",
+              "expression": "worried"
             },
             {
               "speaker": "Nancy",
@@ -573,12 +585,14 @@
             {
               "speaker": "Edwin",
               "text": "Then she knew. She knew, and nobody listened. The police, the theater owners — they all called it an accident because it was easier.",
-              "vo": "vo_edwin_diary_03"
+              "vo": "vo_edwin_diary_03",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
               "text": "That diary could be the evidence we need. Don't lose it, Nancy.",
-              "vo": "vo_edwin_diary_04"
+              "vo": "vo_edwin_diary_04",
+              "expression": "passionate"
             }
           ],
           "nextNode": "end",
@@ -590,17 +604,20 @@
             {
               "speaker": "Edwin",
               "text": "I'm a historian, not a spiritualist. I deal in documents, not — not apparitions. But I've seen things here I can't explain. And I've tried, believe me.",
-              "vo": "vo_edwin_ghost_01"
+              "vo": "vo_edwin_ghost_01",
+              "expression": "worried"
             },
             {
               "speaker": "Edwin",
               "text": "Fog that rolls across the stage when no machine is running. A figure in white that appears under the ghost light and vanishes. The sound of a woman's voice reciting lines from The Crimson Veil — Act Three, Scene Four, to be specific. Word perfect.",
-              "vo": "vo_edwin_ghost_02"
+              "vo": "vo_edwin_ghost_02",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
               "text": "Whether it's truly Margaux's spirit or something else entirely... this theater is not at peace. I can feel it. And I'm not a man who says things like that.",
-              "vo": "vo_edwin_ghost_03"
+              "vo": "vo_edwin_ghost_03",
+              "expression": "passionate"
             }
           ],
           "choices": [
@@ -628,17 +645,20 @@
             {
               "speaker": "Edwin",
               "text": "You've read the — you've actually read the effects manual? The whole thing? That's... thorough.",
-              "vo": "vo_edwin_effects_01"
+              "vo": "vo_edwin_effects_01",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
               "text": "Yes, theoretically, someone could use the old systems to stage a convincing ghost. Fog machines, the trapdoor — which is a Graves & Sons counterweight model, very reliable — proper lighting. It would be — it would be quite an undertaking.",
-              "vo": "vo_edwin_effects_02"
+              "vo": "vo_edwin_effects_02",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
               "text": "But they'd need extensive knowledge of the building. Months of preparation. They'd need to have — to have practiced. Extensively. Not that I've thought about it in detail. I'm just — speaking generally. As a historian.",
-              "vo": "vo_edwin_effects_03"
+              "vo": "vo_edwin_effects_03",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -648,7 +668,8 @@
             {
               "speaker": "Edwin",
               "text": "...That would certainly be a reason. Hypothetically speaking. But you'd want to — I mean, a person would want to look at all the suspects before jumping to conclusions. That's just good detective work, isn't it?",
-              "vo": "vo_edwin_effects_04"
+              "vo": "vo_edwin_effects_04",
+              "expression": "thoughtful"
             }
           ],
           "nextNode": "end"
@@ -659,7 +680,8 @@
             {
               "speaker": "Edwin",
               "text": "I was in my usual seat — row G, center — reviewing my notes. Chapter twelve revisions, if that matters. Around ten o'clock — well, closer to ten-fifteen, maybe ten-ten — I heard a crash from the manager's office.",
-              "vo": "vo_edwin_lastnight_01"
+              "vo": "vo_edwin_lastnight_01",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -669,7 +691,8 @@
             {
               "speaker": "Edwin",
               "text": "I — I wasn't watching the clock. I was working. By the time I got there, Ashworth was on the floor. Stella called the ambulance. The rest of us waited. It was... unsettling.",
-              "vo": "vo_edwin_lastnight_02"
+              "vo": "vo_edwin_lastnight_02",
+              "expression": "defensive"
             },
             {
               "speaker": "Nancy",
@@ -679,7 +702,8 @@
             {
               "speaker": "Edwin",
               "text": "Everyone was — well, I can't say everyone was accounted for. It's a big building. Many hidden corners. Someone could have slipped away and come back without anyone noticing. Hypothetically.",
-              "vo": "vo_edwin_lastnight_03"
+              "vo": "vo_edwin_lastnight_03",
+              "expression": "worried"
             },
             {
               "speaker": "Nancy",
@@ -689,7 +713,8 @@
             {
               "speaker": "Edwin",
               "text": "I said what I said. I'm trying to be helpful, Nancy. That's all.",
-              "vo": "vo_edwin_lastnight_04"
+              "vo": "vo_edwin_lastnight_04",
+              "expression": "thoughtful"
             }
           ],
           "nextNode": "start"
@@ -700,12 +725,14 @@
             {
               "speaker": "Edwin",
               "text": "I have my suspicions. Cecilia Drake had means, motive, and opportunity. She knew the prop table. She had access backstage. And she had everything to gain.",
-              "vo": "vo_edwin_cecilia_01"
+              "vo": "vo_edwin_cecilia_01",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
               "text": "But proving it after nearly a century? That's the challenge. If there's evidence, it's buried somewhere in this theater.",
-              "vo": "vo_edwin_cecilia_02"
+              "vo": "vo_edwin_cecilia_02",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -721,7 +748,8 @@
             {
               "speaker": "Edwin",
               "text": "...Who told you — how did you—",
-              "vo": "vo_edwin_grandfather_01"
+              "vo": "vo_edwin_grandfather_01",
+              "expression": "defensive"
             },
             {
               "speaker": "Nancy",
@@ -731,17 +759,20 @@
             {
               "speaker": "Edwin",
               "text": "I... yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux... they were...",
-              "vo": "vo_edwin_grandfather_02"
+              "vo": "vo_edwin_grandfather_02",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
               "text": "He never got over her death. Forty-three years, Nancy. He spent forty-three years insisting it wasn't an accident. Nobody believed him. He died in 1971 — March 14th — still fighting. Still writing letters to the police department.",
-              "vo": "vo_edwin_grandfather_03"
+              "vo": "vo_edwin_grandfather_03",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
               "text": "I promised him I'd find the truth. I was twelve years old and I promised. That's why I'm here. That's why I've always been here.",
-              "vo": "vo_edwin_grandfather_04"
+              "vo": "vo_edwin_grandfather_04",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -751,7 +782,8 @@
             {
               "speaker": "Edwin",
               "text": "Some promises are worth the weight.",
-              "vo": "vo_edwin_grandfather_05"
+              "vo": "vo_edwin_grandfather_05",
+              "expression": "thoughtful"
             }
           ],
           "nextNode": "end",
@@ -763,12 +795,14 @@
             {
               "speaker": "Edwin",
               "text": "If you need anything — history, floor plans, old records, architectural details — I'm your man. I know this building better than anyone alive. Better than anyone who's ever lived, probably. Forgive the immodesty.",
-              "vo": "vo_edwin_end_01"
+              "vo": "vo_edwin_end_01",
+              "expression": "worried"
             },
             {
               "speaker": "Edwin",
               "text": "Oh, and Nancy? If you see the ghost... try talking to her. You never know. Stranger things have happened. Well — actually, have they? I'd need to check my notes.",
-              "vo": "vo_edwin_end_02"
+              "vo": "vo_edwin_end_02",
+              "expression": "thoughtful"
             }
           ]
         }
@@ -1532,7 +1566,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "...Both? You mean —"
+              "text": "...Both? You mean —",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -1540,7 +1575,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "After all these years... someone else finally sees it. Someone who isn't a Hale, who doesn't have a reason to believe it. You just... followed the evidence."
+              "text": "After all these years... someone else finally sees it. Someone who isn't a Hale, who doesn't have a reason to believe it. You just... followed the evidence.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -1564,7 +1600,8 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "He — what? Ashworth poisoned himself?"
+              "text": "He — what? Ashworth poisoned himself?",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -1572,7 +1609,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "That's... that's monstrous. He turned a real crime scene — a place where a woman was actually murdered — into an insurance scheme. He was going to demolish the evidence of a ninety-seven-year-old murder for money."
+              "text": "That's... that's monstrous. He turned a real crime scene — a place where a woman was actually murdered — into an insurance scheme. He was going to demolish the evidence of a ninety-seven-year-old murder for money.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -1580,7 +1618,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "...When you put it like that, it sounds absurd. And I suppose it is. A historian and a developer, playing games in a dead woman's theater."
+              "text": "...When you put it like that, it sounds absurd. And I suppose it is. A historian and a developer, playing games in a dead woman's theater.",
+              "expression": "passionate"
             }
           ],
           "choices": [
@@ -1599,7 +1638,8 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "You found out about my grandfather."
+              "text": "You found out about my grandfather.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -1607,11 +1647,13 @@
             },
             {
               "speaker": "Edwin",
-              "text": "He died when I was twelve. November 3rd, 1986 — I remember the date because it snowed and grandfathers aren't supposed to die when it snows. The last thing he said to me was: 'Promise me you'll find the truth about Margaux.' I was a kid. I didn't understand."
+              "text": "He died when I was twelve. November 3rd, 1986 — I remember the date because it snowed and grandfathers aren't supposed to die when it snows. The last thing he said to me was: 'Promise me you'll find the truth about Margaux.' I was a kid. I didn't understand.",
+              "expression": "defensive"
             },
             {
               "speaker": "Edwin",
-              "text": "But I grew up. And fifteen years ago, I started keeping that promise. And now, because of you, it's finally done."
+              "text": "But I grew up. And fifteen years ago, I started keeping that promise. And now, because of you, it's finally done.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -1619,7 +1661,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "He poisoned himself? For money? While I was down here trying to save Margaux's legacy, he was turning her theater into a — a balance sheet?"
+              "text": "He poisoned himself? For money? While I was down here trying to save Margaux's legacy, he was turning her theater into a — a balance sheet?",
+              "expression": "passionate"
             }
           ],
           "choices": [
@@ -1638,15 +1681,18 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "I found the truth about a murder that went unsolved for ninety-seven years. I kept a promise my grandfather made to a dying woman. And I committed trespassing, property damage, and fraud to do it."
+              "text": "I found the truth about a murder that went unsolved for ninety-seven years. I kept a promise my grandfather made to a dying woman. And I committed trespassing, property damage, and fraud to do it.",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
-              "text": "Was it worth it?"
+              "text": "Was it worth it?",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
-              "text": "...Ask me on a good day and I'll say yes. Ask me at three in the morning when I'm rehearsing ghost cues alone in a basement and I'll say I don't know anymore."
+              "text": "...Ask me on a good day and I'll say yes. Ask me at three in the morning when I'm rehearsing ghost cues alone in a basement and I'll say I don't know anymore.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -1654,11 +1700,13 @@
             },
             {
               "speaker": "Edwin",
-              "text": "Right now I'm a fifty-three-year-old man standing in a basement, waiting for a detective half my age to decide my fate. Right now I'm terrified. And I'm ashamed. And I'd do it all again tomorrow if it meant Margaux's name wasn't buried under concrete."
+              "text": "Right now I'm a fifty-three-year-old man standing in a basement, waiting for a detective half my age to decide my fate. Right now I'm terrified. And I'm ashamed. And I'd do it all again tomorrow if it meant Margaux's name wasn't buried under concrete.",
+              "expression": "worried"
             },
             {
               "speaker": "Edwin",
-              "text": "That's the truth. I wish it were simpler. I'm a historian — I'm supposed to make things simpler. But this one I can't."
+              "text": "That's the truth. I wish it were simpler. I'm a historian — I'm supposed to make things simpler. But this one I can't.",
+              "expression": "worried"
             }
           ],
           "choices": [
@@ -1682,11 +1730,13 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "Honestly? I haven't thought that far ahead. Fifteen years of momentum and I don't know how to stop. I never planned for 'after.' Historians aren't supposed to become part of the story."
+              "text": "Honestly? I haven't thought that far ahead. Fifteen years of momentum and I don't know how to stop. I never planned for 'after.' Historians aren't supposed to become part of the story.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
-              "text": "Part of me wants to turn myself in — the ghost staging, the trespassing, all of it. Part of me wants to run. And part of me wants to stand on that stage and tell the whole world what Cecilia Drake did and what Ashworth tried to cover up."
+              "text": "Part of me wants to turn myself in — the ghost staging, the trespassing, all of it. Part of me wants to run. And part of me wants to stand on that stage and tell the whole world what Cecilia Drake did and what Ashworth tried to cover up.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -1694,7 +1744,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "I'll carry that either way. Whether I'm in a courtroom or a library in Scotland or standing in this theater — I'll carry it. I faked a ghost in the same building where a real woman died. The irony isn't lost on me. It's never lost on me."
+              "text": "I'll carry that either way. Whether I'm in a courtroom or a library in Scotland or standing in this theater — I'll carry it. I faked a ghost in the same building where a real woman died. The irony isn't lost on me. It's never lost on me.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -1723,11 +1774,13 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "..."
+              "text": "...",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
-              "text": "I've been waiting for someone to say that. Isn't that strange? Part of me is... relieved. Genuinely relieved."
+              "text": "I've been waiting for someone to say that. Isn't that strange? Part of me is... relieved. Genuinely relieved.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -1735,15 +1788,18 @@
             },
             {
               "speaker": "Edwin",
-              "text": "No, I mean it. I've been carrying this alone for months. The lying, the hiding, creeping through passages at 2 AM. I can't keep cataloging my own lies. I'm running out of filing space."
+              "text": "No, I mean it. I've been carrying this alone for months. The lying, the hiding, creeping through passages at 2 AM. I can't keep cataloging my own lies. I'm running out of filing space.",
+              "expression": "worried"
             },
             {
               "speaker": "Edwin",
-              "text": "And Ashworth — he should face charges too. Self-poisoning for an insurance payout is fraud. The Monarch deserves better than both of us."
+              "text": "And Ashworth — he should face charges too. Self-poisoning for an insurance payout is fraud. The Monarch deserves better than both of us.",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
-              "text": "Just — promise me one thing. Make sure Cecilia's letters get to the historical society. All forty-seven of them. Margaux deserves to be remembered for more than how she died."
+              "text": "Just — promise me one thing. Make sure Cecilia's letters get to the historical society. All forty-seven of them. Margaux deserves to be remembered for more than how she died.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -1751,7 +1807,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "My grandfather kept his promise for fifty years. You'll keep yours. I can tell — you have that same look he had. Stubborn. Certain."
+              "text": "My grandfather kept his promise for fifty years. You'll keep yours. I can tell — you have that same look he had. Stubborn. Certain.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -1765,7 +1822,8 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "Together? You'd — you'd actually do that? After everything I've —"
+              "text": "Together? You'd — you'd actually do that? After everything I've —",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -1773,7 +1831,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "I'll face whatever comes. The charges for the staging, the trespassing — I don't care. I've spent fifteen years in archives. A courtroom can't be worse."
+              "text": "I'll face whatever comes. The charges for the staging, the trespassing — I don't care. I've spent fifteen years in archives. A courtroom can't be worse.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -1781,7 +1840,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "Vivian will be furious about the ghost. But maybe — maybe she'll understand why. She knew my grandfather. She knows what promises mean."
+              "text": "Vivian will be furious about the ghost. But maybe — maybe she'll understand why. She knew my grandfather. She knows what promises mean.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -1795,7 +1855,8 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "You'd let me go? After what I — you can't be serious."
+              "text": "You'd let me go? After what I — you can't be serious.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -1803,11 +1864,13 @@
             },
             {
               "speaker": "Edwin",
-              "text": "My conscience. Right. My well-organized, thoroughly documented, deeply guilty conscience."
+              "text": "My conscience. Right. My well-organized, thoroughly documented, deeply guilty conscience.",
+              "expression": "worried"
             },
             {
               "speaker": "Edwin",
-              "text": "...Tell Vivian I'm sorry. For all of it. For hiding down here like a character in one of her old plays. For using Margaux's memory as a prop. For not trusting her enough to ask for help. Tell her I'm sorry I couldn't say goodbye."
+              "text": "...Tell Vivian I'm sorry. For all of it. For hiding down here like a character in one of her old plays. For using Margaux's memory as a prop. For not trusting her enough to ask for help. Tell her I'm sorry I couldn't say goodbye.",
+              "expression": "worried"
             },
             {
               "speaker": "Nancy",
@@ -1815,7 +1878,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "Yes?"
+              "text": "Yes?",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -1823,7 +1887,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "That's the kindest lie anyone's ever told me. And I've read a lot of lies — professionally speaking."
+              "text": "That's the kindest lie anyone's ever told me. And I've read a lot of lies — professionally speaking.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -2635,7 +2700,8 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "Ms. Drew. Two nights in a row. I must say, I didn't expect you to come back after... well. After what you saw last night. Most people would have called the police. Or a priest."
+              "text": "Ms. Drew. Two nights in a row. I must say, I didn't expect you to come back after... well. After what you saw last night. Most people would have called the police. Or a priest.",
+              "expression": "defensive"
             },
             {
               "speaker": "Nancy",
@@ -2644,7 +2710,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "No? Fascinating. You sound very certain for someone who watched a dead woman materialize on stage. But please — questions. I've had all day to think, and I suspect you have too."
+              "text": "No? Fascinating. You sound very certain for someone who watched a dead woman materialize on stage. But please — questions. I've had all day to think, and I suspect you have too.",
+              "expression": "worried"
             }
           ],
           "choices": [
@@ -2700,7 +2767,8 @@
             {
               "speaker": "Edwin",
               "text": "...Who told you — how did you—",
-              "vo": "vo_edwin_grandfather_01"
+              "vo": "vo_edwin_grandfather_01",
+              "expression": "defensive"
             },
             {
               "speaker": "Nancy",
@@ -2710,17 +2778,20 @@
             {
               "speaker": "Edwin",
               "text": "I... yes. James Hale was my grandfather. He was a stagehand here in the twenties. He and Margaux... they were...",
-              "vo": "vo_edwin_grandfather_02"
+              "vo": "vo_edwin_grandfather_02",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
               "text": "He never got over her death. Forty-three years, Nancy. He spent forty-three years insisting it wasn't an accident. Nobody believed him. He died in 1971 — March 14th — still fighting. Still writing letters to the police department.",
-              "vo": "vo_edwin_grandfather_03"
+              "vo": "vo_edwin_grandfather_03",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
               "text": "I promised him I'd find the truth. I was twelve years old and I promised. That's why I'm here. That's why I've always been here.",
-              "vo": "vo_edwin_grandfather_04"
+              "vo": "vo_edwin_grandfather_04",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -2730,7 +2801,8 @@
             {
               "speaker": "Edwin",
               "text": "Some promises are worth the weight.",
-              "vo": "vo_edwin_grandfather_05"
+              "vo": "vo_edwin_grandfather_05",
+              "expression": "thoughtful"
             }
           ],
           "nextNode": "farewell",
@@ -2742,12 +2814,14 @@
             {
               "speaker": "Edwin",
               "text": "You found her — wait. You found her diary? Where? In the dressing room?",
-              "vo": "vo_edwin_diary_01"
+              "vo": "vo_edwin_diary_01",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
               "text": "...May I see it? Please. I've been looking for primary sources — firsthand accounts — about Margaux for fifteen years. This is... this is unprecedented.",
-              "vo": "vo_edwin_diary_02"
+              "vo": "vo_edwin_diary_02",
+              "expression": "worried"
             },
             {
               "speaker": "Nancy",
@@ -2757,12 +2831,14 @@
             {
               "speaker": "Edwin",
               "text": "Then she knew. She knew, and nobody listened. The police, the theater owners — they all called it an accident because it was easier.",
-              "vo": "vo_edwin_diary_03"
+              "vo": "vo_edwin_diary_03",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
               "text": "That diary could be the evidence we need. Don't lose it, Nancy.",
-              "vo": "vo_edwin_diary_04"
+              "vo": "vo_edwin_diary_04",
+              "expression": "passionate"
             }
           ],
           "nextNode": "farewell",
@@ -2774,7 +2850,8 @@
             {
               "speaker": "Edwin",
               "text": "Missing props? That's... concerning. Some of those pieces are historically significant — the Tiffany lamps alone date to 1923, and the candelabra is original to the opening gala.",
-              "vo": "vo_edwin_props_01"
+              "vo": "vo_edwin_props_01",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -2784,7 +2861,8 @@
             {
               "speaker": "Edwin",
               "text": "Stella has her — well, she has her reasons for worrying. But I wouldn't focus on missing props right now, Nancy. The poisoning, the ghost — those are the real mystery. The props are a — a separate matter entirely. A distraction.",
-              "vo": "vo_edwin_props_02"
+              "vo": "vo_edwin_props_02",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -2794,7 +2872,8 @@
             {
               "speaker": "Edwin",
               "text": "I — that's not what I — I'm a historian, Nancy. I know how to sort through noise to find the signal. That's literally my job. I'm not hiding anything, if that's what you're implying. I'm trying to help you prioritize.",
-              "vo": "vo_edwin_props_03"
+              "vo": "vo_edwin_props_03",
+              "expression": "defensive"
             },
             {
               "speaker": "Nancy",
@@ -2804,7 +2883,8 @@
             {
               "speaker": "Edwin",
               "text": "No. No, you didn't. I just — forget I said that. The answer to this mystery is on the stage, not on a prop shelf. I'd stake my reputation on it. What's left of it.",
-              "vo": "vo_edwin_props_04"
+              "vo": "vo_edwin_props_04",
+              "expression": "thoughtful"
             }
           ],
           "nextNode": "farewell"
@@ -2815,17 +2895,20 @@
             {
               "speaker": "Edwin",
               "text": "You've read the — you've actually read the effects manual? The whole thing? That's... thorough.",
-              "vo": "vo_edwin_effects_01"
+              "vo": "vo_edwin_effects_01",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
               "text": "Yes, theoretically, someone could use the old systems to stage a convincing ghost. Fog machines, the trapdoor — which is a Graves & Sons counterweight model, very reliable — proper lighting. It would be — it would be quite an undertaking.",
-              "vo": "vo_edwin_effects_02"
+              "vo": "vo_edwin_effects_02",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
               "text": "But they'd need extensive knowledge of the building. Months of preparation. They'd need to have — to have practiced. Extensively. Not that I've thought about it in detail. I'm just — speaking generally. As a historian.",
-              "vo": "vo_edwin_effects_03"
+              "vo": "vo_edwin_effects_03",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -2835,7 +2918,8 @@
             {
               "speaker": "Edwin",
               "text": "...That would certainly be a reason. Hypothetically speaking. But you'd want to — I mean, a person would want to look at all the suspects before jumping to conclusions. That's just good detective work, isn't it?",
-              "vo": "vo_edwin_effects_04"
+              "vo": "vo_edwin_effects_04",
+              "expression": "thoughtful"
             }
           ],
           "nextNode": "farewell"
@@ -2845,7 +2929,8 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "I'm working on my fourth book, actually. 'Ghosts of the Footlights: Architecture, Memory, and the Haunted Stage.' The working title. My publisher thinks it's too long. My publisher thinks everything is too long. He wanted my last book to be 200 pages. It was 847."
+              "text": "I'm working on my fourth book, actually. 'Ghosts of the Footlights: Architecture, Memory, and the Haunted Stage.' The working title. My publisher thinks it's too long. My publisher thinks everything is too long. He wanted my last book to be 200 pages. It was 847.",
+              "expression": "worried"
             },
             {
               "speaker": "Nancy",
@@ -2853,11 +2938,13 @@
             },
             {
               "speaker": "Edwin",
-              "text": "Thoroughness is underappreciated, Ms. Drew. Do you know that there are exactly 1,247 rivets in the balcony railing? I counted them. Twice. The second time I got 1,248, which kept me up for three nights until I found the extra one. It was hidden behind a renovation patch from 1956."
+              "text": "Thoroughness is underappreciated, Ms. Drew. Do you know that there are exactly 1,247 rivets in the balcony railing? I counted them. Twice. The second time I got 1,248, which kept me up for three nights until I found the extra one. It was hidden behind a renovation patch from 1956.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
-              "text": "My ex-wife used to say I care more about dead theaters than living people. She wasn't wrong, necessarily. But she was unkind about it."
+              "text": "My ex-wife used to say I care more about dead theaters than living people. She wasn't wrong, necessarily. But she was unkind about it.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -2865,7 +2952,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "That's... thank you. Most people just think I'm peculiar. Which I am. But it's nice to hear the alternative interpretation."
+              "text": "That's... thank you. Most people just think I'm peculiar. Which I am. But it's nice to hear the alternative interpretation.",
+              "expression": "thoughtful"
             }
           ],
           "nextNode": "start"
@@ -2875,7 +2963,8 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "I know things about this building that the blueprints don't. For instance — did you notice the asymmetry in the lobby molding? The east wall has seventeen rosettes. The west wall has sixteen. One was removed in 1931 to patch a bullet hole."
+              "text": "I know things about this building that the blueprints don't. For instance — did you notice the asymmetry in the lobby molding? The east wall has seventeen rosettes. The west wall has sixteen. One was removed in 1931 to patch a bullet hole.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -2883,11 +2972,13 @@
             },
             {
               "speaker": "Edwin",
-              "text": "A critic shot at the lead actor during a particularly bad production of 'The Tempest.' Missed entirely. Hit the wall. The management decided it was easier to cover it up than explain. Theater people."
+              "text": "A critic shot at the lead actor during a particularly bad production of 'The Tempest.' Missed entirely. Hit the wall. The management decided it was easier to cover it up than explain. Theater people.",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
-              "text": "I also know that the basement has a room that doesn't appear on any official plan. I found references to it in the original architect's personal correspondence. He called it 'the confession booth.' I've never found it, though. It haunts me. Figuratively. We already have enough literal haunting."
+              "text": "I also know that the basement has a room that doesn't appear on any official plan. I found references to it in the original architect's personal correspondence. He called it 'the confession booth.' I've never found it, though. It haunts me. Figuratively. We already have enough literal haunting.",
+              "expression": "worried"
             }
           ],
           "nextNode": "start"
@@ -2897,7 +2988,8 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "Sleeping here? I — well. Define 'sleeping.' If you mean 'occasionally dozing in seat G-12 between 2 and 5 AM,' then... perhaps."
+              "text": "Sleeping here? I — well. Define 'sleeping.' If you mean 'occasionally dozing in seat G-12 between 2 and 5 AM,' then... perhaps.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -2905,11 +2997,13 @@
             },
             {
               "speaker": "Edwin",
-              "text": "Fine. Yes. I've been staying late. Very late. The acoustics change at night, you know — the building settles, the wood contracts, and you can hear things you'd never notice during the day. Whispers in the walls. Probably just pipes."
+              "text": "Fine. Yes. I've been staying late. Very late. The acoustics change at night, you know — the building settles, the wood contracts, and you can hear things you'd never notice during the day. Whispers in the walls. Probably just pipes.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
-              "text": "Probably."
+              "text": "Probably.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -2917,7 +3011,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "I find it comforting, actually. A building that still makes noise is a building that's still alive. It's when the Monarch goes silent that I'll worry. That'll mean Ashworth's won."
+              "text": "I find it comforting, actually. A building that still makes noise is a building that's still alive. It's when the Monarch goes silent that I'll worry. That'll mean Ashworth's won.",
+              "expression": "passionate"
             }
           ],
           "nextNode": "start"
@@ -2927,7 +3022,8 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "The basement? No. No, I haven't been down there in years. Not since they sealed it off — the door has been locked since the renovation in 2019. I wouldn't even know how to get down there now."
+              "text": "The basement? No. No, I haven't been down there in years. Not since they sealed it off — the door has been locked since the renovation in 2019. I wouldn't even know how to get down there now.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -2935,11 +3031,13 @@
             },
             {
               "speaker": "Edwin",
-              "text": "Stella says a lot of things. She's — look, I'm a historian, not a spelunker. I study documents. Blueprints. I don't go crawling around in basements in the middle of the night."
+              "text": "Stella says a lot of things. She's — look, I'm a historian, not a spelunker. I study documents. Blueprints. I don't go crawling around in basements in the middle of the night.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
-              "text": "If someone has been down there, that's — that's concerning. But it isn't me. I can assure you of that."
+              "text": "If someone has been down there, that's — that's concerning. But it isn't me. I can assure you of that.",
+              "expression": "thoughtful"
             }
           ],
           "nextNode": "start",
@@ -2950,7 +3048,8 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "Right. Back to the rivets. If you need anything, I'll be here. I'm always here. That's either dedication or pathology, depending on who you ask."
+              "text": "Right. Back to the rivets. If you need anything, I'll be here. I'm always here. That's either dedication or pathology, depending on who you ask.",
+              "expression": "thoughtful"
             }
           ]
         }
@@ -3906,11 +4005,13 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "I've told you everything I know, Nancy. Everything I'm — well. Everything I can. If you need architectural details or historical records, I'm your man. Otherwise, I should get back to my notes. Chapter twelve won't revise itself."
+              "text": "I've told you everything I know, Nancy. Everything I'm — well. Everything I can. If you need architectural details or historical records, I'm your man. Otherwise, I should get back to my notes. Chapter twelve won't revise itself.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
-              "text": "You have a look in your eye that suggests you already know more than I'd like. That's... unsettling. In a professional sense."
+              "text": "You have a look in your eye that suggests you already know more than I'd like. That's... unsettling. In a professional sense.",
+              "expression": "thoughtful"
             }
           ]
         }
@@ -4018,11 +4119,13 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "Nancy. I... I suppose I knew this moment would come."
+              "text": "Nancy. I... I suppose I knew this moment would come.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
-              "text": "You've found it all, haven't you. The fog machine controls. The trapdoor mechanism. The costume."
+              "text": "You've found it all, haven't you. The fog machine controls. The trapdoor mechanism. The costume.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -4049,11 +4152,13 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "Yes. All of it. The fog. The lights. The figure on stage. The whispers in the walls. I spent four months planning it — every cue, every timing, every sightline."
+              "text": "Yes. All of it. The fog. The lights. The figure on stage. The whispers in the walls. I spent four months planning it — every cue, every timing, every sightline.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
-              "text": "The ghost of Margaux Fontaine. My greatest production. And I'm not even a theater person — I'm a historian. But I learned. I practiced at 3 AM when nobody was here. I ran the sequence forty-seven times before the first public performance."
+              "text": "The ghost of Margaux Fontaine. My greatest production. And I'm not even a theater person — I'm a historian. But I learned. I practiced at 3 AM when nobody was here. I ran the sequence forty-seven times before the first public performance.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -4061,11 +4166,13 @@
             },
             {
               "speaker": "Edwin",
-              "text": "Ashworth was going to destroy this building! Every passage, every secret, every piece of evidence that Margaux was murdered — buried under condominiums. I couldn't let that happen. Not after what my grandfather—"
+              "text": "Ashworth was going to destroy this building! Every passage, every secret, every piece of evidence that Margaux was murdered — buried under condominiums. I couldn't let that happen. Not after what my grandfather—",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
-              "text": "I made a promise. To a man who spent forty-three years fighting for the truth. I was twelve years old and I promised him I'd finish what he started. So yes. I faked a ghost. I would do it again."
+              "text": "I made a promise. To a man who spent forty-three years fighting for the truth. I was twelve years old and I promised him I'd finish what he started. So yes. I faked a ghost. I would do it again.",
+              "expression": "thoughtful"
             }
           ],
           "choices": [
@@ -4084,11 +4191,13 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "Poison? I would never — that's not — Nancy, I was trying to SAVE this place, not hurt anyone!"
+              "text": "Poison? I would never — that's not — Nancy, I was trying to SAVE this place, not hurt anyone!",
+              "expression": "defensive"
             },
             {
               "speaker": "Edwin",
-              "text": "Look at these bottles. Look at them! They're homemade. I mixed fog fluid and stage effects compounds. I couldn't poison someone if I tried — I'm a historian, not a chemist!"
+              "text": "Look at these bottles. Look at them! They're homemade. I mixed fog fluid and stage effects compounds. I couldn't poison someone if I tried — I'm a historian, not a chemist!",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -4096,7 +4205,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "Because they ARE crude! I followed recipes from a 1920s stage effects manual! The most dangerous thing in these bottles is the glycol fog fluid, and that just makes you cough!"
+              "text": "Because they ARE crude! I followed recipes from a 1920s stage effects manual! The most dangerous thing in these bottles is the glycol fog fluid, and that just makes you cough!",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -4104,11 +4214,13 @@
             },
             {
               "speaker": "Edwin",
-              "text": "No. God, no. I staged a ghost to save a theater. I trespassed. I used equipment that wasn't mine. I scared people. I lied — I lied to you, to Vivian, to everyone. And I'm sorry for all of it."
+              "text": "No. God, no. I staged a ghost to save a theater. I trespassed. I used equipment that wasn't mine. I scared people. I lied — I lied to you, to Vivian, to everyone. And I'm sorry for all of it.",
+              "expression": "worried"
             },
             {
               "speaker": "Edwin",
-              "text": "But I did not poison that man. I would never. That's not — that's not who I am."
+              "text": "But I did not poison that man. I would never. That's not — that's not who I am.",
+              "expression": "defensive"
             }
           ],
           "choices": [
@@ -4133,11 +4245,13 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "I don't know. I genuinely don't know. But Nancy — I was here that night. I was in the basement when Ashworth collapsed."
+              "text": "I don't know. I genuinely don't know. But Nancy — I was here that night. I was in the basement when Ashworth collapsed.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
-              "text": "I heard him fall. Through the ceiling — a thud, then silence. And I was terrified. Not because he was hurt, but because I thought they'd blame me. So I stayed down here. Like a coward."
+              "text": "I heard him fall. Through the ceiling — a thud, then silence. And I was terrified. Not because he was hurt, but because I thought they'd blame me. So I stayed down here. Like a coward.",
+              "expression": "worried"
             },
             {
               "speaker": "Nancy",
@@ -4145,7 +4259,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "No. But here's the thing that's been eating at me. Ashworth's tea. He makes it the same way every night — Earl Grey, two sugars, from the kettle in his office. Nobody brings it to him. Nobody touches that kettle except him."
+              "text": "No. But here's the thing that's been eating at me. Ashworth's tea. He makes it the same way every night — Earl Grey, two sugars, from the kettle in his office. Nobody brings it to him. Nobody touches that kettle except him.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Nancy",
@@ -4153,7 +4268,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "I'm saying the only person who had regular, unsupervised access to that kettle was Ashworth himself. Make of that what you will."
+              "text": "I'm saying the only person who had regular, unsupervised access to that kettle was Ashworth himself. Make of that what you will.",
+              "expression": "thoughtful"
             }
           ],
           "nextNode": "compassionate_end",
@@ -4168,11 +4284,13 @@
             },
             {
               "speaker": "Edwin",
-              "text": "I know. I've known since the first night. Every time I ran the sequence, I knew I was breaking the law. And every time, I told myself it was worth it."
+              "text": "I know. I've known since the first night. Every time I ran the sequence, I knew I was breaking the law. And every time, I told myself it was worth it.",
+              "expression": "thoughtful"
             },
             {
               "speaker": "Edwin",
-              "text": "Was it? I still don't know. But Margaux Fontaine was murdered on this stage ninety-seven years ago, and nobody ever answered for it. If my ghost made one person ask questions — if it bought this building one more day — then maybe it was worth it."
+              "text": "Was it? I still don't know. But Margaux Fontaine was murdered on this stage ninety-seven years ago, and nobody ever answered for it. If my ghost made one person ask questions — if it bought this building one more day — then maybe it was worth it.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -4180,7 +4298,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "I'm not going anywhere. I've been in this building for fifteen years. A few more hours won't hurt."
+              "text": "I'm not going anywhere. I've been in this building for fifteen years. A few more hours won't hurt.",
+              "expression": "thoughtful"
             }
           ],
           "triggerEvent": "edwin_confronted"
@@ -4190,19 +4309,23 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "You found it. Cecilia Drake's confession. The letter she wrote and never sent."
+              "text": "You found it. Cecilia Drake's confession. The letter she wrote and never sent.",
+              "expression": "worried"
             },
             {
               "speaker": "Edwin",
-              "text": "She confessed to switching the prop goblet for a real one. She put poison in the wine for the Act III death scene. And when Margaux drank from it on stage..."
+              "text": "She confessed to switching the prop goblet for a real one. She put poison in the wine for the Act III death scene. And when Margaux drank from it on stage...",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
-              "text": "My grandfather was in the wings. He watched her fall. He caught her. And she died in his arms."
+              "text": "My grandfather was in the wings. He watched her fall. He caught her. And she died in his arms.",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
-              "text": "I found that letter three months ago, hidden in a wall cavity in the passage between the basement and the dressing room. It's the proof my grandfather spent his life looking for."
+              "text": "I found that letter three months ago, hidden in a wall cavity in the passage between the basement and the dressing room. It's the proof my grandfather spent his life looking for.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -4210,7 +4333,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "I know. That's why I couldn't let Ashworth tear down the walls. The letter was IN the walls. If the demolition happened before I found it, it would have been destroyed. Ninety-seven years of truth, ground to dust."
+              "text": "I know. That's why I couldn't let Ashworth tear down the walls. The letter was IN the walls. If the demolition happened before I found it, it would have been destroyed. Ninety-seven years of truth, ground to dust.",
+              "expression": "passionate"
             }
           ],
           "nextNode": "compassionate_end",
@@ -4221,19 +4345,23 @@
           "lines": [
             {
               "speaker": "Edwin",
-              "text": "Because this theater contains proof that Margaux Fontaine was murdered. And Ashworth was going to destroy it."
+              "text": "Because this theater contains proof that Margaux Fontaine was murdered. And Ashworth was going to destroy it.",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
-              "text": "The hidden passages, the wall cavities, the sealed rooms — they're an archive. An accidental time capsule. Cecilia Drake hid a confession letter inside these walls, and it took me three months of searching to find it."
+              "text": "The hidden passages, the wall cavities, the sealed rooms — they're an archive. An accidental time capsule. Cecilia Drake hid a confession letter inside these walls, and it took me three months of searching to find it.",
+              "expression": "worried"
             },
             {
               "speaker": "Edwin",
-              "text": "If the demolition happens, that letter is destroyed. The passages collapse. Every piece of evidence gets bulldozed into rubble."
+              "text": "If the demolition happens, that letter is destroyed. The passages collapse. Every piece of evidence gets bulldozed into rubble.",
+              "expression": "passionate"
             },
             {
               "speaker": "Edwin",
-              "text": "I couldn't let that happen. Not after my grandfather spent forty-three years fighting for this truth."
+              "text": "I couldn't let that happen. Not after my grandfather spent forty-three years fighting for this truth.",
+              "expression": "passionate"
             },
             {
               "speaker": "Nancy",
@@ -4241,7 +4369,8 @@
             },
             {
               "speaker": "Edwin",
-              "text": "Ghost sightings trigger historical review. Historical review delays demolition. It was the only plan I had. And it was working — until someone poisoned Ashworth and turned a ghost story into a crime scene."
+              "text": "Ghost sightings trigger historical review. Historical review delays demolition. It was the only plan I had. And it was working — until someone poisoned Ashworth and turned a ghost story into a crime scene.",
+              "expression": "passionate"
             }
           ],
           "choices": [

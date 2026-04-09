@@ -104,6 +104,7 @@ export class BootScene extends Phaser.Scene {
     const expressions: Record<string, string[]> = {
       ashworth: ['annoyed', 'angry', 'shocked', 'suspicious'],
       vivian: ['sad', 'warm', 'worried', 'happy'],
+      edwin: ['thoughtful', 'passionate', 'worried', 'defensive'],
     };
     for (const [char, exprs] of Object.entries(expressions)) {
       for (const expr of exprs) {
