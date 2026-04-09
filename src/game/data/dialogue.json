@@ -1920,6 +1920,22 @@
       ]
     },
     {
+      "id": "vivian_post_ashworth",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            { "speaker": "Vivian", "text": "You've met him. You see now — the man treats this theater like a balance sheet. Seventy-two hours, he says, as if history has an expiration date." },
+            { "speaker": "Nancy", "text": "He gave me a few leads. But I need more perspective on this place — and on Margaux." },
+            { "speaker": "Vivian", "text": "Then go upstairs, chérie. Use the master key — the grand staircase will take you to the auditorium. Edwin Hale has been camped out up there for weeks. He's the theater's historian, self-appointed guardian of every dusty secret in this building." },
+            { "speaker": "Vivian", "text": "If anyone knows what Ashworth is really after — and what this theater is hiding — it's Edwin. And while you're up there, you may run into Stella and Diego. They've been... restless tonight." },
+            { "speaker": "Vivian", "text": "Be careful, Nancy. This theater has a way of showing you things you weren't looking for." }
+          ],
+          "triggerEvent": "vivian_sent_upstairs"
+        }
+      ]
+    },
+    {
       "id": "edwin_auditorium_done",
       "nodes": [
         {

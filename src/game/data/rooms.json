@@ -62,7 +62,8 @@
           "description": "A silver-handled magnifying glass. Vivian left another note: 'You'll need sharp eyes here.' She's been preparing for my visit. Almost like she's done this before — set up a trail of breadcrumbs for someone to follow.",
           "itemId": "magnifying_glass",
           "onceOnly": true,
-          "showWhen": "vivian_intro"
+          "showWhen": "vivian_intro",
+          "setsFlag": "lobby_explored"
         },
         {
           "id": "lobby_chandelier",
@@ -143,6 +144,18 @@
           "showWhen": "vivian_full_trust"
         },
         {
+          "id": "lobby_vivian_post_ashworth",
+          "x": 734,
+          "y": 664,
+          "width": 109,
+          "height": 418,
+          "label": "Vivian Delacroix",
+          "type": "talk",
+          "dialogueId": "vivian_post_ashworth",
+          "showWhen": "ashworth_office",
+          "hideWhen": "day_2"
+        },
+        {
           "id": "lobby_marble_floor",
           "x": 1093,
           "y": 868,
@@ -216,7 +229,7 @@
           "label": "Office Door",
           "type": "navigate",
           "targetRoom": "managers_office",
-          "showWhen": "vivian_intro"
+          "showWhen": "lobby_explored"
         },
         {
           "id": "lobby_water_stain",
