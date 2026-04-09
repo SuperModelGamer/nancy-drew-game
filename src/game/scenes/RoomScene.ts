@@ -754,9 +754,42 @@ export class RoomScene extends Phaser.Scene {
         }
         break;
     }
+
+    // Check if all clues in the current room are found — set completion flag
+    this.checkRoomCompletion();
   }
 
-  /** Play a contextual sound effect based on the hotspot label and type. */
+  /** If every available clue hotspot in the current room has been examined,
+   *  set a '{roomId}_complete' flag so progression gates can use it. */
+  private checkRoomCompletion(): void {
+    if (!this.currentRoom) return;
+    const save = SaveSystem.getInstance();
+    const dialogue = DialogueSystem.getInstance();
+    let total = 0;
+    let found = 0;
+    for (const hs of this.currentRoom.hotspots) {
+      const isClue = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
+      if (!isClue) continue;
+      if (hs.targetRoom) continue;
+      // Respect showWhen / hideWhen gates
+      if (hs.showWhen) {
+        const flagSet = save.getFlag(hs.showWhen);
+        const eventTriggered = dialogue.hasTriggeredEvent(hs.showWhen);
+        if (!flagSet && !eventTriggered) continue;
+      }
+      if (hs.hideWhen) {
+        const flagSet = save.getFlag(hs.hideWhen);
+        const eventTriggered = dialogue.hasTriggeredEvent(hs.hideWhen);
+        if (flagSet || eventTriggered) continue;
+      }
+      total++;
+      if (save.getFlag('used_hotspot_' + hs.id)) found++;
+    }
+    if (total > 0 && found >= total) {
+      save.setFlag(this.currentRoom.id + '_complete', true);
+      this.createHotspots(); // refresh to reveal newly unlocked hotspots
+    }
+  }
   private playHotspotSFX(hotspot: Hotspot): void {
     // Navigate hotspots use door sound (played in navigateToRoom), skip here
     if (hotspot.type === 'navigate') return;
