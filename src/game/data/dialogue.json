@@ -45,6 +45,11 @@
               "vo": "vo_nancy_choice_ashworth2"
             },
             {
+              "text": "Who else is in the theater right now?",
+              "nextNode": "about_others",
+              "triggerEvent": "learned_about_margaux"
+            },
+            {
               "text": "I'll start investigating.",
               "nextNode": "end",
               "triggerEvent": "learned_about_margaux",
@@ -59,8 +64,24 @@
             { "speaker": "Nancy", "text": "Does he have enemies here?", "vo": "vo_nancy_ashworth_01" },
             { "speaker": "Vivian", "text": "Everyone in this theater has a reason to want the demolition stopped. Myself included. I won't insult your intelligence by pretending otherwise.", "vo": "vo_vivian_ashworth_02" }
           ],
-          "nextNode": "end",
-          "triggerEvent": "learned_about_ashworth"
+          "choices": [
+            {
+              "text": "Tell me about Margaux Fontaine.",
+              "nextNode": "about_margaux",
+              "triggerEvent": "learned_about_ashworth"
+            },
+            {
+              "text": "Who else is in the theater right now?",
+              "nextNode": "about_others",
+              "triggerEvent": "learned_about_ashworth"
+            },
+            {
+              "text": "I'll start investigating.",
+              "nextNode": "end",
+              "triggerEvent": "learned_about_ashworth",
+              "vo": "vo_nancy_choice_investigate"
+            }
+          ]
         },
         {
           "id": "about_others",
