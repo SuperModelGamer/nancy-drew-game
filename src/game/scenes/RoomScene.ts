@@ -694,6 +694,10 @@ export class RoomScene extends Phaser.Scene {
             this.showDescription('You already have this.');
           } else {
             inventory.addItem(hotspot.itemId);
+            // Auto-equip the magnifying glass since it's the investigation tool
+            if (hotspot.itemId === 'magnifying_glass') {
+              inventory.selectItem(hotspot.itemId);
+            }
             UISounds.itemPickup();
             this.showPickupToast(hotspot.label);
             this.usedHotspots.add(hotspot.id);
