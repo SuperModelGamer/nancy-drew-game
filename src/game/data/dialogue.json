@@ -84,7 +84,8 @@
             {
               "text": "Who else is in the theater right now?",
               "nextNode": "about_others",
-              "triggerEvent": "learned_about_margaux"
+              "triggerEvent": "learned_about_margaux",
+              "vo": "vo_nancy_choice_others"
             },
             {
               "text": "I'll start investigating.",
@@ -119,12 +120,14 @@
             {
               "text": "Tell me about Margaux Fontaine.",
               "nextNode": "about_margaux",
-              "triggerEvent": "learned_about_ashworth"
+              "triggerEvent": "learned_about_ashworth",
+              "vo": "vo_nancy_choice_margaux"
             },
             {
               "text": "Who else is in the theater right now?",
               "nextNode": "about_others",
-              "triggerEvent": "learned_about_ashworth"
+              "triggerEvent": "learned_about_ashworth",
+              "vo": "vo_nancy_choice_others"
             },
             {
               "text": "I'll start investigating.",
