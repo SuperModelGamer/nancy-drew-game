@@ -302,6 +302,28 @@ export class BootScene extends Phaser.Scene {
       'vo_nancy_choice_the_night', 'vo_nancy_choice_blueprints', 'vo_nancy_choice_intruder',
       'vo_nancy_choice_insurance', 'vo_nancy_choice_poison', 'vo_nancy_choice_see_blueprints',
       'vo_nancy_choice_examine', 'vo_nancy_choice_about_intruder', 'vo_nancy_choice_thank_ashworth',
+      // Vivian diary / locket / revisit / post-ashworth / idle
+      'vo_vivian_diary_01', 'vo_vivian_diary_02',
+      'vo_vivian_cecilia_01', 'vo_vivian_cecilia_02', 'vo_vivian_cecilia_03', 'vo_vivian_cecilia_04',
+      'vo_vivian_trunk_01', 'vo_vivian_trunk_02', 'vo_vivian_trunk_03',
+      'vo_vivian_lover_01', 'vo_vivian_lover_02',
+      'vo_vivian_promise_01',
+      'vo_vivian_locket_silence', 'vo_vivian_locket_01', 'vo_vivian_locket_02', 'vo_vivian_locket_03',
+      'vo_vivian_trust_01', 'vo_vivian_trust_02', 'vo_vivian_trust_03',
+      'vo_vivian_suspicion_01', 'vo_vivian_suspicion_02', 'vo_vivian_suspicion_03',
+      'vo_vivian_mirror_01', 'vo_vivian_mirror_02', 'vo_vivian_mirror_03',
+      'vo_vivian_post_ash_01', 'vo_vivian_post_ash_02', 'vo_vivian_post_ash_03', 'vo_vivian_post_ash_04',
+      'vo_vivian_done_01', 'vo_vivian_idle_01',
+      // Nancy — Vivian scenes
+      'vo_nancy_heard_her',
+      'vo_nancy_diary_found', 'vo_nancy_diary_poisoned',
+      'vo_nancy_choice_cd', 'vo_nancy_choice_trunk', 'vo_nancy_choice_lover',
+      'vo_nancy_after_margaux', 'vo_nancy_october',
+      'vo_nancy_hale_edwin', 'vo_nancy_changes_everything',
+      'vo_nancy_found_locket', 'vo_nancy_choice_show_locket',
+      'vo_nancy_choice_protect', 'vo_nancy_choice_who_killed',
+      'vo_nancy_find_proof', 'vo_nancy_wax_hidden',
+      'vo_nancy_post_ash_leads',
     ];
     for (const key of voFiles) {
       this.load.audio(key, [`audio/vo/${key}.mp3`]);

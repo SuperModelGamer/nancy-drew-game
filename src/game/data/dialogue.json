@@ -193,37 +193,44 @@
           "lines": [
             {
               "speaker": "Nancy",
-              "text": "Vivian, I found something in the dressing room. Margaux's diary."
+              "text": "Vivian, I found something in the dressing room. Margaux's diary.",
+              "vo": "vo_nancy_diary_found"
             },
             {
               "speaker": "Vivian",
               "text": "Oh... oh, mon Dieu. I always hoped it survived. What does it say? Tell me — s'il te plaît.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_diary_01"
             },
             {
               "speaker": "Nancy",
-              "text": "She suspected she was being poisoned. Long before the final night. 'The tea tastes wrong again,' she wrote."
+              "text": "She suspected she was being poisoned. Long before the final night. 'The tea tastes wrong again,' she wrote.",
+              "vo": "vo_nancy_diary_poisoned"
             },
             {
               "speaker": "Vivian",
               "text": "I knew it. I always knew it wasn't an accident.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_diary_02"
             }
           ],
           "choices": [
             {
               "text": "She mentions someone with the initials 'C.D.' — does that mean anything to you?",
               "nextNode": "cecilia_reveal",
-              "requiredItem": "margaux_diary"
+              "requiredItem": "margaux_diary",
+              "vo": "vo_nancy_choice_cd"
             },
             {
               "text": "Tell me about the trunk in the dressing room.",
-              "nextNode": "trunk_hint"
+              "nextNode": "trunk_hint",
+              "vo": "vo_nancy_choice_trunk"
             },
             {
               "text": "Did Margaux have a lover? The diary mentions someone named 'J.'",
               "nextNode": "lover_reveal",
-              "requiredItem": "margaux_diary"
+              "requiredItem": "margaux_diary",
+              "vo": "vo_nancy_choice_lover"
             }
           ]
         },
@@ -233,26 +240,31 @@
             {
               "speaker": "Vivian",
               "text": "C.D... Cecilia Drake. Margaux's understudy.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_cecilia_01"
             },
             {
               "speaker": "Vivian",
               "text": "She was young, ambitious, très talentueuse. Margaux adored her — took her under her wing. But Cecilia wanted more than mentorship. She wanted the role. She wanted... everything.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_cecilia_02"
             },
             {
               "speaker": "Nancy",
-              "text": "And after Margaux died—"
+              "text": "And after Margaux died—",
+              "vo": "vo_nancy_after_margaux"
             },
             {
               "speaker": "Vivian",
               "text": "Cecilia took over Lady Ashford the very next night. The very next night, Nancy. She became a star. Built a forty-year career on the role she stole from a dead woman.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_cecilia_03"
             },
             {
               "speaker": "Vivian",
               "text": "She died in 1987. Celebrated. Beloved. While my Margaux was forgotten. C'est injuste. It's unbearable.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_cecilia_04"
             }
           ],
           "nextNode": "end",
@@ -264,21 +276,25 @@
             {
               "speaker": "Vivian",
               "text": "Margaux's trunk! I remember it from when I was small. She kept her most precious things inside.",
-              "expression": "happy"
+              "expression": "happy",
+              "vo": "vo_vivian_trunk_01"
             },
             {
               "speaker": "Vivian",
               "text": "The combination was always a date — Margaux used dates she could never forget. She called it 'my last Halloween.' The night everything changed.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_trunk_02"
             },
             {
               "speaker": "Nancy",
-              "text": "October 31st..."
+              "text": "October 31st...",
+              "vo": "vo_nancy_october"
             },
             {
               "speaker": "Vivian",
               "text": "1928. The night of the final performance.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_trunk_03"
             }
           ],
           "nextNode": "start"
@@ -289,20 +305,24 @@
             {
               "speaker": "Vivian",
               "text": "J? I... oui, yes. Margaux had a great love. Un grand amour. A man named James — James Hale. He was a stagehand here at the Monarch.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_lover_01"
             },
             {
               "speaker": "Nancy",
-              "text": "Hale? As in Edwin Hale?"
+              "text": "Hale? As in Edwin Hale?",
+              "vo": "vo_nancy_hale_edwin"
             },
             {
               "speaker": "Vivian",
               "text": "Edwin is James's grandson. That's why he's so... how shall I say... consumed by this theater, by Margaux's story. It's personal for him. His grandfather lost the love of his life on that stage.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_lover_02"
             },
             {
               "speaker": "Nancy",
-              "text": "That changes everything."
+              "text": "That changes everything.",
+              "vo": "vo_nancy_changes_everything"
             }
           ],
           "nextNode": "end",
@@ -314,7 +334,8 @@
             {
               "speaker": "Vivian",
               "text": "Nancy... promets-moi — promise me something. Whatever you find out — whoever is responsible, past or present — make sure Margaux's name is cleared. She deserves that much. She deserves everything.",
-              "expression": "worried"
+              "expression": "worried",
+              "vo": "vo_vivian_promise_01"
             }
           ]
         }
@@ -328,14 +349,16 @@
           "lines": [
             {
               "speaker": "Nancy",
-              "text": "Vivian, I found this in Margaux's trunk."
+              "text": "Vivian, I found this in Margaux's trunk.",
+              "vo": "vo_nancy_found_locket"
             }
           ],
           "choices": [
             {
               "text": "Show her the locket.",
               "nextNode": "locket_reaction",
-              "requiredItem": "margaux_locket"
+              "requiredItem": "margaux_locket",
+              "vo": "vo_nancy_choice_show_locket"
             }
           ]
         },
@@ -345,32 +368,38 @@
             {
               "speaker": "Vivian",
               "text": "...",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_locket_silence"
             },
             {
               "speaker": "Vivian",
               "text": "That's... c'est moi. That's me. I was four years old.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_locket_01"
             },
             {
               "speaker": "Vivian",
               "text": "'To my little star.' Ma petite étoile. She called me that. Every time she held me. Every time.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_locket_02"
             },
             {
               "speaker": "Vivian",
               "text": "She kept it in the trunk. All these years, she... pardonne-moi... she locked it away because she knew. She knew she wouldn't be coming back.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_locket_03"
             }
           ],
           "choices": [
             {
               "text": "She wanted to protect what mattered most.",
-              "nextNode": "locket_comfort"
+              "nextNode": "locket_comfort",
+              "vo": "vo_nancy_choice_protect"
             },
             {
               "text": "Vivian — do you know who killed her?",
-              "nextNode": "locket_suspicion"
+              "nextNode": "locket_suspicion",
+              "vo": "vo_nancy_choice_who_killed"
             }
           ]
         },
@@ -379,22 +408,26 @@
           "lines": [
             {
               "speaker": "Nancy",
-              "text": "She wanted to protect what mattered most."
+              "text": "She wanted to protect what mattered most.",
+              "vo": "vo_nancy_choice_protect"
             },
             {
               "speaker": "Vivian",
               "text": "I've been waiting seventy years to know what happened to her. Soixante-dix ans. I've lived my whole life in this theater because I couldn't leave her behind.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_trust_01"
             },
             {
               "speaker": "Vivian",
               "text": "There are private archives in my office — Margaux's personal effects, letters, photographs. I've never let anyone touch them. Not once. Take whatever you need, ma chère.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_trust_02"
             },
             {
               "speaker": "Vivian",
               "text": "Don't let this building come down without the truth coming out. Je t'en prie. Please.",
-              "expression": "worried"
+              "expression": "worried",
+              "vo": "vo_vivian_trust_03"
             }
           ],
           "triggerEvent": "vivian_full_trust"
@@ -405,21 +438,25 @@
             {
               "speaker": "Vivian",
               "text": "I was four years old when she died. I remember the screaming. I remember someone carrying me out of the theater.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_suspicion_01"
             },
             {
               "speaker": "Vivian",
               "text": "I've always suspected Cecilia. She was the understudy. She took the role. She never looked back. But I could never prove it.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_suspicion_02"
             },
             {
               "speaker": "Nancy",
-              "text": "I'm going to find the proof. I promise."
+              "text": "I'm going to find the proof. I promise.",
+              "vo": "vo_nancy_find_proof"
             },
             {
               "speaker": "Vivian",
               "text": "My office — there are private archives. Margaux's personal effects. Take whatever you need. Just bring me the truth.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_suspicion_03"
             }
           ],
           "triggerEvent": "vivian_full_trust"
@@ -2200,7 +2237,8 @@
             },
             {
               "speaker": "Nancy",
-              "text": "Thanks, Dad. That changes everything."
+              "text": "Thanks, Dad. That changes everything.",
+              "vo": "vo_nancy_changes_everything"
             },
             {
               "speaker": "Carson Drew",
@@ -2509,32 +2547,38 @@
             {
               "speaker": "Vivian",
               "text": "Oh... oh, mon Dieu. I always hoped it survived. What does it say? Tell me — s'il te plaît.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_diary_01"
             },
             {
               "speaker": "Nancy",
-              "text": "She suspected she was being poisoned. Long before the final night. 'The tea tastes wrong again,' she wrote."
+              "text": "She suspected she was being poisoned. Long before the final night. 'The tea tastes wrong again,' she wrote.",
+              "vo": "vo_nancy_diary_poisoned"
             },
             {
               "speaker": "Vivian",
               "text": "I knew it. I always knew it wasn't an accident.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_diary_02"
             }
           ],
           "choices": [
             {
               "text": "She mentions someone with the initials 'C.D.' — does that mean anything to you?",
               "nextNode": "cecilia_reveal",
-              "requiredItem": "margaux_diary"
+              "requiredItem": "margaux_diary",
+              "vo": "vo_nancy_choice_cd"
             },
             {
               "text": "Did Margaux have a lover? The diary mentions someone named 'J.'",
               "nextNode": "lover_reveal",
-              "requiredItem": "margaux_diary"
+              "requiredItem": "margaux_diary",
+              "vo": "vo_nancy_choice_lover"
             },
             {
               "text": "I'll keep reading. There might be more.",
-              "nextNode": "start"
+              "nextNode": "start",
+              "vo": "vo_nancy_choice_keep_reading"
             }
           ]
         },
@@ -2544,26 +2588,31 @@
             {
               "speaker": "Vivian",
               "text": "C.D... Cecilia Drake. Margaux's understudy.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_cecilia_01"
             },
             {
               "speaker": "Vivian",
               "text": "She was young, ambitious, très talentueuse. Margaux adored her — took her under her wing. But Cecilia wanted more than mentorship. She wanted the role. She wanted... everything.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_cecilia_02"
             },
             {
               "speaker": "Nancy",
-              "text": "And after Margaux died—"
+              "text": "And after Margaux died—",
+              "vo": "vo_nancy_after_margaux"
             },
             {
               "speaker": "Vivian",
               "text": "Cecilia took over Lady Ashford the very next night. The very next night, Nancy. She became a star. Built a forty-year career on the role she stole from a dead woman.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_cecilia_03"
             },
             {
               "speaker": "Vivian",
               "text": "She died in 1987. Celebrated. Beloved. While my Margaux was forgotten. C'est injuste. It's unbearable.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_cecilia_04"
             }
           ],
           "nextNode": "start",
@@ -2575,20 +2624,24 @@
             {
               "speaker": "Vivian",
               "text": "J? I... oui, yes. Margaux had a great love. Un grand amour. A man named James — James Hale. He was a stagehand here at the Monarch.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_lover_01"
             },
             {
               "speaker": "Nancy",
-              "text": "Hale? As in Edwin Hale?"
+              "text": "Hale? As in Edwin Hale?",
+              "vo": "vo_nancy_hale_edwin"
             },
             {
               "speaker": "Vivian",
               "text": "Edwin is James's grandson. That's why he's so... how shall I say... consumed by this theater, by Margaux's story. It's personal for him. His grandfather lost the love of his life on that stage.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_lover_02"
             },
             {
               "speaker": "Nancy",
-              "text": "That changes everything."
+              "text": "That changes everything.",
+              "vo": "vo_nancy_changes_everything"
             }
           ],
           "nextNode": "start",
@@ -2600,32 +2653,38 @@
             {
               "speaker": "Vivian",
               "text": "...",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_locket_silence"
             },
             {
               "speaker": "Vivian",
               "text": "That's... c'est moi. That's me. I was four years old.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_locket_01"
             },
             {
               "speaker": "Vivian",
               "text": "'To my little star.' Ma petite étoile. She called me that. Every time she held me. Every time.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_locket_02"
             },
             {
               "speaker": "Vivian",
               "text": "She kept it in the trunk. All these years, she... pardonne-moi... she locked it away because she knew. She knew she wouldn't be coming back.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_locket_03"
             }
           ],
           "choices": [
             {
               "text": "She wanted to protect what mattered most.",
-              "nextNode": "locket_comfort"
+              "nextNode": "locket_comfort",
+              "vo": "vo_nancy_choice_protect"
             },
             {
               "text": "Vivian — do you know who killed her?",
-              "nextNode": "locket_suspicion"
+              "nextNode": "locket_suspicion",
+              "vo": "vo_nancy_choice_who_killed"
             }
           ]
         },
@@ -2634,22 +2693,26 @@
           "lines": [
             {
               "speaker": "Nancy",
-              "text": "She wanted to protect what mattered most."
+              "text": "She wanted to protect what mattered most.",
+              "vo": "vo_nancy_choice_protect"
             },
             {
               "speaker": "Vivian",
               "text": "I've been waiting seventy years to know what happened to her. Soixante-dix ans. I've lived my whole life in this theater because I couldn't leave her behind.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_trust_01"
             },
             {
               "speaker": "Vivian",
               "text": "There are private archives in my office — Margaux's personal effects, letters, photographs. I've never let anyone touch them. Not once. Take whatever you need, ma chère.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_trust_02"
             },
             {
               "speaker": "Vivian",
               "text": "Don't let this building come down without the truth coming out. Je t'en prie. Please.",
-              "expression": "worried"
+              "expression": "worried",
+              "vo": "vo_vivian_trust_03"
             }
           ],
           "triggerEvent": "vivian_full_trust"
@@ -2660,21 +2723,25 @@
             {
               "speaker": "Vivian",
               "text": "I was four years old when she died. I remember the screaming. I remember someone carrying me out of the theater.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_suspicion_01"
             },
             {
               "speaker": "Vivian",
               "text": "I've always suspected Cecilia. She was the understudy. She took the role. She never looked back. But I could never prove it.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_suspicion_02"
             },
             {
               "speaker": "Nancy",
-              "text": "I'm going to find the proof. I promise."
+              "text": "I'm going to find the proof. I promise.",
+              "vo": "vo_nancy_find_proof"
             },
             {
               "speaker": "Vivian",
               "text": "My office — there are private archives. Margaux's personal effects. Take whatever you need. Just bring me the truth.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_suspicion_03"
             }
           ],
           "triggerEvent": "vivian_full_trust"
@@ -2685,25 +2752,30 @@
             {
               "speaker": "Vivian",
               "text": "C.D.... Margaux wrote that? On her own mirror?",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_mirror_01"
             },
             {
               "speaker": "Nancy",
-              "text": "In wax, hidden under the surface. She knew who was poisoning her and she left an accusation where only someone looking carefully would find it."
+              "text": "In wax, hidden under the surface. She knew who was poisoning her and she left an accusation where only someone looking carefully would find it.",
+              "vo": "vo_nancy_wax_hidden"
             },
             {
               "speaker": "Vivian",
               "text": "Cecilia Drake. She — my godmother wrote the killer's initials on her mirror and nobody found them for seventy years. Mon Dieu. She was crying out for help and nobody heard her.",
-              "expression": "sad"
+              "expression": "sad",
+              "vo": "vo_vivian_mirror_02"
             },
             {
               "speaker": "Nancy",
-              "text": "I heard her, Vivian. Seventy years late, but I heard her."
+              "text": "I heard her, Vivian. Seventy years late, but I heard her.",
+              "vo": "vo_nancy_heard_her"
             },
             {
               "speaker": "Vivian",
               "text": "Then make it count, Nancy. Make it count.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_mirror_03"
             }
           ],
           "nextNode": "start",
@@ -3955,7 +4027,8 @@
           "lines": [
             {
               "speaker": "Vivian",
-              "text": "Still here, ma chère? Go, go — explore. The theater won't investigate itself. I'll be right here when you need me."
+              "text": "Still here, ma chère? Go, go — explore. The theater won't investigate itself. I'll be right here when you need me.",
+              "vo": "vo_vivian_idle_01"
             }
           ]
         }
@@ -3970,12 +4043,14 @@
             {
               "speaker": "Vivian",
               "text": "Nancy, ma chère. You have that look again — the furrow. Go, go. The theater will keep its secrets whether I'm talking or not. I'll be here, as always.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_done_01"
             },
             {
               "speaker": "Vivian",
               "text": "And remember — crackers in the concession stand. Only slightly stale.",
-              "expression": "happy"
+              "expression": "happy",
+              "vo": "vo_vivian_done_01"
             }
           ]
         }
@@ -3990,26 +4065,31 @@
             {
               "speaker": "Vivian",
               "text": "You've met him. You see now — the man treats this theater like a balance sheet. Seventy-two hours, he says, as if history has an expiration date.",
-              "expression": "worried"
+              "expression": "worried",
+              "vo": "vo_vivian_post_ash_01"
             },
             {
               "speaker": "Nancy",
-              "text": "He gave me a few leads. But I need more perspective on this place — and on Margaux."
+              "text": "He gave me a few leads. But I need more perspective on this place — and on Margaux.",
+              "vo": "vo_nancy_post_ash_leads"
             },
             {
               "speaker": "Vivian",
               "text": "Then go upstairs, chérie. Use the master key — the grand staircase will take you to the auditorium. Edwin Hale has been camped out up there for weeks. He's the theater's historian, self-appointed guardian of every dusty secret in this building.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_post_ash_02"
             },
             {
               "speaker": "Vivian",
               "text": "If anyone knows what Ashworth is really after — and what this theater is hiding — it's Edwin. And while you're up there, you may run into Stella and Diego. They've been... restless tonight.",
-              "expression": "warm"
+              "expression": "warm",
+              "vo": "vo_vivian_post_ash_03"
             },
             {
               "speaker": "Vivian",
               "text": "Be careful, Nancy. This theater has a way of showing you things you weren't looking for.",
-              "expression": "happy"
+              "expression": "happy",
+              "vo": "vo_vivian_post_ash_04"
             }
           ],
           "triggerEvent": "vivian_sent_upstairs"
