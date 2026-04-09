@@ -50,8 +50,7 @@
           "type": "pickup",
           "itemId": "master_key",
           "onceOnly": true,
-          "showWhen": "vivian_intro",
-          "setsFlag": "lobby_explored"
+          "showWhen": "vivian_intro"
         },
         {
           "id": "lobby_magnifying_glass",
@@ -236,7 +235,7 @@
           "label": "Office Door",
           "type": "navigate",
           "targetRoom": "managers_office",
-          "showWhen": "lobby_explored"
+          "showWhen": "called_dad"
         },
         {
           "id": "lobby_water_stain",
