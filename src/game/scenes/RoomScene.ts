@@ -576,11 +576,13 @@ export class RoomScene extends Phaser.Scene {
 
       // Hover: change cursor by type, show label, subtle gold edge shimmer
       bg.on('pointerover', () => {
+        if (DialogueSystem.getInstance().isActive()) return;
         this.tweens.add({ targets: label, alpha: 1, duration: 180 });
         this.input.setDefaultCursor(this.getHotspotCursor(hotspot.type));
       });
 
       bg.on('pointerout', () => {
+        if (DialogueSystem.getInstance().isActive()) return;
         this.tweens.add({ targets: label, alpha: 0, duration: 180 });
         // Restore default cursor (spyglass if exploring, or equipped item)
         const equippedCursor = this.getEquippedItemCursor();
@@ -589,6 +591,7 @@ export class RoomScene extends Phaser.Scene {
 
       // Click/tap handler with sparkle feedback and sound
       bg.on('pointerdown', () => {
+        if (DialogueSystem.getInstance().isActive()) return;
         this.playClickSparkle(hx, hy, Colors.gold);
         this.handleHotspot(hotspot);
       });
