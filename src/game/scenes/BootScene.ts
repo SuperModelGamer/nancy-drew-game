@@ -109,22 +109,22 @@ export class BootScene extends Phaser.Scene {
     // Load real item icons (texture key matches item_icon_{id} so procedural fallback is skipped)
     // Primary: new high-quality assets from assets/items/
     const itemIconsHQ: Record<string, string> = {
-      master_key: 'nicekey',
-      magnifying_glass: 'mglass',
-      playbill_1928: '1928page',
-      effects_manual: 'stageeffects',
-      margaux_diary: 'leatherbook',
-      annotated_script: 'Scroll',
-      poisoned_teacup: 'Teacup',
-      blueprints: 'Page3',
-      basement_key: 'Key',
-      edwins_notebook: 'EH Book',
-      fog_machine_part: 'Machine',
-      cecilia_letter: 'Letter',
-      stella_records: 'Clipboard',
-      ashworth_files: 'Briefcase',
-      chemical_receipt: 'Page',
-      margaux_locket: 'Locket',
+      master_key: 'master-key',
+      magnifying_glass: 'magnifying-glass',
+      playbill_1928: 'playbill-1928',
+      effects_manual: 'effects-manual',
+      margaux_diary: 'diary',
+      annotated_script: 'script',
+      poisoned_teacup: 'teacup',
+      blueprints: 'blueprints',
+      basement_key: 'basement-key',
+      edwins_notebook: 'notebook',
+      fog_machine_part: 'fog-machine',
+      cecilia_letter: 'letter',
+      stella_records: 'clipboard',
+      ashworth_files: 'briefcase',
+      chemical_receipt: 'receipt',
+      margaux_locket: 'locket',
     };
     for (const [itemId, filename] of Object.entries(itemIconsHQ)) {
       this.load.image(`item_icon_${itemId}`, `assets/items/${filename}.png`);

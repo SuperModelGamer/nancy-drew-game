@@ -27,8 +27,8 @@ const SFX_MANIFEST: Record<string, string> = {
   click: 'audio/sfx_click.mp3',
   hover: 'audio/sfx_click.mp3',
   spotlightClick: 'audio/sfx_spotlight_click.mp3',
-  phoneRing: 'audio/BELLMisc-Dramatic_old_telepho-Elevenlabs.mp3',
-  phoneDialTone: 'audio/COMTelph-A_faint_buzz_or_dial-Elevenlabs.mp3',
+  phoneRing: 'audio/sfx_phone_ring.mp3',
+  phoneDialTone: 'audio/sfx_dial_tone.mp3',
 };
 
 // ─── Audio cache & playback ──────────────────────────────────────────────────
