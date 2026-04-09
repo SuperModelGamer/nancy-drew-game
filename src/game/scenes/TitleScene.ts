@@ -289,7 +289,7 @@ export class TitleScene extends Phaser.Scene {
     container.add(divGfx);
 
     // ── Tab toggle: SIGN IN | REGISTER ──
-    let mode: 'signin' | 'signup' = 'signup';
+    let mode: 'signin' | 'signup' = 'signin';
     const tabY = -162;
 
     const signInTab = this.add.text(-90, tabY, 'SIGN IN', {
