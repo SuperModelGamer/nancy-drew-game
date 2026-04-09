@@ -32,7 +32,7 @@
               "speaker": "Vivian",
               "text": "Margaux Fontaine. The greatest actress who ever graced that stage. She died here in 1928 — on stage, during her final performance. And now her ghost walks the Monarch.",
               "vo": "vo_vivian_start_03",
-              "expression": "sad"
+              "expression": "warm"
             }
           ],
           "choices": [
@@ -188,7 +188,7 @@
             {
               "speaker": "Vivian",
               "text": "I knew it. I always knew it wasn't an accident.",
-              "expression": "worried"
+              "expression": "warm"
             }
           ],
           "choices": [
@@ -214,12 +214,12 @@
             {
               "speaker": "Vivian",
               "text": "C.D... Cecilia Drake. Margaux's understudy.",
-              "expression": "worried"
+              "expression": "warm"
             },
             {
               "speaker": "Vivian",
               "text": "She was young, ambitious, très talentueuse. Margaux adored her — took her under her wing. But Cecilia wanted more than mentorship. She wanted the role. She wanted... everything.",
-              "expression": "sad"
+              "expression": "warm"
             },
             {
               "speaker": "Nancy",
@@ -259,7 +259,7 @@
             {
               "speaker": "Vivian",
               "text": "1928. The night of the final performance.",
-              "expression": "sad"
+              "expression": "warm"
             }
           ],
           "nextNode": "start"
@@ -270,7 +270,7 @@
             {
               "speaker": "Vivian",
               "text": "J? I... oui, yes. Margaux had a great love. Un grand amour. A man named James — James Hale. He was a stagehand here at the Monarch.",
-              "expression": "sad"
+              "expression": "warm"
             },
             {
               "speaker": "Nancy",
@@ -391,7 +391,7 @@
             {
               "speaker": "Vivian",
               "text": "I've always suspected Cecilia. She was the understudy. She took the role. She never looked back. But I could never prove it.",
-              "expression": "worried"
+              "expression": "warm"
             },
             {
               "speaker": "Nancy",
@@ -2363,7 +2363,7 @@
               "speaker": "Vivian",
               "text": "I miss those days. The theater was alive then. People came here to feel something. Now they stare at their telephones and call it entertainment. Bah.",
               "vo": "vo_vivian_history_04",
-              "expression": "sad"
+              "expression": "warm"
             }
           ],
           "nextNode": "start"
@@ -2434,7 +2434,7 @@
             {
               "speaker": "Vivian",
               "text": "I knew it. I always knew it wasn't an accident.",
-              "expression": "worried"
+              "expression": "warm"
             }
           ],
           "choices": [
@@ -2460,12 +2460,12 @@
             {
               "speaker": "Vivian",
               "text": "C.D... Cecilia Drake. Margaux's understudy.",
-              "expression": "worried"
+              "expression": "warm"
             },
             {
               "speaker": "Vivian",
               "text": "She was young, ambitious, très talentueuse. Margaux adored her — took her under her wing. But Cecilia wanted more than mentorship. She wanted the role. She wanted... everything.",
-              "expression": "sad"
+              "expression": "warm"
             },
             {
               "speaker": "Nancy",
@@ -2491,7 +2491,7 @@
             {
               "speaker": "Vivian",
               "text": "J? I... oui, yes. Margaux had a great love. Un grand amour. A man named James — James Hale. He was a stagehand here at the Monarch.",
-              "expression": "sad"
+              "expression": "warm"
             },
             {
               "speaker": "Nancy",
@@ -2581,7 +2581,7 @@
             {
               "speaker": "Vivian",
               "text": "I've always suspected Cecilia. She was the understudy. She took the role. She never looked back. But I could never prove it.",
-              "expression": "worried"
+              "expression": "warm"
             },
             {
               "speaker": "Nancy",
@@ -2619,7 +2619,7 @@
             {
               "speaker": "Vivian",
               "text": "Then make it count, Nancy. Make it count.",
-              "expression": "worried"
+              "expression": "warm"
             }
           ],
           "nextNode": "start",
@@ -3891,7 +3891,7 @@
             {
               "speaker": "Vivian",
               "text": "Be careful, Nancy. This theater has a way of showing you things you weren't looking for.",
-              "expression": "worried"
+              "expression": "happy"
             }
           ],
           "triggerEvent": "vivian_sent_upstairs"
