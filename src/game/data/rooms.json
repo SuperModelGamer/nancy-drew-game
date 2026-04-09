@@ -1258,7 +1258,7 @@
           "height": 141,
           "label": "Painting",
           "type": "inspect",
-          "description": "A painting of the Monarch Theatre in its golden age, the lobby filled with elegantly dressed theatergoers. A small brass plaque reads: 'Opening Night, 1924.'",
+          "description": "A painting of a rain-slicked city street at dusk — gas lamps glowing along the sidewalk, the Monarch Theatre's marquee bright in the distance. It looks like the view from this very window, decades ago. A small brass plaque reads: 'Grand Avenue, 1924.' Ashworth hung a picture of the neighborhood he's about to demolish right above his desk. Either he doesn't notice the irony, or he enjoys it.",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1455,7 +1455,7 @@
           "height": 200,
           "label": "Theater Painting",
           "type": "inspect",
-          "description": "The painting of the Monarch's opening night, 1924. From this angle I notice something I missed before — the frame is slightly crooked. He moved it recently. The wall safe behind it is hanging open... and empty. Whatever was inside, Ashworth took it with him when he ran.",
+          "description": "The painting of Grand Avenue, 1924. From this angle I notice something I missed before — the frame is slightly crooked. He moved it recently. The wall safe behind it is hanging open... and empty. Whatever was inside, Ashworth took it with him when he ran.",
           "showWhen": "ashworth_motive_revealed"
         },
         {
