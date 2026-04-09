@@ -33,6 +33,8 @@ export interface MusicTrackDef {
   description: string;
   /** Path to the audio file (relative to public/) */
   file: string;
+  /** Per-track gain multiplier (default 1.0). Normalizes tracks mastered at different levels. */
+  gain?: number;
 }
 
 export const MUSIC_TRACKS: MusicTrackDef[] = [
@@ -65,24 +67,28 @@ export const MUSIC_TRACKS: MusicTrackDef[] = [
     name: 'Velvet Curtain',
     description: 'Moody, building tension',
     file: '/music/crypto.mp3',
+    gain: 1.4,
   },
   {
     id: 'ghost_story',
     name: 'The Empty Stage',
     description: 'Classic haunting atmosphere',
     file: '/music/ghost_story.mp3',
+    gain: 1.2,
   },
   {
     id: 'darkest_child',
     name: 'Gaslight',
     description: 'Dark, unsettling — something lurks below',
     file: '/music/darkest_child.mp3',
+    gain: 1.2,
   },
   {
     id: 'comfortable_mystery',
     name: 'The Study',
     description: 'Vintage electric piano — surreal and contemplative',
     file: '/music/comfortable_mystery.mp3',
+    gain: 1.3,
   },
   {
     id: 'dreamy_flashback',
@@ -110,6 +116,12 @@ export class MusicSystem {
   private fadeTimer: number = 0;
   private targetVolume = 1;
   private ducked = false;
+
+  /** Effective volume accounting for per-track gain. */
+  private get effectiveVolume(): number {
+    const gain = this.currentTrack?.gain ?? 1;
+    return Math.max(0, Math.min(1, this.targetVolume * gain));
+  }
   private duckTimer: number = 0;
   /** Multiplier applied when VO is playing to keep music from competing. */
   private static readonly DUCK_LEVEL = 0.3;
@@ -165,7 +177,7 @@ export class MusicSystem {
   updateVolume(): void {
     this.targetVolume = UISounds.getMusicVolume() * UISounds.getVolume();
     if (this.currentAudio) {
-      this.currentAudio.volume = Math.max(0, Math.min(1, this.targetVolume));
+      this.currentAudio.volume = Math.max(0, Math.min(1, this.effectiveVolume));
     }
   }
 
@@ -177,7 +189,7 @@ export class MusicSystem {
     if (this.ducked || !this.currentAudio) return;
     this.ducked = true;
     window.clearInterval(this.duckTimer);
-    const target = this.targetVolume * MusicSystem.DUCK_LEVEL;
+    const target = this.effectiveVolume * MusicSystem.DUCK_LEVEL;
     const steps = 15;
     const interval = 300 / steps;
     let step = 0;
@@ -203,11 +215,11 @@ export class MusicSystem {
     const interval = 600 / steps;
     let step = 0;
     const startVol = this.currentAudio.volume;
-    const increment = (this.targetVolume - startVol) / steps;
+    const increment = (this.effectiveVolume - startVol) / steps;
     this.duckTimer = window.setInterval(() => {
       step++;
       if (step >= steps || !this.currentAudio) {
-        if (this.currentAudio) this.currentAudio.volume = Math.max(0, Math.min(1, this.targetVolume));
+        if (this.currentAudio) this.currentAudio.volume = Math.max(0, Math.min(1, this.effectiveVolume));
         window.clearInterval(this.duckTimer);
         return;
       }
@@ -291,13 +303,14 @@ export class MusicSystem {
   private fadeIn(audio: HTMLAudioElement, duration: number): void {
     const steps = 30;
     const interval = (duration * 1000) / steps;
-    const increment = this.targetVolume / steps;
+    const vol = this.effectiveVolume;
+    const increment = vol / steps;
     let step = 0;
 
     const timer = window.setInterval(() => {
       step++;
       if (step >= steps || audio.paused) {
-        audio.volume = Math.max(0, Math.min(1, this.targetVolume));
+        audio.volume = Math.max(0, Math.min(1, vol));
         window.clearInterval(timer);
         return;
       }
