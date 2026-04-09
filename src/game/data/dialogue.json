@@ -579,7 +579,16 @@
             { "speaker": "Diego", "text": "Be my guest. It's right here on my desk. I've been trying to crack it for weeks." },
             { "speaker": "Diego", "text": "You know what's weird? The annotations are only in Act III — the act where Lady Ashford drinks from the goblet. Whoever wrote these notes was focused on that specific scene." }
           ],
-          "nextNode": "end"
+          "choices": [
+            {
+              "text": "What have you heard at night?",
+              "nextNode": "night_sounds"
+            },
+            {
+              "text": "Thanks, Diego. I'll look into this.",
+              "nextNode": "end"
+            }
+          ]
         },
         {
           "id": "cipher_solved",
@@ -620,7 +629,16 @@
             { "speaker": "Diego", "text": "That's... actually a really good point. I didn't think of it as a trapdoor because — well, ghosts don't need trapdoors. That's like, Haunting 101." },
             { "speaker": "Diego", "text": "But a person would. Oh man. I feel like the guy in the Scooby-Doo episode who doesn't realize it's Old Man Jenkins until the very end." }
           ],
-          "nextNode": "end"
+          "choices": [
+            {
+              "text": "Have you found anything unusual up here?",
+              "nextNode": "found_script"
+            },
+            {
+              "text": "Thanks, Diego. I'll keep investigating.",
+              "nextNode": "end"
+            }
+          ]
         },
         {
           "id": "manual_connection",
@@ -630,7 +648,16 @@
             { "speaker": "Diego", "text": "So the ghost isn't floating through the floor. Someone is riding an elevator through it. That's... diabolically theatrical." },
             { "speaker": "Diego", "text": "I feel so stupid. I'm a playwright. I literally write stage directions for a living. I should know about trapdoors. Shakespeare used trapdoors! Marlowe used trapdoors! What is wrong with me?" }
           ],
-          "nextNode": "end"
+          "choices": [
+            {
+              "text": "Have you found anything unusual up here?",
+              "nextNode": "found_script"
+            },
+            {
+              "text": "Thanks, Diego. I'll keep investigating.",
+              "nextNode": "end"
+            }
+          ]
         },
         {
           "id": "end",
@@ -717,7 +744,22 @@
             { "speaker": "Nancy", "text": "I'm not accusing anyone yet. But the connection between the compounds used on you and the ones used on Margaux Fontaine is significant.", "vo": "vo_nancy_poison_02" },
             { "speaker": "Ashworth", "text": "Then stop not accusing and start acting. Get him out of my theater. I want him gone, I want his boxes gone, and I want this demolition back on schedule. Am I making myself clear?", "vo": "vo_ashworth_poison_03" }
           ],
-          "nextNode": "end"
+          "choices": [
+            {
+              "text": "Someone marked up your blueprints. Was that you?",
+              "nextNode": "blueprints",
+              "vo": "vo_nancy_choice_blueprints"
+            },
+            {
+              "text": "You mentioned seeing someone in the building at night.",
+              "nextNode": "intruder",
+              "vo": "vo_nancy_choice_intruder"
+            },
+            {
+              "text": "That's all for now.",
+              "nextNode": "end"
+            }
+          ]
         },
         {
           "id": "insurance_confronted",
@@ -728,8 +770,19 @@
             { "speaker": "Nancy", "text": "It's a motive. If the theater gets landmark status, you can't demolish it. You lose the insurance payout and have to accept the lower offer. Everyone in this building wants to save the theater — and you have a $1.5 million reason to destroy it.", "vo": "vo_nancy_insurance_02" },
             { "speaker": "Ashworth", "text": "I'm the victim here. Someone poisoned ME. I was on a hospital floor for six hours. So don't you dare turn this around on me — I won't have it.", "vo": "vo_ashworth_insurance_03" }
           ],
-          "nextNode": "end",
-          "triggerEvent": "ashworth_motive_revealed"
+          "choices": [
+            {
+              "text": "What happened the night you collapsed?",
+              "nextNode": "the_night",
+              "triggerEvent": "ashworth_motive_revealed",
+              "vo": "vo_nancy_choice_the_night"
+            },
+            {
+              "text": "That's all for now.",
+              "nextNode": "end",
+              "triggerEvent": "ashworth_motive_revealed"
+            }
+          ]
         },
         {
           "id": "blueprints",
@@ -763,7 +816,22 @@
             { "speaker": "Nancy", "text": "You think they poisoned you to keep you quiet?", "vo": "vo_nancy_intruder_01" },
             { "speaker": "Ashworth", "text": "I don't think. I know. And I'll tell you something else — if you find whoever's down there, you'll find whoever tried to kill me. Count on it.", "vo": "vo_ashworth_intruder_04" }
           ],
-          "nextNode": "end"
+          "choices": [
+            {
+              "text": "What happened the night you collapsed?",
+              "nextNode": "the_night",
+              "vo": "vo_nancy_choice_the_night"
+            },
+            {
+              "text": "Someone marked up your blueprints. Was that you?",
+              "nextNode": "blueprints",
+              "vo": "vo_nancy_choice_blueprints"
+            },
+            {
+              "text": "That's all for now.",
+              "nextNode": "end"
+            }
+          ]
         },
         {
           "id": "end",
