@@ -14,6 +14,8 @@ interface DialogueLine {
   vo?: string;
   /** Optional flag to trigger when this line starts displaying */
   triggerEvent?: string;
+  /** Optional expression variant for the speaker portrait (e.g. "angry", "shocked") */
+  expression?: string;
 }
 
 interface DialogueChoice {
@@ -302,7 +304,7 @@ export class DialogueSystem {
     this.container.add(overlay);
 
     // ── Portrait detection ──
-    const portraitKey = this.getSpeakerPortraitKey(line.speaker);
+    const portraitKey = this.getSpeakerPortraitKey(line.speaker, line.expression);
     const hasPortrait = portraitKey !== null && this.scene.textures.exists(portraitKey);
     // Reserve portrait space if ANY speaker in this dialogue has a portrait,
     // even on lines from speakers without one (keeps layout stable)
@@ -876,7 +878,7 @@ export class DialogueSystem {
 
   // ─── Speaker Data ─────────────────────────────────────────────────────────
 
-  private getSpeakerPortraitKey(speaker: string): string | null {
+  private getSpeakerPortraitKey(speaker: string, expression?: string): string | null {
     const portraitMap: Record<string, string> = {
       'Vivian': 'portrait_vivian',
       'Edwin': 'portrait_edwin',
@@ -884,7 +886,13 @@ export class DialogueSystem {
       'Ashworth': 'portrait_ashworth',
       'Diego': 'portrait_diego',
     };
-    return portraitMap[speaker] || null;
+    const base = portraitMap[speaker];
+    if (!base) return null;
+    if (expression) {
+      const exprKey = `${base}_${expression}`;
+      if (this.scene?.textures.exists(exprKey)) return exprKey;
+    }
+    return base;
   }
 
   private getSpeakerColor(speaker: string): string {

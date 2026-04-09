@@ -100,6 +100,16 @@ export class BootScene extends Phaser.Scene {
       this.load.image(`portrait_${suspect}`, `assets/portraits/${suspect}.png`);
     }
 
+    // Load expression variants for dialogue portraits
+    const expressions: Record<string, string[]> = {
+      ashworth: ['annoyed', 'angry', 'shocked', 'suspicious'],
+    };
+    for (const [char, exprs] of Object.entries(expressions)) {
+      for (const expr of exprs) {
+        this.load.image(`portrait_${char}_${expr}`, `assets/portraits/${char}-${expr}.png`);
+      }
+    }
+
     // Load map room medallion icons
     const mapRooms = ['lobby', 'auditorium', 'backstage', 'dressing_room', 'projection_booth', 'catwalk', 'basement', 'managers_office'];
     for (const room of mapRooms) {
