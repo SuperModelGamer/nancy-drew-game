@@ -1294,17 +1294,6 @@
           "hideWhen": "ashworth_motive_revealed"
         },
         {
-          "id": "mo_desk_lamp",
-          "x": 1553,
-          "y": 531,
-          "width": 132,
-          "height": 94,
-          "label": "Desk Lamp",
-          "type": "inspect",
-          "description": "A green banker's lamp casting warm light across the desk. Its chain pull glints in the dim room.",
-          "hideWhen": "ashworth_motive_revealed"
-        },
-        {
           "id": "mo_open_drawer",
           "x": 1563,
           "y": 962,
