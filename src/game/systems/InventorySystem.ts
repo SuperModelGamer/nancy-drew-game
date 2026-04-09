@@ -3,6 +3,7 @@ export class InventorySystem {
   private items: string[] = [];
   private selectedItem: string | null = null;
   private usedItems: Set<string> = new Set();
+  private lastPickedUp: string | null = null;
   private maxSlots = 12;
   private listeners: Array<() => void> = [];
 
@@ -18,6 +19,7 @@ export class InventorySystem {
     if (this.items.includes(itemId)) return false;
 
     this.items.push(itemId);
+    this.lastPickedUp = itemId;
     this.notify();
     return true;
   }
@@ -61,6 +63,13 @@ export class InventorySystem {
 
   getSelectedItem(): string | null {
     return this.selectedItem;
+  }
+
+  /** Returns the last picked-up item ID and clears it (consume-once). */
+  consumeLastPickup(): string | null {
+    const id = this.lastPickedUp;
+    this.lastPickedUp = null;
+    return id;
   }
 
   onChange(listener: () => void): void {

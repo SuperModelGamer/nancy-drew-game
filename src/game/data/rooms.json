@@ -95,9 +95,9 @@
           "y": 564,
           "width": 85,
           "height": 152,
-          "label": "Wall Paintings",
+          "label": "Wall Painting",
           "type": "inspect",
-          "description": "Dozens of playbills covering the wall like wallpaper — decades of shows. 'The Secret of the Old Clock,' 'Treasure in the Royal Tower,' 'Danger on Deception Island' — the Monarch hosted touring companies from everywhere. But one has a gold frame: 'THE CRIMSON VEIL — Starring Margaux Fontaine — Final Performance, October 31, 1928.' Fresh flowers underneath. Someone's still honoring her, almost a hundred years later. That kind of devotion is either beautiful or obsessive. Maybe both."
+          "description": "A large painting of a city street — probably this neighborhood, decades ago. Cobblestones, gas lamps, horse-drawn carriages passing a row of theaters with bright marquees. The Monarch is right in the center, its facade gleaming and new. This must be from the 1920s, when the theater district was alive. A small brass plate at the bottom reads: 'Grand Avenue, 1926 — Commissioned by the Fontaine Estate.' The Fontaines built more than a theater. They built a whole world around it. And Ashworth wants to tear it all down."
         },
         {
           "id": "lobby_old_poster",
@@ -1247,7 +1247,7 @@
           "label": "Filing Cabinet",
           "type": "inspect",
           "description": "A metal filing cabinet. Most drawers are demolition permits and contractor invoices. But the bottom drawer — jackpot. A folder labeled 'HISTORICAL SIGNIFICANCE ASSESSMENT — MONARCH THEATRE' from the city's heritage department. Status: 'Pending Review.' Someone filed for landmark status. And Ashworth buried it in his own filing cabinet. He's racing to demolish before this review goes through. That's not illegal, but it's not exactly ethical either.",
-          "showWhen": "ashworth_office",
+          "showWhen": "edwin_auditorium",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1283,7 +1283,7 @@
           "label": "Office Window",
           "type": "inspect",
           "description": "The office window overlooks the alley behind the theater. Rain streaks down the glass, but I can see clearly enough — there's a service entrance to the basement down there, and it's propped open with a brick. Someone's been coming and going without using the main entrance. That's how they avoid being seen. I need to find my way down there.",
-          "showWhen": "ashworth_office",
+          "showWhen": "edwin_auditorium",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1306,7 +1306,7 @@
           "label": "Open Drawer",
           "type": "inspect",
           "description": "A desk drawer left slightly open. Inside: a flashlight and a book — 'Ghosts of the American Theatre.' The chapter on the Monarch is bookmarked, with passages underlined in shaky pen. Ashworth was researching the ghost. The tough businessman who calls everyone a 'vulture' and threatens lawsuits before breakfast was reading ghost stories with the lights on. He's more frightened than he'd ever admit. Join the club, Ashworth.",
-          "showWhen": "ashworth_office",
+          "showWhen": "edwin_auditorium",
           "hideWhen": "ashworth_motive_revealed"
         },
         {

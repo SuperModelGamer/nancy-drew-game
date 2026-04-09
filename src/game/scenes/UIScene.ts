@@ -167,7 +167,20 @@ export class UIScene extends Phaser.Scene {
 
     // Listen for inventory changes — update both evidence panel and right panel stats
     const onInventoryChange = () => {
-      if (this.evidenceOpen) this.refreshInventoryGrid();
+      const pickedUp = InventorySystem.getInstance().consumeLastPickup();
+      if (pickedUp) {
+        if (!this.evidenceOpen) {
+          this.openEvidence();
+        } else {
+          this.refreshInventoryGrid();
+        }
+        // Show item detail after panel is ready
+        this.time.delayedCall(250, () => {
+          this.showItemDetail(pickedUp);
+        });
+      } else {
+        if (this.evidenceOpen) this.refreshInventoryGrid();
+      }
       this.updateRightPanelStats();
     };
     InventorySystem.getInstance().onChange(onInventoryChange);
