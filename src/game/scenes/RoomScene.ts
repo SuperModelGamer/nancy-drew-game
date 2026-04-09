@@ -1067,12 +1067,12 @@ export class RoomScene extends Phaser.Scene {
   private getHotspotCursor(type: string): string {
     const hasGlass = InventorySystem.getInstance().hasItem('magnifying_glass');
     switch (type) {
-      case 'inspect': return hasGlass ? this.glowCursor : Cursors.inspect;
+      case 'inspect': return hasGlass ? this.glowCursor : Cursors.default;
       case 'pickup': return Cursors.pickup;    // grabbing hand
       case 'navigate': return Cursors.navigate; // door with arrow
       case 'talk': return Cursors.talk;         // speech bubble
       case 'locked': return Cursors.locked;     // padlock
-      default: return hasGlass ? this.glowCursor : Cursors.inspect;
+      default: return hasGlass ? this.glowCursor : Cursors.default;
     }
   }
 
