@@ -627,78 +627,85 @@
           "id": "start",
           "triggerEvent": "ashworth_office",
           "lines": [
-            { "speaker": "Ashworth", "text": "Oh, wonderful. Another vulture. What do you want? I'm on a deadline — literally." },
-            { "speaker": "Nancy", "text": "Nancy Drew. I'm here to find out who poisoned you, Mr. Ashworth." },
-            { "speaker": "Ashworth", "text": "Ha. Take your pick. Everyone in this building wants me dead. The old actress, the historian, even my own stage manager. This theater is full of people who'd rather see me in the ground than see one brick moved." },
-            { "speaker": "Ashworth", "text": "You want my opinion? Start with Hale. The man's been circling this building like a vulture for fifteen years. He's got keys he shouldn't have, he knows rooms that aren't on the blueprints, and he looks at me like I'm a war criminal for filing a demolition permit. Start with Hale." }
+            { "speaker": "Ashworth", "text": "Oh, wonderful. Another vulture. What do you want? I'm on a deadline — literally.", "vo": "vo_ashworth_start_01" },
+            { "speaker": "Nancy", "text": "Nancy Drew. I'm here to find out who poisoned you, Mr. Ashworth.", "vo": "vo_nancy_office_01" },
+            { "speaker": "Ashworth", "text": "Ha. Take your pick. Everyone in this building wants me dead. The old actress, the historian, even my own stage manager. This theater is full of people who'd rather see me in the ground than see one brick moved.", "vo": "vo_ashworth_start_02" },
+            { "speaker": "Ashworth", "text": "You want my opinion? Start with Hale. The man's been circling this building like a vulture for fifteen years. He's got keys he shouldn't have, he knows rooms that aren't on the blueprints, and he looks at me like I'm a war criminal for filing a demolition permit. Start with Hale.", "vo": "vo_ashworth_start_03" }
           ],
           "choices": [
             {
               "text": "What happened the night you collapsed?",
-              "nextNode": "the_night"
+              "nextNode": "the_night",
+              "vo": "vo_nancy_choice_the_night"
             },
             {
               "text": "Someone marked up your blueprints. Was that you?",
-              "nextNode": "blueprints"
+              "nextNode": "blueprints",
+              "vo": "vo_nancy_choice_blueprints"
             },
             {
               "text": "You mentioned seeing someone in the building at night.",
-              "nextNode": "intruder"
+              "nextNode": "intruder",
+              "vo": "vo_nancy_choice_intruder"
             },
             {
               "text": "Your wall safe contains insurance documents. The demolition is worth $2.3 million — you rejected an $800K offer to sell.",
               "nextNode": "insurance_confronted",
-              "requiredItem": "ashworth_files"
+              "requiredItem": "ashworth_files",
+              "vo": "vo_nancy_choice_insurance"
             }
           ]
         },
         {
           "id": "the_night",
           "lines": [
-            { "speaker": "Ashworth", "text": "I was working late. Had a cup of tea from the kettle — same as every night. Earl Grey, two sugars, not that it matters. Within twenty minutes, my vision went sideways and I couldn't stand. I'm a big man, Drew. I don't just fall down." },
-            { "speaker": "Ashworth", "text": "Before I blacked out, I saw... someone. A shape in the doorway. Just standing there. Watching me fall." },
-            { "speaker": "Nancy", "text": "Can you describe them?" },
-            { "speaker": "Ashworth", "text": "Dark clothes. Average build. They didn't help. They didn't call out. They just watched, like I was — like I was a show. And then they were gone. I woke up on the floor with Stella shaking me." },
-            { "speaker": "Nancy", "text": "Did anyone else see this figure?" },
-            { "speaker": "Ashworth", "text": "No one else was — I was alone in the office. But I know what I saw. I'm not making this up." }
+            { "speaker": "Ashworth", "text": "I was working late. Had a cup of tea from the kettle — same as every night. Earl Grey, two sugars, not that it matters. Within twenty minutes, my vision went sideways and I couldn't stand. I'm a big man, Drew. I don't just fall down.", "vo": "vo_ashworth_night_01" },
+            { "speaker": "Ashworth", "text": "Before I blacked out, I saw... someone. A shape in the doorway. Just standing there. Watching me fall.", "vo": "vo_ashworth_night_02" },
+            { "speaker": "Nancy", "text": "Can you describe them?", "vo": "vo_nancy_night_01" },
+            { "speaker": "Ashworth", "text": "Dark clothes. Average build. They didn't help. They didn't call out. They just watched, like I was — like I was a show. And then they were gone. I woke up on the floor with Stella shaking me.", "vo": "vo_ashworth_night_03" },
+            { "speaker": "Nancy", "text": "Did anyone else see this figure?", "vo": "vo_nancy_night_02" },
+            { "speaker": "Ashworth", "text": "No one else was — I was alone in the office. But I know what I saw. I'm not making this up.", "vo": "vo_ashworth_night_04" }
           ],
           "choices": [
             {
               "text": "I found the teacup. The residue looks like antimony — a metallic poison.",
               "nextNode": "poison_identified",
-              "requiredFlag": "poison_identified"
+              "requiredFlag": "poison_identified",
+              "vo": "vo_nancy_choice_poison"
             },
             {
               "text": "Can I see the blueprints on your wall?",
               "nextNode": "blueprints",
-              "triggerEvent": "saw_figure_before_collapse"
+              "triggerEvent": "saw_figure_before_collapse",
+              "vo": "vo_nancy_choice_see_blueprints"
             },
             {
               "text": "I'll examine the office.",
               "nextNode": "end",
-              "triggerEvent": "saw_figure_before_collapse"
+              "triggerEvent": "saw_figure_before_collapse",
+              "vo": "vo_nancy_choice_examine"
             }
           ]
         },
         {
           "id": "poison_identified",
           "lines": [
-            { "speaker": "Ashworth", "text": "Antimony? That's — you're serious. That's a Victorian poison. Nobody uses that. Nobody even thinks about that unless they've got their nose in some dusty —" },
-            { "speaker": "Nancy", "text": "Someone who's been researching a murder from 1928." },
-            { "speaker": "Ashworth", "text": "Hale. You're talking about Hale. Of course you are. That man treats a seventy-year-old crime scene like it's a personal hobby." },
-            { "speaker": "Nancy", "text": "I'm not accusing anyone yet. But the connection between the compounds used on you and the ones used on Margaux Fontaine is significant." },
-            { "speaker": "Ashworth", "text": "Then stop not accusing and start acting. Get him out of my theater. I want him gone, I want his boxes gone, and I want this demolition back on schedule. Am I making myself clear?" }
+            { "speaker": "Ashworth", "text": "Antimony? That's — you're serious. That's a Victorian poison. Nobody uses that. Nobody even thinks about that unless they've got their nose in some dusty —", "vo": "vo_ashworth_poison_01" },
+            { "speaker": "Nancy", "text": "Someone who's been researching a murder from 1928.", "vo": "vo_nancy_poison_01" },
+            { "speaker": "Ashworth", "text": "Hale. You're talking about Hale. Of course you are. That man treats a seventy-year-old crime scene like it's a personal hobby.", "vo": "vo_ashworth_poison_02" },
+            { "speaker": "Nancy", "text": "I'm not accusing anyone yet. But the connection between the compounds used on you and the ones used on Margaux Fontaine is significant.", "vo": "vo_nancy_poison_02" },
+            { "speaker": "Ashworth", "text": "Then stop not accusing and start acting. Get him out of my theater. I want him gone, I want his boxes gone, and I want this demolition back on schedule. Am I making myself clear?", "vo": "vo_ashworth_poison_03" }
           ],
           "nextNode": "end"
         },
         {
           "id": "insurance_confronted",
           "lines": [
-            { "speaker": "Ashworth", "text": "How did you — that safe was locked. I changed the combination myself." },
-            { "speaker": "Nancy", "text": "The Historical Society offered you $800,000 for the theater. You turned it down because the demolition insurance pays $2.3 million." },
-            { "speaker": "Ashworth", "text": "That's a business decision. It's called math, Drew. Not a crime." },
-            { "speaker": "Nancy", "text": "It's a motive. If the theater gets landmark status, you can't demolish it. You lose the insurance payout and have to accept the lower offer. Everyone in this building wants to save the theater — and you have a $1.5 million reason to destroy it." },
-            { "speaker": "Ashworth", "text": "I'm the victim here. Someone poisoned ME. I was on a hospital floor for six hours. So don't you dare turn this around on me — I won't have it." }
+            { "speaker": "Ashworth", "text": "How did you — that safe was locked. I changed the combination myself.", "vo": "vo_ashworth_insurance_01" },
+            { "speaker": "Nancy", "text": "The Historical Society offered you $800,000 for the theater. You turned it down because the demolition insurance pays $2.3 million.", "vo": "vo_nancy_insurance_01" },
+            { "speaker": "Ashworth", "text": "That's a business decision. It's called math, Drew. Not a crime.", "vo": "vo_ashworth_insurance_02" },
+            { "speaker": "Nancy", "text": "It's a motive. If the theater gets landmark status, you can't demolish it. You lose the insurance payout and have to accept the lower offer. Everyone in this building wants to save the theater — and you have a $1.5 million reason to destroy it.", "vo": "vo_nancy_insurance_02" },
+            { "speaker": "Ashworth", "text": "I'm the victim here. Someone poisoned ME. I was on a hospital floor for six hours. So don't you dare turn this around on me — I won't have it.", "vo": "vo_ashworth_insurance_03" }
           ],
           "nextNode": "end",
           "triggerEvent": "ashworth_motive_revealed"
@@ -706,40 +713,42 @@
         {
           "id": "blueprints",
           "lines": [
-            { "speaker": "Ashworth", "text": "I didn't draw those red marks. Don't look at me like that — I didn't. They were already there when I pinned the blueprints up. Someone's been mapping hidden passages, sealed rooms, a whole tunnel network beneath the stage." },
-            { "speaker": "Ashworth", "text": "This theater is a maze. Whoever built it wanted people to disappear. And apparently, someone still does." },
-            { "speaker": "Nancy", "text": "Do you know who made the annotations?" },
-            { "speaker": "Ashworth", "text": "My money's on the historian. Hale. The man practically lives here — he knows more about this building than the people who built it. And that makes me nervous." }
+            { "speaker": "Ashworth", "text": "I didn't draw those red marks. Don't look at me like that — I didn't. They were already there when I pinned the blueprints up. Someone's been mapping hidden passages, sealed rooms, a whole tunnel network beneath the stage.", "vo": "vo_ashworth_blueprints_01" },
+            { "speaker": "Ashworth", "text": "This theater is a maze. Whoever built it wanted people to disappear. And apparently, someone still does.", "vo": "vo_ashworth_blueprints_02" },
+            { "speaker": "Nancy", "text": "Do you know who made the annotations?", "vo": "vo_nancy_blueprints_01" },
+            { "speaker": "Ashworth", "text": "My money's on the historian. Hale. The man practically lives here — he knows more about this building than the people who built it. And that makes me nervous.", "vo": "vo_ashworth_blueprints_03" }
           ],
           "choices": [
             {
               "text": "Tell me about the intruder you found.",
               "nextNode": "intruder",
-              "triggerEvent": "learned_about_basement_intruder"
+              "triggerEvent": "learned_about_basement_intruder",
+              "vo": "vo_nancy_choice_about_intruder"
             },
             {
               "text": "Thank you, Mr. Ashworth.",
               "nextNode": "end",
-              "triggerEvent": "learned_about_basement_intruder"
+              "triggerEvent": "learned_about_basement_intruder",
+              "vo": "vo_nancy_choice_thank_ashworth"
             }
           ]
         },
         {
           "id": "intruder",
           "lines": [
-            { "speaker": "Ashworth", "text": "Two weeks ago. I came in early — 5 AM, because the demolition crew needed measurements. I heard noises from below the stage. Mechanical sounds. Rhythmic, like machinery. The basement door was unlocked, which it shouldn't have been. I went down." },
-            { "speaker": "Ashworth", "text": "Someone had set up a workshop down there. Tools, documents, chemicals I couldn't identify. And then they heard me coming. The lights went out — all of them, at once. I couldn't see my hand in front of my face. I barely made it back to the stairs." },
-            { "speaker": "Ashworth", "text": "That's when the 'ghost' sightings ramped up. Fog in the hallways, voices from the walls. And three days later — three days — I was poisoned. You tell me that's a coincidence." },
-            { "speaker": "Nancy", "text": "You think they poisoned you to keep you quiet?" },
-            { "speaker": "Ashworth", "text": "I don't think. I know. And I'll tell you something else — if you find whoever's down there, you'll find whoever tried to kill me. Count on it." }
+            { "speaker": "Ashworth", "text": "Two weeks ago. I came in early — 5 AM, because the demolition crew needed measurements. I heard noises from below the stage. Mechanical sounds. Rhythmic, like machinery. The basement door was unlocked, which it shouldn't have been. I went down.", "vo": "vo_ashworth_intruder_01" },
+            { "speaker": "Ashworth", "text": "Someone had set up a workshop down there. Tools, documents, chemicals I couldn't identify. And then they heard me coming. The lights went out — all of them, at once. I couldn't see my hand in front of my face. I barely made it back to the stairs.", "vo": "vo_ashworth_intruder_02" },
+            { "speaker": "Ashworth", "text": "That's when the 'ghost' sightings ramped up. Fog in the hallways, voices from the walls. And three days later — three days — I was poisoned. You tell me that's a coincidence.", "vo": "vo_ashworth_intruder_03" },
+            { "speaker": "Nancy", "text": "You think they poisoned you to keep you quiet?", "vo": "vo_nancy_intruder_01" },
+            { "speaker": "Ashworth", "text": "I don't think. I know. And I'll tell you something else — if you find whoever's down there, you'll find whoever tried to kill me. Count on it.", "vo": "vo_ashworth_intruder_04" }
           ],
           "nextNode": "end"
         },
         {
           "id": "end",
           "lines": [
-            { "speaker": "Ashworth", "text": "Find whoever did this. Fast. I'm not asking — I'm telling you. Because in seventy-two hours, my crew arrives and this building comes down. Permits are signed, inspections are done." },
-            { "speaker": "Ashworth", "text": "Ghost or no ghost. That's the deadline. Work with it." }
+            { "speaker": "Ashworth", "text": "Find whoever did this. Fast. I'm not asking — I'm telling you. Because in seventy-two hours, my crew arrives and this building comes down. Permits are signed, inspections are done.", "vo": "vo_ashworth_end_01" },
+            { "speaker": "Ashworth", "text": "Ghost or no ghost. That's the deadline. Work with it.", "vo": "vo_ashworth_end_02" }
           ]
         }
       ]
