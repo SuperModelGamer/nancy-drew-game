@@ -359,15 +359,15 @@ export class UIScene extends Phaser.Scene {
     // Audio toggle (left of buttons) + volume slider
     const musicSys = MusicSystem.getInstance();
     const audioBtnX = btnCenterX - btnSpacing * 2.3;
-    const audioBtn = this.add.text(audioBtnX, btnCenterY, '\u{1F50A}', {
-      fontSize: '44px',
+    const audioBtn = this.add.text(audioBtnX, btnCenterY, 'VOL', {
+      fontFamily: FONT, fontSize: '16px', fontStyle: 'bold', letterSpacing: 1,
     }).setOrigin(0.5, 0.5);
     audioBtn.setInteractive({ cursor: POINTER_CURSOR });
 
     const updateAudioIcon = () => {
       const vol = UISounds.getVolume();
       const muted = vol <= 0;
-      audioBtn.setText(muted ? '\u{1F507}' : '\u{1F50A}');
+      audioBtn.setText(muted ? 'MUTE' : 'VOL');
       audioBtn.setColor(muted ? '#4a4a5a' : '#8a8a9a');
       this.updateVolumeSlider();
     };
@@ -844,7 +844,7 @@ export class UIScene extends Phaser.Scene {
     if (this.barRoomClueText) {
       const remaining = roomClueTotal - roomClueFound;
       if (remaining > 0) {
-        this.barRoomClueText.setText(`\u{1F50D} ${roomClueFound}/${roomClueTotal} CLUES`);
+        this.barRoomClueText.setText(`${roomClueFound}/${roomClueTotal} CLUES`);
         this.barRoomClueText.setColor('#8a9aaa');
       } else {
         this.barRoomClueText.setText(`\u2713 ${roomClueTotal}/${roomClueTotal} CLUES`);
@@ -1417,7 +1417,7 @@ export class UIScene extends Phaser.Scene {
       }
     }
     if (this.hotspotCounterText) {
-      this.hotspotCounterText.setText(`🔍 Clues Discovered: ${discoveredHotspots} / ${totalHotspots}`);
+      this.hotspotCounterText.setText(`Clues Discovered: ${discoveredHotspots} / ${totalHotspots}`);
     }
 
     // Per-room clue counter (all interactive hotspot types, excluding doors)
