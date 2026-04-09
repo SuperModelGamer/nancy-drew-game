@@ -150,7 +150,23 @@
               "expression": "happy"
             }
           ],
-          "nextNode": "start"
+          "choices": [
+            {
+              "text": "Tell me about Margaux Fontaine.",
+              "nextNode": "about_margaux",
+              "vo": "vo_nancy_choice_margaux"
+            },
+            {
+              "text": "What happened to Ashworth?",
+              "nextNode": "about_ashworth",
+              "vo": "vo_nancy_choice_ashworth"
+            },
+            {
+              "text": "I'll start investigating.",
+              "nextNode": "end",
+              "vo": "vo_nancy_choice_investigate"
+            }
+          ]
         },
         {
           "id": "end",
