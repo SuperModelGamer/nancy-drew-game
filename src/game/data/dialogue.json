@@ -3830,6 +3830,20 @@
       ]
     },
     {
+      "id": "vivian_idle",
+      "nodes": [
+        {
+          "id": "start",
+          "lines": [
+            {
+              "speaker": "Vivian",
+              "text": "Still here, ma chère? Go, go — explore. The theater won't investigate itself. I'll be right here when you need me."
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "vivian_intro_done",
       "nodes": [
         {

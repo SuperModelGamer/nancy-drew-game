@@ -156,6 +156,18 @@
           "type": "talk",
           "dialogueId": "vivian_post_ashworth",
           "showWhen": "ashworth_office",
+          "hideWhen": "vivian_sent_upstairs"
+        },
+        {
+          "id": "lobby_vivian_idle",
+          "x": 734,
+          "y": 664,
+          "width": 109,
+          "height": 418,
+          "label": "Vivian Delacroix",
+          "type": "talk",
+          "dialogueId": "vivian_idle",
+          "showWhen": "vivian_intro",
           "hideWhen": "day_2"
         },
         {
