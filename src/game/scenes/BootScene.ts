@@ -103,6 +103,7 @@ export class BootScene extends Phaser.Scene {
     // Load expression variants for dialogue portraits
     const expressions: Record<string, string[]> = {
       ashworth: ['annoyed', 'angry', 'shocked', 'suspicious'],
+      vivian: ['sad', 'warm', 'worried', 'happy'],
     };
     for (const [char, exprs] of Object.entries(expressions)) {
       for (const expr of exprs) {
