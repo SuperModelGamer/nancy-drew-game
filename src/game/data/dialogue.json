@@ -176,7 +176,7 @@
           "lines": [
             {
               "speaker": "Vivian",
-              "text": "I left a master key at the concierge desk — it opens most doors in the theater. There's also a magnifying glass. It belonged to my late husband. He was... he had sharp eyes. You'll need them. And Nancy — sois prudente. Be careful. The Monarch has kept its secrets for almost a century. It won't give them up easily.",
+              "text": "I left a master key at the concierge desk — it opens most doors in the theater. There's also a magnifying glass. It belonged to my late husband. He was... he had sharp eyes. You'll need them. And Nancy — sois prudente. Be careful. The Monarch has kept its secrets for over seventy years. It won't give them up easily.",
               "vo": "vo_vivian_end_01",
               "triggerEvent": "vivian_intro",
               "expression": "warm"
@@ -749,7 +749,7 @@
             },
             {
               "speaker": "Edwin",
-              "text": "But proving it after nearly a century? That's the challenge. If there's evidence, it's buried somewhere in this theater.",
+              "text": "But proving it after over seventy years? That's the challenge. If there's evidence, it's buried somewhere in this theater.",
               "vo": "vo_edwin_cecilia_02",
               "expression": "passionate"
             },
@@ -1140,7 +1140,7 @@
             },
             {
               "speaker": "Diego",
-              "text": "Holy — okay, this is like Chekhov's gun except it's Margaux's goblet. Someone knew. Someone wrote it down in code in the margins of the actual script. And that script has been sitting in a film canister up here for almost a century!"
+              "text": "Holy — okay, this is like Chekhov's gun except it's Margaux's goblet. Someone knew. Someone wrote it down in code in the margins of the actual script. And that script has been sitting in a film canister up here for over seventy years!"
             },
             {
               "speaker": "Nancy",
@@ -2693,12 +2693,12 @@
             },
             {
               "speaker": "Vivian",
-              "text": "Cecilia Drake. She — my godmother wrote the killer's initials on her mirror and nobody found them for a century. Mon Dieu. She was crying out for help and nobody heard her.",
+              "text": "Cecilia Drake. She — my godmother wrote the killer's initials on her mirror and nobody found them for seventy years. Mon Dieu. She was crying out for help and nobody heard her.",
               "expression": "sad"
             },
             {
               "speaker": "Nancy",
-              "text": "I heard her, Vivian. Almost a hundred years late, but I heard her."
+              "text": "I heard her, Vivian. Seventy years late, but I heard her."
             },
             {
               "speaker": "Vivian",
