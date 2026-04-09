@@ -27,6 +27,7 @@
           "height": 126,
           "label": "Ticket Booth",
           "type": "inspect",
+          "showWhen": "used_hotspot_lobby_magnifying_glass",
           "description": "The brass ticket booth — the glass is clouded with age, but I can make out a price card: 'Orchestra: $2.00 / Balcony: $0.75 / Standing: $0.25.' There's a stack of unsold tickets for the October 31st show inside. They never got to sell them. I wonder if people had already started staying away... if rumors about Margaux were circulating before that night."
         },
         {
@@ -73,6 +74,7 @@
           "height": 145,
           "label": "Chandelier",
           "type": "inspect",
+          "showWhen": "used_hotspot_lobby_magnifying_glass",
           "clueImage": "clue_lobby_chandelier",
           "description": "A massive crystal chandelier — most of the prisms are dark, but a few still catch the light and scatter tiny rainbows across the marble. Hold on. One of the chain links is shinier than the rest. That's a recent repair. Someone's been maintaining this chandelier. In a building that's supposed to be condemned? That doesn't add up."
         },
@@ -97,6 +99,7 @@
           "height": 152,
           "label": "Wall Painting",
           "type": "inspect",
+          "showWhen": "used_hotspot_lobby_magnifying_glass",
           "description": "A large painting of a city street — probably this neighborhood, decades ago. Cobblestones, gas lamps, horse-drawn carriages passing a row of theaters with bright marquees. The Monarch is right in the center, its facade gleaming and new. This must be from the 1920s, when the theater district was alive. A small brass plate at the bottom reads: 'Grand Avenue, 1926 — Commissioned by the Fontaine Estate.' The Fontaines built more than a theater. They built a whole world around it. And Ashworth wants to tear it all down."
         },
         {
@@ -107,6 +110,7 @@
           "height": 115,
           "label": "Faded Poster",
           "type": "inspect",
+          "showWhen": "used_hotspot_lobby_magnifying_glass",
           "description": "A half-torn touring poster: 'BLACKMOOR PLAYERS present: The Penvellyn Curse — A Tale of Alchemy and Shadows.' There's pencil at the bottom: 'Brilliant. Almost too real. —M.F.' Margaux's handwriting. A play about alchemy and poison. Given what happened to Margaux, 'almost too real' hits differently. Next to it, a smaller bill: 'Mystico the Magnificent — One Night Only!' with a cartoon magician in a top hat. Cute."
         },
         {
@@ -163,6 +167,7 @@
           "height": 81,
           "label": "Marble Floor",
           "type": "inspect",
+          "showWhen": "used_hotspot_lobby_magnifying_glass",
           "description": "Black and white marble checkerboard — gorgeous, even cracked. There's a worn path from the front doors to the auditorium, which makes sense. But there's a second path, fainter, heading toward a corridor marked 'STAFF ONLY.' The dust is scuffed. Someone's been using this route regularly, and recently. I should find out where it leads."
         },
         {
@@ -173,6 +178,7 @@
           "height": 30,
           "label": "Guest Ledger",
           "type": "inspect",
+          "showWhen": "used_hotspot_lobby_magnifying_glass",
           "description": "The guest ledger is open to recent entries. Mostly Ashworth's contractors — plumbers, electricians, structural engineers. But one entry appears over and over, going back fifteen years: 'E. Hale — Research.' Every single week. The handwriting never changes. That's not dedication, that's obsession. Flipping to an older page, I spot signatures from a 1990s gala — 'F. & J. Hardy, Bayport' and 'S. Joon — still looking!!!' with three exclamation marks. That name sounds familiar somehow."
         },
         {
@@ -195,6 +201,7 @@
           "height": 118,
           "label": "Wall Sconce",
           "type": "inspect",
+          "showWhen": "used_hotspot_lobby_magnifying_glass",
           "description": "An ornate wall sconce — brass, art deco style, shaped like a sunburst. One of the glass shades is missing. I reach up to touch it and the fixture shifts slightly. There's a gap in the wall behind it... a faint rectangular outline where a door used to be, plastered over. Someone sealed off a doorway. I wonder what's on the other side."
         },
         {
@@ -239,6 +246,7 @@
           "height": 81,
           "label": "Ceiling Stain",
           "type": "inspect",
+          "showWhen": "used_hotspot_lobby_magnifying_glass",
           "description": "A water stain spreading across the ceiling plaster. Most of the damage is old, but this one spot is fresh — and it's directly above where that sealed door used to be. That's not a coincidence. Something above this spot is active. Pipes? Or something else entirely?"
         }
       ]
