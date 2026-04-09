@@ -271,6 +271,25 @@ export class BootScene extends Phaser.Scene {
       'vo_nancy_choice_grandfather', 'vo_nancy_choice_props',
       'vo_nancy_choice_cecilia', 'vo_nancy_choice_diary_edwin', 'vo_nancy_choice_effects',
       'vo_nancy_choice_investigate_edwin',
+      // Ashworth office — Ashworth lines
+      'vo_ashworth_start_01', 'vo_ashworth_start_02', 'vo_ashworth_start_03',
+      'vo_ashworth_night_01', 'vo_ashworth_night_02', 'vo_ashworth_night_03', 'vo_ashworth_night_04',
+      'vo_ashworth_poison_01', 'vo_ashworth_poison_02', 'vo_ashworth_poison_03',
+      'vo_ashworth_insurance_01', 'vo_ashworth_insurance_02', 'vo_ashworth_insurance_03',
+      'vo_ashworth_blueprints_01', 'vo_ashworth_blueprints_02', 'vo_ashworth_blueprints_03',
+      'vo_ashworth_intruder_01', 'vo_ashworth_intruder_02', 'vo_ashworth_intruder_03', 'vo_ashworth_intruder_04',
+      'vo_ashworth_end_01', 'vo_ashworth_end_02',
+      // Ashworth office — Nancy lines
+      'vo_nancy_office_01',
+      'vo_nancy_night_01', 'vo_nancy_night_02',
+      'vo_nancy_poison_01', 'vo_nancy_poison_02',
+      'vo_nancy_insurance_01', 'vo_nancy_insurance_02',
+      'vo_nancy_blueprints_01',
+      'vo_nancy_intruder_01',
+      // Ashworth office — Nancy choice lines
+      'vo_nancy_choice_the_night', 'vo_nancy_choice_blueprints', 'vo_nancy_choice_intruder',
+      'vo_nancy_choice_insurance', 'vo_nancy_choice_poison', 'vo_nancy_choice_see_blueprints',
+      'vo_nancy_choice_examine', 'vo_nancy_choice_about_intruder', 'vo_nancy_choice_thank_ashworth',
     ];
     for (const key of voFiles) {
       this.load.audio(key, [`audio/vo/${key}.mp3`]);
