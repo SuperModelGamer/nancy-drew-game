@@ -235,7 +235,7 @@
           "label": "Office Door",
           "type": "navigate",
           "targetRoom": "managers_office",
-          "showWhen": "called_dad"
+          "showWhen": "answered_parents_call"
         },
         {
           "id": "lobby_water_stain",
