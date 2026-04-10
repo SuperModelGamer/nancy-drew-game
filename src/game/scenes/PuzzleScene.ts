@@ -60,6 +60,15 @@ export class PuzzleScene extends Phaser.Scene {
   private chemistryStep = 0;
   private chemistryCorrectSoFar = true;
 
+  // Sliding tile state
+  private tileGrid: number[] = [];
+  private tileSize = 0;
+  private tileContainers: Phaser.GameObjects.Container[] = [];
+  private gridSize = 5;
+  private emptyIndex = -1;
+  private moveCount = 0;
+  private moveCountText!: Phaser.GameObjects.Text;
+
   constructor() {
     super({ key: 'PuzzleScene' });
   }
@@ -87,6 +96,10 @@ export class PuzzleScene extends Phaser.Scene {
     this.mazePath = [];
     this.chemistryStep = 0;
     this.chemistryCorrectSoFar = true;
+    this.tileGrid = [];
+    this.tileContainers = [];
+    this.emptyIndex = -1;
+    this.moveCount = 0;
   }
 
   create(): void {
@@ -202,6 +215,9 @@ export class PuzzleScene extends Phaser.Scene {
         break;
       case 'chemistry':
         this.buildChemistryUI(panelW, panelH, puzzle);
+        break;
+      case 'sliding_tile':
+        this.buildSlidingTileUI(panelW, panelH, puzzle);
         break;
       case 'logic':
       case 'code':
@@ -1762,9 +1778,193 @@ export class PuzzleScene extends Phaser.Scene {
     return colors[option.toLowerCase()] || 0x3a3a5a;
   }
 
+  // ─── SLIDING TILE PUZZLE (5×5) ─────────────────────────────────────────
+
+  private buildSlidingTileUI(panelW: number, _panelH: number, puzzle: any): void {
+    const data = puzzle.interactiveData || {};
+    this.gridSize = data.gridSize || 5;
+    const n = this.gridSize;
+    const totalTiles = n * n;
+    this.tileSize = Math.min(Math.floor((panelW - 120) / n), 90);
+    const gridPx = this.tileSize * n;
+    const startX = -gridPx / 2;
+    const startY = -gridPx / 2 + 30;
+
+    // Gold color palette
+    const tileBg = 0x2a2218;
+    const tileBorder = 0xc9a84c;
+    const tileTextColor = '#c9a84c';
+
+    // The tile labels — numbers 1..(n*n-1) plus one empty slot
+    // For the image: divide a conceptual grid into numbered tiles
+    // Each tile shows a piece of the engraving hint
+    const tileLabels: string[] = data.tileLabels || [];
+    const useTileLabels = tileLabels.length === totalTiles - 1;
+
+    // Generate a solvable shuffled state
+    this.tileGrid = this.generateSolvableShuffle(totalTiles);
+    this.emptyIndex = this.tileGrid.indexOf(0);
+    this.moveCount = 0;
+
+    // Move counter
+    this.moveCountText = this.add.text(0, startY - 40, 'Moves: 0', {
+      fontFamily: FONT, fontSize: '18px', color: '#8a9aaa',
+    }).setOrigin(0.5);
+    this.panel.add(this.moveCountText);
+
+    // Build tile visuals
+    this.tileContainers = [];
+    for (let i = 0; i < totalTiles; i++) {
+      const val = this.tileGrid[i];
+      const col = i % n;
+      const row = Math.floor(i / n);
+      const tx = startX + col * this.tileSize + this.tileSize / 2;
+      const ty = startY + row * this.tileSize + this.tileSize / 2;
+
+      const container = this.add.container(tx, ty);
+
+      if (val === 0) {
+        // Empty slot — no visual
+        container.setData('value', 0);
+        container.setVisible(false);
+        this.tileContainers.push(container);
+        this.panel.add(container);
+        continue;
+      }
+
+      const bg = this.add.rectangle(0, 0, this.tileSize - 4, this.tileSize - 4, tileBg);
+      bg.setStrokeStyle(2, tileBorder, 0.8);
+      container.add(bg);
+
+      // Row/col where this tile SHOULD be in the solved state
+      const solvedRow = Math.floor((val - 1) / n);
+      const solvedCol = (val - 1) % n;
+      // Determine tint based on quadrant for visual variety
+      const quadTint = (solvedRow < n / 2 ? 0 : 1) + (solvedCol < n / 2 ? 0 : 2);
+      const tints = [0x2a2218, 0x1e2a18, 0x2a1e28, 0x18222a];
+      bg.setFillStyle(tints[quadTint]);
+
+      const label = useTileLabels ? tileLabels[val - 1] : String(val);
+      const text = this.add.text(0, 0, label, {
+        fontFamily: FONT,
+        fontSize: useTileLabels ? '13px' : '22px',
+        color: tileTextColor,
+        fontStyle: 'bold',
+        align: 'center',
+        wordWrap: { width: this.tileSize - 16 },
+      }).setOrigin(0.5);
+      container.add(text);
+
+      container.setData('value', val);
+      container.setSize(this.tileSize - 4, this.tileSize - 4);
+      container.setInteractive({ cursor: HAND_CURSOR });
+      container.on('pointerdown', () => this.handleTileClick(i));
+
+      this.tileContainers.push(container);
+      this.panel.add(container);
+    }
+  }
+
+  private handleTileClick(clickedIndex: number): void {
+    const n = this.gridSize;
+    const clickedRow = Math.floor(clickedIndex / n);
+    const clickedCol = clickedIndex % n;
+    const emptyRow = Math.floor(this.emptyIndex / n);
+    const emptyCol = this.emptyIndex % n;
+
+    // Must be adjacent (not diagonal)
+    const rowDiff = Math.abs(clickedRow - emptyRow);
+    const colDiff = Math.abs(clickedCol - emptyCol);
+    if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+      // Swap in data
+      this.tileGrid[this.emptyIndex] = this.tileGrid[clickedIndex];
+      this.tileGrid[clickedIndex] = 0;
+
+      // Animate the tile sliding to the empty position
+      const clickedTile = this.tileContainers[clickedIndex];
+      const emptyTile = this.tileContainers[this.emptyIndex];
+
+      // Swap container positions (animate the clicked one, snap the empty one)
+      const targetX = emptyTile.x;
+      const targetY = emptyTile.y;
+      emptyTile.setPosition(clickedTile.x, clickedTile.y);
+
+      this.tweens.add({
+        targets: clickedTile,
+        x: targetX, y: targetY,
+        duration: 120,
+        ease: 'Power2',
+      });
+
+      // Swap in container array
+      this.tileContainers[this.emptyIndex] = clickedTile;
+      this.tileContainers[clickedIndex] = emptyTile;
+      this.emptyIndex = clickedIndex;
+
+      this.moveCount++;
+      if (this.moveCountText) this.moveCountText.setText(`Moves: ${this.moveCount}`);
+
+      UISounds.click();
+
+      // Check if solved
+      if (this.isTilePuzzleSolved()) {
+        // Brief delay then solve
+        this.time.delayedCall(300, () => {
+          this.feedbackText.setColor('#c9a84c');
+          this.feedbackText.setText(`Solved in ${this.moveCount} moves! A hidden compartment clicks open...`);
+          this.time.delayedCall(1200, () => this.handleInteractiveSolved());
+        });
+      }
+    }
+  }
+
+  private isTilePuzzleSolved(): boolean {
+    const total = this.gridSize * this.gridSize;
+    for (let i = 0; i < total - 1; i++) {
+      if (this.tileGrid[i] !== i + 1) return false;
+    }
+    return this.tileGrid[total - 1] === 0;
+  }
+
+  /** Generate a solvable permutation using Fisher-Yates + parity check */
+  private generateSolvableShuffle(total: number): number[] {
+    const n = Math.sqrt(total);
+    let tiles: number[];
+    let solvable = false;
+    while (!solvable) {
+      tiles = Array.from({ length: total }, (_, i) => i); // 0 = empty
+      // Fisher-Yates shuffle
+      for (let i = total - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+      }
+      // Count inversions (ignoring the blank)
+      let inversions = 0;
+      for (let i = 0; i < total; i++) {
+        for (let j = i + 1; j < total; j++) {
+          if (tiles[i] && tiles[j] && tiles[i] > tiles[j]) inversions++;
+        }
+      }
+      const blankRow = Math.floor(tiles.indexOf(0) / n);
+      // For odd-size grids (5×5): solvable when inversions is even
+      if (n % 2 === 1) {
+        solvable = inversions % 2 === 0;
+      } else {
+        // For even-size grids: solvable when (inversions + blank row from bottom) is even
+        solvable = (inversions + (n - 1 - blankRow)) % 2 === 0;
+      }
+      // Make sure it's not already solved
+      if (solvable) {
+        const solved = tiles.every((v, i) => i < total - 1 ? v === i + 1 : v === 0);
+        if (solved) solvable = false;
+      }
+    }
+    return tiles!;
+  }
+
   /**
    * Called when an interactive puzzle type is solved via its own UI logic
-   * (mirror_reveal, cipher, lighting_board, film_assembly, symbol_match, maze, chemistry).
+   * (mirror_reveal, cipher, lighting_board, film_assembly, symbol_match, maze, chemistry, sliding_tile).
    */
   private handleInteractiveSolved(): void {
     const puzzleSystem = PuzzleSystem.getInstance();

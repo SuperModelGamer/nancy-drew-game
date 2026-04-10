@@ -3,20 +3,30 @@
     {
       "id": "trunk_puzzle",
       "name": "Margaux's Trunk",
-      "type": "combination",
-      "description": "An antique trunk with a three-dial combination lock. Each dial shows numbers 0–9. Something precious is locked inside. The combination is a date that mattered to Margaux more than any other.",
-      "answer": "10-31-28",
+      "type": "sliding_tile",
+      "description": "The trunk lid is a mosaic of 24 sliding tiles — an engraving broken apart. Slide the tiles to reconstruct the image. When complete, a hidden compartment will click open.",
+      "answer": "solved",
       "clues": [
-        "The 1928 playbill is dated October 31, 1928.",
-        "Margaux's diary: 'I will lock away what matters most before the final curtain on the 31st.'",
-        "Vivian: 'Margaux always used dates she could never forget — she called it her last Halloween.'"
+        "The image appears to show two hands reaching toward each other across a stage.",
+        "Look for the initials in the corner of the completed image — M.F. + J.H.",
+        "The border pattern flows from the edges inward — start with the corners."
       ],
       "unlocks": "margaux_locket",
       "hints": [
-        "The trunk was locked the night of the final performance.",
-        "Think about the date of The Crimson Veil's last show.",
-        "October is the 10th month. The show was on the 31st. The year was 1928."
-      ]
+        "Work the edges and corners first, like a jigsaw puzzle.",
+        "The top-left corner has the darkest shading — the stage curtain.",
+        "Focus on one row at a time. Get the top row in place, then the second, and so on."
+      ],
+      "interactiveData": {
+        "gridSize": 5,
+        "tileLabels": [
+          "🎭", "━", "━", "━", "🌹",
+          "│", "✋", "·", "·", "│",
+          "│", "·", "♥", "·", "│",
+          "│", "·", "·", "🤚", "│",
+          "M.F", "━", "+", "━", "J.H"
+        ]
+      }
     },
     {
       "id": "script_cipher",
