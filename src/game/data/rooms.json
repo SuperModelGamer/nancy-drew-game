@@ -271,7 +271,7 @@
           "key": "bg_auditorium_ghost_aftermath",
           "showWhen": "saw_ghost",
           "priority": 1,
-          "description": "The auditorium looks the same, but it doesn't feel the same. The ghost light flickers where it was steady before. There's a faint haze near the stage — residual fog? Or just my imagination working overtime. The scent of old roses lingers. I keep glancing at the spot where she vanished."
+          "description": "The auditorium looks the same, but it doesn't feel the same. The ghost light flickers where it was steady before. There's a faint haze near the stage — residual fog? Or just my imagination working overtime. The scent of jasmine lingers. I keep glancing at the spot where she vanished."
         },
         {
           "key": "bg_auditorium_lights_on",
@@ -501,7 +501,7 @@
     {
       "id": "backstage",
       "name": "The Monarch Theatre — Backstage",
-      "description": "Backstage is a maze of rigging ropes, costume racks, and stacked set pieces. It smells like sawdust and old paint. Somewhere in the shadows, something mechanical is humming — a low, steady pulse I can feel through the floorboards. A draft moves through here that shouldn't exist — the air shifts like someone just walked past me. I'm not alone back here.",
+      "description": "Backstage is a maze of rigging ropes, costume racks, and stacked set pieces. It smells like sawdust and old paint. Somewhere in the shadows, something mechanical is humming — a low, steady pulse I can feel through the floorboards. A woman with a clipboard and a no-nonsense expression is organizing props at a work table. That must be Stella Morrow — the stage manager Vivian mentioned.",
       "altBackgrounds": [
         {
           "key": "bg_backstage_fog_active",
@@ -702,18 +702,8 @@
           "label": "Stella's Lockbox",
           "type": "locked",
           "puzzleId": "lockbox_puzzle",
-          "showWhen": "learned_about_missing_props",
+          "showWhen": "day_2",
           "description": "A metal lockbox shoved under Stella's work station. Four rotating dials, each engraved with little theatrical symbols — masks, spotlights, curtains, roses, and more. She doesn't want anyone getting into this. I need to find the right combination of symbols. Knowing Stella, the answer is probably somewhere nearby."
-        },
-        {
-          "id": "bs_table_lamp",
-          "x": 1324,
-          "y": 662,
-          "width": 62,
-          "height": 134,
-          "label": "Table Lamp",
-          "type": "inspect",
-          "description": "A warm oil lamp sitting on the work table, casting a golden glow across the scattered papers and tools. Its flame flickers with every draft that moves through the backstage."
         },
         {
           "id": "bs_catwalk_ladder",
@@ -735,26 +725,26 @@
           "label": "To Dressing Room",
           "type": "navigate",
           "targetRoom": "dressing_room",
-          "showWhen": "stella_backstage"
+          "showWhen": "backstage_complete"
         }
       ]
     },
     {
       "id": "dressing_room",
       "name": "Margaux's Dressing Room",
-      "description": "Time stopped in this room in 1928. Margaux's vanity mirror is still surrounded by lightbulbs — half of them dead — reflecting dusty perfume bottles and a dried corsage. A velvet settee sits beneath moth-eaten costumes. It smells like old powder and roses. She never came back to clean up. She never came back at all. The lights flicker when I step inside — just once — and then hold steady. Probably the wiring. Probably.",
+      "description": "Time stopped in this room in 1928. Margaux's vanity mirror is still surrounded by lightbulbs — half of them dead — reflecting dusty perfume bottles and a dried corsage. A velvet settee sits beneath moth-eaten costumes. It smells like old powder and jasmine. She never came back to clean up. She never came back at all. The lights flicker when I step inside — just once — and then hold steady. Probably the wiring. Probably.",
       "altBackgrounds": [
         {
           "key": "bg_dressing_room_trunk_open",
           "showWhen": "margaux_locket",
           "priority": 1,
-          "description": "Margaux's trunk sits open now, the locket gone from its velvet cradle. The room feels lighter — like something that was waiting was finally released. The vanity mirror catches a reflection of the open trunk and for a moment, in the dusty glass, I swear I see someone standing behind me. When I turn, there's no one there. Just the scent of roses, stronger than before."
+          "description": "Margaux's trunk sits open now, the locket gone from its velvet cradle. The room feels lighter — like something that was waiting was finally released. The vanity mirror catches a reflection of the open trunk and for a moment, in the dusty glass, I swear I see someone standing behind me. When I turn, there's no one there. Just the scent of jasmine, stronger than before."
         },
         {
           "key": "bg_dressing_room_mirror_revealed",
           "showWhen": "margaux_accusation",
           "priority": 2,
-          "description": "The wax letters on the mirror are visible now — C.D. — shining in the vanity lights like an accusation that's waited nearly a century to be read. Margaux wrote her killer's initials on this mirror knowing she might not survive to say the name aloud. The room feels charged, electric. Someone's secret has been exposed."
+          "description": "The wax letters on the mirror are visible now — C.D. — shining in the vanity lights like an accusation that's waited over seventy years to be read. Margaux wrote her killer's initials on this mirror knowing she might not survive to say the name aloud. The room feels charged, electric. Someone's secret has been exposed."
         },
         {
           "key": "bg_dressing_room_passage_found",
@@ -772,7 +762,7 @@
           "height": 156,
           "label": "Margaux's Vanity",
           "type": "inspect",
-          "description": "Margaux's vanity. Her name is still painted on the mirror in faded gold letters. The lightbulbs around the frame are mostly dead, but two still glow, warm and amber. There are dried roses, an empty perfume bottle, and a hairbrush with dark strands still caught in the bristles. Almost a hundred years, and her hair is still here. It feels wrong to touch anything. But I have to."
+          "description": "Margaux's vanity. Her name is still painted on the mirror in faded gold letters. The lightbulbs around the frame are mostly dead, but two still glow, warm and amber. There are dried roses, an empty perfume bottle, and a hairbrush with dark strands still caught in the bristles. Over seventy years, and her hair is still here. It feels wrong to touch anything. But I have to."
         },
         {
           "id": "dr_vanity_mirror",
@@ -782,7 +772,7 @@
           "height": 366,
           "label": "Vanity Mirror",
           "type": "locked",
-          "description": "I hold the magnifying glass up to the mirror and tilt it in the light. There — barely visible — letters traced in wax on the glass surface. My hands are shaking a little. Margaux wrote this. Nearly a hundred years ago, she sat right where I'm standing and wrote: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.' She knew. She knew who was killing her, and nobody listened.",
+          "description": "I hold the magnifying glass up to the mirror and tilt it in the light. There — barely visible — letters traced in wax on the glass surface. My hands are shaking a little. Margaux wrote this. Over seventy years ago, she sat right where I'm standing and wrote: 'C.D. brings the tea. C.D. changed the goblet. C.D. will be the death of me.' She knew. She knew who was killing her, and nobody listened.",
           "requiredItem": "magnifying_glass",
           "puzzleId": "mirror_puzzle",
           "showWhen": "day_2"
@@ -1325,7 +1315,7 @@
           "height": 136,
           "label": "Pinned Notes",
           "type": "inspect",
-          "description": "A printed demolition timeline pinned to the wall. Day 1 — Final inspection. Day 2 — Utilities disconnected. Day 3 — Demolition begins, east wing. Today is circled: Day 1. Two days. That's all this theater has left. Two days to solve a century-old murder and a brand-new poisoning. No pressure, Drew.",
+          "description": "A printed demolition timeline pinned to the wall. Day 1 — Final inspection. Day 2 — Utilities disconnected. Day 3 — Demolition begins, east wing. Today is circled: Day 1. Two days. That's all this theater has left. Two days to solve a seventy-year-old murder and a brand-new poisoning. No pressure, Drew.",
           "hideWhen": "ashworth_motive_revealed"
         },
         {
@@ -1697,7 +1687,7 @@
           "height": 150,
           "label": "Stone Archway",
           "type": "inspect",
-          "description": "A section of the basement wall has been carefully dismantled — the mortar here is different from the rest, newer somehow. Someone noticed that inconsistency and pried it open. Inside the alcove: letters tied with ribbon, and a small vial with crystalline residue. The letters are correspondence with a pharmacist, dated October 1928. Someone bricked up the evidence of their own crime in this wall, probably thinking no one would ever look. It stayed hidden for almost a century — until someone studying this building noticed the mortar didn't match."
+          "description": "A section of the basement wall has been carefully dismantled — the mortar here is different from the rest, newer somehow. Someone noticed that inconsistency and pried it open. Inside the alcove: letters tied with ribbon, and a small vial with crystalline residue. The letters are correspondence with a pharmacist, dated October 1928. Someone bricked up the evidence of their own crime in this wall, probably thinking no one would ever look. It stayed hidden for over seventy years — until someone studying this building noticed the mortar didn't match."
         },
         {
           "id": "bm_cecilia_letter",
