@@ -313,7 +313,7 @@ export class BootScene extends Phaser.Scene {
       'vo_vivian_suspicion_01', 'vo_vivian_suspicion_02', 'vo_vivian_suspicion_03',
       'vo_vivian_mirror_01', 'vo_vivian_mirror_02', 'vo_vivian_mirror_03',
       'vo_vivian_post_ash_01', 'vo_vivian_post_ash_02', 'vo_vivian_post_ash_03', 'vo_vivian_post_ash_04',
-      'vo_vivian_done_01', 'vo_vivian_idle_01',
+      'vo_vivian_done_01', 'vo_vivian_done_02', 'vo_vivian_idle_01',
       // Nancy — Vivian scenes
       'vo_nancy_heard_her',
       'vo_nancy_diary_found', 'vo_nancy_diary_poisoned',
