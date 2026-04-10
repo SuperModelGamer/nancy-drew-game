@@ -825,6 +825,7 @@ export class UIScene extends Phaser.Scene {
         const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
         if (!isClueType) continue;
         if (hs.targetRoom) continue;
+        if ((hs as any).noClue) continue;
         if (!this.isHotspotAvailable(hs.showWhen)) continue;
         if (this.isHotspotHidden(hs.hideWhen)) continue;
         roomClueTotal++;
@@ -875,6 +876,7 @@ export class UIScene extends Phaser.Scene {
         const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
         if (!isClueType) continue;
         if (hs.targetRoom) continue;
+        if ((hs as any).noClue) continue;
         if (!this.isHotspotAvailable((hs as { showWhen?: string }).showWhen)) continue;
         if (this.isHotspotHidden(hs.hideWhen)) continue;
         totalClues++;
@@ -1431,7 +1433,7 @@ export class UIScene extends Phaser.Scene {
       const roomHotspots = currentRoom.hotspots.filter(
         (hs: { type: string; showWhen?: string; hideWhen?: string; targetRoom?: string }) => {
           const isClueType = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
-          return isClueType && !hs.targetRoom && this.isHotspotAvailable(hs.showWhen) && !this.isHotspotHidden(hs.hideWhen);
+          return isClueType && !hs.targetRoom && !(hs as any).noClue && this.isHotspotAvailable(hs.showWhen) && !this.isHotspotHidden(hs.hideWhen);
         }
       );
       const foundInRoom = roomHotspots.filter(
