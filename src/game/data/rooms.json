@@ -868,7 +868,7 @@
           "height": 111,
           "label": "Locked Trunk",
           "type": "locked",
-          "description": "An antique trunk with a combination lock. Three dials, each numbered 0–9. The trunk is engraved with Margaux's initials: M.F.",
+          "description": "An antique trunk with a mosaic lid — tiles of engraved brass arranged in a grid. The image is scrambled, but I can make out fragments: a hand reaching, a heart, what might be initials. This is a sliding tile puzzle. If I reconstruct the image, it might open. Margaux loved puzzles within puzzles.",
           "puzzleId": "trunk_puzzle",
           "showWhen": "day_2"
         },
