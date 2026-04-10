@@ -133,7 +133,8 @@
           "type": "talk",
           "dialogueId": "vivian_intro_revisit",
           "showWhen": "day_2",
-          "hideWhen": "vivian_full_trust"
+          "hideWhen": "vivian_full_trust",
+          "noClue": true
         },
         {
           "id": "lobby_vivian_done",
@@ -144,7 +145,8 @@
           "label": "Vivian Delacroix",
           "type": "talk",
           "dialogueId": "vivian_intro_done",
-          "showWhen": "vivian_full_trust"
+          "showWhen": "vivian_full_trust",
+          "noClue": true
         },
         {
           "id": "lobby_vivian_post_ashworth",
@@ -156,7 +158,8 @@
           "type": "talk",
           "dialogueId": "vivian_post_ashworth",
           "showWhen": "ashworth_office",
-          "hideWhen": "vivian_sent_upstairs"
+          "hideWhen": "vivian_sent_upstairs",
+          "noClue": true
         },
         {
           "id": "lobby_vivian_idle",
@@ -168,7 +171,8 @@
           "type": "talk",
           "dialogueId": "vivian_idle",
           "showWhen": "vivian_intro",
-          "hideWhen": "day_2"
+          "hideWhen": "day_2",
+          "noClue": true
         },
         {
           "id": "lobby_marble_floor",
@@ -236,7 +240,8 @@
           "label": "Lobby Phone",
           "type": "talk",
           "dialogueId": "phone_calls_done",
-          "showWhen": "called_ned"
+          "showWhen": "called_ned",
+          "noClue": true
         },
         {
           "id": "lobby_managers_door",
@@ -367,7 +372,8 @@
           "type": "talk",
           "dialogueId": "edwin_auditorium_revisit",
           "showWhen": "day_2",
-          "hideWhen": "edwin_personal_revealed"
+          "hideWhen": "edwin_personal_revealed",
+          "noClue": true
         },
         {
           "id": "aud_edwin_done",
@@ -378,7 +384,8 @@
           "label": "Edwin Hale",
           "type": "talk",
           "dialogueId": "edwin_auditorium_done",
-          "showWhen": "edwin_personal_revealed"
+          "showWhen": "edwin_personal_revealed",
+          "noClue": true
         },
         {
           "id": "aud_orchestra_pit",
@@ -398,7 +405,8 @@
           "height": 208,
           "label": "Balcony",
           "type": "inspect",
-          "description": "The upper balcony is lost in shadow. I can barely make out the silhouettes of empty seats up there. For a second I could swear I see someone sitting in the front row — a dark shape, perfectly still. I blink and it's gone. Just shadows. Probably. My heart is beating a little faster than I'd like to admit."
+          "description": "The upper balcony is lost in shadow. I can barely make out the silhouettes of empty seats up there. For a second I could swear I see someone sitting in the front row — a dark shape, perfectly still. I blink and it's gone. Just shadows. Probably. My heart is beating a little faster than I'd like to admit.",
+          "showWhen": "edwin_auditorium"
         },
         {
           "id": "aud_ceiling_mural",
@@ -428,7 +436,8 @@
           "height": 118,
           "label": "Stage Lights",
           "type": "inspect",
-          "description": "Old stage lights along the proscenium arch. A few are still glowing — just enough to cast long shadows across the empty seats. The warm light almost makes this place feel alive. Almost."
+          "description": "Old stage lights along the proscenium arch. A few are still glowing — just enough to cast long shadows across the empty seats. The warm light almost makes this place feel alive. Almost.",
+          "showWhen": "edwin_auditorium"
         },
         {
           "id": "aud_backstage_door",
@@ -560,7 +569,8 @@
           "type": "talk",
           "dialogueId": "stella_backstage_revisit",
           "showWhen": "day_2",
-          "hideWhen": "stella_confession"
+          "hideWhen": "stella_confession",
+          "noClue": true
         },
         {
           "id": "bs_stella_done",
@@ -572,7 +582,8 @@
           "type": "talk",
           "dialogueId": "stella_backstage_done",
           "showWhen": "stella_confession",
-          "hideWhen": "edwin_confronted"
+          "hideWhen": "edwin_confronted",
+          "noClue": true
         },
         {
           "id": "bs_stella_resolution",
@@ -584,7 +595,8 @@
           "type": "talk",
           "dialogueId": "stella_resolution",
           "showWhen": "edwin_confronted",
-          "hideWhen": "stella_resolved"
+          "hideWhen": "stella_resolved",
+          "noClue": true
         },
         {
           "id": "bs_notice_board",
@@ -1013,7 +1025,8 @@
           "type": "talk",
           "dialogueId": "diego_booth_revisit",
           "showWhen": "day_2",
-          "hideWhen": "cipher_discussed"
+          "hideWhen": "cipher_discussed",
+          "noClue": true
         },
         {
           "id": "pb_diego_done",
@@ -1024,7 +1037,8 @@
           "label": "Diego Reyes",
           "type": "talk",
           "dialogueId": "diego_booth_done",
-          "showWhen": "cipher_discussed"
+          "showWhen": "cipher_discussed",
+          "noClue": true
         },
         {
           "id": "pb_writing_desk",
@@ -1170,7 +1184,8 @@
           "type": "talk",
           "dialogueId": "ashworth_office_revisit",
           "showWhen": "day_2",
-          "hideWhen": "ashworth_motive_revealed"
+          "hideWhen": "ashworth_motive_revealed",
+          "noClue": true
         },
         {
           "id": "mo_ashworth_done",
@@ -1181,7 +1196,8 @@
           "label": "Roland Ashworth",
           "type": "talk",
           "dialogueId": "ashworth_office_done",
-          "showWhen": "ashworth_motive_revealed"
+          "showWhen": "ashworth_motive_revealed",
+          "noClue": true
         },
         {
           "id": "mo_blueprints",
@@ -1342,7 +1358,6 @@
           "targetRoom": "lobby",
           "hideWhen": "ashworth_motive_revealed"
         },
-
         {
           "id": "mo_snoop_laptop",
           "x": 1373,
@@ -1385,7 +1400,6 @@
           "setsFlag": "found_burner_phone",
           "onceOnly": true
         },
-
         {
           "id": "mo_alt_cot",
           "x": 480,

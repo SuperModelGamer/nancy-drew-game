@@ -40,6 +40,8 @@ interface Hotspot {
   onceOnly?: boolean;
   showWhen?: string;
   hideWhen?: string;
+  /** If true, this hotspot doesn't count toward clue totals or room completion. */
+  noClue?: boolean;
   setsFlag?: string;
   /** Texture key for a close-up image shown alongside the inspection description */
   clueImage?: string;
@@ -775,6 +777,7 @@ export class RoomScene extends Phaser.Scene {
       const isClue = hs.type === 'inspect' || hs.type === 'pickup' || hs.type === 'locked' || hs.type === 'talk';
       if (!isClue) continue;
       if (hs.targetRoom) continue;
+      if (hs.noClue) continue;
       // Respect showWhen / hideWhen gates
       if (hs.showWhen) {
         const flagSet = save.getFlag(hs.showWhen);
