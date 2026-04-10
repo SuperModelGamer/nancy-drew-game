@@ -4,7 +4,7 @@ import { SaveSystem } from './SaveSystem';
 interface PuzzleData {
   id: string;
   name: string;
-  type: 'code' | 'sequence' | 'combination' | 'logic' | 'mirror_reveal' | 'cipher' | 'lighting_board' | 'film_assembly' | 'symbol_match' | 'maze' | 'chemistry';
+  type: 'code' | 'sequence' | 'combination' | 'logic' | 'mirror_reveal' | 'cipher' | 'lighting_board' | 'film_assembly' | 'symbol_match' | 'maze' | 'chemistry' | 'sliding_tile';
   description: string;
   answer: string;
   clues: string[];
