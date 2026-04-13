@@ -1701,7 +1701,7 @@ export class UIScene extends Phaser.Scene {
       text: 'Find Margaux\u2019s diary', doneText: 'Found Margaux\u2019s diary' },
     { check: (s) => s.getChapter() < 2 ? 'hidden' : !s.getFlag('learned_about_cecilia') ? 'active' : 'done',
       text: 'Discover who C.D. is', doneText: 'Cecilia Drake \u2014 the understudy' },
-    { check: (s) => s.getChapter() < 2 ? 'hidden' : !s.getFlag('ashworth_office') ? 'active' : 'done',
+    { check: (s) => !s.getFlag('learned_about_ashworth') ? 'hidden' : !s.getFlag('ashworth_office') ? 'active' : 'done',
       text: 'Question Ashworth', doneText: 'Questioned Ashworth' },
     { check: (s) => s.getChapter() < 2 ? 'hidden' : !s.getFlag('basement_key_location') ? 'active' : 'done',
       text: 'Find the basement key', doneText: 'Stella revealed the key location' },
