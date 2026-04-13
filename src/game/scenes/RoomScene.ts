@@ -45,6 +45,8 @@ interface Hotspot {
   setsFlag?: string;
   /** Texture key for a close-up image shown alongside the inspection description */
   clueImage?: string;
+  /** Flag that must be set before a navigate hotspot allows room transition. Shows description as a hint until met. */
+  requiredFlag?: string;
 }
 
 interface AltBackground {
@@ -723,6 +725,11 @@ export class RoomScene extends Phaser.Scene {
 
       case 'navigate':
         if (hotspot.targetRoom) {
+          // Gate: if requiredFlag is set on this hotspot, block until condition is met
+          if (hotspot.requiredFlag && !SaveSystem.getInstance().getFlag(hotspot.requiredFlag)) {
+            this.showDescription(hotspot.description || 'I shouldn\'t leave yet — there\'s more to find here.');
+            break;
+          }
           // Clear equipped item when navigating
           if (selectedItem) {
             InventorySystem.getInstance().selectItem(null);
