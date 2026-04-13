@@ -938,24 +938,28 @@ export class UIScene extends Phaser.Scene {
 
   private static readonly QUEST_HINTS: { check: (s: SaveSystem, i: InventorySystem) => boolean; hint: string }[] = [
     // ── Chapter 1: Opening Night ──
+    // Phase 1: Essential setup (sequential)
     { check: (s) => s.getChapter() === 1 && !s.getFlag('vivian_intro'),
       hint: 'Talk to Vivian in the lobby. She called me here for a reason.' },
     { check: (s, i) => s.getChapter() === 1 && !!s.getFlag('vivian_intro') && !i.hasItem('magnifying_glass'),
       hint: 'Vivian left something at the concierge desk. I should pick it up.' },
     { check: (s) => s.getChapter() === 1 && !!s.getFlag('vivian_intro') && !s.getFlag('answered_parents_call') && !s.getFlag('used_hotspot_lobby_phone'),
       hint: 'The phone is ringing. I should answer it.' },
+    // Phase 2: Lobby exploration
     { check: (s) => s.getChapter() === 1 && !s.getFlag('lobby_complete'),
       hint: 'Explore the lobby. My magnifying glass might reveal things I\u2019d miss otherwise.' },
     { check: (s) => s.getChapter() === 1 && !!s.getFlag('lobby_complete') && !s.getFlag('ashworth_office'),
       hint: 'The manager\u2019s office is open. Time to question Ashworth about the poisoning.' },
-    { check: (s) => s.getChapter() === 1 && !!s.getFlag('ashworth_office') && !s.getFlag('vivian_sent_upstairs'),
-      hint: 'I should talk to Vivian. She\u2019ll know where to go next.' },
+    // Phase 3: Main investigation (parallel — Edwin, Stella, Crimson Veil)
     { check: (s) => s.getChapter() === 1 && !s.getFlag('edwin_auditorium'),
       hint: 'Head upstairs to the auditorium. Edwin Hale has been studying this theater for years.' },
-    { check: (s) => s.getChapter() === 1 && !s.getFlag('learned_about_crimson_veil'),
+    { check: (s) => s.getChapter() === 1 && !!s.getFlag('edwin_auditorium') && !s.getFlag('learned_about_crimson_veil'),
       hint: 'Ask Edwin about The Crimson Veil. That play is at the center of everything.' },
     { check: (s) => s.getChapter() === 1 && !s.getFlag('stella_backstage'),
       hint: 'Stella\u2019s backstage. She manages everything in this building.' },
+    // Phase 4: Optional follow-up (after main investigation hints)
+    { check: (s) => s.getChapter() === 1 && !!s.getFlag('ashworth_office') && !s.getFlag('vivian_sent_upstairs'),
+      hint: 'I could check in with Vivian \u2014 she\u2019ll want to hear what Ashworth said.' },
     { check: (s) => s.getChapter() === 1,
       hint: 'Explore every corner. This theater is full of secrets.' },
     // ── Phone calls — Day 2 (critical plot info) ──
@@ -1690,11 +1694,11 @@ export class UIScene extends Phaser.Scene {
       text: 'Talk to Vivian', doneText: 'Talked to Vivian' },
     { check: (s) => !s.getFlag('vivian_intro') ? 'hidden' : !s.getFlag('answered_parents_call') ? 'active' : 'done',
       text: 'Answer the phone', doneText: 'Spoke with Dad' },
-    { check: (s) => s.getChapter() < 1 ? 'hidden' : !s.getFlag('edwin_auditorium') ? 'active' : 'done',
+    { check: (s) => !s.getFlag('vivian_intro') ? 'hidden' : !s.getFlag('edwin_auditorium') ? 'active' : 'done',
       text: 'Find Edwin in the auditorium', doneText: 'Met Edwin Hale' },
     { check: (s) => !s.getFlag('edwin_auditorium') ? 'hidden' : !s.getFlag('learned_about_crimson_veil') ? 'active' : 'done',
       text: 'Ask about The Crimson Veil', doneText: 'Learned about The Crimson Veil' },
-    { check: (s) => s.getChapter() < 1 ? 'hidden' : !s.getFlag('stella_backstage') ? 'active' : 'done',
+    { check: (s) => !s.getFlag('vivian_intro') ? 'hidden' : !s.getFlag('stella_backstage') ? 'active' : 'done',
       text: 'Meet Stella backstage', doneText: 'Met Stella Morrow' },
     // Chapter 2
     { check: (s, i) => s.getChapter() < 2 ? 'hidden' : !i.hasItem('margaux_diary') ? 'active' : 'done',
