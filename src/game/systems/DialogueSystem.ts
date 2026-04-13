@@ -46,6 +46,7 @@ interface Dialogue {
 const EVENT_JOURNAL_ENTRIES: Record<string, string> = {
   learned_about_margaux: 'Vivian told me about Margaux Fontaine — a legendary actress who died on stage in 1928 from poison in a prop goblet. Vivian was her goddaughter.',
   learned_about_ashworth: 'Roland Ashworth collapsed last night — poisoned. He owns the Monarch and plans to demolish it for the insurance payout.',
+  ashworth_office: 'Met Ashworth in person. He\'s hostile, suspicious of everyone, and pointed the finger straight at Edwin Hale — says Hale has keys he shouldn\'t have and knows rooms that aren\'t on the blueprints. Ashworth wants me to "start with Hale."',
   learned_about_cecilia: 'Cecilia Drake was Margaux\'s understudy in 1928. She had the most to gain from Margaux\'s death and took the lead role after.',
   learned_about_hale_family: 'The Hale family has deep roots in the Monarch. Edwin Hale is the theater historian — he knows more about 1928 than anyone alive.',
   vivian_full_trust: 'Vivian trusts me fully now. She gave me access to the private archives and Margaux\'s personal effects.',
@@ -81,6 +82,7 @@ const EVENT_THINKING_HINTS: Record<string, string> = {
   vivian_intro: 'Thinking: Vivian mentioned Edwin in the auditorium and Stella backstage. I should talk to both of them — and check the concierge desk for that master key.',
   learned_about_margaux: 'Thinking: Margaux died from poison in a prop goblet during The Crimson Veil. I should ask Edwin about the play — he\'s the theater historian.',
   learned_about_ashworth: 'Thinking: Everyone has a motive to stop the demolition. I should talk to the others before confronting Ashworth.',
+  ashworth_office: 'Thinking: Ashworth is pointing me at Edwin Hale, but that feels too convenient. I should talk to Vivian again — she may have more to say now that I\'ve met Ashworth.',
   learned_about_crimson_veil: 'Thinking: The Crimson Veil\'s final act mirrors Margaux\'s death. Stella would know how the stage effects work — she manages everything backstage.',
   learned_about_cecilia: 'Thinking: Cecilia Drake was the understudy who took over after Margaux died. I should ask Edwin about her — he\'s researched the 1928 case for years.',
   learned_about_hale_family: 'Thinking: Edwin\'s grandfather was Margaux\'s lover. That\'s why he\'s so obsessed with this theater. I should confront Edwin about the Hale connection.',
